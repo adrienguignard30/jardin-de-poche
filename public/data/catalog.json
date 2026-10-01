@@ -1,0 +1,397 @@
+{
+ "version": 1,
+ "characters": [
+  {
+   "id": "lea",
+   "file": "models/char_lea.glb",
+   "name": {
+    "fr": "Léa",
+    "en": "Léa"
+   },
+   "tagline": {
+    "fr": "Balcon haussmannien, vue sur la tour Eiffel",
+    "en": "Haussmann balcony, Eiffel Tower view"
+   },
+   "view": "tour",
+   "universe": "woman",
+   "startSeeds": {
+    "fraise": 1,
+    "basilic": 1,
+    "menthe": 1
+   },
+   "age": 28,
+   "job": {
+    "fr": "Graphiste",
+    "en": "Graphic designer"
+   },
+   "story": {
+    "fr": "Son 22 m² sous les toits n'a pas de jardin. Alors elle en fait un sur le balcon.",
+    "en": "Her 22 m² under the roofs has no garden. So she makes one on the balcony."
+   },
+   "address": {
+    "fr": "Rue Oberkampf, Paris 11e, 5e étage sans ascenseur",
+    "en": "Rue Oberkampf, Paris 11th, 5th floor, no lift"
+   },
+   "likes": {
+    "fr": "Le basilic frais sur tout, les vinyles jazz, les cafés en terrasse, dessiner les toits depuis son balcon.",
+    "en": "Fresh basil on everything, jazz records, café terraces, drawing the roofs from her balcony."
+   },
+   "theme": {
+    "plaster": "#ece2cc",
+    "plasterDark": "#d3c3a6",
+    "tileA": "#c9c2b2",
+    "tileB": "#b7ae9d",
+    "rail": "#3a3d42",
+    "brass": "#caa24b",
+    "roof": true
+   },
+   "env": {
+    "apartment": "apartment_01_classic_paris",
+    "balcony": "balcony_01_classic",
+    "roof": true,
+    "room": true
+   }
+  },
+  {
+   "id": "marcel",
+   "file": "models/char_marcel.glb",
+   "name": {
+    "fr": "Marcel",
+    "en": "Marcel"
+   },
+   "tagline": {
+    "fr": "Cour d'immeuble, vue sur le pont Alexandre III",
+    "en": "Courtyard, Pont Alexandre III view"
+   },
+   "view": "pont",
+   "universe": "papi",
+   "startSeeds": {
+    "tomate": 1,
+    "basilic": 1,
+    "persil": 1
+   },
+   "age": 74,
+   "job": {
+    "fr": "Ancien cheminot",
+    "en": "Retired railwayman"
+   },
+   "story": {
+    "fr": "Il a toujours eu un potager. Aujourd'hui c'est une cour, et il s'en contente très bien.",
+    "en": "He always had a vegetable garden. Now it's a courtyard, and that suits him fine."
+   },
+   "address": {
+    "fr": "Rue de Belleville, Paris 20e, rez-de-cour",
+    "en": "Rue de Belleville, Paris 20th, courtyard level"
+   },
+   "likes": {
+    "fr": "Les tomates qui ont du goût, la radio le matin, les parties de belote, raconter la gare de l'Est.",
+    "en": "Tomatoes that taste like tomatoes, the morning radio, card games, stories from the old station."
+   },
+   "theme": {
+    "plaster": "#e3cfa6",
+    "plasterDark": "#c9ad7c",
+    "tileA": "#c47a55",
+    "tileB": "#b06a48",
+    "rail": "#5b4634",
+    "brass": "#8a6a3a",
+    "roof": true
+   },
+   "env": {
+    "apartment": "apartment_02_modern_brick",
+    "balcony": "balcony_02_modern",
+    "roof": true,
+    "room": true
+   }
+  },
+  {
+   "id": "jimy",
+   "file": "models/char_jimy.glb",
+   "name": {
+    "fr": "Jimy",
+    "en": "Jimy"
+   },
+   "tagline": {
+    "fr": "Toit-terrasse, vue sur l'Arc de Triomphe",
+    "en": "Rooftop terrace, Arc de Triomphe view"
+   },
+   "view": "arc",
+   "universe": "reggae",
+   "startSeeds": {
+    "concombre": 1,
+    "menthe": 1,
+    "mangue": 1
+   },
+   "age": 35,
+   "job": {
+    "fr": "DJ, sound system",
+    "en": "DJ, sound system"
+   },
+   "story": {
+    "fr": "Un toit-terrasse, des enceintes, et des plantes qui poussent au rythme du dub.",
+    "en": "A rooftop terrace, speakers, and plants growing to the rhythm of dub."
+   },
+   "address": {
+    "fr": "Rue Myrha, Paris 18e, sur le toit",
+    "en": "Rue Myrha, Paris 18th, on the roof"
+   },
+   "likes": {
+    "fr": "Le dub qui fait vibrer les pots, le piment dans tout, les couchers de soleil sur les toits, les soirées sur sa terrasse.",
+    "en": "Dub that makes the pots vibrate, chili in everything, sunsets over the roofs, evenings on his terrace."
+   },
+   "theme": {
+    "plaster": "#f2efe6",
+    "plasterDark": "#d9d3c4",
+    "tileA": "#a9865d",
+    "tileB": "#94734d",
+    "rail": "#2e5d3a",
+    "brass": "#e2b83a",
+    "roof": false,
+    "terrace": true
+   },
+   "env": {
+    "apartment": "apartment_04_rooftop",
+    "balcony": "balcony_04_rooftop",
+    "extra": "decor_rooftop_terrace",
+    "roof": false,
+    "room": false
+   }
+  }
+ ],
+ "views": {
+  "tour": {
+   "farDay": "fonds/fond_tour_far_day.png",
+   "farNight": "fonds/fond_tour_far_night.png",
+   "nearDay": "fonds/fond_toits_near_day.png",
+   "nearNight": "fonds/fond_toits_near_night.png"
+  },
+  "pont": {
+   "farDay": "fonds/fond_pont_far_day.png",
+   "farNight": "fonds/fond_pont_far_night.png",
+   "nearDay": "fonds/fond_toits_near_day.png",
+   "nearNight": "fonds/fond_toits_near_night.png"
+  },
+  "arc": {
+   "farDay": "fonds/fond_arc_far_day.png",
+   "farNight": "fonds/fond_arc_far_night.png",
+   "nearDay": "fonds/fond_toits_near_day.png",
+   "nearNight": "fonds/fond_toits_near_night.png"
+  }
+ },
+ "plants": [
+  {
+   "id": "basilic",
+   "name": {
+    "fr": "Basilic",
+    "en": "Basil"
+   },
+   "seed": 5,
+   "harvest": 12,
+   "grow": 40,
+   "yield": 4,
+   "harvests": 3,
+   "unlock": {
+    "earned": 0
+   }
+  },
+  {
+   "id": "menthe",
+   "name": {
+    "fr": "Menthe",
+    "en": "Mint"
+   },
+   "seed": 8,
+   "harvest": 20,
+   "grow": 60,
+   "yield": 4,
+   "harvests": 3,
+   "unlock": {
+    "earned": 0
+   }
+  },
+  {
+   "id": "fraise",
+   "name": {
+    "fr": "Fraise",
+    "en": "Strawberry"
+   },
+   "seed": 15,
+   "harvest": 40,
+   "grow": 90,
+   "yield": 5,
+   "harvests": 3,
+   "unlock": {
+    "earned": 0
+   }
+  },
+  {
+   "id": "piment",
+   "name": {
+    "fr": "Piment",
+    "en": "Chili"
+   },
+   "seed": 30,
+   "harvest": 80,
+   "grow": 120,
+   "yield": 3,
+   "harvests": 3,
+   "unlock": {
+    "earned": 100
+   }
+  },
+  {
+   "id": "tomate",
+   "name": {
+    "fr": "Tomate cerise",
+    "en": "Cherry tomato"
+   },
+   "seed": 50,
+   "harvest": 140,
+   "grow": 180,
+   "yield": 6,
+   "harvests": 3,
+   "unlock": {
+    "earned": 500
+   }
+  }
+ ],
+ "pots": {
+  "basePrice": 40,
+  "stepPrice": 20,
+  "max": 8,
+  "styles": [
+   {
+    "id": "terracotta",
+    "name": {
+     "fr": "Terre cuite",
+     "en": "Terracotta"
+    },
+    "extra": 0
+   },
+   {
+    "id": "wood",
+    "name": {
+     "fr": "Bac en bois",
+     "en": "Wooden planter"
+    },
+    "extra": 15
+   },
+   {
+    "id": "painted",
+    "name": {
+     "fr": "Pot peint",
+     "en": "Painted pot"
+    },
+    "extra": 20
+   },
+   {
+    "id": "metal",
+    "name": {
+     "fr": "Pot métal",
+     "en": "Metal pot"
+    },
+    "extra": 40
+   }
+  ]
+ },
+ "items": [
+  {
+   "id": "lantern",
+   "kind": "deco",
+   "object": "decor_lantern",
+   "price": 50,
+   "name": {
+    "fr": "Lanterne",
+    "en": "Lantern"
+   },
+   "desc": {
+    "fr": "S'allume la nuit.",
+    "en": "Lights up at night."
+   }
+  },
+  {
+   "id": "garland",
+   "kind": "deco",
+   "object": "decor_garland",
+   "price": 70,
+   "name": {
+    "fr": "Guirlande",
+    "en": "String lights"
+   },
+   "desc": {
+    "fr": "Onze ampoules chaudes.",
+    "en": "Eleven warm bulbs."
+   }
+  },
+  {
+   "id": "table",
+   "kind": "deco",
+   "object": "furniture_table_bistro",
+   "price": 90,
+   "name": {
+    "fr": "Table bistrot",
+    "en": "Bistro table"
+   },
+   "desc": {
+    "fr": "La lanterne se pose dessus.",
+    "en": "The lantern sits on it."
+   }
+  },
+  {
+   "id": "awning",
+   "kind": "deco",
+   "object": "decor_awning",
+   "price": 120,
+   "name": {
+    "fr": "Store banne",
+    "en": "Awning"
+   },
+   "desc": {
+    "fr": "Rayé rouge et crème.",
+    "en": "Red and cream stripes."
+   }
+  },
+  {
+   "id": "can_green",
+   "kind": "upgrade",
+   "object": "decor_watering_can_green",
+   "price": 80,
+   "name": {
+    "fr": "Arrosoir vert",
+    "en": "Green watering can"
+   },
+   "desc": {
+    "fr": "Arrose deux pots d'un coup.",
+    "en": "Waters two pots at once."
+   },
+   "effect": "water2"
+  },
+  {
+   "id": "roof",
+   "kind": "roof",
+   "object": null,
+   "price": 400,
+   "name": {
+    "fr": "Le toit",
+    "en": "The roof"
+   },
+   "desc": {
+    "fr": "Six plantes de plus, là-haut. Balcon plein requis.",
+    "en": "Six more plants, up there. Full balcony required."
+   }
+  }
+ ],
+ "start": {
+  "coins": 30,
+  "pots": 3,
+  "basket": 9999
+ },
+ "timing": {
+  "wetFraction": 0.45,
+  "wetMin": 30,
+  "wiltAfterDry": 60,
+  "regrowFraction": 0.6,
+  "autonomyMin": 4,
+  "autonomyMax": 9,
+  "dayLength": 600
+ }
+}

@@ -1,0 +1,26 @@
+﻿[
+    {
+        "fichier":  "planche-jour-01.png",
+        "nuit":  false
+    },
+    {
+        "fichier":  "planche-jour-02.png",
+        "nuit":  false
+    },
+    {
+        "fichier":  "planche-jour-03.png",
+        "nuit":  false
+    },
+    {
+        "fichier":  "planche-jour-04.png",
+        "nuit":  false
+    },
+    {
+        "fichier":  "planche-nuit-01.png",
+        "nuit":  true
+    },
+    {
+        "fichier":  "planche-nuit-02.png",
+        "nuit":  true
+    }
+]

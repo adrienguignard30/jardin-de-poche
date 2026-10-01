@@ -1,0 +1,1 @@
+Coques de telephone optionnelles : phone_lea.png, phone_marcel.png, phone_jimy.png (voir le chat pour les specs)

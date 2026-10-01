@@ -1,0 +1,942 @@
+{
+ "version": 2,
+ "characters": {
+  "jimy": {
+   "hauteur_repos": 1.702,
+   "echelle": 0.999,
+   "anims": {
+    "dance": {
+     "duree": 15.97,
+     "derive_max": 0.33,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0
+    },
+    "harvest": {
+     "duree": 6.2,
+     "derive_max": 0.04,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "gestes": {
+      "droite_bas": {
+       "t": 6.2,
+       "avant": 0.052,
+       "cote": 0.225,
+       "z": 0.938
+      },
+      "droite_loin": {
+       "t": 1.07,
+       "avant": 0.467,
+       "cote": -0.02,
+       "z": 1.269
+      },
+      "gauche_bas": {
+       "t": 5.7,
+       "avant": 0.092,
+       "cote": -0.309,
+       "z": 1.063
+      },
+      "gauche_loin": {
+       "t": 2.0,
+       "avant": 0.15,
+       "cote": -0.27,
+       "z": 1.074
+      }
+     }
+    },
+    "idle": {
+     "duree": 3.3,
+     "derive_max": 0.01,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0
+    },
+    "phone": {
+     "duree": 18.53,
+     "derive_max": 0.02,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0
+    },
+    "phone_walk": {
+     "duree": 42.23,
+     "derive_max": 3.48,
+     "derive_nette": 3.1,
+     "saut_boucle_cm": 309.7,
+     "vitesse_pied": 0.39
+    },
+    "pickup": {
+     "duree": 3.83,
+     "derive_max": 0.28,
+     "derive_nette": 0.01,
+     "saut_boucle_cm": 49.7,
+     "gestes": {
+      "droite_bas": {
+       "t": 2.03,
+       "avant": 0.141,
+       "cote": 0.253,
+       "z": 0.83
+      },
+      "droite_loin": {
+       "t": 1.53,
+       "avant": 0.288,
+       "cote": 0.237,
+       "z": 0.856
+      },
+      "gauche_bas": {
+       "t": 1.6,
+       "avant": 0.584,
+       "cote": -0.218,
+       "z": 0.176
+      },
+      "gauche_loin": {
+       "t": 1.73,
+       "avant": 0.592,
+       "cote": -0.2,
+       "z": 0.195
+      }
+     }
+    },
+    "plant": {
+     "duree": 7.57,
+     "derive_max": 0.14,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "gestes": {
+      "droite_bas": {
+       "t": 2.97,
+       "avant": 0.385,
+       "cote": 0.027,
+       "z": 0.016
+      },
+      "droite_loin": {
+       "t": 6.1,
+       "avant": 0.51,
+       "cote": 0.117,
+       "z": 0.159
+      },
+      "gauche_bas": {
+       "t": 2.9,
+       "avant": 0.177,
+       "cote": -0.229,
+       "z": 0.12
+      },
+      "gauche_loin": {
+       "t": 5.03,
+       "avant": 0.341,
+       "cote": -0.151,
+       "z": 0.156
+      }
+     }
+    },
+    "sit": {
+     "duree": 4.0,
+     "derive_max": 0.0,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.1,
+     "installe_a": 0.0,
+     "bassin_z": 0.55,
+     "bassin_avant": -0.198,
+     "cuisses_z": 0.501
+    },
+    "sleep": {
+     "duree": 6.87,
+     "derive_max": 0.0,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "installe_a": 0.0,
+     "bassin_z": 0.119,
+     "bassin_avant": 0.003,
+     "cuisses_z": 0.118,
+     "dos_z": 0.017
+    },
+    "walk": {
+     "duree": 0.97,
+     "derive_max": 0.06,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "vitesse_pied": 1.371
+    },
+    "walk_stop": {
+     "duree": 3.0,
+     "derive_max": 0.44,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 15.0,
+     "vitesse_pied": 0.344
+    },
+    "water": {
+     "duree": 5.6,
+     "derive_max": 0.13,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "gestes": {
+      "droite_bas": {
+       "t": 5.53,
+       "avant": 0.003,
+       "cote": 0.197,
+       "z": 0.944
+      },
+      "droite_loin": {
+       "t": 1.6,
+       "avant": 0.586,
+       "cote": -0.144,
+       "z": 1.031
+      },
+      "gauche_bas": {
+       "t": 4.77,
+       "avant": -0.009,
+       "cote": -0.363,
+       "z": 0.927
+      },
+      "gauche_loin": {
+       "t": 2.8,
+       "avant": 0.19,
+       "cote": -0.182,
+       "z": 1.026
+      }
+     }
+    }
+   },
+   "reglages": {
+    "vitesse": 1.165,
+    "walk_timescale": 0.85,
+    "gestes": {
+     "plant": {
+      "anim": "pickup",
+      "main": "gauche",
+      "debut": 0.2,
+      "fin": 2.7,
+      "effet": 1.6,
+      "distance": 0.584,
+      "cote": -0.218,
+      "main_z": 0.176,
+      "sur_le_pot": true
+     },
+     "harvest": {
+      "anim": "pickup",
+      "main": "gauche",
+      "debut": 0.2,
+      "fin": 2.7,
+      "effet": 1.6,
+      "distance": 0.584,
+      "cote": -0.218,
+      "main_z": 0.176,
+      "sur_le_pot": true
+     },
+     "water": {
+      "anim": "water",
+      "main": "droite",
+      "debut": 0.2,
+      "fin": 2.7,
+      "effet": 1.6,
+      "distance": 0.866,
+      "cote": -0.144,
+      "main_z": 1.031,
+      "sur_le_pot": true
+     }
+    },
+    "assis": {
+     "anim": "sit",
+     "installe_a": 0.0,
+     "bassin_z": 0.55,
+     "cuisses_z": 0.501,
+     "chaise_ok": true
+    },
+    "couche": {
+     "anim": "sleep",
+     "installe_a": 0.0,
+     "dos_z": 0.017
+    },
+    "sur_place": [
+     "phone_walk"
+    ]
+   },
+   "problemes": [],
+   "a_telecharger": []
+  },
+  "lea": {
+   "hauteur_repos": 1.717,
+   "echelle": 0.99,
+   "anims": {
+    "dance": {
+     "duree": 7.07,
+     "derive_max": 0.25,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0
+    },
+    "harvest": {
+     "duree": 6.2,
+     "derive_max": 0.04,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "gestes": {
+      "droite_bas": {
+       "t": 6.2,
+       "avant": 0.048,
+       "cote": 0.196,
+       "z": 0.96
+      },
+      "droite_loin": {
+       "t": 1.07,
+       "avant": 0.436,
+       "cote": -0.045,
+       "z": 1.3
+      },
+      "gauche_bas": {
+       "t": 5.7,
+       "avant": 0.094,
+       "cote": -0.281,
+       "z": 1.087
+      },
+      "gauche_loin": {
+       "t": 2.0,
+       "avant": 0.149,
+       "cote": -0.241,
+       "z": 1.095
+      }
+     }
+    },
+    "idle": {
+     "duree": 9.93,
+     "derive_max": 0.12,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0
+    },
+    "phone": {
+     "duree": 18.53,
+     "derive_max": 0.02,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0
+    },
+    "pickup": {
+     "duree": 3.83,
+     "derive_max": 0.28,
+     "derive_nette": 0.01,
+     "saut_boucle_cm": 50.5,
+     "gestes": {
+      "droite_bas": {
+       "t": 2.13,
+       "avant": 0.098,
+       "cote": 0.219,
+       "z": 0.88
+      },
+      "droite_loin": {
+       "t": 1.57,
+       "avant": 0.292,
+       "cote": 0.218,
+       "z": 0.932
+      },
+      "gauche_bas": {
+       "t": 1.6,
+       "avant": 0.595,
+       "cote": -0.2,
+       "z": 0.271
+      },
+      "gauche_loin": {
+       "t": 1.73,
+       "avant": 0.6,
+       "cote": -0.182,
+       "z": 0.288
+      }
+     }
+    },
+    "plant": {
+     "duree": 2.77,
+     "derive_max": 0.1,
+     "derive_nette": 0.01,
+     "saut_boucle_cm": 67.9,
+     "gestes": {
+      "droite_bas": {
+       "t": 2.5,
+       "avant": 0.091,
+       "cote": 0.177,
+       "z": 0.388
+      },
+      "droite_loin": {
+       "t": 2.77,
+       "avant": 0.097,
+       "cote": 0.188,
+       "z": 0.388
+      },
+      "gauche_bas": {
+       "t": 2.2,
+       "avant": 0.123,
+       "cote": -0.129,
+       "z": 0.506
+      },
+      "gauche_loin": {
+       "t": 1.3,
+       "avant": 0.192,
+       "cote": -0.188,
+       "z": 0.807
+      }
+     }
+    },
+    "sit": {
+     "duree": 2.1,
+     "derive_max": 0.01,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "installe_a": 0.0,
+     "bassin_z": 0.845,
+     "bassin_avant": -0.008,
+     "cuisses_z": 0.817
+    },
+    "sleep": {
+     "duree": 17.6,
+     "derive_max": 0.21,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "installe_a": 0.0,
+     "bassin_z": 0.142,
+     "bassin_avant": -0.071,
+     "cuisses_z": 0.142,
+     "dos_z": 0.004
+    },
+    "walk": {
+     "duree": 0.97,
+     "derive_max": 0.06,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "vitesse_pied": 1.554
+    },
+    "water": {
+     "duree": 5.6,
+     "derive_max": 0.14,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "gestes": {
+      "droite_bas": {
+       "t": 0.3,
+       "avant": 0.051,
+       "cote": 0.18,
+       "z": 0.963
+      },
+      "droite_loin": {
+       "t": 1.63,
+       "avant": 0.559,
+       "cote": -0.146,
+       "z": 1.059
+      },
+      "gauche_bas": {
+       "t": 4.8,
+       "avant": 0.004,
+       "cote": -0.341,
+       "z": 0.951
+      },
+      "gauche_loin": {
+       "t": 2.8,
+       "avant": 0.184,
+       "cote": -0.156,
+       "z": 1.044
+      }
+     }
+    }
+   },
+   "reglages": {
+    "vitesse": 1.321,
+    "walk_timescale": 0.85,
+    "gestes": {
+     "plant": {
+      "anim": "pickup",
+      "main": "gauche",
+      "debut": 0.2,
+      "fin": 2.7,
+      "effet": 1.6,
+      "distance": 0.595,
+      "cote": -0.2,
+      "main_z": 0.271,
+      "sur_le_pot": true
+     },
+     "harvest": {
+      "anim": "pickup",
+      "main": "gauche",
+      "debut": 0.2,
+      "fin": 2.7,
+      "effet": 1.6,
+      "distance": 0.595,
+      "cote": -0.2,
+      "main_z": 0.271,
+      "sur_le_pot": true
+     },
+     "water": {
+      "anim": "water",
+      "main": "droite",
+      "debut": 0.23,
+      "fin": 2.73,
+      "effet": 1.63,
+      "distance": 0.839,
+      "cote": -0.146,
+      "main_z": 1.059,
+      "sur_le_pot": true
+     }
+    },
+    "assis": {
+     "anim": "sit",
+     "installe_a": 0.0,
+     "bassin_z": 0.845,
+     "cuisses_z": 0.817,
+     "chaise_ok": false
+    },
+    "couche": {
+     "anim": "sleep",
+     "installe_a": 0.0,
+     "dos_z": 0.004
+    },
+    "sur_place": []
+   },
+   "problemes": [],
+   "a_telecharger": []
+  },
+  "marcel": {
+   "hauteur_repos": 1.696,
+   "echelle": 1.002,
+   "anims": {
+    "dance": {
+     "duree": 4.87,
+     "derive_max": 1.39,
+     "derive_nette": 1.1,
+     "saut_boucle_cm": 115.7
+    },
+    "harvest": {
+     "duree": 7.1,
+     "derive_max": 0.3,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "gestes": {
+      "droite_bas": {
+       "t": 4.4,
+       "avant": 0.072,
+       "cote": 0.371,
+       "z": 0.296
+      },
+      "droite_loin": {
+       "t": 1.57,
+       "avant": 0.229,
+       "cote": 0.104,
+       "z": 0.429
+      },
+      "gauche_bas": {
+       "t": 5.33,
+       "avant": -0.012,
+       "cote": -0.356,
+       "z": 0.712
+      },
+      "gauche_loin": {
+       "t": 6.23,
+       "avant": 0.099,
+       "cote": -0.429,
+       "z": 1.104
+      }
+     }
+    },
+    "idle": {
+     "duree": 9.93,
+     "derive_max": 0.12,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0
+    },
+    "phone": {
+     "duree": 37.23,
+     "derive_max": 0.23,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0
+    },
+    "pickup": {
+     "duree": 3.83,
+     "derive_max": 0.28,
+     "derive_nette": 0.01,
+     "saut_boucle_cm": 45.4,
+     "gestes": {
+      "droite_bas": {
+       "t": 1.7,
+       "avant": 0.367,
+       "cote": 0.343,
+       "z": 0.866
+      },
+      "droite_loin": {
+       "t": 1.57,
+       "avant": 0.39,
+       "cote": 0.34,
+       "z": 0.875
+      },
+      "gauche_bas": {
+       "t": 1.6,
+       "avant": 0.595,
+       "cote": -0.321,
+       "z": 0.254
+      },
+      "gauche_loin": {
+       "t": 1.73,
+       "avant": 0.607,
+       "cote": -0.308,
+       "z": 0.275
+      }
+     }
+    },
+    "plant": {
+     "duree": 10.8,
+     "derive_max": 0.27,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "gestes": {
+      "droite_bas": {
+       "t": 3.17,
+       "avant": -0.077,
+       "cote": 0.371,
+       "z": 0.647
+      },
+      "droite_loin": {
+       "t": 7.4,
+       "avant": 0.14,
+       "cote": 0.491,
+       "z": 0.963
+      },
+      "gauche_bas": {
+       "t": 5.97,
+       "avant": 0.172,
+       "cote": -0.326,
+       "z": 0.692
+      },
+      "gauche_loin": {
+       "t": 4.23,
+       "avant": 0.182,
+       "cote": -0.348,
+       "z": 0.738
+      }
+     }
+    },
+    "sit": {
+     "duree": 6.4,
+     "derive_max": 0.0,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "installe_a": 0.0,
+     "bassin_z": 0.562,
+     "bassin_avant": 0.0,
+     "cuisses_z": 0.511
+    },
+    "sleep": {
+     "duree": 1.7,
+     "derive_max": 0.0,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "installe_a": 0.0,
+     "bassin_z": 1.003,
+     "bassin_avant": -0.038,
+     "cuisses_z": 1.006,
+     "dos_z": 0.884
+    },
+    "sleep_2": {
+     "duree": 6.87,
+     "derive_max": 0.0,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "installe_a": 0.0,
+     "bassin_z": 0.144,
+     "bassin_avant": 0.016,
+     "cuisses_z": 0.144,
+     "dos_z": 0.043
+    },
+    "walk": {
+     "duree": 1.13,
+     "derive_max": 0.12,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "vitesse_pied": 1.279
+    },
+    "water": {
+     "duree": 5.6,
+     "derive_max": 0.13,
+     "derive_nette": 0.0,
+     "saut_boucle_cm": 0.0,
+     "gestes": {
+      "droite_bas": {
+       "t": 2.93,
+       "avant": 0.18,
+       "cote": 0.517,
+       "z": 1.024
+      },
+      "droite_loin": {
+       "t": 1.53,
+       "avant": 0.59,
+       "cote": -0.052,
+       "z": 1.119
+      },
+      "gauche_bas": {
+       "t": 4.77,
+       "avant": -0.037,
+       "cote": -0.481,
+       "z": 1.032
+      },
+      "gauche_loin": {
+       "t": 2.77,
+       "avant": 0.232,
+       "cote": -0.274,
+       "z": 1.16
+      }
+     }
+    }
+   },
+   "reglages": {
+    "vitesse": 1.087,
+    "walk_timescale": 0.85,
+    "gestes": {
+     "plant": {
+      "anim": "pickup",
+      "main": "gauche",
+      "debut": 0.2,
+      "fin": 2.7,
+      "effet": 1.6,
+      "distance": 0.595,
+      "cote": -0.321,
+      "main_z": 0.254,
+      "sur_le_pot": true
+     },
+     "harvest": {
+      "anim": "pickup",
+      "main": "gauche",
+      "debut": 0.2,
+      "fin": 2.7,
+      "effet": 1.6,
+      "distance": 0.595,
+      "cote": -0.321,
+      "main_z": 0.254,
+      "sur_le_pot": true
+     },
+     "water": {
+      "anim": "water",
+      "main": "droite",
+      "debut": 0.13,
+      "fin": 2.63,
+      "effet": 1.53,
+      "distance": 0.87,
+      "cote": -0.052,
+      "main_z": 1.119,
+      "sur_le_pot": true
+     }
+    },
+    "assis": {
+     "anim": "sit",
+     "installe_a": 0.0,
+     "bassin_z": 0.562,
+     "cuisses_z": 0.511,
+     "chaise_ok": true
+    },
+    "couche": {
+     "anim": "sleep_2",
+     "installe_a": 0.0,
+     "dos_z": 0.043
+    },
+    "sur_place": [
+     "dance"
+    ]
+   },
+   "problemes": [],
+   "a_telecharger": []
+  }
+ },
+ "maisons": {
+  "jimy": {
+   "meubles": {
+    "bookshelf": {
+     "haut": 0.057,
+     "larg": 0.63,
+     "prof": 0.11
+    },
+    "bed": {
+     "haut": 0.68,
+     "larg": 1.97,
+     "prof": 2.05,
+     "matelas_z": 0.51
+    }
+   },
+   "pots": [
+    {
+     "id": 0,
+     "x": -2.332,
+     "y": -1.351
+    },
+    {
+     "id": 1,
+     "x": -1.669,
+     "y": -1.351
+    },
+    {
+     "id": 2,
+     "x": -1.006,
+     "y": -1.351
+    },
+    {
+     "id": 3,
+     "x": -0.343,
+     "y": -1.351
+    },
+    {
+     "id": 4,
+     "x": 0.32,
+     "y": -1.351
+    },
+    {
+     "id": 5,
+     "x": 0.983,
+     "y": -1.351
+    },
+    {
+     "id": 6,
+     "x": 1.646,
+     "y": -1.351
+    },
+    {
+     "id": 7,
+     "x": 2.309,
+     "y": -1.351
+    }
+   ],
+   "ecart_min_entre_pots": 0.08,
+   "couloir_y": -0.524
+  },
+  "lea": {
+   "meubles": {
+    "bed": {
+     "haut": 0.675,
+     "larg": 2.74,
+     "prof": 2.25,
+     "matelas_z": 0.505
+    },
+    "bookshelf": {
+     "haut": 2.0,
+     "larg": 1.66,
+     "prof": 0.48
+    },
+    "floor_lamp": {
+     "haut": 0.08,
+     "larg": 0.66,
+     "prof": 0.4
+    },
+    "rug": {
+     "haut": 0.045,
+     "larg": 2.99,
+     "prof": 1.2
+    }
+   },
+   "pots": [
+    {
+     "id": 0,
+     "x": -2.273,
+     "y": -1.249
+    },
+    {
+     "id": 1,
+     "x": -1.61,
+     "y": -1.249
+    },
+    {
+     "id": 2,
+     "x": -0.947,
+     "y": -1.249
+    },
+    {
+     "id": 3,
+     "x": -0.284,
+     "y": -1.249
+    },
+    {
+     "id": 4,
+     "x": 0.379,
+     "y": -1.249
+    },
+    {
+     "id": 5,
+     "x": 1.042,
+     "y": -1.249
+    },
+    {
+     "id": 6,
+     "x": 1.705,
+     "y": -1.249
+    },
+    {
+     "id": 7,
+     "x": 2.368,
+     "y": -1.249
+    }
+   ],
+   "ecart_min_entre_pots": 0.08,
+   "couloir_y": -0.597
+  },
+  "marcel": {
+   "meubles": {
+    "floor_lamp": {
+     "haut": 0.08,
+     "larg": 0.62,
+     "prof": 0.4
+    },
+    "rug": {
+     "haut": 0.045,
+     "larg": 2.77,
+     "prof": 1.2
+    },
+    "armchair": {
+     "haut": 1.03,
+     "larg": 1.82,
+     "prof": 1.14,
+     "assise_z": 0.32
+    },
+    "bed": {
+     "haut": 0.675,
+     "larg": 2.74,
+     "prof": 2.05,
+     "matelas_z": 0.505
+    }
+   },
+   "pots": [
+    {
+     "id": 0,
+     "x": -2.184,
+     "y": -1.249
+    },
+    {
+     "id": 1,
+     "x": -1.521,
+     "y": -1.249
+    },
+    {
+     "id": 2,
+     "x": -0.858,
+     "y": -1.249
+    },
+    {
+     "id": 3,
+     "x": -0.195,
+     "y": -1.249
+    },
+    {
+     "id": 4,
+     "x": 0.468,
+     "y": -1.249
+    },
+    {
+     "id": 5,
+     "x": 1.131,
+     "y": -1.249
+    },
+    {
+     "id": 6,
+     "x": 1.794,
+     "y": -1.249
+    },
+    {
+     "id": 7,
+     "x": 2.457,
+     "y": -1.249
+    }
+   ],
+   "ecart_min_entre_pots": 0.08,
+   "couloir_y": -0.661
+  }
+ },
+ "objets": {
+  "pot_bord_z": 0.424,
+  "pot_diametre": 0.583,
+  "terre_z": 0.384,
+  "chaise_assise_z": 0.49
+ }
+}

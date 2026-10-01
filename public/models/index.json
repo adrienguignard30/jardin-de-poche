@@ -1,0 +1,462 @@
+{
+  "files": {
+    "pots.glb": {
+      "objects": [
+        "pot_metal_dry",
+        "pot_metal_wet",
+        "pot_painted_dry",
+        "pot_painted_wet",
+        "pot_roof_planter_dry",
+        "pot_terracotta_dry",
+        "pot_terracotta_wet",
+        "pot_wood_dry",
+        "pot_wood_wet"
+      ]
+    },
+    "plants.glb": {
+      "objects": [
+        "plant_aubergine_s2",
+        "plant_aubergine_s3",
+        "plant_aubergine_s3_wilt",
+        "plant_aubergine_s4",
+        "plant_aubergine_s4_wilt",
+        "plant_basilic_s2",
+        "plant_basilic_s3",
+        "plant_basilic_s3_wilt",
+        "plant_basilic_s4",
+        "plant_basilic_s4_wilt",
+        "plant_carotte_s2",
+        "plant_carotte_s3",
+        "plant_carotte_s3_wilt",
+        "plant_carotte_s4",
+        "plant_carotte_s4_wilt",
+        "plant_ciboulette_s2",
+        "plant_ciboulette_s3",
+        "plant_ciboulette_s3_wilt",
+        "plant_ciboulette_s4",
+        "plant_ciboulette_s4_wilt",
+        "plant_citronnier_s2",
+        "plant_citronnier_s3",
+        "plant_citronnier_s3_wilt",
+        "plant_citronnier_s4",
+        "plant_citronnier_s4_wilt",
+        "plant_common_s0",
+        "plant_common_s1",
+        "plant_courgette_s2",
+        "plant_courgette_s3",
+        "plant_courgette_s3_wilt",
+        "plant_courgette_s4",
+        "plant_courgette_s4_wilt",
+        "plant_fraise_s2",
+        "plant_fraise_s3",
+        "plant_fraise_s3_wilt",
+        "plant_fraise_s4",
+        "plant_fraise_s4_wilt",
+        "plant_haricot_s2",
+        "plant_haricot_s3",
+        "plant_haricot_s3_wilt",
+        "plant_haricot_s4",
+        "plant_haricot_s4_wilt",
+        "plant_lavande_s2",
+        "plant_lavande_s3",
+        "plant_lavande_s3_wilt",
+        "plant_lavande_s4",
+        "plant_lavande_s4_wilt",
+        "plant_menthe_s2",
+        "plant_menthe_s3",
+        "plant_menthe_s3_wilt",
+        "plant_menthe_s4",
+        "plant_piment_s2",
+        "plant_piment_s3",
+        "plant_piment_s3_wilt",
+        "plant_piment_s4",
+        "plant_piment_s4_wilt",
+        "plant_poivron_s2",
+        "plant_poivron_s3",
+        "plant_poivron_s3_wilt",
+        "plant_poivron_s4",
+        "plant_poivron_s4_wilt",
+        "plant_radis_s2",
+        "plant_radis_s3",
+        "plant_radis_s3_wilt",
+        "plant_radis_s4",
+        "plant_radis_s4_wilt",
+        "plant_salade_s2",
+        "plant_salade_s3",
+        "plant_salade_s3_wilt",
+        "plant_salade_s4",
+        "plant_salade_s4_wilt",
+        "plant_tomate_s2",
+        "plant_tomate_s3",
+        "plant_tomate_s3_wilt",
+        "plant_tomate_s4",
+        "plant_tomate_s4_wilt",
+        "plant_tournesol_s2",
+        "plant_tournesol_s3",
+        "plant_tournesol_s3_wilt",
+        "plant_tournesol_s4",
+        "plant_tournesol_s4_wilt"
+      ]
+    },
+    "seeds.glb": {
+      "objects": [
+        "seeds_aubergine",
+        "seeds_basilic",
+        "seeds_ciboulette",
+        "seeds_citronnier",
+        "seeds_courgette",
+        "seeds_fraise",
+        "seeds_haricot",
+        "seeds_lavande",
+        "seeds_menthe",
+        "seeds_piment",
+        "seeds_poivron",
+        "seeds_radis",
+        "seeds_salade",
+        "seeds_tomate",
+        "seeds_tournesol"
+      ]
+    },
+    "crops.glb": {
+      "objects": [
+        "crop_aubergine",
+        "crop_basilic",
+        "crop_carotte",
+        "crop_ciboulette",
+        "crop_citronnier",
+        "crop_courgette",
+        "crop_fraise",
+        "crop_haricot",
+        "crop_lavande",
+        "crop_menthe",
+        "crop_piment",
+        "crop_poivron",
+        "crop_radis",
+        "crop_salade",
+        "crop_tomate",
+        "crop_tournesol"
+      ]
+    },
+    "furniture.glb": {
+      "objects": [
+        "furniture_basket",
+        "furniture_chair_bistro",
+        "furniture_table_bistro"
+      ]
+    },
+    "decor.glb": {
+      "objects": [
+        "decor_awning",
+        "decor_building_below",
+        "decor_chimney.001",
+        "decor_dormer",
+        "decor_facade_window",
+        "decor_garland",
+        "decor_hatch_closed.001",
+        "decor_hatch_open.001",
+        "decor_ladder",
+        "decor_lantern",
+        "decor_railing_post",
+        "decor_railing_segment",
+        "decor_roof_zinc",
+        "decor_watering_can_green",
+        "decor_watering_can_zinc",
+        "prop_coin"
+      ]
+    },
+    "environments.glb": {
+      "objects": [
+        "apartment_01_classic_paris",
+        "apartment_02_modern_brick",
+        "apartment_03_art_deco",
+        "apartment_04_rooftop",
+        "balcony_01_classic",
+        "balcony_02_modern",
+        "balcony_03_art_deco",
+        "balcony_04_rooftop"
+      ],
+      "groups": {
+        "apartment_01_classic_paris": {
+          "size": [
+            8.383,
+            5.406,
+            4.97
+          ],
+          "front": -2.703,
+          "back": 2.703,
+          "children": 96
+        },
+        "apartment_02_modern_brick": {
+          "size": [
+            7.47,
+            6.83,
+            4.97
+          ],
+          "front": -3.415,
+          "back": 3.415,
+          "children": 82
+        },
+        "apartment_03_art_deco": {
+          "size": [
+            4.85,
+            3.659,
+            4.575
+          ],
+          "front": -1.83,
+          "back": 1.83,
+          "children": 61
+        },
+        "apartment_04_rooftop": {
+          "size": [
+            7.364,
+            6.58,
+            4.03
+          ],
+          "front": -3.29,
+          "back": 3.29,
+          "children": 194
+        },
+        "balcony_01_classic": {
+          "size": [
+            7.337,
+            1.69,
+            1.795
+          ],
+          "front": -0.845,
+          "back": 0.845,
+          "children": 34
+        },
+        "balcony_02_modern": {
+          "size": [
+            6.81,
+            1.69,
+            1.795
+          ],
+          "front": -0.845,
+          "back": 0.845,
+          "children": 30
+        },
+        "balcony_03_art_deco": {
+          "size": [
+            4.42,
+            1.69,
+            1.795
+          ],
+          "front": -0.845,
+          "back": 0.845,
+          "children": 26
+        },
+        "balcony_04_rooftop": {
+          "size": [
+            7.042,
+            2.16,
+            1.795
+          ],
+          "front": -1.08,
+          "back": 1.08,
+          "children": 47
+        }
+      }
+    },
+    "env_decor.glb": {
+      "objects": [
+        "decor_chimney",
+        "decor_hatch_closed",
+        "decor_hatch_open",
+        "decor_rooftop_terrace",
+        "decor_skylight"
+      ],
+      "groups": {
+        "decor_chimney": {
+          "size": [
+            0.82,
+            0.72,
+            1.91
+          ],
+          "front": -0.36,
+          "back": 0.36,
+          "children": 5
+        },
+        "decor_hatch_closed": {
+          "size": [
+            1.05,
+            0.9,
+            0.26
+          ],
+          "front": -0.45,
+          "back": 0.45,
+          "children": 3
+        },
+        "decor_hatch_open": {
+          "size": [
+            1.05,
+            0.978,
+            0.917
+          ],
+          "front": -0.489,
+          "back": 0.489,
+          "children": 3
+        },
+        "decor_rooftop_terrace": {
+          "size": [
+            8.74,
+            6.74,
+            4.08
+          ],
+          "front": -3.37,
+          "back": 3.37,
+          "children": 275
+        },
+        "decor_skylight": {
+          "size": [
+            1.25,
+            1.05,
+            0.32
+          ],
+          "front": -0.525,
+          "back": 0.525,
+          "children": 2
+        }
+      }
+    },
+    "interiors.glb": {
+      "objects": [
+        "furniture_armchair",
+        "furniture_bed",
+        "furniture_bookshelf",
+        "furniture_cabinet",
+        "furniture_chair",
+        "furniture_coffee_table",
+        "furniture_desk",
+        "furniture_dining_table",
+        "furniture_floor_lamp",
+        "furniture_fridge",
+        "furniture_rug",
+        "furniture_sofa"
+      ],
+      "groups": {
+        "furniture_armchair": {
+          "size": [
+            0.9,
+            0.76,
+            1.03
+          ],
+          "front": -0.38,
+          "back": 0.38,
+          "children": 4
+        },
+        "furniture_bed": {
+          "size": [
+            1.65,
+            2.05,
+            1.36
+          ],
+          "front": -1.025,
+          "back": 1.025,
+          "children": 6
+        },
+        "furniture_bookshelf": {
+          "size": [
+            1.0,
+            0.48,
+            2.0
+          ],
+          "front": -0.24,
+          "back": 0.24,
+          "children": 25
+        },
+        "furniture_cabinet": {
+          "size": [
+            1.2,
+            0.515,
+            1.3
+          ],
+          "front": -0.258,
+          "back": 0.257,
+          "children": 3
+        },
+        "furniture_chair": {
+          "size": [
+            0.48,
+            0.48,
+            1.28
+          ],
+          "front": -0.24,
+          "back": 0.24,
+          "children": 10
+        },
+        "furniture_coffee_table": {
+          "size": [
+            1.04,
+            1.04,
+            0.45
+          ],
+          "front": -0.52,
+          "back": 0.52,
+          "children": 2
+        },
+        "furniture_desk": {
+          "size": [
+            1.35,
+            0.62,
+            0.83
+          ],
+          "front": -0.31,
+          "back": 0.31,
+          "children": 6
+        },
+        "furniture_dining_table": {
+          "size": [
+            1.55,
+            0.86,
+            0.835
+          ],
+          "front": -0.43,
+          "back": 0.43,
+          "children": 5
+        },
+        "furniture_floor_lamp": {
+          "size": [
+            0.6,
+            0.6,
+            2.5
+          ],
+          "front": -0.3,
+          "back": 0.3,
+          "children": 3
+        },
+        "furniture_fridge": {
+          "size": [
+            0.72,
+            0.7,
+            1.8
+          ],
+          "front": -0.35,
+          "back": 0.35,
+          "children": 2
+        },
+        "furniture_rug": {
+          "size": [
+            1.8,
+            1.2,
+            0.045
+          ],
+          "front": -0.6,
+          "back": 0.6,
+          "children": 2
+        },
+        "furniture_sofa": {
+          "size": [
+            2.04,
+            0.8,
+            1.08
+          ],
+          "front": -0.4,
+          "back": 0.4,
+          "children": 6
+        }
+      }
+    }
+  },
+  "fonds": {}
+}

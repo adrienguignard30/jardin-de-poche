@@ -1,0 +1,2 @@
+Copie ici tout le contenu de Bureau\jardin-cadeaux\models :
+char_lea.glb, char_marcel.glb, char_jimy.glb, pots.glb, plants.glb, seeds.glb, crops.glb, furniture.glb, decor.glb, index.json

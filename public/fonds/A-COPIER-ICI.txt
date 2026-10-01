@@ -1,0 +1,2 @@
+Copie ici tout le contenu de Bureau\jardin-cadeaux\fonds :
+fond_tour_far_day.png, fond_tour_far_night.png, fond_pont_far_day.png, fond_pont_far_night.png, fond_arc_far_day.png, fond_arc_far_night.png, fond_toits_near_day.png, fond_toits_near_night.png

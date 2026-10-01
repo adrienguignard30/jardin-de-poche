@@ -1,0 +1,2474 @@
+[
+ {
+  "id": "fraises_au_basilic",
+  "accueil": true,
+  "type": "dessert",
+  "difficulte": 0,
+  "nom_fr": "Fraises au basilic",
+  "nom_en": "Strawberries with basil",
+  "ingredients": [
+   {
+    "graine": "fraise",
+    "quantite": 2
+   },
+   {
+    "graine": "basilic",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un dessert frais, fruité et lumineux avec une touche de miel.",
+  "phrase_en": "A fresh, fruity and bright dessert with a touch of honey.",
+  "amour_fr": "une pincée d'amour",
+  "amour_en": "a pinch of love",
+  "etapes_fr": [
+   "Prépare et coupe fraises, basilic.",
+   "Mélange délicatement avec un peu de miel ou de sucre.",
+   "Laisse reposer quelques minutes puis sers frais."
+  ],
+  "etapes_en": [
+   "Prepare and cut the strawberries, basil.",
+   "Toss gently with a little honey or sugar.",
+   "Rest for a few minutes, then serve chilled."
+  ]
+ },
+ {
+  "id": "fraises_a_la_menthe",
+  "accueil": true,
+  "type": "dessert",
+  "difficulte": 0,
+  "nom_fr": "Fraises à la menthe",
+  "nom_en": "Minted strawberries",
+  "ingredients": [
+   {
+    "graine": "fraise",
+    "quantite": 2
+   },
+   {
+    "graine": "menthe",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
+  "phrase_en": "Just a few minutes make this naturally delicious dessert.",
+  "amour_fr": "un soupçon d'amour",
+  "amour_en": "a hint of love",
+  "etapes_fr": [
+   "Prépare et coupe fraises, menthe.",
+   "Mélange délicatement avec un peu de miel ou de sucre.",
+   "Laisse reposer quelques minutes puis sers frais."
+  ],
+  "etapes_en": [
+   "Prepare and cut the strawberries, mint.",
+   "Toss gently with a little honey or sugar.",
+   "Rest for a few minutes, then serve chilled."
+  ]
+ },
+ {
+  "id": "tomates_au_basilic",
+  "accueil": true,
+  "type": "entree",
+  "difficulte": 0,
+  "nom_fr": "Tomates au basilic",
+  "nom_en": "Basil cherry tomatoes",
+  "ingredients": [
+   {
+    "graine": "tomate",
+    "quantite": 2
+   },
+   {
+    "graine": "basilic",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+  "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "amour_fr": "fait avec beaucoup d'amour",
+  "amour_en": "made with lots of love",
+  "etapes_fr": [
+   "Lave puis prépare tomates cerises, basilic.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the cherry tomatoes, basil.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "radis_ciboulette",
+  "accueil": true,
+  "type": "entree",
+  "difficulte": 0,
+  "nom_fr": "Radis à la ciboulette",
+  "nom_en": "Radishes with chives",
+  "ingredients": [
+   {
+    "graine": "radis",
+    "quantite": 2
+   },
+   {
+    "graine": "ciboulette",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
+  "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "amour_fr": "une larme d'amour",
+  "amour_en": "a drop of love",
+  "etapes_fr": [
+   "Lave puis prépare radis, ciboulette.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the radish, chives.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "carottes_coriandre",
+  "accueil": true,
+  "type": "entree",
+  "difficulte": 0,
+  "nom_fr": "Carottes à la coriandre",
+  "nom_en": "Carrots with coriander",
+  "ingredients": [
+   {
+    "graine": "carotte",
+    "quantite": 2
+   },
+   {
+    "graine": "coriandre",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+  "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "amour_fr": "un nuage d'amour",
+  "amour_en": "a cloud of love",
+  "etapes_fr": [
+   "Lave puis prépare carotte, coriandre.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the carrot, coriander.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "concombre_a_la_menthe",
+  "accueil": true,
+  "type": "entree",
+  "difficulte": 0,
+  "nom_fr": "Concombre à la menthe",
+  "nom_en": "Minted cucumber",
+  "ingredients": [
+   {
+    "graine": "concombre",
+    "quantite": 2
+   },
+   {
+    "graine": "menthe",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
+  "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "amour_fr": "une poignée de tendresse",
+  "amour_en": "a handful of tenderness",
+  "etapes_fr": [
+   "Lave puis prépare concombre, menthe.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the cucumber, mint.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "salade_croquante_du_balcon",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 1,
+  "nom_fr": "Salade croquante du balcon",
+  "nom_en": "Crunchy balcony salad",
+  "ingredients": [
+   {
+    "graine": "salade",
+    "quantite": 2
+   },
+   {
+    "graine": "radis",
+    "quantite": 1
+   },
+   {
+    "graine": "concombre",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+  "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "amour_fr": "un zeste de tendresse",
+  "amour_en": "a zest of tenderness",
+  "etapes_fr": [
+   "Lave puis prépare laitue, radis, concombre.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the lettuce, radish, cucumber.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "tomates_persil_oignon",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 1,
+  "nom_fr": "Tomates fraîches au persil",
+  "nom_en": "Fresh parsley tomatoes",
+  "ingredients": [
+   {
+    "graine": "tomate",
+    "quantite": 2
+   },
+   {
+    "graine": "persil",
+    "quantite": 1
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
+  "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "amour_fr": "un filet d'amour",
+  "amour_en": "a drizzle of love",
+  "etapes_fr": [
+   "Lave puis prépare tomates cerises, persil plat, oignon nouveau.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the cherry tomatoes, flat parsley, spring onion.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "rubans_courgette_citron",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 1,
+  "nom_fr": "Rubans de courgette citronnés",
+  "nom_en": "Lemony zucchini ribbons",
+  "ingredients": [
+   {
+    "graine": "courgette",
+    "quantite": 2
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   },
+   {
+    "graine": "basilic",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+  "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "amour_fr": "une cuillère de câlins",
+  "amour_en": "a spoonful of hugs",
+  "etapes_fr": [
+   "Lave puis prépare courgette, citron, basilic.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the zucchini, lemon, basil.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "poivron_coriandre_citron",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 1,
+  "nom_fr": "Poivron vif à la coriandre",
+  "nom_en": "Bright coriander pepper",
+  "ingredients": [
+   {
+    "graine": "poivron",
+    "quantite": 2
+   },
+   {
+    "graine": "coriandre",
+    "quantite": 1
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
+  "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "amour_fr": "un brin de douceur",
+  "amour_en": "a sprig of sweetness",
+  "etapes_fr": [
+   "Lave puis prépare poivron, coriandre, citron.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the bell pepper, coriander, lemon.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "epinards_radis_ciboulette",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 1,
+  "nom_fr": "Épinards aux radis",
+  "nom_en": "Spinach and radish salad",
+  "ingredients": [
+   {
+    "graine": "epinard",
+    "quantite": 2
+   },
+   {
+    "graine": "radis",
+    "quantite": 1
+   },
+   {
+    "graine": "ciboulette",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+  "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "amour_fr": "un grain de folie douce",
+  "amour_en": "a grain of sweet madness",
+  "etapes_fr": [
+   "Lave puis prépare épinards, radis, ciboulette.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the spinach, radish, chives.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "haricots_tomates_persil",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 1,
+  "nom_fr": "Haricots aux tomates",
+  "nom_en": "Green beans with tomatoes",
+  "ingredients": [
+   {
+    "graine": "haricot",
+    "quantite": 2
+   },
+   {
+    "graine": "tomate",
+    "quantite": 1
+   },
+   {
+    "graine": "persil",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
+  "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "amour_fr": "une caresse de soleil",
+  "amour_en": "a caress of sunshine",
+  "etapes_fr": [
+   "Lave puis prépare haricots verts, tomates cerises, persil plat.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the green beans, cherry tomatoes, flat parsley.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "carottes_menthe_citron",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 1,
+  "nom_fr": "Carottes fraîches à la menthe",
+  "nom_en": "Fresh minted carrots",
+  "ingredients": [
+   {
+    "graine": "carotte",
+    "quantite": 2
+   },
+   {
+    "graine": "menthe",
+    "quantite": 1
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+  "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "amour_fr": "un sourire en plus",
+  "amour_en": "one more smile",
+  "etapes_fr": [
+   "Lave puis prépare carotte, menthe, citron.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the carrot, mint, lemon.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "concombre_oignon_coriandre",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 1,
+  "nom_fr": "Concombre à la coriandre",
+  "nom_en": "Coriander cucumber",
+  "ingredients": [
+   {
+    "graine": "concombre",
+    "quantite": 2
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   },
+   {
+    "graine": "coriandre",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
+  "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "amour_fr": "une bonne dose d'amour",
+  "amour_en": "a good dose of love",
+  "etapes_fr": [
+   "Lave puis prépare concombre, oignon nouveau, coriandre.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the cucumber, spring onion, coriander.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "salade_peche_basilic",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 1,
+  "nom_fr": "Laitue pêche basilic",
+  "nom_en": "Peach basil lettuce",
+  "ingredients": [
+   {
+    "graine": "salade",
+    "quantite": 2
+   },
+   {
+    "graine": "peche",
+    "quantite": 1
+   },
+   {
+    "graine": "basilic",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+  "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "amour_fr": "un clin d'œil d'amour",
+  "amour_en": "a wink of love",
+  "etapes_fr": [
+   "Lave puis prépare laitue, pêche, basilic.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the lettuce, peach, basil.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "radis_persil_citron",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 1,
+  "nom_fr": "Radis citron persil",
+  "nom_en": "Lemony parsley radishes",
+  "ingredients": [
+   {
+    "graine": "radis",
+    "quantite": 2
+   },
+   {
+    "graine": "persil",
+    "quantite": 1
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
+  "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "amour_fr": "un peu de cœur",
+  "amour_en": "a little heart",
+  "etapes_fr": [
+   "Lave puis prépare radis, persil plat, citron.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the radish, flat parsley, lemon.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "tomate_poivron_ciboulette",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 1,
+  "nom_fr": "Tomates au poivron croquant",
+  "nom_en": "Tomatoes with crisp pepper",
+  "ingredients": [
+   {
+    "graine": "tomate",
+    "quantite": 2
+   },
+   {
+    "graine": "poivron",
+    "quantite": 1
+   },
+   {
+    "graine": "ciboulette",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+  "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "amour_fr": "tout son cœur",
+  "amour_en": "all your heart",
+  "etapes_fr": [
+   "Lave puis prépare tomates cerises, poivron, ciboulette.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the cherry tomatoes, bell pepper, chives.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "courgette_menthe_oignon",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 1,
+  "nom_fr": "Courgette fraîche à la menthe",
+  "nom_en": "Fresh minted zucchini",
+  "ingredients": [
+   {
+    "graine": "courgette",
+    "quantite": 2
+   },
+   {
+    "graine": "menthe",
+    "quantite": 1
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
+  "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "amour_fr": "un bisou du chef",
+  "amour_en": "a chef's kiss",
+  "etapes_fr": [
+   "Lave puis prépare courgette, menthe, oignon nouveau.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the zucchini, mint, spring onion.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "poelee_courgette_ail_thym",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 1,
+  "nom_fr": "Courgette dorée au thym",
+  "nom_en": "Golden thyme zucchini",
+  "ingredients": [
+   {
+    "graine": "courgette",
+    "quantite": 2
+   },
+   {
+    "graine": "ail",
+    "quantite": 1
+   },
+   {
+    "graine": "thym",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+  "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "amour_fr": "une touche de tendresse",
+  "amour_en": "a touch of tenderness",
+  "etapes_fr": [
+   "Prépare et coupe courgette, ail, thym.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the zucchini, garlic, thyme.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "haricots_ail_persil",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 1,
+  "nom_fr": "Haricots persillés à l'ail",
+  "nom_en": "Garlic parsley beans",
+  "ingredients": [
+   {
+    "graine": "haricot",
+    "quantite": 2
+   },
+   {
+    "graine": "ail",
+    "quantite": 1
+   },
+   {
+    "graine": "persil",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+  "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "amour_fr": "une pluie d'amour",
+  "amour_en": "a shower of love",
+  "etapes_fr": [
+   "Prépare et coupe haricots verts, ail, persil plat.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the green beans, garlic, flat parsley.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "poivron_tomate_oignon",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 1,
+  "nom_fr": "Poivron fondant aux tomates",
+  "nom_en": "Tender pepper and tomatoes",
+  "ingredients": [
+   {
+    "graine": "poivron",
+    "quantite": 2
+   },
+   {
+    "graine": "tomate",
+    "quantite": 1
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+  "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "amour_fr": "un murmure d'amour",
+  "amour_en": "a whisper of love",
+  "etapes_fr": [
+   "Prépare et coupe poivron, tomates cerises, oignon nouveau.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the bell pepper, cherry tomatoes, spring onion.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "epinards_ail_citron",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 1,
+  "nom_fr": "Épinards ail citron",
+  "nom_en": "Lemony garlic spinach",
+  "ingredients": [
+   {
+    "graine": "epinard",
+    "quantite": 2
+   },
+   {
+    "graine": "ail",
+    "quantite": 1
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+  "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "amour_fr": "une étincelle d'amour",
+  "amour_en": "a spark of love",
+  "etapes_fr": [
+   "Prépare et coupe épinards, ail, citron.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the spinach, garlic, lemon.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "carottes_thym_oignon",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 1,
+  "nom_fr": "Carottes rôties au thym",
+  "nom_en": "Thyme-roasted carrots",
+  "ingredients": [
+   {
+    "graine": "carotte",
+    "quantite": 2
+   },
+   {
+    "graine": "thym",
+    "quantite": 1
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+  "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "amour_fr": "un voile de douceur",
+  "amour_en": "a veil of sweetness",
+  "etapes_fr": [
+   "Prépare et coupe carotte, thym, oignon nouveau.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the carrot, thyme, spring onion.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "courgette_tomate_basilic",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 1,
+  "nom_fr": "Courgette tomate basilic",
+  "nom_en": "Zucchini tomato basil",
+  "ingredients": [
+   {
+    "graine": "courgette",
+    "quantite": 2
+   },
+   {
+    "graine": "tomate",
+    "quantite": 1
+   },
+   {
+    "graine": "basilic",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+  "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "amour_fr": "une bouffée de bonheur",
+  "amour_en": "a breath of happiness",
+  "etapes_fr": [
+   "Prépare et coupe courgette, tomates cerises, basilic.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the zucchini, cherry tomatoes, basil.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "haricots_poivron_coriandre",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 1,
+  "nom_fr": "Haricots au poivron",
+  "nom_en": "Green beans and pepper",
+  "ingredients": [
+   {
+    "graine": "haricot",
+    "quantite": 2
+   },
+   {
+    "graine": "poivron",
+    "quantite": 1
+   },
+   {
+    "graine": "coriandre",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+  "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "amour_fr": "une louche d'amour",
+  "amour_en": "a ladle of love",
+  "etapes_fr": [
+   "Prépare et coupe haricots verts, poivron, coriandre.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the green beans, bell pepper, coriander.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "epinards_oignon_ciboulette",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 1,
+  "nom_fr": "Épinards aux oignons nouveaux",
+  "nom_en": "Spinach with spring onions",
+  "ingredients": [
+   {
+    "graine": "epinard",
+    "quantite": 2
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   },
+   {
+    "graine": "ciboulette",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+  "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "amour_fr": "un rayon de tendresse",
+  "amour_en": "a ray of tenderness",
+  "etapes_fr": [
+   "Prépare et coupe épinards, oignon nouveau, ciboulette.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the spinach, spring onion, chives.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "carotte_courgette_persil",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 1,
+  "nom_fr": "Poêlée carotte courgette",
+  "nom_en": "Carrot zucchini skillet",
+  "ingredients": [
+   {
+    "graine": "carotte",
+    "quantite": 2
+   },
+   {
+    "graine": "courgette",
+    "quantite": 1
+   },
+   {
+    "graine": "persil",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+  "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "amour_fr": "un cœur tout entier",
+  "amour_en": "a whole heart",
+  "etapes_fr": [
+   "Prépare et coupe carotte, courgette, persil plat.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the carrot, zucchini, flat parsley.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "tomate_ail_thym",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 1,
+  "nom_fr": "Tomates confites minute",
+  "nom_en": "Quick thyme tomatoes",
+  "ingredients": [
+   {
+    "graine": "tomate",
+    "quantite": 2
+   },
+   {
+    "graine": "ail",
+    "quantite": 1
+   },
+   {
+    "graine": "thym",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+  "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "amour_fr": "une miette de magie",
+  "amour_en": "a crumb of magic",
+  "etapes_fr": [
+   "Prépare et coupe tomates cerises, ail, thym.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the cherry tomatoes, garlic, thyme.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "poivron_courgette_basilic",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 1,
+  "nom_fr": "Poêlée du soleil",
+  "nom_en": "Sunny vegetable skillet",
+  "ingredients": [
+   {
+    "graine": "poivron",
+    "quantite": 2
+   },
+   {
+    "graine": "courgette",
+    "quantite": 1
+   },
+   {
+    "graine": "basilic",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+  "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "amour_fr": "un souffle d'amour",
+  "amour_en": "a breath of love",
+  "etapes_fr": [
+   "Prépare et coupe poivron, courgette, basilic.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the bell pepper, zucchini, basil.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "haricot_carotte_thym",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 1,
+  "nom_fr": "Haricots carottes au thym",
+  "nom_en": "Thyme beans and carrots",
+  "ingredients": [
+   {
+    "graine": "haricot",
+    "quantite": 2
+   },
+   {
+    "graine": "carotte",
+    "quantite": 1
+   },
+   {
+    "graine": "thym",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+  "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "amour_fr": "une goutte de bonheur",
+  "amour_en": "a drop of happiness",
+  "etapes_fr": [
+   "Prépare et coupe haricots verts, carotte, thym.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the green beans, carrot, thyme.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "melon_fraise_menthe",
+  "accueil": false,
+  "type": "dessert",
+  "difficulte": 1,
+  "nom_fr": "Melon fraise menthe",
+  "nom_en": "Melon strawberry mint",
+  "ingredients": [
+   {
+    "graine": "melon",
+    "quantite": 2
+   },
+   {
+    "graine": "fraise",
+    "quantite": 1
+   },
+   {
+    "graine": "menthe",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un dessert frais, fruité et lumineux avec une touche de miel.",
+  "phrase_en": "A fresh, fruity and bright dessert with a touch of honey.",
+  "amour_fr": "un éclat de rire",
+  "amour_en": "a burst of laughter",
+  "etapes_fr": [
+   "Prépare et coupe melon, fraises, menthe.",
+   "Mélange délicatement avec un peu de miel ou de sucre.",
+   "Laisse reposer quelques minutes puis sers frais."
+  ],
+  "etapes_en": [
+   "Prepare and cut the melon, strawberries, mint.",
+   "Toss gently with a little honey or sugar.",
+   "Rest for a few minutes, then serve chilled."
+  ]
+ },
+ {
+  "id": "peche_framboise_basilic",
+  "accueil": false,
+  "type": "dessert",
+  "difficulte": 1,
+  "nom_fr": "Pêche framboise basilic",
+  "nom_en": "Peach raspberry basil",
+  "ingredients": [
+   {
+    "graine": "peche",
+    "quantite": 2
+   },
+   {
+    "graine": "framboise",
+    "quantite": 1
+   },
+   {
+    "graine": "basilic",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
+  "phrase_en": "Just a few minutes make this naturally delicious dessert.",
+  "amour_fr": "une caresse d'amour",
+  "amour_en": "a caress of love",
+  "etapes_fr": [
+   "Prépare et coupe pêche, framboises, basilic.",
+   "Mélange délicatement avec un peu de miel ou de sucre.",
+   "Laisse reposer quelques minutes puis sers frais."
+  ],
+  "etapes_en": [
+   "Prepare and cut the peach, raspberries, basil.",
+   "Toss gently with a little honey or sugar.",
+   "Rest for a few minutes, then serve chilled."
+  ]
+ },
+ {
+  "id": "mangue_citron_menthe",
+  "accueil": false,
+  "type": "dessert",
+  "difficulte": 1,
+  "nom_fr": "Mangue citron menthe",
+  "nom_en": "Mango lemon mint",
+  "ingredients": [
+   {
+    "graine": "mangue",
+    "quantite": 2
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   },
+   {
+    "graine": "menthe",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un dessert frais, fruité et lumineux avec une touche de miel.",
+  "phrase_en": "A fresh, fruity and bright dessert with a touch of honey.",
+  "amour_fr": "une tasse de tendresse",
+  "amour_en": "a cup of tenderness",
+  "etapes_fr": [
+   "Prépare et coupe mangue, citron, menthe.",
+   "Mélange délicatement avec un peu de miel ou de sucre.",
+   "Laisse reposer quelques minutes puis sers frais."
+  ],
+  "etapes_en": [
+   "Prepare and cut the mango, lemon, mint.",
+   "Toss gently with a little honey or sugar.",
+   "Rest for a few minutes, then serve chilled."
+  ]
+ },
+ {
+  "id": "ananas_basilic_citron",
+  "accueil": false,
+  "type": "dessert",
+  "difficulte": 1,
+  "nom_fr": "Ananas basilic citron",
+  "nom_en": "Pineapple basil lemon",
+  "ingredients": [
+   {
+    "graine": "ananas",
+    "quantite": 2
+   },
+   {
+    "graine": "basilic",
+    "quantite": 1
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
+  "phrase_en": "Just a few minutes make this naturally delicious dessert.",
+  "amour_fr": "un bouquet d'amour",
+  "amour_en": "a bouquet of love",
+  "etapes_fr": [
+   "Prépare et coupe ananas, basilic, citron.",
+   "Mélange délicatement avec un peu de miel ou de sucre.",
+   "Laisse reposer quelques minutes puis sers frais."
+  ],
+  "etapes_en": [
+   "Prepare and cut the pineapple, basil, lemon.",
+   "Toss gently with a little honey or sugar.",
+   "Rest for a few minutes, then serve chilled."
+  ]
+ },
+ {
+  "id": "papaye_framboise_menthe",
+  "accueil": false,
+  "type": "dessert",
+  "difficulte": 1,
+  "nom_fr": "Papaye framboise menthe",
+  "nom_en": "Papaya raspberry mint",
+  "ingredients": [
+   {
+    "graine": "papaye",
+    "quantite": 2
+   },
+   {
+    "graine": "framboise",
+    "quantite": 1
+   },
+   {
+    "graine": "menthe",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un dessert frais, fruité et lumineux avec une touche de miel.",
+  "phrase_en": "A fresh, fruity and bright dessert with a touch of honey.",
+  "amour_fr": "un fond de douceur",
+  "amour_en": "a hint of gentleness",
+  "etapes_fr": [
+   "Prépare et coupe papaye, framboises, menthe.",
+   "Mélange délicatement avec un peu de miel ou de sucre.",
+   "Laisse reposer quelques minutes puis sers frais."
+  ],
+  "etapes_en": [
+   "Prepare and cut the papaya, raspberries, mint.",
+   "Toss gently with a little honey or sugar.",
+   "Rest for a few minutes, then serve chilled."
+  ]
+ },
+ {
+  "id": "fraise_peche_citron",
+  "accueil": false,
+  "type": "dessert",
+  "difficulte": 1,
+  "nom_fr": "Fraise pêche citron",
+  "nom_en": "Strawberry peach lemon",
+  "ingredients": [
+   {
+    "graine": "fraise",
+    "quantite": 2
+   },
+   {
+    "graine": "peche",
+    "quantite": 1
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
+  "phrase_en": "Just a few minutes make this naturally delicious dessert.",
+  "amour_fr": "une vague d'amour",
+  "amour_en": "a wave of love",
+  "etapes_fr": [
+   "Prépare et coupe fraises, pêche, citron.",
+   "Mélange délicatement avec un peu de miel ou de sucre.",
+   "Laisse reposer quelques minutes puis sers frais."
+  ],
+  "etapes_en": [
+   "Prepare and cut the strawberries, peach, lemon.",
+   "Toss gently with a little honey or sugar.",
+   "Rest for a few minutes, then serve chilled."
+  ]
+ },
+ {
+  "id": "salade_jardin_citronnee",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 2,
+  "nom_fr": "Salade du jardin citronnée",
+  "nom_en": "Lemony garden salad",
+  "ingredients": [
+   {
+    "graine": "salade",
+    "quantite": 2
+   },
+   {
+    "graine": "concombre",
+    "quantite": 1
+   },
+   {
+    "graine": "radis",
+    "quantite": 1
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+  "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "amour_fr": "un grain d'amour",
+  "amour_en": "a grain of love",
+  "etapes_fr": [
+   "Lave puis prépare laitue, concombre, radis, citron.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the lettuce, cucumber, radish, lemon.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "tomates_fraiches_aux_herbes",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 2,
+  "nom_fr": "Tomates fraîches aux herbes",
+  "nom_en": "Herby cherry tomatoes",
+  "ingredients": [
+   {
+    "graine": "tomate",
+    "quantite": 2
+   },
+   {
+    "graine": "basilic",
+    "quantite": 1
+   },
+   {
+    "graine": "persil",
+    "quantite": 1
+   },
+   {
+    "graine": "ciboulette",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
+  "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "amour_fr": "une pointe de tendresse",
+  "amour_en": "a dash of tenderness",
+  "etapes_fr": [
+   "Lave puis prépare tomates cerises, basilic, persil plat, ciboulette.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the cherry tomatoes, basil, flat parsley, chives.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "carottes_poivron_coriandre",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 2,
+  "nom_fr": "Carottes poivron coriandre",
+  "nom_en": "Carrot pepper coriander",
+  "ingredients": [
+   {
+    "graine": "carotte",
+    "quantite": 2
+   },
+   {
+    "graine": "poivron",
+    "quantite": 1
+   },
+   {
+    "graine": "coriandre",
+    "quantite": 1
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+  "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "amour_fr": "un doigt de bonheur",
+  "amour_en": "a finger of happiness",
+  "etapes_fr": [
+   "Lave puis prépare carotte, poivron, coriandre, citron.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the carrot, bell pepper, coriander, lemon.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "haricots_radis_persil",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 2,
+  "nom_fr": "Haricots croquants aux radis",
+  "nom_en": "Crunchy bean radish salad",
+  "ingredients": [
+   {
+    "graine": "haricot",
+    "quantite": 2
+   },
+   {
+    "graine": "radis",
+    "quantite": 1
+   },
+   {
+    "graine": "persil",
+    "quantite": 1
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
+  "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "amour_fr": "une montagne d'amour",
+  "amour_en": "a mountain of love",
+  "etapes_fr": [
+   "Lave puis prépare haricots verts, radis, persil plat, oignon nouveau.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the green beans, radish, flat parsley, spring onion.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "courgette_concombre_menthe",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 2,
+  "nom_fr": "Duo vert à la menthe",
+  "nom_en": "Minted green duo",
+  "ingredients": [
+   {
+    "graine": "courgette",
+    "quantite": 2
+   },
+   {
+    "graine": "concombre",
+    "quantite": 1
+   },
+   {
+    "graine": "menthe",
+    "quantite": 1
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+  "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "amour_fr": "un pétale de tendresse",
+  "amour_en": "a petal of tenderness",
+  "etapes_fr": [
+   "Lave puis prépare courgette, concombre, menthe, citron.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the zucchini, cucumber, mint, lemon.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "epinards_fraise_basilic",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 2,
+  "nom_fr": "Épinards fraise basilic",
+  "nom_en": "Strawberry basil spinach",
+  "ingredients": [
+   {
+    "graine": "epinard",
+    "quantite": 2
+   },
+   {
+    "graine": "fraise",
+    "quantite": 1
+   },
+   {
+    "graine": "basilic",
+    "quantite": 1
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
+  "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "amour_fr": "une mesure d'amour",
+  "amour_en": "a measure of love",
+  "etapes_fr": [
+   "Lave puis prépare épinards, fraises, basilic, oignon nouveau.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the spinach, strawberries, basil, spring onion.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "salade_peche_radis",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 2,
+  "nom_fr": "Salade pêche radis",
+  "nom_en": "Peach radish salad",
+  "ingredients": [
+   {
+    "graine": "salade",
+    "quantite": 2
+   },
+   {
+    "graine": "peche",
+    "quantite": 1
+   },
+   {
+    "graine": "radis",
+    "quantite": 1
+   },
+   {
+    "graine": "ciboulette",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+  "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "amour_fr": "un chant d'amour",
+  "amour_en": "a love song",
+  "etapes_fr": [
+   "Lave puis prépare laitue, pêche, radis, ciboulette.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the lettuce, peach, radish, chives.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "tomate_concombre_coriandre",
+  "accueil": false,
+  "type": "entree",
+  "difficulte": 2,
+  "nom_fr": "Fraîcheur tomate concombre",
+  "nom_en": "Tomato cucumber freshness",
+  "ingredients": [
+   {
+    "graine": "tomate",
+    "quantite": 2
+   },
+   {
+    "graine": "concombre",
+    "quantite": 1
+   },
+   {
+    "graine": "coriandre",
+    "quantite": 1
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
+  "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "amour_fr": "une chanson douce",
+  "amour_en": "a soft song",
+  "etapes_fr": [
+   "Lave puis prépare tomates cerises, concombre, coriandre, oignon nouveau.",
+   "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
+   "Sers aussitôt pour garder tout le croquant."
+  ],
+  "etapes_en": [
+   "Wash and prepare the cherry tomatoes, cucumber, coriander, spring onion.",
+   "Toss with a drizzle of olive oil, salt and pepper.",
+   "Serve at once to keep everything crisp."
+  ]
+ },
+ {
+  "id": "ratatouille_du_balcon",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Ratatouille du balcon",
+  "nom_en": "Balcony ratatouille",
+  "ingredients": [
+   {
+    "graine": "tomate",
+    "quantite": 2
+   },
+   {
+    "graine": "courgette",
+    "quantite": 1
+   },
+   {
+    "graine": "poivron",
+    "quantite": 1
+   },
+   {
+    "graine": "ail",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+  "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "amour_fr": "un trait d'amour",
+  "amour_en": "a stroke of love",
+  "etapes_fr": [
+   "Prépare et coupe tomates cerises, courgette, poivron, ail.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the cherry tomatoes, zucchini, bell pepper, garlic.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "haricots_carottes_persilles",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Haricots carottes persillés",
+  "nom_en": "Parsley beans and carrots",
+  "ingredients": [
+   {
+    "graine": "haricot",
+    "quantite": 2
+   },
+   {
+    "graine": "carotte",
+    "quantite": 1
+   },
+   {
+    "graine": "persil",
+    "quantite": 1
+   },
+   {
+    "graine": "ail",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+  "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "amour_fr": "une ribambelle de bisous",
+  "amour_en": "a string of kisses",
+  "etapes_fr": [
+   "Prépare et coupe haricots verts, carotte, persil plat, ail.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the green beans, carrot, flat parsley, garlic.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "epinards_courgette_thym",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Épinards courgette thym",
+  "nom_en": "Spinach zucchini thyme",
+  "ingredients": [
+   {
+    "graine": "epinard",
+    "quantite": 2
+   },
+   {
+    "graine": "courgette",
+    "quantite": 1
+   },
+   {
+    "graine": "thym",
+    "quantite": 1
+   },
+   {
+    "graine": "ail",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+  "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "amour_fr": "un parfum d'amour",
+  "amour_en": "a scent of love",
+  "etapes_fr": [
+   "Prépare et coupe épinards, courgette, thym, ail.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the spinach, zucchini, thyme, garlic.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "poivrons_tomates_coriandre",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Poivrons fondants coriandre",
+  "nom_en": "Tender coriander peppers",
+  "ingredients": [
+   {
+    "graine": "poivron",
+    "quantite": 2
+   },
+   {
+    "graine": "tomate",
+    "quantite": 1
+   },
+   {
+    "graine": "coriandre",
+    "quantite": 1
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+  "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "amour_fr": "une étreinte",
+  "amour_en": "a hug",
+  "etapes_fr": [
+   "Prépare et coupe poivron, tomates cerises, coriandre, oignon nouveau.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the bell pepper, cherry tomatoes, coriander, spring onion.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "carottes_courgettes_thym",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Carottes courgettes au thym",
+  "nom_en": "Thyme carrots and zucchini",
+  "ingredients": [
+   {
+    "graine": "carotte",
+    "quantite": 2
+   },
+   {
+    "graine": "courgette",
+    "quantite": 1
+   },
+   {
+    "graine": "thym",
+    "quantite": 1
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+  "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "amour_fr": "un peu de patience et d'amour",
+  "amour_en": "a little patience and love",
+  "etapes_fr": [
+   "Prépare et coupe carotte, courgette, thym, oignon nouveau.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the carrot, zucchini, thyme, spring onion.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "haricots_tomates_basilic",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Haricots tomate basilic",
+  "nom_en": "Tomato basil beans",
+  "ingredients": [
+   {
+    "graine": "haricot",
+    "quantite": 2
+   },
+   {
+    "graine": "tomate",
+    "quantite": 1
+   },
+   {
+    "graine": "basilic",
+    "quantite": 1
+   },
+   {
+    "graine": "ail",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+  "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "amour_fr": "une pincée de bonne humeur",
+  "amour_en": "a pinch of good mood",
+  "etapes_fr": [
+   "Prépare et coupe haricots verts, tomates cerises, basilic, ail.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the green beans, cherry tomatoes, basil, garlic.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "epinards_poivron_ciboulette",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Épinards poivron ciboulette",
+  "nom_en": "Spinach pepper chives",
+  "ingredients": [
+   {
+    "graine": "epinard",
+    "quantite": 2
+   },
+   {
+    "graine": "poivron",
+    "quantite": 1
+   },
+   {
+    "graine": "ciboulette",
+    "quantite": 1
+   },
+   {
+    "graine": "ail",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+  "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "amour_fr": "un souvenir d'enfance",
+  "amour_en": "a childhood memory",
+  "etapes_fr": [
+   "Prépare et coupe épinards, poivron, ciboulette, ail.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the spinach, bell pepper, chives, garlic.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "courgette_oignon_persil",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Courgette persillée citron",
+  "nom_en": "Lemony parsley zucchini",
+  "ingredients": [
+   {
+    "graine": "courgette",
+    "quantite": 2
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   },
+   {
+    "graine": "persil",
+    "quantite": 1
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+  "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "amour_fr": "un cœur léger",
+  "amour_en": "a light heart",
+  "etapes_fr": [
+   "Prépare et coupe courgette, oignon nouveau, persil plat, citron.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the zucchini, spring onion, flat parsley, lemon.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "carotte_epinard_coriandre",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Carotte épinard coriandre",
+  "nom_en": "Carrot spinach coriander",
+  "ingredients": [
+   {
+    "graine": "carotte",
+    "quantite": 2
+   },
+   {
+    "graine": "epinard",
+    "quantite": 1
+   },
+   {
+    "graine": "coriandre",
+    "quantite": 1
+   },
+   {
+    "graine": "ail",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+  "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "amour_fr": "une note de tendresse",
+  "amour_en": "a note of tenderness",
+  "etapes_fr": [
+   "Prépare et coupe carotte, épinards, coriandre, ail.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the carrot, spinach, coriander, garlic.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "haricot_courgette_thym",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Haricot courgette thym",
+  "nom_en": "Green bean zucchini thyme",
+  "ingredients": [
+   {
+    "graine": "haricot",
+    "quantite": 2
+   },
+   {
+    "graine": "courgette",
+    "quantite": 1
+   },
+   {
+    "graine": "thym",
+    "quantite": 1
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+  "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "amour_fr": "un morceau de soleil",
+  "amour_en": "a piece of sunshine",
+  "etapes_fr": [
+   "Prépare et coupe haricots verts, courgette, thym, oignon nouveau.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the green beans, zucchini, thyme, spring onion.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "poivron_carotte_persil",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Poivron carotte persil",
+  "nom_en": "Pepper carrot parsley",
+  "ingredients": [
+   {
+    "graine": "poivron",
+    "quantite": 2
+   },
+   {
+    "graine": "carotte",
+    "quantite": 1
+   },
+   {
+    "graine": "persil",
+    "quantite": 1
+   },
+   {
+    "graine": "ail",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+  "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "amour_fr": "une brassée d'amour",
+  "amour_en": "an armful of love",
+  "etapes_fr": [
+   "Prépare et coupe poivron, carotte, persil plat, ail.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the bell pepper, carrot, flat parsley, garlic.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "tomate_epinard_ciboulette",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Tomate épinard ciboulette",
+  "nom_en": "Tomato spinach chives",
+  "ingredients": [
+   {
+    "graine": "tomate",
+    "quantite": 2
+   },
+   {
+    "graine": "epinard",
+    "quantite": 1
+   },
+   {
+    "graine": "ciboulette",
+    "quantite": 1
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+  "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "amour_fr": "un sourire de voisin",
+  "amour_en": "a neighbour's smile",
+  "etapes_fr": [
+   "Prépare et coupe tomates cerises, épinards, ciboulette, oignon nouveau.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the cherry tomatoes, spinach, chives, spring onion.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "courgette_poivron_thym",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Courgette poivron thym",
+  "nom_en": "Zucchini pepper thyme",
+  "ingredients": [
+   {
+    "graine": "courgette",
+    "quantite": 2
+   },
+   {
+    "graine": "poivron",
+    "quantite": 1
+   },
+   {
+    "graine": "thym",
+    "quantite": 1
+   },
+   {
+    "graine": "ail",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+  "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "amour_fr": "une pensée pour l'autre",
+  "amour_en": "a thought for the other",
+  "etapes_fr": [
+   "Prépare et coupe courgette, poivron, thym, ail.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the zucchini, bell pepper, thyme, garlic.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "haricots_epinards_citron",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Haricots épinards citron",
+  "nom_en": "Lemon beans and spinach",
+  "ingredients": [
+   {
+    "graine": "haricot",
+    "quantite": 2
+   },
+   {
+    "graine": "epinard",
+    "quantite": 1
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   },
+   {
+    "graine": "persil",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+  "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "amour_fr": "le temps qu'il faut, et de l'amour",
+  "amour_en": "the time it takes, and love",
+  "etapes_fr": [
+   "Prépare et coupe haricots verts, épinards, citron, persil plat.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the green beans, spinach, lemon, flat parsley.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "carottes_tomates_ciboulette",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Carottes tomates ciboulette",
+  "nom_en": "Carrot tomato chives",
+  "ingredients": [
+   {
+    "graine": "carotte",
+    "quantite": 2
+   },
+   {
+    "graine": "tomate",
+    "quantite": 1
+   },
+   {
+    "graine": "ciboulette",
+    "quantite": 1
+   },
+   {
+    "graine": "ail",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+  "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "amour_fr": "une cuillerée de joie",
+  "amour_en": "a spoonful of joy",
+  "etapes_fr": [
+   "Prépare et coupe carotte, tomates cerises, ciboulette, ail.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the carrot, cherry tomatoes, chives, garlic.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "poelee_quatre_du_jardin",
+  "accueil": false,
+  "type": "plat",
+  "difficulte": 2,
+  "nom_fr": "Poêlée quatre du jardin",
+  "nom_en": "Four-garden skillet",
+  "ingredients": [
+   {
+    "graine": "courgette",
+    "quantite": 2
+   },
+   {
+    "graine": "haricot",
+    "quantite": 1
+   },
+   {
+    "graine": "poivron",
+    "quantite": 1
+   },
+   {
+    "graine": "oignon",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+  "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "amour_fr": "un ciel bleu dans l'assiette",
+  "amour_en": "a blue sky on the plate",
+  "etapes_fr": [
+   "Prépare et coupe courgette, haricots verts, poivron, oignon nouveau.",
+   "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
+   "Mélange jusqu'à ce que les légumes soient tendres."
+  ],
+  "etapes_en": [
+   "Prepare and cut the zucchini, green beans, bell pepper, spring onion.",
+   "Cook gently with a drizzle of olive oil, salt and pepper.",
+   "Stir until the vegetables are tender."
+  ]
+ },
+ {
+  "id": "salade_tropicale_menthee",
+  "accueil": false,
+  "type": "dessert",
+  "difficulte": 2,
+  "nom_fr": "Salade tropicale menthée",
+  "nom_en": "Minted tropical salad",
+  "ingredients": [
+   {
+    "graine": "mangue",
+    "quantite": 2
+   },
+   {
+    "graine": "ananas",
+    "quantite": 1
+   },
+   {
+    "graine": "papaye",
+    "quantite": 1
+   },
+   {
+    "graine": "menthe",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un dessert frais, fruité et lumineux avec une touche de miel.",
+  "phrase_en": "A fresh, fruity and bright dessert with a touch of honey.",
+  "amour_fr": "une rafale de tendresse",
+  "amour_en": "a gust of tenderness",
+  "etapes_fr": [
+   "Prépare et coupe mangue, ananas, papaye, menthe.",
+   "Mélange délicatement avec un peu de miel ou de sucre.",
+   "Laisse reposer quelques minutes puis sers frais."
+  ],
+  "etapes_en": [
+   "Prepare and cut the mango, pineapple, papaya, mint.",
+   "Toss gently with a little honey or sugar.",
+   "Rest for a few minutes, then serve chilled."
+  ]
+ },
+ {
+  "id": "papaye_mangue_citron",
+  "accueil": false,
+  "type": "dessert",
+  "difficulte": 2,
+  "nom_fr": "Papaye mangue citron",
+  "nom_en": "Papaya mango lemon",
+  "ingredients": [
+   {
+    "graine": "papaye",
+    "quantite": 2
+   },
+   {
+    "graine": "mangue",
+    "quantite": 1
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   },
+   {
+    "graine": "basilic",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
+  "phrase_en": "Just a few minutes make this naturally delicious dessert.",
+  "amour_fr": "un coin de paradis",
+  "amour_en": "a corner of paradise",
+  "etapes_fr": [
+   "Prépare et coupe papaye, mangue, citron, basilic.",
+   "Mélange délicatement avec un peu de miel ou de sucre.",
+   "Laisse reposer quelques minutes puis sers frais."
+  ],
+  "etapes_en": [
+   "Prepare and cut the papaya, mango, lemon, basil.",
+   "Toss gently with a little honey or sugar.",
+   "Rest for a few minutes, then serve chilled."
+  ]
+ },
+ {
+  "id": "ananas_fraise_menthe",
+  "accueil": false,
+  "type": "dessert",
+  "difficulte": 2,
+  "nom_fr": "Ananas fraise menthe",
+  "nom_en": "Pineapple strawberry mint",
+  "ingredients": [
+   {
+    "graine": "ananas",
+    "quantite": 2
+   },
+   {
+    "graine": "fraise",
+    "quantite": 1
+   },
+   {
+    "graine": "menthe",
+    "quantite": 1
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un dessert frais, fruité et lumineux avec une touche de miel.",
+  "phrase_en": "A fresh, fruity and bright dessert with a touch of honey.",
+  "amour_fr": "un nuage de bonheur",
+  "amour_en": "a cloud of happiness",
+  "etapes_fr": [
+   "Prépare et coupe ananas, fraises, menthe, citron.",
+   "Mélange délicatement avec un peu de miel ou de sucre.",
+   "Laisse reposer quelques minutes puis sers frais."
+  ],
+  "etapes_en": [
+   "Prepare and cut the pineapple, strawberries, mint, lemon.",
+   "Toss gently with a little honey or sugar.",
+   "Rest for a few minutes, then serve chilled."
+  ]
+ },
+ {
+  "id": "melon_peche_framboise",
+  "accueil": false,
+  "type": "dessert",
+  "difficulte": 2,
+  "nom_fr": "Papaye pêche framboise",
+  "nom_en": "Papaya peach raspberry",
+  "ingredients": [
+   {
+    "graine": "papaye",
+    "quantite": 2
+   },
+   {
+    "graine": "peche",
+    "quantite": 1
+   },
+   {
+    "graine": "framboise",
+    "quantite": 1
+   },
+   {
+    "graine": "menthe",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
+  "phrase_en": "Just a few minutes make this naturally delicious dessert.",
+  "amour_fr": "une douceur de dimanche",
+  "amour_en": "a Sunday sweetness",
+  "etapes_fr": [
+   "Prépare et coupe papaye, pêche, framboises, menthe.",
+   "Mélange délicatement avec un peu de miel ou de sucre.",
+   "Laisse reposer quelques minutes puis sers frais."
+  ],
+  "etapes_en": [
+   "Prepare and cut the papaya, peach, raspberries, mint.",
+   "Toss gently with a little honey or sugar.",
+   "Rest for a few minutes, then serve chilled."
+  ]
+ },
+ {
+  "id": "framboise_fraise_basilic",
+  "accueil": false,
+  "type": "dessert",
+  "difficulte": 2,
+  "nom_fr": "Ananas fraise basilic",
+  "nom_en": "Pineapple strawberry basil",
+  "ingredients": [
+   {
+    "graine": "ananas",
+    "quantite": 2
+   },
+   {
+    "graine": "fraise",
+    "quantite": 1
+   },
+   {
+    "graine": "basilic",
+    "quantite": 1
+   },
+   {
+    "graine": "citron",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Un dessert frais, fruité et lumineux avec une touche de miel.",
+  "phrase_en": "A fresh, fruity and bright dessert with a touch of honey.",
+  "amour_fr": "tout l'amour du balcon",
+  "amour_en": "all the balcony's love",
+  "etapes_fr": [
+   "Prépare et coupe ananas, fraises, basilic, citron.",
+   "Mélange délicatement avec un peu de miel ou de sucre.",
+   "Laisse reposer quelques minutes puis sers frais."
+  ],
+  "etapes_en": [
+   "Prepare and cut the pineapple, strawberries, basil, lemon.",
+   "Toss gently with a little honey or sugar.",
+   "Rest for a few minutes, then serve chilled."
+  ]
+ },
+ {
+  "id": "melon_mangue_framboise",
+  "accueil": false,
+  "type": "dessert",
+  "difficulte": 2,
+  "nom_fr": "Melon mangue framboise",
+  "nom_en": "Melon mango raspberry",
+  "ingredients": [
+   {
+    "graine": "melon",
+    "quantite": 2
+   },
+   {
+    "graine": "mangue",
+    "quantite": 1
+   },
+   {
+    "graine": "framboise",
+    "quantite": 1
+   },
+   {
+    "graine": "menthe",
+    "quantite": 1
+   }
+  ],
+  "phrase_fr": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
+  "phrase_en": "Just a few minutes make this naturally delicious dessert.",
+  "amour_fr": "un merci glissé dedans",
+  "amour_en": "a thank-you tucked inside",
+  "etapes_fr": [
+   "Prépare et coupe melon, mangue, framboises, menthe.",
+   "Mélange délicatement avec un peu de miel ou de sucre.",
+   "Laisse reposer quelques minutes puis sers frais."
+  ],
+  "etapes_en": [
+   "Prepare and cut the melon, mango, raspberries, mint.",
+   "Toss gently with a little honey or sugar.",
+   "Rest for a few minutes, then serve chilled."
+  ]
+ }
+]
