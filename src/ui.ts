@@ -85,6 +85,7 @@ export class UI {
       <div id="phone" class="phone hidden"><div class="notch"></div><div class="dial"><div class="disc"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="cord"></div></div><div class="stickers"><span>♥</span><span>★</span><span>☮</span></div><div class="screen">
         <div class="statusbar"><b id="telHeure">9:41</b><span class="sbIcons"><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="currentColor"/><rect x="2" y="2" width="16" height="8" rx="2"/><rect x="23.5" y="4" width="2" height="4" rx="1"/></svg></span></div>
         <div class="appbar hidden" id="appBar"><button id="appBack"></button><b id="appTitre"></b><span class="apSpace"></span></div>
+        <button class="fermerMobile" id="fermerMobile" aria-label="fermer">✕</button>
         <div class="content" id="phoneContent"></div>
         <div class="telAction hidden" id="telAction"></div>
         <div class="telBanner hidden" id="telBanner"></div>
@@ -99,15 +100,18 @@ export class UI {
     $('#appBack').onclick = () => this.ouvrir('home', undefined, 'versGauche');     // « ‹ Accueil » ramène TOUJOURS à l'accueil ; glisser revient d'un cran
     // les gestes d'un vrai téléphone : glisser vers la gauche ou la droite = revenir en arrière ; glisser vers le haut depuis le bas = accueil
     const ecran = $('#phone').querySelector('.screen') as HTMLElement;
-    let g0: { x: number; y: number; t: number; bas: boolean } | null = null;
-    ecran.addEventListener('pointerdown', e => { this.toucheTel = Date.now(); if ((e.target as HTMLElement).closest('input, select, textarea, .stepper')) { g0 = null; return; } const r = ecran.getBoundingClientRect(); g0 = { x: e.clientX, y: e.clientY, t: performance.now(), bas: e.clientY > r.bottom - 70 }; });
+    let g0: { x: number; y: number; t: number; bas: boolean; haut: boolean } | null = null;
+    ecran.addEventListener('pointerdown', e => { this.toucheTel = Date.now(); if ((e.target as HTMLElement).closest('input, select, textarea, .stepper')) { g0 = null; return; } const r = ecran.getBoundingClientRect(); const ct = $('#phoneContent'); g0 = { x: e.clientX, y: e.clientY, t: performance.now(), bas: e.clientY > r.bottom - 70, haut: e.clientY < r.top + 140 || (ct?.scrollTop ?? 0) <= 0 }; });
     ecran.addEventListener('pointerup', e => {
-      if (!g0) return; const dx = e.clientX - g0.x, dy = e.clientY - g0.y, dt = performance.now() - g0.t; const bas = g0.bas; g0 = null;
+      if (!g0) return; const dx = e.clientX - g0.x, dy = e.clientY - g0.y, dt = performance.now() - g0.t; const bas = g0.bas, haut = g0.haut; g0 = null;
       if (dt > 700) return;
       if (bas && dy < -50 && Math.abs(dy) > Math.abs(dx)) { if (this.phoneTab !== 'home') this.ouvrir('home'); return; }
+      const mobile = window.matchMedia('(max-width: 700px), (max-height: 520px) and (pointer: coarse)').matches;
+      if (mobile && haut && dy > 90 && Math.abs(dy) > 1.5 * Math.abs(dx)) { this.togglePhone(false); return; }   // glisser vers le bas : on range le téléphone
       if (Math.abs(dx) > 70 && Math.abs(dx) > 1.6 * Math.abs(dy) && this.phoneTab !== 'home') this.retour();
     });
     ecran.addEventListener('pointercancel', () => { g0 = null; });
+    $('#fermerMobile').onclick = () => this.togglePhone(false);
     $('#btnSettings').onclick = () => this.openSettings();
     $('#seedsPill').onclick = () => { this.phoneTab = 'boutique'; this.togglePhone(true); };
     $('#recetteHud').onclick = () => this.ouvrir('recette');
@@ -161,7 +165,19 @@ export class UI {
   private chosen = 'lea';
   private confirme = false;
   private perso: Record<string, Perso> = {};
+  private glisserAccueil = false;
+  private activerGlisserAccueil() {
+    if (this.glisserAccueil) return; this.glisserAccueil = true;
+    let d0: { x: number; y: number; t: number } | null = null;
+    window.addEventListener('touchstart', e => { if ($('#start').classList.contains('hidden') || (e.target as HTMLElement).closest('button, input, .sheet .fl')) { d0 = null; return; } d0 = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: performance.now() }; }, { passive: true });
+    window.addEventListener('touchend', e => {
+      if (!d0 || $('#start').classList.contains('hidden') || $('#sheet').classList.contains('perso')) { d0 = null; return; }
+      const t = e.changedTouches[0], dx = t.clientX - d0.x, dy = t.clientY - d0.y, dt = performance.now() - d0.t; d0 = null;
+      if (dt < 700 && Math.abs(dx) > 60 && Math.abs(dx) > 1.5 * Math.abs(dy)) this.changerPerso(dx < 0 ? 1 : -1);
+    }, { passive: true });
+  }
   private renderStart(hasSave: boolean) {
+    this.activerGlisserAccueil();
     const s = t();
     const body = $('#startBody');
     body.innerHTML = '';
@@ -187,6 +203,22 @@ export class UI {
   }
   /** Fiche d'un personnage, ouverte quand on le touche sur l'accueil. */
   private sheetId = '';
+  /** Accueil sur mobile : le personnage suivant ou précédent (glisser, flèches, points). */
+  private changerPerso(sens: number) {
+    const ids = CATALOG.characters.map(c => c.id);
+    const i = Math.max(0, ids.indexOf(this.sheetId || this.chosen));
+    const id = ids[(i + sens + ids.length) % ids.length];
+    this.h.onPick(id); this.showSheet(id);
+  }
+  private carrousel(id: string): HTMLElement {
+    const ids = CATALOG.characters.map(c => c.id);
+    const nav = el('div', 'carrousel');
+    const g = el('button', 'fl', '‹'); g.onclick = () => this.changerPerso(-1);
+    const pts = el('div', 'points', ids.map(x => `<i class="${x === id ? 'on' : ''}"></i>`).join(''));
+    const d = el('button', 'fl', '›'); d.onclick = () => this.changerPerso(1);
+    nav.append(g, pts, d);
+    return nav;
+  }
   showSheet(id: string) {
     const c = CATALOG.characters.find(x => x.id === id); if (!c) return;
     this.sheetId = id; this.chosen = id;
@@ -201,6 +233,7 @@ export class UI {
     const perso = el('button', 'ghost', `${s.personnaliser}`); perso.style.cssText = LISIBLE; perso.onclick = () => this.showCustomize(id);
     const play = el('button', 'primary', this.hasSave ? s.newGame : s.jouerAvec(nom)); agir(play, () => this.lancer(id));
     row.append(perso, play); sh.appendChild(row);
+    sh.prepend(this.carrousel(id));                                  // sur mobile : ‹ ● ○ ○ › en haut de la fiche
     (sh.querySelector('.x') as HTMLButtonElement).onclick = () => { sh.classList.add('hidden'); $('#startBody').classList.remove('hidden'); this.h.onSheet(false); };
     sh.classList.remove('hidden');
     if (window.innerWidth < 640 || window.innerHeight > window.innerWidth) $('#startBody').classList.add('hidden');

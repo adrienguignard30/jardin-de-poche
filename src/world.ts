@@ -827,7 +827,7 @@ export class World {
         drag.x = e.clientX; drag.y = e.clientY;
       }
       p.x = e.clientX; p.y = e.clientY;
-      if (pts.size === 2) { const [a, b] = [...pts.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (pinch) this.zoomTarget = THREE.MathUtils.clamp(this.zoomTarget * (pinch / d), .75, 1.35); pinch = d; }
+      if (pts.size === 2) { const [a, b] = [...pts.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (pinch) this.zoomTarget = THREE.MathUtils.clamp(this.zoomTarget * (pinch / d), .75, this.enHauteur() ? 2.4 : 1.35); pinch = d; }
     });
     const up = (e: PointerEvent) => { pts.delete(e.pointerId); if (pts.size < 2) pinch = 0; if (drag && drag.id === e.pointerId) { el.dispatchEvent(new CustomEvent('tapend', { detail: { moved, x: e.clientX, y: e.clientY } })); drag = null; } };
     el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);

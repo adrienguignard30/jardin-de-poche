@@ -34,6 +34,7 @@ class Musique {
   private voulu = '';                               // le morceau demandé
   private enCours: { id: string; gain: GainNode; sources: AudioBufferSourceNode[]; timer: number } | null = null;
   private pret = false;
+  private muet: HTMLAudioElement | null = null;
   private auditeurs: (() => void)[] = [];
   R = reglagesSon();
 
@@ -43,6 +44,17 @@ class Musique {
   }
   private demarrerContexte() {
     if (this.pret) return;
+    // Sur iPhone, l'audio d'une page web suit l'interrupteur « silencieux » comme une sonnerie. On déclare que c'est de la
+    // musique (« playback ») et on joue un son <audio> muet en boucle : la page passe alors en audio « média », comme une
+    // vidéo, et la musique se fait entendre même en mode silencieux, au volume « média » du téléphone.
+    try { (navigator as any).audioSession && ((navigator as any).audioSession.type = 'playback'); } catch { /* ancien navigateur */ }
+    try {
+      const muet = document.createElement('audio');
+      muet.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
+      muet.loop = true; muet.setAttribute('playsinline', ''); (muet as any).playsInline = true; muet.volume = .01;
+      muet.play().catch(() => { /* refusé : tant pis */ });
+      this.muet = muet;
+    } catch { /* ignore */ }
     try {
       this.ac = new AudioContext();
       this.maitre = this.ac.createGain(); this.maitre.connect(this.ac.destination);

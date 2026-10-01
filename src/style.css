@@ -594,3 +594,26 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
   #phone.phone:not(.hidden) .screen { border-radius: 0 !important; padding-top: var(--sat, env(safe-area-inset-top)); padding-bottom: var(--sab, env(safe-area-inset-bottom)); }
   #phone.phone:not(.hidden) .notch, #phone.phone:not(.hidden) .home { display: none !important; }
 }
+
+/* ======================= SUR MOBILE SEULEMENT (l'ordinateur ne change pas) ======================= */
+.phone .fermerMobile { display: none; }
+.sheet .carrousel { display: none; }
+@media (max-width: 700px), (max-height: 520px) and (pointer: coarse) {
+  /* le téléphone du jeu, plein écran : un ✕ toujours visible en haut à droite ; glisser vers le bas le range */
+  #phone.phone:not(.hidden) .fermerMobile { display: flex; align-items: center; justify-content: center; position: absolute; z-index: 9;
+    top: calc(var(--sat, env(safe-area-inset-top)) + 8px); right: 10px; width: 36px; height: 36px; border-radius: 50%; background: rgba(36,49,58,.12); color: #24313a; font-size: 18px; font-weight: 800; }
+  /* la bulle d'explication en HAUT (sous les pastilles), pour ne plus chevaucher les infos des pots en bas */
+  .guide { bottom: auto !important; top: calc(var(--sat, env(safe-area-inset-top)) + 150px); max-width: 94vw; font-size: 14px; padding: 10px 12px; }
+  /* l'accueil : la fiche devient un panneau en bas, avec ‹ ● ○ ○ › et le bouton Jouer toujours visible sans faire défiler */
+  .sheet:not(.perso) { position: fixed; left: 0; right: 0; top: auto; bottom: 0; transform: none; width: auto; max-height: 52dvh; overflow-y: auto;
+    border-radius: 22px 22px 0 0; padding: 10px 16px calc(12px + var(--sab, env(safe-area-inset-bottom))); gap: 4px; animation: monteBas .25s ease-out; }
+  .sheet:not(.perso) .carrousel { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 0 0 2px; }
+  .sheet .carrousel .fl { width: 40px; height: 40px; border-radius: 50%; background: rgba(36,49,58,.08); font-size: 26px; line-height: 1; color: #24313a; border: 0; display: flex; align-items: center; justify-content: center; padding: 0 0 3px; }
+  .sheet .carrousel .points { display: flex; gap: 8px; } .sheet .carrousel .points i { width: 8px; height: 8px; border-radius: 50%; background: rgba(36,49,58,.25); }
+  .sheet .carrousel .points i.on { background: var(--terra, #c25a2a); width: 22px; border-radius: 4px; }
+  .sheet:not(.perso) h3 { font-size: 20px; text-align: center; margin: 0; }
+  .sheet:not(.perso) .fl { font-size: 13px; padding: 3px 0; }
+  .sheet:not(.perso) .startRow { position: sticky; bottom: calc(-12px - var(--sab, env(safe-area-inset-bottom))); background: rgba(255,255,255,.97); margin: 4px -16px 0; padding: 8px 16px calc(10px + var(--sab, env(safe-area-inset-bottom))); display: flex; gap: 8px; }
+  .sheet:not(.perso) .startRow .primary { flex: 1.4; min-height: 50px; font-size: 16px; margin: 0; } .sheet:not(.perso) .startRow .ghost { flex: 1; min-height: 50px; }
+}
+@keyframes monteBas { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
