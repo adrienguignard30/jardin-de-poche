@@ -919,6 +919,31 @@ export class World {
     }
     console.info(`[sol] balcon ${(this.solBalcon * 100).toFixed(1)} cm, pièce ${(this.solPiece * 100).toFixed(1)} cm au-dessus de la dalle`);
   }
+  /** Sur téléphone seulement : la caméra se place pour VOIR le personnage. Si un mur le cache (dans le fauteuil, au fond de
+   *  la pièce…), on cherche, en glissant la vue de côté, la position la plus proche d'où l'on voit sa tête par l'ouverture. */
+  private panVisible: number | null = null;
+  private derniereVue = 0;
+  voirLaTete(tete: THREE.Vector3) {
+    if (!this.enHauteur() || this.suivreX === null) { this.panVisible = null; return; }
+    const now = performance.now(); if (now - this.derniereVue < 200) return; this.derniereVue = now;
+    const voulu = THREE.MathUtils.clamp(this.suivreX - this.baseX, -this.panMax, this.panMax);
+    const ray = new THREE.Raycaster(); ray.camera = this.camera;
+    const libre = (pan: number) => {
+      const cam = this.camera.position.clone().add(new THREE.Vector3(pan - this.panX, 0, 0));
+      const d = tete.clone().sub(cam), L = d.length(); d.normalize();
+      ray.set(cam, d); ray.near = .1; ray.far = L - .3;
+      try { return !ray.intersectObject(this.envGroup, true).some(h => (h.object as THREE.Mesh).isMesh); } catch { return true; }
+    };
+    if (libre(voulu)) { this.panVisible = voulu; return; }
+    for (let k = 1; k <= 10; k++) {                                       // de 25 en 25 cm, d'un côté puis de l'autre
+      for (const sgn of [1, -1]) {
+        const c = voulu + sgn * k * .25;
+        if (Math.abs(c) > this.panMax + .01) continue;
+        if (libre(c)) { this.panVisible = c; return; }
+      }
+    }
+    this.panVisible = voulu;                                              // rien de dégagé : on reste sur lui
+  }
   /** Sur un écran en hauteur : où regarder de côté (suivi du personnage, ou glissé au doigt). */
   enHauteur() { return this.camera.aspect < 1; }
   suivreX: number | null = null;          // la position du personnage, donnée par le jeu
@@ -929,7 +954,7 @@ export class World {
     this.world_dt = dt;
     (this.ciel ??= new Ciel(this.scene, () => this.night, this.camera, () => this.fenetreCiel())).update();
     if (this.enHauteur()) {
-      if (this.suivreX !== null && performance.now() - this.panMain > 4000) this.panCible = this.suivreX - this.baseX;   // on suit le personnage
+      if (this.suivreX !== null && performance.now() - this.panMain > 4000) this.panCible = this.panVisible ?? (this.suivreX - this.baseX);   // on suit le personnage, là où on le voit
       this.panCible = THREE.MathUtils.clamp(this.panCible, -this.panMax, this.panMax);
       this.panX += (this.panCible - this.panX) * Math.min(1, dt * 3);
       this.lookAt.x = this.baseX + this.panX;

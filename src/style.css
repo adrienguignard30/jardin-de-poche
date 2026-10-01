@@ -586,3 +586,11 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
 .phone .cmd { width: 44px; height: 44px; border-radius: 50%; background: rgba(36,49,58,.07); color: #24313a; font-size: 18px; }
 .phone .cmd.grand { width: 58px; height: 58px; background: #c2185b; color: #fff; font-size: 22px; }
 .phone .volLigne { display: flex; align-items: center; gap: 8px; margin-top: 12px; } .phone .volLigne .volTel { flex: 1; width: auto; }
+
+/* sur un téléphone (écran étroit ou bas), le téléphone du jeu ouvert prend TOUT l'écran, comme une vraie appli */
+@media (max-width: 700px), (max-height: 520px) and (pointer: coarse) {
+  #phone.phone:not(.hidden) { left: 0 !important; right: 0 !important; top: 0 !important; bottom: 0 !important; width: 100vw !important; height: 100dvh !important;
+    max-width: none !important; max-height: none !important; border-radius: 0 !important; padding: 0 !important; box-shadow: none !important; z-index: 80; }
+  #phone.phone:not(.hidden) .screen { border-radius: 0 !important; padding-top: var(--sat, env(safe-area-inset-top)); padding-bottom: var(--sab, env(safe-area-inset-bottom)); }
+  #phone.phone:not(.hidden) .notch, #phone.phone:not(.hidden) .home { display: none !important; }
+}

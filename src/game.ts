@@ -1528,6 +1528,7 @@ export class Game {
       const sol = FL + (dedans ? W.solPiece : W.solBalcon);
       if (Math.abs(y - FL) < .03 || Math.abs(y - sol) < .03) this.char.obj.position.y = sol;   // debout : les pieds sur le vrai sol
       if (this.tel) this.placerTel();                                   // après l'animation : les mains sont à leur vraie place
+      { const t = this.char.bone('Head'), p = new THREE.Vector3(); if (t) t.getWorldPosition(p); else p.copy(this.char.obj.position).setY(this.char.obj.position.y + 1.4); this.world.voirLaTete(p); }
       if (this.arrosoir) this.placerArrosoir(dt);
       this.tickAll();
       this.updateBubbles();
