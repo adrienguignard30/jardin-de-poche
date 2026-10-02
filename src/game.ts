@@ -238,6 +238,7 @@ export class Game {
     this.showroom = new Showroom(this.assets);
     await this.showroom.load(label => this.ui.setProgress(1, 1, label));
     for (const c of this.showroom.chars) { c.char.applyMesures(this.reglages(c.def.id)); const u = new URLSearchParams(location.search).get('bras'); c.char.brasOffset = u !== null ? +u : ((c.def as any).bras_offset ?? 0); await this.chargerMoyennes(c.def.id); }
+    await this.teinterAccueil();
     this.showroom.resize(window.innerWidth / window.innerHeight);
     window.addEventListener('resize', () => this.showroom?.resize(window.innerWidth / window.innerHeight));
     this.ui.showStart(!!saved, saved ? tx(charDef(saved.character).name) : '');
@@ -314,6 +315,17 @@ export class Game {
       });
       m.material = Array.isArray(m.material) ? out : out[0];
     });
+  }
+  /** Chaque personnage de l'accueil avec SES couleurs : celles de sa partie, sinon celles choisies dans Personnaliser. */
+  private async teinterAccueil() {
+    if (!this.showroom) return;
+    let persos: Record<string, Perso> = {};
+    try { persos = JSON.parse(localStorage.getItem('jdp.persos') || '{}'); } catch { /* ignore */ }
+    for (const c of this.showroom.chars) {
+      const g = await this.save.loadFor(c.def.id);
+      const couleurs = g?.perso?.couleurs ?? persos[c.def.id]?.couleurs;
+      if (couleurs && Object.keys(couleurs).length) this.teinter(c.char.obj, couleurs, c.def.id);
+    }
   }
   /** Photo du personnage de l'accueil : un carré au centre de la vue, juste après un rendu. */
   private photoDe(id: string): string {
@@ -906,13 +918,13 @@ export class Game {
         o.position.lerpVectors(start, target, e);
         o.position.y += Math.sin(k * Math.PI) * .9;
         o.rotation.y += .12;
-        if (k < 1) requestAnimationFrame(step); else { this.world.scene.remove(o); this.remplirPanier(true); }
+        if (k < 1) requestAnimationFrame(step); else { this.world.scene.remove(o); clearTimeout(this.panierT); this.panierT = window.setTimeout(() => this.remplirPanier(true), 250); }
       };
       requestAnimationFrame(step);
     }
   }
   /** Le panier montre ce qu'il contient : les légumes 3D des récoltes, posés dedans (5 au plus, les plus nombreux). */
-  private contenuPanier: THREE.Group | null = null; private signaturePanier = ''; private panierVu = 0;
+  private contenuPanier: THREE.Group | null = null; private signaturePanier = ''; private panierVu = 0; private panierT = 0;
   private remplirPanier(force = false) {
     const W = this.world, b = W.basket; if (!b || !this.state) return;
     const panier = this.state.eco.jardin.panier;
@@ -956,7 +968,7 @@ export class Game {
         const k = Math.min(1, (performance.now() - t0) / dur);
         if (k < 0) { requestAnimationFrame(step); return; }
         o.position.lerpVectors(start, end, k); o.rotation.y += .25; o.rotation.x = k * 3;
-        if (k < 1) requestAnimationFrame(step); else { this.world.scene.remove(o); this.remplirPanier(true); }
+        if (k < 1) requestAnimationFrame(step); else { this.world.scene.remove(o); clearTimeout(this.panierT); this.panierT = window.setTimeout(() => this.remplirPanier(true), 250); }
       };
       requestAnimationFrame(step);
     }
@@ -1612,6 +1624,7 @@ export class Game {
     if (derniere && afficher) {
       const g = await this.save.loadFor(derniere.perso);
       if (g) { this.state = g; this.ui.showStart(true, tx(charDef(g.character).name)); }
+      await this.teinterAccueil();
     }
   }
 

@@ -63,29 +63,31 @@ class Musique {
       if (this.voulu) this.jouer(this.voulu);
     } catch { /* pas de son possible sur cet appareil */ }
   }
-  private variantes = new Map<string, Promise<Morceau[]>>();
-  /** Tous les morceaux d'un personnage : music-lea.mp3, puis music-lea-2.mp3, music-lea-3.mp3… (d'autres écritures acceptées). */
-  private charger(id: string): Promise<Morceau[]> {
-    if (!this.variantes.has(id)) this.variantes.set(id, (async () => {
-      const out: Morceau[] = [];
-      const essayer = async (urls: string[]) => {
-        for (const url of urls) {
-          try {
-            const r = await fetch(url); if (!r.ok || !(r.headers.get('content-type') || '').includes('audio')) continue;
-            const buf = await this.ac!.decodeAudioData(await r.arrayBuffer());
-            out.push(utile(buf)); return true;
-          } catch { /* suivant */ }
-        }
-        return false;
-      };
-      await essayer([`music/music-${id}.mp3`, `music/music_${id}.mp3`, `music/musique_${id}.mp3`, `music/${id}.mp3`]);
-      for (let k = 2; k <= 4; k++) if (!(await essayer([`music/music-${id}-${k}.mp3`, `music/music-${id}${k}.mp3`, `music/music_${id}_${k}.mp3`]))) break;
-      if (!out.length) console.warn(`[musique] aucun fichier pour ${id} (attendu : public/music/music-${id}.mp3)`);
-      else console.info(`[musique] ${id} : ${out.length} morceau(x), ` + out.map(m => `${m.debut.toFixed(1)}–${m.fin.toFixed(1)} s`).join(', '));
+  // Un morceau de 2 minutes décodé pèse ~40 Mo en mémoire. Avant, on décodait TOUS les morceaux de chaque playlist
+  // visitée (jusqu'à 9, soit ~380 Mo) : de quoi faire caler un navigateur. Maintenant on ne décode que le morceau qui joue
+  // et le suivant ; les autres ne sont que des adresses, décodées au moment voulu, puis libérées.
+  private listes = new Map<string, Promise<string[]>>();       // perso → adresses des morceaux (rien de décodé)
+  private decodes = new Map<string, Promise<Morceau | null>>(); // adresse → morceau décodé (2 au plus)
+  private async adresses(id: string): Promise<string[]> {
+    if (!this.listes.has(id)) this.listes.set(id, (async () => {
+      const out: string[] = [];
+      const existe = async (u: string) => { try { const r = await fetch(u, { method: 'HEAD' }); return r.ok && (r.headers.get('content-type') || '').includes('audio'); } catch { return false; } };
+      for (const u of [`music/music-${id}.mp3`, `music/music_${id}.mp3`, `music/musique_${id}.mp3`, `music/${id}.mp3`]) if (await existe(u)) { out.push(u); break; }
+      for (let k = 2; k <= 4; k++) { const u = [`music/music-${id}-${k}.mp3`, `music/music-${id}${k}.mp3`, `music/music_${id}_${k}.mp3`]; let ok = false; for (const x of u) if (await existe(x)) { out.push(x); ok = true; break; } if (!ok) break; }
+      if (!out.length) console.warn(`[musique] aucun fichier pour ${id}`);
       return out;
     })());
-    return this.variantes.get(id)!;
+    return this.listes.get(id)!;
   }
+  private decoder(url: string): Promise<Morceau | null> {
+    if (!this.decodes.has(url)) {
+      this.decodes.set(url, (async () => { try { const r = await fetch(url); return utile(await this.ac!.decodeAudioData(await r.arrayBuffer())); } catch { return null; } })());
+      while (this.decodes.size > 2) this.decodes.delete(this.decodes.keys().next().value!);   // on libère le plus ancien
+    }
+    return this.decodes.get(url)!;
+  }
+  /** Compat : nombre de morceaux d'un personnage. */
+  private async charger(id: string): Promise<string[]> { return this.adresses(id); }
   /** Ce qui joue : quelle playlist, quel morceau sur combien. */
   enCours_: { id: string; index: number; total: number } | null = null;
   private perso = '';
@@ -104,39 +106,47 @@ class Musique {
   }
   pause(p: boolean) { this.enPause = p; if (this.ac) { if (p) this.ac.suspend(); else this.ac.resume(); } for (const f of this.auditeurs) f(); }
   /** Combien de morceaux dans une playlist (0 tant qu'elle n'est pas chargée). */
-  async nbMorceaux(id: string) { return this.pret ? (await this.charger(id)).length : 0; }
+  async nbMorceaux(id: string) { return this.pret ? (await this.adresses(id)).length : 0; }
 
-  /** Jouer une playlist, à partir d'un morceau ; les morceaux s'enchaînent dans l'ordre, en fondu, puis on recommence. */
+  /** Jouer une playlist, à partir d'un morceau ; les morceaux s'enchaînent dans l'ordre, en fondu, puis on recommence.
+   *  Chaque morceau n'est décodé qu'au moment d'être programmé (≈ 8 s avant), et seuls 2 restent en mémoire. */
   async jouer(id: string, depart = 0, force = false) {
     this.voulu = id;
     if (!this.pret || !this.ac) return;
     if (this.enCours?.id === id && !force) return;
-    const morceaux = await this.charger(id);
-    if (!morceaux.length || this.voulu !== id) return;
+    const urls = await this.adresses(id);
+    if (!urls.length || this.voulu !== id) return;
+    const premierM = await this.decoder(urls[depart % urls.length]);
+    if (!premierM || this.voulu !== id) return;
     this.arreter(force ? 1 : CHANGEMENT);
     const ac = this.ac, gain = ac.createGain(); gain.connect(this.maitre!);
     const entree = force ? 1 : CHANGEMENT;
     gain.gain.setValueAtTime(0, ac.currentTime); gain.gain.linearRampToValueAtTime(1, ac.currentTime + entree);
     const piste = { id, gain, sources: [] as AudioBufferSourceNode[], timer: 0 };
-    let debut = ac.currentTime + .05, premier = true, k = depart % morceaux.length;
-    const planifier = () => {
-      const m = morceaux[k], duree = m.fin - m.debut, indexIci = k;
-      const f = Math.min(FONDU, duree / 4);
+    let debut = ac.currentTime + .05, premier = true, k = depart % urls.length, occupe = false;
+    const planifier = async () => {
+      if (occupe) return; occupe = true;
+      const indexIci = k;
+      const m = indexIci === depart % urls.length && premier ? premierM : await this.decoder(urls[indexIci]);
+      occupe = false;
+      if (!m || this.enCours !== piste) return;
+      const duree = m.fin - m.debut, f = Math.min(FONDU, duree / 4);
       const s = ac.createBufferSource(); s.buffer = m.buf;
       const g = ac.createGain(); s.connect(g); g.connect(gain);
       if (premier) g.gain.setValueAtTime(1, debut); else { g.gain.setValueAtTime(0, debut); g.gain.linearRampToValueAtTime(1, debut + f); }
       g.gain.setValueAtTime(1, debut + duree - f); g.gain.linearRampToValueAtTime(0, debut + duree);
       s.start(debut, m.debut, duree + .05);
+      s.onended = () => { try { s.disconnect(); g.disconnect(); } catch { /* déjà */ } };
       const quand = Math.max(0, (debut - ac.currentTime) * 1000);
-      window.setTimeout(() => { if (this.enCours === piste) { this.enCours_ = { id, index: indexIci, total: morceaux.length }; for (const fn of this.auditeurs) fn(); } }, quand);
+      window.setTimeout(() => { if (this.enCours === piste) { this.enCours_ = { id, index: indexIci, total: urls.length }; for (const fn of this.auditeurs) fn(); } }, quand);
       piste.sources.push(s); if (piste.sources.length > 3) piste.sources.shift();
       premier = false;
       debut += duree - f;
-      k = (k + 1) % morceaux.length;                                           // le suivant, dans l'ordre
+      k = (k + 1) % urls.length;
     };
-    planifier();
-    piste.timer = window.setInterval(() => { if (debut - ac.currentTime < 8) planifier(); }, 1000);
     this.enCours = piste;
+    await planifier();
+    piste.timer = window.setInterval(() => { if (debut - ac.currentTime < 8) planifier(); }, 1000);
     if (this.enPause) this.pause(false);
   }
   arreter(fondu = 1) {

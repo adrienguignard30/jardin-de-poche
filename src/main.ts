@@ -3,8 +3,12 @@ import { Game } from './game';
 
 // ---------- toute erreur s'affiche À L'ÉCRAN, en rouge, avec un bouton pour la copier : plus besoin d'ouvrir la console
 const erreurs: string[] = [];
+const deja = new Map<string, number>();
 function montrerErreur(msg: string) {
-  erreurs.push(msg);
+  const n = (deja.get(msg) ?? 0) + 1; deja.set(msg, n);
+  if (n > 1) { const i = erreurs.findIndex(e => e.startsWith(msg.slice(0, 80))); if (i >= 0) erreurs[i] = `${msg}\n(×${n})`; }
+  else { erreurs.push(msg); if (erreurs.length > 8) erreurs.shift(); }       // 8 erreurs différentes au plus
+  if (n > 1 && n % 30 !== 0 && document.getElementById('boiteErreur')) return;  // une erreur qui se répète : on ne redessine pas à chaque fois
   let box = document.getElementById('boiteErreur');
   if (!box) {
     box = document.createElement('div'); box.id = 'boiteErreur';

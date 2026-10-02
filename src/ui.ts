@@ -260,8 +260,10 @@ export class UI {
     agir(go, async () => {
       err.textContent = '';
       const nom = this.state?.nickname || this.state?.perso?.prenom || 'Jardinier';
-      const r = mode === 'creer' ? await EL.creerCompte(ps.value, mdp.value, nom) : await EL.seConnecter(ps.value, mdp.value);
-      if (r) { err.textContent = s.errCompte[r] ?? r; return; }
+      let r: string | null;
+      try { r = mode === 'creer' ? await EL.creerCompte(ps.value, mdp.value, nom, await EL.jetonAntiRobot()) : await EL.seConnecter(ps.value, mdp.value, await EL.jetonAntiRobot()); }
+      catch (e) { r = String((e as Error)?.message ?? e); }
+      if (r) { err.textContent = ''; void err.offsetWidth; err.textContent = s.errCompte[r] ?? (r.includes('captcha') ? s.errCompte.robot : r); return; }
       this.fermerModal(); this.toast(mode === 'creer' ? s.compteOk : s.connexionOk, 3500, true); this.majCompte();
       if (mode === 'connecter') this.h.onConnecte();
     });
@@ -470,15 +472,16 @@ export class UI {
   /** Étiquettes prénom + âge au-dessus des personnages de l'accueil. */
   nameTags(list: { id: string; x: number; y: number; visible: boolean }[], chosen: string) {
     const s = t();
+    const brand0 = this.root.querySelector('#start .startTop .brand') as HTMLElement | null;
+    const rb0 = brand0?.getBoundingClientRect();
+    const sousTitre0 = rb0 && rb0.height > 0 && !$('#start').classList.contains('hidden') ? rb0.bottom + 8 : 0;
     for (const l of list) {
       let e = this.tags.get(l.id);
       if (!e) { e = el('div', 'nameTag'); $('#bubbles').appendChild(e); this.tags.set(l.id, e); }
       const c = CATALOG.characters.find(x => x.id === l.id);
-      e.innerHTML = `${c ? tx(c.name) : l.id}<small>${c?.age ? s.years(c.age) : ''}</small>`;
-      e.className = 'nameTag' + (l.id === chosen ? ' chosen' : '');
-      const brand = this.root.querySelector('#start .startTop .brand') as HTMLElement | null;
-      const rb = brand?.getBoundingClientRect();
-      const sousTitre = rb && rb.height > 0 && !$('#start').classList.contains('hidden') ? rb.bottom + 8 : 0;
+      const html = `${c ? tx(c.name) : l.id}<small>${c?.age ? s.years(c.age) : ''}</small>`; if (e.innerHTML !== html) e.innerHTML = html;
+      const cls = 'nameTag' + (l.id === chosen ? ' chosen' : ''); if (e.className !== cls) e.className = cls;
+      const sousTitre = sousTitre0;
       const y = Math.max(l.y, sousTitre + 40);                           // l'étiquette fait ~40 px de haut, tracée au-dessus du point
       e.style.display = l.visible ? 'block' : 'none';
       e.style.transform = `translate(${l.x}px, ${y}px) translate(-50%, -100%)`;

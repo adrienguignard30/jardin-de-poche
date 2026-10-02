@@ -271,7 +271,7 @@ export class World {
 
   constructor(public canvas: HTMLCanvasElement, public assets: Assets) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.isMobile ? 2 : 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.isMobile ? 1.5 : 1.75));   // assez net, beaucoup moins lourd
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
@@ -301,7 +301,7 @@ export class World {
     this.sun = new THREE.DirectionalLight(0xfff1d8, 1.6);
     this.sun.position.set(5, 9, 6);
     this.sun.castShadow = !this.isMobile;
-    this.sun.shadow.mapSize.set(2048, 2048);
+    this.sun.shadow.mapSize.set(1536, 1536);
     const sc = this.sun.shadow.camera;
     sc.left = -5; sc.right = 5; sc.top = 8; sc.bottom = -2; sc.near = 1; sc.far = 30;
     this.sun.shadow.bias = -.0004;

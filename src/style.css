@@ -719,3 +719,8 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
 .apercuRecolte.vu { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; }
 .apercuRecolte img { width: 96px; height: 96px; object-fit: contain; } .apercuRecolte .em { font-size: 56px; }
 .apercuRecolte small { display: block; color: #8a6a2a; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; } .apercuRecolte b { font-size: 20px; color: #24313a; }
+
+.overlay.start .demoBtn { right: auto !important; left: 12px !important; top: calc(58px + var(--sat, 0px)) !important; }
+/* erreurs du compte : bien visibles (encadré rouge qui secoue) */
+.fenCompte .warn:not(:empty) { background: #fde6df; color: #b3382c; border: 1.5px solid #f0a593; border-radius: 10px; padding: 8px 10px; font-weight: 700; animation: secoue .35s; }
+@keyframes secoue { 0%, 100% { transform: none; } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }

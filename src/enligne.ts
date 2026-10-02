@@ -51,7 +51,7 @@ export async function demarrer() {
 export async function jouerInvite(nom: string, captcha?: string): Promise<string | null> {
   if (!sb) return 'hors_ligne';
   if (etat.connecte) return null;
-  const { error } = await sb.auth.signInAnonymously({ options: { captchaToken: captcha } });
+  const { error } = await sb.auth.signInAnonymously({ options: { captchaToken: captcha ?? await jetonAntiRobot().catch(() => undefined) } });
   if (error) return error.message;
   await sb.rpc('creer_profil', { p_pseudo: null, p_nom: nom });
   maj({ connecte: true, invite: true, pseudo: null });
@@ -126,4 +126,29 @@ export async function classement(cat: Categorie): Promise<{ rang: number; nom: s
   if (!sb) return [];
   const { data } = await sb.rpc('classement', { p_type: cat, p_n: 20 });
   return (data ?? []) as any;
+}
+
+// ---------- l'anti-robot (Cloudflare Turnstile, gratuit et invisible pour un humain)
+// Sa clé de site est PUBLIQUE (comme celle de Supabase). Tant qu'elle est vide, on ne demande rien (et Supabase non plus).
+const CLE_TURNSTILE = ((import.meta as any).env?.VITE_TURNSTILE_SITEKEY as string | undefined) || '0x4AAAAAAFMLQ4CjEyknI-gx';   // clé de site (publique)
+let chargement: Promise<any> | null = null;
+function turnstile(): Promise<any> {
+  if (!chargement) chargement = new Promise((ok, ko) => {
+    if ((window as any).turnstile) return ok((window as any).turnstile);
+    const sc = document.createElement('script'); sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; sc.async = true;
+    sc.onload = () => ok((window as any).turnstile); sc.onerror = () => ko(new Error('captcha'));
+    document.head.appendChild(sc);
+  });
+  return chargement;
+}
+/** Un jeton anti-robot tout frais (ou rien si l'anti-robot n'est pas encore branché). */
+export async function jetonAntiRobot(): Promise<string | undefined> {
+  if (!CLE_TURNSTILE) return undefined;
+  const ts = await turnstile();
+  return new Promise((ok, ko) => {
+    const boite = document.createElement('div'); boite.style.cssText = 'position:fixed;left:-9999px;top:0'; document.body.appendChild(boite);
+    const fin = (f: () => void) => { try { ts.remove(id); } catch { /* ignore */ } boite.remove(); f(); };
+    const id = ts.render(boite, { sitekey: CLE_TURNSTILE, size: 'invisible', callback: (t: string) => fin(() => ok(t)), 'error-callback': () => fin(() => ko(new Error('captcha'))) });
+    setTimeout(() => fin(() => ko(new Error('captcha'))), 15000);
+  });
 }
