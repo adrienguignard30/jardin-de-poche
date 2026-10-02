@@ -365,8 +365,8 @@ export function livrer(im: Immeuble, j: Jardin, now: number, cat?: Catalogue): A
     const re = cat && j.recette ? cat.recettes.find(x => x.id === j.recette!.recette) : undefined;
     const pour = re && re.ingredients.some(i => i.graine === a.cherche.graine);
     im.evenements.push({ a: now, pour: j.id, type: 'troc_accepte', de, deId: a.accepte_par,
-      texte_fr: `${de} a accepté ton échange : ${a.cherche.quantite} ${(g?.nom_fr ?? a.cherche.graine).toLowerCase()} dans ton panier${pour ? ` pour « ${re!.nom_fr} »` : ''}.`,
-      texte_en: `${de} accepted your trade: ${a.cherche.quantite} ${(g?.nom_en ?? a.cherche.graine).toLowerCase()} in your basket${pour ? ` for “${re!.nom_en}”` : ''}.` });
+      texte_fr: `Troc fait avec ${de} : tu reçois ${a.cherche.quantite} ${(g?.nom_fr ?? a.cherche.graine).toLowerCase()} contre ${a.donne.quantite} ${(cat?.graines.find(x => x.id === a.donne.graine)?.nom_fr ?? a.donne.graine).toLowerCase()}${pour ? `, pour « ${re!.nom_fr} »` : ''}.`,
+      texte_en: `Trade done with ${de}: you get ${a.cherche.quantite} ${(g?.nom_en ?? a.cherche.graine).toLowerCase()} for ${a.donne.quantite} ${(cat?.graines.find(x => x.id === a.donne.graine)?.nom_en ?? a.donne.graine).toLowerCase()}${pour ? `, for “${re!.nom_en}”` : ''}.` });
   }
   return livrees;
 }

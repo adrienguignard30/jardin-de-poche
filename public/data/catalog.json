@@ -393,5 +393,6 @@
   "autonomyMin": 4,
   "autonomyMax": 9,
   "dayLength": 600
- }
+ },
+  "miniJeu": { "titre": "Jeu du mois", "url": "" }
 }

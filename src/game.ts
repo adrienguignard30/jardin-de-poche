@@ -922,7 +922,14 @@ export class Game {
     const a = e.immeuble.annonces.find(x => x.id === id); if (!a) return;
     const refus = E.refusAccepter(a, e.jardin, this.ecoNow());
     if (refus) { const r = tt.refus[refus]; this.ui.toast(typeof r === 'function' ? r(a.cherche.quantite, a.cherche.graine === E.POINTS ? tt.points : tx(plantDef(a.cherche.graine).name).toLowerCase()) : r, 4000); return; }
-    if (E.accepterAnnonce(e.immeuble, a, e.jardin, this.ecoNow())) { this.ui.toast(tt.trocAccepteToast, 3500); this.flyCoins(4); if ((e.jardin.etape ?? 0) === 5 && E.manque(e.jardin, ECO).every(m => E.cultivables(e.jardin).has(m.graine))) this.etape(6); }
+    if (E.accepterAnnonce(e.immeuble, a, e.jardin, this.ecoNow())) {
+      const nom = (g: string) => tx(plantDef(g).name).toLowerCase(), ic = (g: string) => icon(g);
+      const avec = e.immeuble.jardins.find(x => x.id === a.de)?.nom ?? '?';
+      const msg = tt.trocFait(`${a.cherche.quantite} ${ic(a.cherche.graine)} ${nom(a.cherche.graine)}`, `${a.donne.quantite} ${ic(a.donne.graine)} ${nom(a.donne.graine)}`, avec);
+      this.ui.toast(msg, 4500, true);
+      e.immeuble.evenements.push({ a: this.ecoNow(), pour: e.jardin.id, type: 'troc_accepte', de: avec, deId: a.de, repondu: true,
+        texte_fr: t().trocFait(`${a.cherche.quantite} ${nom(a.cherche.graine)}`, `${a.donne.quantite} ${nom(a.donne.graine)}`, avec), texte_en: t().trocFait(`${a.cherche.quantite} ${nom(a.cherche.graine)}`, `${a.donne.quantite} ${nom(a.donne.graine)}`, avec) });
+      this.flyCoins(4); if ((e.jardin.etape ?? 0) === 5 && E.manque(e.jardin, ECO).every(m => E.cultivables(e.jardin).has(m.graine))) this.etape(6); }
     this.ui.refresh(); this.persist();
   }
   private retirer(id: string) {

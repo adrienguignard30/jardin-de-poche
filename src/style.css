@@ -634,3 +634,12 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
   .guide:not(.ouvert)::after { content: '▾'; position: absolute; right: 12px; bottom: 7px; color: #c2902a; font-weight: 800; }
   .guide.hidden { display: none !important; }
 }
+
+/* fermer les messages */
+.guide { position: fixed; pointer-events: auto; }
+.guide .fermerGuide { position: absolute; top: 6px; right: 8px; width: 24px; height: 24px; border-radius: 50%; background: rgba(36,49,58,.1); color: #24313a; font-size: 13px; font-weight: 800; line-height: 1; display: flex; align-items: center; justify-content: center; padding: 0; border: 0; cursor: pointer; }
+.toast { pointer-events: auto; cursor: pointer; }
+
+/* le jeu du mois : il occupe tout l'écran du téléphone */
+.phone .content.avecJeu { display: flex; flex-direction: column; padding: 6px !important; }
+.phone .cadreJeu { flex: 1; width: 100%; min-height: 60vh; border: 0; border-radius: 14px; background: #000; }

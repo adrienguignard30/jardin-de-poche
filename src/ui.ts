@@ -366,7 +366,7 @@ export class UI {
   toast(msg: string, ms = 2200, prioritaire = false) {
     if (!$('#start').classList.contains('hidden')) return;
     if (this.fileActive && !prioritaire) return;                     // un message important est à l'écran : on ne l'écrase pas
-    const tt = $('#toast'); tt.textContent = msg; tt.classList.remove('hidden'); this.placerBulles();
+    const tt = $('#toast'); tt.textContent = msg; tt.classList.remove('hidden'); tt.onclick = () => { tt.classList.add('hidden'); this.placerBulles(); }; this.placerBulles();
     clearTimeout(this.toastTimer); this.toastTimer = window.setTimeout(() => { tt.classList.add('hidden'); this.placerBulles(); }, ms);
   }
   welcome(lines: string[]) {
@@ -458,7 +458,15 @@ export class UI {
     this.modal(c, false);
   }
   /** Le guide des premiers pas : une phrase douce en bas de l'écran, jusqu'à l'étape suivante. */
-  guide(text: string) { if (!$('#start').classList.contains('hidden')) return; const g = $('#guide'); g.textContent = text; g.classList.remove('hidden', 'ouvert'); g.onclick = () => { g.classList.toggle('ouvert'); this.placerBulles(); }; this.placerBulles(); }
+  guide(text: string) {
+    if (!$('#start').classList.contains('hidden')) return;
+    const g = $('#guide'); g.textContent = text; g.classList.remove('hidden', 'ouvert');
+    const x = el('button', 'fermerGuide', '✕'); x.setAttribute('aria-label', 'fermer');
+    x.onclick = (e) => { e.stopPropagation(); g.classList.add('hidden'); this.placerBulles(); };   // fermer : l'astuce revient à l'étape suivante
+    g.appendChild(x);
+    g.onclick = () => { g.classList.toggle('ouvert'); this.placerBulles(); };
+    this.placerBulles();
+  }
   guideHide() { $('#guide').classList.add('hidden'); }
   /** Ce qu'on montre selon l'étape : rien de plus que ce qui sert maintenant. */
   etape(e: number) {
@@ -515,12 +523,13 @@ export class UI {
     }
   }
   /** Ranger le téléphone sans rien déclencher (utilisé en quittant ou en entrant dans une partie). */
-  rangerTelephone() { $('#phone').classList.add('hidden'); this.phoneTab = 'home'; this.cherche = undefined; }
+  rangerTelephone() { $('#phone').classList.add('hidden'); this.phoneTab = 'home'; this.cherche = undefined; MUSIQUE.pauseJeu(false); }
   togglePhone(force?: boolean) {
     const ph = $('#phone');
     const open = force ?? ph.classList.contains('hidden');
     this.applySkin();
     ph.classList.toggle('hidden', !open);
+    if (!open) MUSIQUE.pauseJeu(false);                              // téléphone rangé : notre musique reprend
     this.hidePicker();
     if (open) this.renderPhone(true); else this.phoneTab = 'home';
     this.refresh();

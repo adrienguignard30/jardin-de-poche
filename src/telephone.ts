@@ -5,7 +5,7 @@ import { t, tx, lang, quantite } from './i18n';
 import { MUSIQUE } from './musique';
 import { icon } from './ui';
 
-export type Onglet = 'home' | 'recette' | 'marche' | 'bourse' | 'boutique' | 'carnet' | 'recus' | 'voisins' | 'notifs' | 'musique' | 'reglages';
+export type Onglet = 'home' | 'jeu' | 'recette' | 'marche' | 'bourse' | 'boutique' | 'carnet' | 'recus' | 'voisins' | 'notifs' | 'musique' | 'reglages';
 export interface TelHandlers {
   onCuisiner(): void; onOffrir(jardinId: string): void;
   onTroc(donne: E.Ingredient, cherche: E.Ingredient): void; onAccepter(annonceId: string): void; onRetirer(annonceId: string): void;
@@ -50,6 +50,7 @@ export const APPS: { id: Onglet; couleur: string; svg: string }[] = [
   { id: 'recus', couleur: '#d86f8a', svg: SVG('<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>') },
   { id: 'voisins', couleur: '#7a5ac9', svg: SVG('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>') },
   { id: 'notifs', couleur: '#e0533a', svg: SVG('<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>') },
+  { id: 'jeu', couleur: '#7b1fa2', svg: SVG('<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="16" cy="11.5" r="1" fill="currentColor"/><circle cx="18.5" cy="13.5" r="1" fill="currentColor"/>') },
   { id: 'musique', couleur: '#c2185b', svg: SVG('<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>') },
   { id: 'reglages', couleur: '#6b7780', svg: SVG('<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>') },
 ];
@@ -89,7 +90,7 @@ function graphique(pts: { x: string; cours: number; demande: number; cultiv: num
 export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h: TelHandlers, precedent?: Record<string, number>, cherche?: string) {
   const s = t(), j = st.eco.jardin, im = st.eco.immeuble;
   c.innerHTML = '';
-  c.classList.toggle('homeScreen', onglet === 'home'); c.classList.remove('avecBarre');
+  c.classList.toggle('homeScreen', onglet === 'home'); c.classList.remove('avecBarre', 'avecJeu');
   const zoneA = c.parentElement?.querySelector('#telAction') as HTMLElement | null; if (zoneA) { zoneA.innerHTML = ''; zoneA.classList.add('hidden'); }
   c.dataset.rendu = String(++RENDUS);
   c.style.background = '';
@@ -173,6 +174,18 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
     }
     return;
   }
+  if (onglet === 'jeu') {                                                  // le jeu du mois : un autre jeu, dans son cadre, avec SA musique
+    const mj = (CATALOG as any).miniJeu as { titre?: string; url?: string } | undefined;
+    if (!mj?.url) { c.appendChild(el('p', 'small', s.jeuBientot)); return; }
+    c.classList.add('avecJeu');
+    c.appendChild(el('div', 'ttl', mj.titre || s.jeuT));
+    const cadre = el<HTMLIFrameElement>('iframe', 'cadreJeu');
+    cadre.src = mj.url; cadre.allow = 'autoplay; fullscreen; gamepad'; cadre.title = mj.titre || s.jeuT;
+    c.appendChild(cadre);
+    MUSIQUE.pauseJeu(true);                                                // le jeu a sa musique : la nôtre attend
+    return;
+  }
+  MUSIQUE.pauseJeu(false);
   if (onglet === 'musique') {                                               // l'appli Musique : les trois playlists, en choisir une
     const M = MUSIQUE, ec = M.enCours_;
     const PL: { id: string; titre: string; couleur: string }[] = [

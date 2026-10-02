@@ -96,6 +96,12 @@ class Musique {
   suivant() { if (this.enCours_) this.jouer(this.enCours_.id, (this.enCours_.index + 1) % this.enCours_.total, true); }
   precedent() { if (this.enCours_) this.jouer(this.enCours_.id, (this.enCours_.index - 1 + this.enCours_.total) % this.enCours_.total, true); }
   enPause = false;
+  private pauseParJeu = false;
+  /** Le jeu du mois a sa propre musique : on met la nôtre en pause pendant qu'il est ouvert, et on la reprend après. */
+  pauseJeu(oui: boolean) {
+    if (oui && !this.enPause) { this.pauseParJeu = true; this.pause(true); }
+    else if (!oui && this.pauseParJeu) { this.pauseParJeu = false; this.pause(false); }
+  }
   pause(p: boolean) { this.enPause = p; if (this.ac) { if (p) this.ac.suspend(); else this.ac.resume(); } for (const f of this.auditeurs) f(); }
   /** Combien de morceaux dans une playlist (0 tant qu'elle n'est pas chargée). */
   async nbMorceaux(id: string) { return this.pret ? (await this.charger(id)).length : 0; }
