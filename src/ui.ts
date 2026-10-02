@@ -16,6 +16,7 @@ export interface UIHandlers {
   onPick(characterId: string): void;
   /** Mode personnalisation : seul ce personnage, en pied (on = true), ou retour à l'accueil (false). */
   onFocus(characterId: string, on: boolean): void;
+  onPersoSave(characterId: string, perso: Perso): void;
   onContinue(): void;
   onNewGame(): void;
   onSow(slot: number, plant: string): void;
@@ -178,7 +179,7 @@ export class UI {
     }, { passive: true });
   }
   private renderStart(hasSave: boolean) {
-    this.activerGlisserAccueil(); this.majCompte();
+    this.activerGlisserAccueil(); this.majCompte(); this.chargerPersos();
     const s = t();
     const body = $('#startBody');
     body.innerHTML = '';
@@ -320,7 +321,9 @@ export class UI {
     this.perso[id] = perso;
     const back = el('button', 'ghost small back', `← ${s.retour}`); back.style.cssText = LISIBLE;
     back.onclick = () => { this.h.onFocus(id, false); sh.classList.remove('perso'); $('#start .startTop').classList.remove('hidden'); this.showSheet(id); };
-    sh.appendChild(back);
+    const accueil = el('button', 'ghost small back', `⌂ ${s.changerPerso}`); accueil.style.cssText = LISIBLE;
+    accueil.onclick = () => { this.h.onFocus(id, false); sh.classList.remove('perso'); sh.classList.add('hidden'); $('#start .startTop').classList.remove('hidden'); $('#startBody').classList.remove('hidden'); this.h.onSheet(false); };
+    const haut = el('div', 'persoHaut'); haut.append(back, accueil); sh.appendChild(haut);
     const form = el('div', 'persoForm');
     const champ = (label: string, value: string, on: (v: string) => void, type = 'text') => { const w = el('label', 'pf', `<span>${label}</span>`); const i = el<HTMLInputElement>('input'); i.type = type; i.value = value; i.maxLength = 24; i.oninput = () => on(i.value); w.appendChild(i); return w; };
     form.appendChild(champ(s.persoPrenom, perso.prenom, v => { perso.prenom = v; }));
@@ -333,16 +336,17 @@ export class UI {
     };
     const labels: Record<string, string> = { peau: s.zPeau, cheveux: s.zCheveux, haut: s.zHaut, bas: s.zBas, chaussures: s.zChaussures };
     const mats = this.h.getCouleurs(id);
-    const zones = mats.filter(m => /^mat_\w+_(peau|cheveux|haut|bas|chaussures)$/.test(m.name));
+    const zones = mats.filter(m => /^mat_\w+_(peau|cheveux|haut|bas|chaussures)(\.\d{3})?$/.test(m.name));
     const liste = zones.length ? zones : mats.slice(0, 4);
     for (const m of liste) {
-      const z = m.name.split('_').pop()!;
+      const z = m.name.replace(/\.\d{3}$/, '').split('_').pop()!;
       const row = el('div', 'pf zone', `<span>${labels[z] ?? s.persoCouleurNom(liste.indexOf(m) + 1)}</span>`);
       const pal = el('div', 'palette');
-      const choisir = (hex: string | null) => { if (hex) perso.couleurs[m.name] = hex; else delete perso.couleurs[m.name]; this.h.setCouleur(id, m.name, hex ?? ''); pal.querySelectorAll('.sw').forEach(x => x.classList.toggle('on', (x as HTMLElement).dataset.hex === (hex ?? ''))); };
+      const choisir = (hex: string | null) => { console.info('[couleur]', m.name, hex ?? 'origine'); if (hex) perso.couleurs[m.name] = hex; else delete perso.couleurs[m.name]; this.h.setCouleur(id, m.name, hex ?? ''); pal.querySelectorAll('.sw').forEach(x => x.classList.toggle('on', (x as HTMLElement).dataset.hex === (hex ?? ''))); };
       const orig = el('button', 'sw orig', '↺'); orig.title = s.zReset; orig.dataset.hex = ''; orig.onclick = () => choisir(null); pal.appendChild(orig);
       for (const hex of PAL[z] ?? PAL.haut) { const b = el('button', 'sw' + (perso.couleurs[m.name] === hex ? ' on' : '')); b.style.background = hex; b.dataset.hex = hex; b.onclick = () => choisir(hex); pal.appendChild(b); }
-      if (z !== 'peau') { const inp = el<HTMLInputElement>('input', 'sw free'); inp.type = 'color'; inp.title = s.zAutre; inp.value = perso.couleurs[m.name] ?? m.hex; inp.oninput = () => choisir(inp.value); pal.appendChild(inp); }
+      if (z !== 'peau') { const arc = el('button', 'sw arc' + (perso.couleurs[m.name] === 'arc' ? ' on' : ''), ''); arc.title = '🌈'; arc.dataset.hex = 'arc'; arc.onclick = () => choisir('arc'); pal.appendChild(arc); }
+      if (z !== 'peau') { const inp = el<HTMLInputElement>('input', 'sw free'); inp.type = 'color'; inp.title = s.zAutre; inp.value = perso.couleurs[m.name] && perso.couleurs[m.name] !== 'arc' ? perso.couleurs[m.name] : m.hex; inp.oninput = () => choisir(inp.value); pal.appendChild(inp); }
       row.appendChild(pal); form.appendChild(row);
     }
     const more = el('button', 'ghost small', s.plus); more.style.cssText = LISIBLE;
@@ -351,10 +355,18 @@ export class UI {
     more.onclick = () => moreBox.classList.toggle('hidden');
     form.append(more, moreBox);
     sh.appendChild(form);
-    const play = el('button', 'primary', this.hasSave ? s.newGame : s.jouerAvec(perso.prenom || tx(c.name)));
-    agir(play, () => this.lancer(id));
-    sh.appendChild(play);
+    const valider = el('button', 'primary', `✓ ${s.valider}`);
+    agir(valider, () => {
+      this.sauverPersos();                                              // gardé sur l'appareil…
+      this.h.onPersoSave(id, perso);                                    // …et dans la partie de ce personnage s'il en a une
+      this.h.onFocus(id, false); sh.classList.remove('perso'); $('#start .startTop').classList.remove('hidden');
+      this.showSheet(id); this.toast(s.persoEnregistre, 2200, true);
+    });
+    sh.appendChild(valider);
   }
+  /** Les personnalisations (prénom, couleurs, âge, métier), gardées sur l'appareil pour chaque personnage. */
+  private sauverPersos() { try { localStorage.setItem('jdp.persos', JSON.stringify(this.perso)); } catch { /* ignore */ } }
+  private chargerPersos() { try { const p = JSON.parse(localStorage.getItem('jdp.persos') || '{}'); if (p && typeof p === 'object') Object.assign(this.perso, p); } catch { /* ignore */ } }
   hideStart() { $('#start').classList.add('hidden'); $('#hud').classList.remove('hidden'); this.hideNameTags(); }
 
   // ---------- HUD

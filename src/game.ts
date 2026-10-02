@@ -17,6 +17,9 @@ interface SlotView { slot: Slot; group: THREE.Group; potDry: THREE.Object3D | nu
 
 const fwdV = (o: THREE.Object3D, d: number) => new THREE.Vector3(Math.sin(o.rotation.y) * d, 0, Math.cos(o.rotation.y) * d);
 
+/** Le temps de l'arc-en-ciel, partagé par toutes les matières 🌈 (avancé à chaque image). */
+const TEMPS_ARC = { value: 0 };
+
 export class Game {
   assets = new Assets();
   world: World;
@@ -158,6 +161,9 @@ export class Game {
       photo: id => this.photoDe(id),
       onPick: id => { this.showroom?.select(id); MUSIQUE.jouerPerso(id); },
       onFocus: (id, on) => { if (on) this.showroom?.focus(id); else this.showroom?.unfocus(); },
+      onPersoSave: (id, perso) => {                                     // la personnalisation entre dans la partie de ce personnage
+        if (this.state && this.state.character === id) { this.state.perso = { ...perso, couleurs: { ...perso.couleurs } }; this.state.nickname = perso.prenom || this.state.nickname; this.save.store(this.state); this.sauverNuage(true); }
+      },
       onContinue: () => this.continueGame(),
       onNewGame: () => {},
       onSow: (slot, plant) => this.sow(slot, plant),
@@ -274,29 +280,32 @@ export class Game {
       const m = o as THREE.Mesh; if (!m.isMesh) return;
       const arr = Array.isArray(m.material) ? m.material : [m.material];
       const out = arr.map(mat => {
-        const sm = mat as THREE.MeshStandardMaterial; if (!sm.name || !(sm.name in couleurs)) return mat;
-        const hex = couleurs[sm.name];
+        const sm = mat as THREE.MeshStandardMaterial; if (!sm.name) return mat;
+        const cle = sm.name in couleurs ? sm.name : Object.keys(couleurs).find(k => k.replace(/\.\d{3}$/, '') === sm.name.replace(/\.\d{3}$/, ''));
+        if (!cle) return mat;
+        const hex = couleurs[cle];
         const c = (sm.userData.tinted ? sm : sm.clone()) as THREE.MeshStandardMaterial;
         // la texture reste (plis, ombres) : on garde sa luminosité relative et on remplace sa couleur par la teinte choisie
         if (!c.userData.tinted) {
           c.userData.tinted = true;
-          c.userData.u = { uTint: { value: new THREE.Color('#ffffff') }, uLum: { value: 1 }, uOn: { value: 0 }, uAvg: { value: new THREE.Color('#808080') }, uKeep: { value: 0 } };
+          c.userData.u = { uTint: { value: new THREE.Color('#ffffff') }, uLum: { value: 1 }, uOn: { value: 0 }, uAvg: { value: new THREE.Color('#808080') }, uKeep: { value: 0 }, uArc: { value: 0 }, uTemps: TEMPS_ARC };
           c.onBeforeCompile = sh => {
             Object.assign(sh.uniforms, c.userData.u);
             sh.fragmentShader = sh.fragmentShader
-              .replace('#include <common>', '#include <common>\nuniform vec3 uTint; uniform float uLum; uniform float uOn; uniform vec3 uAvg; uniform float uKeep;')
+              .replace('#include <common>', '#include <common>\nuniform vec3 uTint; uniform float uLum; uniform float uOn; uniform vec3 uAvg; uniform float uKeep; uniform float uArc; uniform float uTemps;\nvec3 arcEnCiel(float h) { return clamp(abs(mod(h * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0); }')
               // ce qui n'est pas de la couleur de la zone (yeux, moustache, boutons) garde sa couleur d'origine
-              .replace('#include <map_fragment>', '#include <map_fragment>\nif (uOn > 0.5) { float l = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114)); vec3 t = uTint * clamp(l / max(uLum, 0.02), 0.25, 1.9); float d = distance(diffuseColor.rgb / max(l, 0.05), uAvg / max(dot(uAvg, vec3(0.299, 0.587, 0.114)), 0.05)); float k = uKeep > 0.5 ? 1.0 - smoothstep(0.35, 0.8, d) : 1.0; diffuseColor.rgb = mix(diffuseColor.rgb, t, k); }');
+              .replace('#include <map_fragment>', '#include <map_fragment>\nif (uOn > 0.5) { float l = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114)); vec3 base = uTint;\n#ifdef USE_MAP\n if (uArc > 0.5) base = mix(vec3(1.0), arcEnCiel(fract(uTemps * 0.12 + vMapUv.y * 2.5 + vMapUv.x * 1.2)), 0.85);\n#else\n if (uArc > 0.5) base = mix(vec3(1.0), arcEnCiel(fract(uTemps * 0.12 + gl_FragCoord.y * 0.004)), 0.85);\n#endif\n vec3 t = base * clamp(l / max(uLum, 0.02), 0.25, 1.9); float d = distance(diffuseColor.rgb / max(l, 0.05), uAvg / max(dot(uAvg, vec3(0.299, 0.587, 0.114)), 0.05)); float k = uKeep > 0.5 ? 1.0 - smoothstep(0.35, 0.8, d) : 1.0; diffuseColor.rgb = mix(diffuseColor.rgb, t, k); }');
           };
           c.customProgramCacheKey = () => 'teinte-zone';
           c.needsUpdate = true;
         }
         const u = c.userData.u;
         if (!hex) { u.uOn.value = 0; return c; }                                // ↺ : la texture d'origine
-        const zone = sm.name.split('_').pop()!;
+        const zone = sm.name.replace(/\.\d{3}$/, '').split('_').pop()!;
         const avg = moy[zone] ? new THREE.Color(moy[zone]) : null;
         const lum = avg ? (0.299 * avg.r + 0.587 * avg.g + 0.114 * avg.b) : 0.5;
-        u.uTint.value.set(hex); u.uLum.value = Math.max(0.08, lum); u.uOn.value = 1; if (avg) u.uAvg.value.copy(avg);
+        if (hex === 'arc') { u.uArc.value = 1; u.uTint.value.set('#ffffff'); } else { u.uArc.value = 0; u.uTint.value.set(hex); }   // 🌈 : les couleurs défilent
+        u.uLum.value = Math.max(0.08, lum); u.uOn.value = 1; if (avg) u.uAvg.value.copy(avg);
         u.uKeep.value = zone === 'peau' ? 1 : 0;      // yeux et sourcils gardés dans la peau ; cheveux, bonnet et vêtements se recolorent en entier
         return c;
       });
@@ -1561,6 +1570,7 @@ export class Game {
   // ---------- boucle
   private loop() {
     const dt = Math.min(.05, this.world.clock.getDelta());
+    TEMPS_ARC.value += dt;
     if (!this.running && this.showroom) {
       this.showroom.update(dt);
       this.world.renderer.render(this.showroom.scene, this.showroom.camera);
