@@ -3,14 +3,15 @@ import { CATALOG, ECO, prixProchainPot, type GameState } from './state';
 import * as E from './economie';
 import { t, tx, lang, quantite } from './i18n';
 import { MUSIQUE } from './musique';
+import * as EL from './enligne';
 import { icon } from './ui';
 
-export type Onglet = 'home' | 'jeu' | 'recette' | 'marche' | 'bourse' | 'boutique' | 'carnet' | 'recus' | 'voisins' | 'notifs' | 'musique' | 'reglages';
+export type Onglet = 'home' | 'classement' | 'jeu' | 'recette' | 'marche' | 'bourse' | 'boutique' | 'carnet' | 'recus' | 'voisins' | 'notifs' | 'musique' | 'reglages';
 export interface TelHandlers {
   onCuisiner(): void; onOffrir(jardinId: string): void;
   onTroc(donne: E.Ingredient, cherche: E.Ingredient): void; onAccepter(annonceId: string): void; onRetirer(annonceId: string): void;
   onBuySeed(id: string): void; onBuyPot(): void;
-  onDemain(): void; onChercher(graine: string): void; onFiche(recetteId: string): void; onSemer(graine: string): void; onMontrerPlat(): void;
+  onDemain(): void; onChercher(graine: string): void; onFiche(recetteId: string): void; onSemer(graine: string): void; onMontrerPlat(): void; onCompte(): void;
   onApp(app: Onglet, detail?: string): void; onReglage(k: 'fond' | 'vibre' | 'son', v: string | boolean): void;
   onRepondre(evId: string, texte: { fr: string; en: string }): void;
 }
@@ -50,6 +51,7 @@ export const APPS: { id: Onglet; couleur: string; svg: string }[] = [
   { id: 'recus', couleur: '#d86f8a', svg: SVG('<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>') },
   { id: 'voisins', couleur: '#7a5ac9', svg: SVG('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>') },
   { id: 'notifs', couleur: '#e0533a', svg: SVG('<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>') },
+  { id: 'classement', couleur: '#f2a33a', svg: SVG('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>') },
   { id: 'jeu', couleur: '#7b1fa2', svg: SVG('<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="16" cy="11.5" r="1" fill="currentColor"/><circle cx="18.5" cy="13.5" r="1" fill="currentColor"/>') },
   { id: 'musique', couleur: '#c2185b', svg: SVG('<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>') },
   { id: 'reglages', couleur: '#6b7780', svg: SVG('<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>') },
@@ -174,6 +176,21 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
     }
     return;
   }
+  if (onglet === 'classement') {                                          // les meilleurs de l'immeuble… du monde
+    if (!EL.EN_LIGNE) { c.appendChild(el('p', 'small', s.classementHorsLigne)); return; }
+    const cats: [EL.Categorie, string][] = [['trocs', s.catTrocs], ['recoltes', s.catRecoltes], ['offerts', s.catOfferts], ['recus', s.catRecus]];
+    const choix = (window as any).__catClassement as EL.Categorie ?? 'trocs';
+    const onglets = el('div', 'ongletsClassement');
+    for (const [k, nom] of cats) { const b = el('button', 'og' + (k === choix ? ' on' : ''), nom); b.onclick = () => { (window as any).__catClassement = k; h.onApp('classement'); }; onglets.appendChild(b); }
+    c.appendChild(onglets);
+    const liste = el('div', 'listeClassement', `<p class="small">…</p>`); c.appendChild(liste);
+    EL.classement(choix).then(rangs => {
+      liste.innerHTML = '';
+      if (!rangs.length) { liste.appendChild(el('p', 'small', s.classementVide)); return; }
+      for (const r of rangs) liste.appendChild(el('div', 'row rang' + (r.moi ? ' moi' : ''), `<span class="n">${r.rang <= 3 ? ['🥇', '🥈', '🥉'][r.rang - 1] : r.rang}</span><span class="nom">${r.nom.replace(/[<>&]/g, '')}${r.moi ? ` <i>(${s.toi})</i>` : ''}</span><b>${r.score}</b>`));
+    });
+    return;
+  }
   if (onglet === 'jeu') {                                                  // le jeu du mois : un autre jeu, dans son cadre, avec SA musique
     const mj = (CATALOG as any).miniJeu as { titre?: string; url?: string } | undefined;
     if (!mj?.url) { c.appendChild(el('p', 'small', s.jeuBientot)); return; }
@@ -212,6 +229,13 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
   }
   if (onglet === 'reglages') {
     const R = reglagesTel();
+    if (EL.EN_LIGNE) {                                                     // le compte
+      const e = EL.etatCompte();
+      c.appendChild(el('div', 'ttl', s.compteT));
+      const lc = el('div', 'row', `<span>${e.connecte && !e.invite ? s.connecteComme(e.pseudo ?? '') : s.inviteEnCours}</span>`);
+      const bc = el('button', 'buy', e.connecte && !e.invite ? s.deconnecterBtn : s.creerCompteT);
+      bc.onclick = () => h.onCompte(); lc.appendChild(bc); c.appendChild(lc);
+    }
     // la musique : marche / arrêt et volume
     c.appendChild(el('div', 'ttl', s.musiqueT));
     const M = MUSIQUE.R;

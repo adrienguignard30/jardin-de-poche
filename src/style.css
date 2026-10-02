@@ -647,3 +647,17 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
 /* le jeu du mois prend toute la place (plus de bandeau de titre) */
 .phone .content.avecJeu { padding: 0 !important; }
 .phone .content.avecJeu .cadreJeu { border-radius: 0; min-height: 0; height: 100%; }
+
+/* le compte */
+.compteBtn { position: fixed; top: calc(12px + var(--sat, 0px)); left: 12px; z-index: 30; background: rgba(255,255,255,.92); border: 1px solid rgba(36,49,58,.12); border-radius: 999px; padding: 8px 14px; font-weight: 700; color: #24313a; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
+.fenCompte { display: flex; flex-direction: column; gap: 8px; min-width: min(360px, 86vw); }
+.fenCompte .primary { width: 100%; }
+.fenCompte .champ { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid rgba(36,49,58,.18); font-size: 16px; background: #fff; color: #24313a; }
+.fenCompte .aideChamp { margin: -4px 2px 2px; color: #5b6b75; } .fenCompte .aideChamp.ok, .fenCompte .cpt.ok { color: #2f7a45; } .fenCompte .aideChamp.warn { color: #b3382c; }
+.ongletsCompte, .phone .ongletsClassement { display: flex; gap: 6px; margin-top: 8px; }
+.ongletsCompte .og, .phone .ongletsClassement .og { flex: 1; padding: 9px 6px; border-radius: 12px; background: rgba(36,49,58,.07); border: 0; font-weight: 700; color: #24313a; font-size: 13px; }
+.ongletsCompte .og.on, .phone .ongletsClassement .og.on { background: #24313a; color: #fff; }
+/* le classement */
+.phone .listeClassement { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.phone .row.rang { display: flex; align-items: center; gap: 10px; } .phone .row.rang .n { width: 30px; text-align: center; font-weight: 800; font-size: 16px; }
+.phone .row.rang .nom { flex: 1; } .phone .row.rang b { font-size: 16px; } .phone .row.rang.moi { border: 2px solid #3f9a5a; background: #eef8f0; }

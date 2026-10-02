@@ -75,7 +75,7 @@ export interface GameState {
   items: string[];        // ids d'objets achetés (décos, améliorations, roof)
   roof: boolean;
   lastSeen: number;       // ms, pour le résumé au retour
-  log: { wateredByChar: number };
+  log: { wateredByChar: number; recoltes?: number };
   /** Mon profil : prénom, âge, métier, couleurs des vêtements, photo prise dans le jeu. */
   perso?: Perso;
   /** Le potager : mon jardin (règles), l'immeuble (voisins, cours, annonces), le carnet, l'horloge. */

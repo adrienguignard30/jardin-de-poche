@@ -4,6 +4,7 @@ import { World, SLOTS, FL, POT_SCALE, FACADE_FRONT, freePoint, segmentBlocked, C
 import { Character, type Reglages } from './character';
 import { UI, icon } from './ui';
 import { MUSIQUE } from './musique';
+import * as EL from './enligne';
 import { t, tx, lang, quantite, liste } from './i18n';
 import { CATALOG, ECO, loadCatalog, plantDef, itemDef, charDef, newGame, prixProchainPot, LocalSave, generateNickname, type GameState, type PotState, type SaveProvider, type Perso } from './state';
 import * as E from './economie';
@@ -167,6 +168,8 @@ export class Game {
       onFiche: id => this.ui.fiche(id),
       onSemer: g => this.semerDansPotLibre(g),
       onMontrerPlat: () => { this.ui.togglePhone(false); this.montrerPlat(); },
+      onCompte: () => this.ui.compte(),
+      onConnecte: () => { this.recupererNuage().catch(e => console.warn('[en ligne]', e)); },
       onRepondre: (id, texte) => this.repondre(id, texte),
       onBuySeed: id => this.buySeed(id),
       onBuyPot: () => this.buyPot(),
@@ -196,6 +199,7 @@ export class Game {
     await this.assets.loadOptional(['environments', 'interiors', 'env_decor', 'plantes']);   // plantes.glb : tes plantes, 7 stades par variété
     this.world.buildBalcony();
     this.world.addCritters();
+    try { await EL.demarrer(); } catch (e) { console.warn('[en ligne]', e); }
     const saved = await this.save.load();
     this.state = saved ?? newGame(CATALOG.characters[0].id, '');
     if (q.get('cycle')) this.dayLength = parseFloat(q.get('cycle')!) || 120;
@@ -318,6 +322,7 @@ export class Game {
     const c = charDef(s.character);
     MUSIQUE.jouerPerso(c.id);
     this.autoToken++; this.remiseAZero();
+    if (EL.EN_LIGNE && !EL.etatCompte().connecte) EL.jouerInvite(s.nickname || s.perso?.prenom || 'Jardinier').catch(() => { /* hors ligne : on joue en local */ });
     this.ui.setProgress(0, 1, tx(c.name));
     await this.world.setView(CATALOG.views[s.view] ?? CATALOG.views.tour);
     const asset = await this.assets.loadCharacter(c.id, c.file);
@@ -842,6 +847,7 @@ export class Game {
     await wait(g.effet * 1000);
     const d = plantDef(p.plant.plant), j = this.state.eco.jardin;
     const r = P.harvest(p.plant);                                          // on récolte toujours : le pot se libère
+    this.state.log.recoltes = (this.state.log.recoltes ?? 0) + r.count;
     j.panier[d.id] = Math.min(E.REGLES.PANIER_MAX, (j.panier[d.id] ?? 0) + r.count);
     this.flyCrops(d.id, SLOTS[p.id].pos, r.count, p.plant.variete ?? 1);
     if (r.emptied) { p.plant = null; }
@@ -1531,7 +1537,26 @@ export class Game {
   }
 
   // ---------- sauvegarde
-  private persist() { this.state.lastSeen = Date.now(); this.save.store(this.state); }
+  private persist() { this.state.lastSeen = Date.now(); this.save.store(this.state); this.sauverNuage(); }
+  /** La copie en ligne : compacte (sans l'historique de la Bourse, 30 derniers messages, 20 derniers plats ≈ 23 Ko). */
+  private sauverNuage(maintenant = false) {
+    if (!EL.EN_LIGNE || !this.state) return;
+    const s = this.state, im = s.eco.immeuble, j = s.eco.jardin;
+    const data = { ...s, eco: { ...s.eco, immeuble: { ...im, historique: undefined, evenements: im.evenements.filter(e => e.pour === j.id).slice(-30), plats: im.plats.slice(-20) } } };
+    const compteurs = { trocs: j.unites_echangees, recoltes: s.log.recoltes ?? 0, offerts: j.plats_offerts, recus: im.plats.filter(p => p.a === j.id).length };
+    EL.sauverEnLigne(s.character as EL.Perso, data, compteurs, s.perso?.prenom || s.nickname || 'Jardinier', maintenant);
+  }
+  /** Connecté avec un compte : on reprend la partie en ligne la plus récente (si elle est plus récente que celle du téléphone). */
+  private async recupererNuage() {
+    const parties = await EL.partiesEnLigne();
+    if (!parties.length) { this.sauverNuage(true); return; }
+    const p = parties.sort((a, b) => +new Date(b.maj) - +new Date(a.maj))[0];
+    const local = this.state?.savedAt ?? 0;
+    if (+new Date(p.maj) > local || this.state.character !== p.perso) {
+      this.state = p.data as GameState; await this.save.store(this.state);
+      this.ui.showStart(true, tx(charDef(this.state.character).name));
+    }
+  }
 
   // ---------- boucle
   private loop() {

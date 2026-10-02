@@ -2,6 +2,7 @@ import { t, tx, lang, setLang, fmtTime, type Lang } from './i18n';
 import { CATALOG, ECO, type GameState, type CharacterDef, type Perso } from './state';
 import * as E from './economie';
 import { MUSIQUE } from './musique';
+import * as EL from './enligne';
 import { renderTelephone, ficheRecette, imagePlat, reglagesTel, iconeApp, FONDS, type Onglet, type TelHandlers } from './telephone';
 
 export interface UIHandlers {
@@ -22,7 +23,7 @@ export interface UIHandlers {
   onBuyPot(): void;
   onCuisiner(): void; onOffrir(jardinId: string): void;
   onTroc(donne: E.Ingredient, cherche: E.Ingredient): void; onAccepter(annonceId: string): void; onRetirer(annonceId: string): void;
-  onDemain(): void; onChercher(graine: string): void; onFiche(recetteId: string): void; onSemer(graine: string): void; onMontrerPlat(): void;
+  onDemain(): void; onChercher(graine: string): void; onFiche(recetteId: string): void; onSemer(graine: string): void; onMontrerPlat(): void; onCompte(): void; onConnecte(): void;
   onRepondre(evId: string, texte: { fr: string; en: string }): void;
   onLang(l: Lang): void;
   onNight(mode: 'auto' | 'day' | 'night'): void;
@@ -177,7 +178,7 @@ export class UI {
     }, { passive: true });
   }
   private renderStart(hasSave: boolean) {
-    this.activerGlisserAccueil();
+    this.activerGlisserAccueil(); this.majCompte();
     const s = t();
     const body = $('#startBody');
     body.innerHTML = '';
@@ -203,6 +204,60 @@ export class UI {
   }
   /** Fiche d'un personnage, ouverte quand on le touche sur l'accueil. */
   private sheetId = '';
+  /** Le compte : jouer tout de suite (invité) ou pseudo + mot de passe (8 caractères minimum). */
+  compte() {
+    const s = t(), e = EL.etatCompte();
+    const c = el('div', 'fenCompte');
+    c.appendChild(el('h3', '', s.compteT));
+    if (e.connecte && !e.invite) {
+      c.appendChild(el('p', 'q', s.connecteComme(e.pseudo ?? '')));
+      const b = el('button', 'ghost', s.deconnecterBtn); b.style.cssText = LISIBLE;
+      b.onclick = async () => { await EL.seDeconnecter(); this.fermerModal(); this.majCompte(); };
+      c.appendChild(b); this.modal(c, true); return;
+    }
+    if (!e.connecte) {
+      const tout = el('button', 'primary', s.jouerTout); tout.onclick = () => this.fermerModal();
+      c.append(tout, el('p', 'small', s.jouerToutAide));
+    } else c.appendChild(el('p', 'small', s.inviteEnCours));
+    let mode: 'creer' | 'connecter' = 'creer';
+    const og = el('div', 'ongletsCompte');
+    const o1 = el('button', 'og on', s.creerCompteT), o2 = el('button', 'og', s.dejaCompte);
+    og.append(o1, o2); c.appendChild(og);
+    const ps = el<HTMLInputElement>('input', 'champ'); ps.placeholder = s.pseudoT; ps.autocomplete = 'username'; ps.maxLength = 20;
+    const infoP = el('p', 'small aideChamp', s.pseudoAide);
+    const mdp = el<HTMLInputElement>('input', 'champ'); mdp.type = 'password'; mdp.placeholder = s.mdpT; mdp.autocomplete = 'new-password'; mdp.maxLength = 72;
+    const infoM = el('p', 'small aideChamp', `${s.mdpAide} <b class="cpt">0/8</b>`);
+    const err = el('p', 'small warn', '');
+    const go = el('button', 'primary', s.creerBtn);
+    c.append(ps, infoP, mdp, infoM, err, go);
+    const choisir = (m: 'creer' | 'connecter') => { mode = m; o1.classList.toggle('on', m === 'creer'); o2.classList.toggle('on', m === 'connecter'); go.textContent = m === 'creer' ? s.creerBtn : s.connecterBtn; mdp.autocomplete = m === 'creer' ? 'new-password' : 'current-password'; infoP.textContent = s.pseudoAide; err.textContent = ''; };
+    o1.onclick = () => choisir('creer'); o2.onclick = () => choisir('connecter');
+    let t0 = 0;
+    ps.oninput = () => {                                                  // pseudo libre ? (vérifié pendant la frappe)
+      clearTimeout(t0); const v = ps.value;
+      if (mode !== 'creer') return;
+      if (!EL.pseudoValide(v)) { infoP.textContent = s.pseudoAide; infoP.className = 'small aideChamp'; return; }
+      t0 = window.setTimeout(async () => { const ok = await EL.pseudoDisponible(v); if (ps.value !== v) return; infoP.textContent = ok ? s.pseudoLibre : s.pseudoPris; infoP.className = 'small aideChamp ' + (ok ? 'ok' : 'warn'); }, 350);
+    };
+    mdp.oninput = () => { const n = mdp.value.length; const cpt = infoM.querySelector('.cpt') as HTMLElement; cpt.textContent = n >= 8 ? '✓' : `${n}/8`; cpt.className = 'cpt' + (n >= 8 ? ' ok' : ''); };
+    agir(go, async () => {
+      err.textContent = '';
+      const nom = this.state?.nickname || this.state?.perso?.prenom || 'Jardinier';
+      const r = mode === 'creer' ? await EL.creerCompte(ps.value, mdp.value, nom) : await EL.seConnecter(ps.value, mdp.value);
+      if (r) { err.textContent = s.errCompte[r] ?? r; return; }
+      this.fermerModal(); this.toast(mode === 'creer' ? s.compteOk : s.connexionOk, 3500, true); this.majCompte();
+      if (mode === 'connecter') this.h.onConnecte();
+    });
+    this.modal(c, true);
+  }
+  /** La pastille compte de l'accueil : « 👤 Se connecter » ou « 👤 pseudo ». */
+  majCompte() {
+    if (!EL.EN_LIGNE) return;
+    let b = document.getElementById('compteBtn') as HTMLButtonElement | null;
+    if (!b) { b = el<HTMLButtonElement>('button', 'compteBtn'); b.id = 'compteBtn'; $('#start').appendChild(b); b.onclick = () => this.compte(); }
+    const e = EL.etatCompte();
+    b.textContent = `👤 ${e.connecte && !e.invite ? e.pseudo : t().compteT}`;
+  }
   /** Accueil sur mobile : le personnage suivant ou précédent (glisser, flèches, points). */
   private changerPerso(sens: number) {
     const ids = CATALOG.characters.map(c => c.id);
