@@ -458,7 +458,7 @@ export class UI {
     this.modal(c, false);
   }
   /** Le guide des premiers pas : une phrase douce en bas de l'écran, jusqu'à l'étape suivante. */
-  guide(text: string) { if (!$('#start').classList.contains('hidden')) return; const g = $('#guide'); g.textContent = text; g.classList.remove('hidden'); this.placerBulles(); }
+  guide(text: string) { if (!$('#start').classList.contains('hidden')) return; const g = $('#guide'); g.textContent = text; g.classList.remove('hidden', 'ouvert'); g.onclick = () => { g.classList.toggle('ouvert'); this.placerBulles(); }; this.placerBulles(); }
   guideHide() { $('#guide').classList.add('hidden'); }
   /** Ce qu'on montre selon l'étape : rien de plus que ce qui sert maintenant. */
   etape(e: number) {

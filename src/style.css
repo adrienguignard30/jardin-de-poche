@@ -625,3 +625,12 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
   #infoCard { right: 112px !important; left: 10px !important; max-width: none !important; width: auto !important; }
   #recetteHud { font-size: 13px; padding: 8px 12px !important; }
 }
+
+/* mobile : la bulle d'aide est une carte d'astuce courte (une idée à la fois), 3 lignes au plus ; la toucher déplie la suite */
+@media (max-width: 700px), (max-height: 520px) and (pointer: coarse) {
+  .guide { pointer-events: auto !important; text-align: left !important; padding: 9px 34px 9px 40px !important; background: #fffdf6 !important; border: 1.5px solid #f2c46b !important; box-shadow: 0 6px 18px rgba(36,49,58,.18) !important; }
+  .guide::before { content: '💡'; position: absolute; left: 12px; top: 9px; font-size: 16px; }
+  .guide:not(.ouvert) { display: -webkit-box !important; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .guide:not(.ouvert)::after { content: '▾'; position: absolute; right: 12px; bottom: 7px; color: #c2902a; font-weight: 800; }
+  .guide.hidden { display: none !important; }
+}

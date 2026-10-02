@@ -146,7 +146,7 @@ export class Showroom {
     if (selH) { this.halo.position.x = selH.char.obj.position.x; this.halo.position.z = selH.char.obj.position.z; this.halo.scale.setScalar(1 + Math.sin(this.t * 2) * .04); }
     if (this.focused) { for (const c of this.chars) c.char.update(dt); return; }
     const want = this.portrait ? 0 : this.pan;
-    const lookY = this.portrait && this.sheetOpen ? .15 : 1.0;        // fiche ouverte sur téléphone : les personnages montent dans l'écran
+    const lookY = this.portrait && this.sheetOpen ? -.45 : 1.0;       // fiche ouverte sur téléphone : le personnage monte au-dessus du panneau
     if (Math.abs(want - this.panNow) > .001 || Math.abs(lookY - this.lookYNow) > .001) {
       this.panNow += (want - this.panNow) * Math.min(1, dt * 4); this.lookYNow += (lookY - this.lookYNow) * Math.min(1, dt * 4);
       this.camera.position.x = this.panNow; this.camera.lookAt(this.panNow, this.lookYNow, 0);
