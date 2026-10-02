@@ -617,3 +617,11 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
   .sheet:not(.perso) .startRow .primary { flex: 1.4; min-height: 50px; font-size: 16px; margin: 0; } .sheet:not(.perso) .startRow .ghost { flex: 1; min-height: 50px; }
 }
 @keyframes monteBas { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* mobile : le message (toast) et la bulle d'aide sont placés par le jeu sous les pastilles ; la fiche du pot ne passe pas sous le téléphone */
+@media (max-width: 700px), (max-height: 520px) and (pointer: coarse) {
+  .toast { left: 12px !important; right: 12px !important; transform: none !important; max-width: none !important; border-radius: 14px !important; font-size: 13px !important; padding: 8px 12px !important; z-index: 40; }
+  .guide { left: 12px !important; right: 12px !important; transform: none !important; max-width: none !important; }
+  #infoCard { right: 112px !important; left: 10px !important; max-width: none !important; width: auto !important; }
+  #recetteHud { font-size: 13px; padding: 8px 12px !important; }
+}

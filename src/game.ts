@@ -314,6 +314,7 @@ export class Game {
   private async continueGame() { await this.enterGame(); }
   private async enterGame() {
     const s = this.state;
+    s.eco.immeuble.annonces = s.eco.immeuble.annonces.filter(a => a.accepte_par || (a.donne.graine !== E.POINTS && a.cherche.graine !== E.POINTS));
     const c = charDef(s.character);
     MUSIQUE.jouerPerso(c.id);
     this.autoToken++; this.remiseAZero();

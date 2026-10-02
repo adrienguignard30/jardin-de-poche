@@ -333,10 +333,9 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
       }
       else c.appendChild(el('p', 'small warn', s.personnePoste(nomG(cible ?? mq[0].graine).toLowerCase())));
     }
-    // 2. proposer un échange : je cherche (ce qui manque) contre ce que je donne (surplus ou points). Tout reste équilibré :
+    // 2. proposer un échange : je cherche (ce qui manque) contre ce que je donne (mes légumes en trop ; les points, c'est pour la Boutique). Tout reste équilibré :
     //    changer une quantité recalcule l'autre ; les compteurs tournent en rond (au-delà du max → 1, sous 1 → max) ; « Max » va au plus.
     const dons: [string, number][] = Object.keys(j.panier).filter(g => surplus(g) > 0).map(g => [g, surplus(g)] as [string, number]);
-    if (j.points > 0) dons.push([E.POINTS, j.points]);
     c.appendChild(el('div', 'ttl', s.proposerTroc));
     if (!dons.length) c.appendChild(el('p', 'small warn', s.rienADonner));
     else {

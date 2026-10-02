@@ -306,7 +306,7 @@ export class UI {
   bind(state: GameState) { this.state = state; this.refresh(); }
   refresh() {
     if (!this.state) return;
-    this.badges(); this.miniTel();
+    this.badges(); this.miniTel(); this.placerBulles();
     const j = this.state.eco.jardin, im = this.state.eco.immeuble;
     if (!this.compteurAnime) $('#coins').textContent = String(j.points);
     const ouvertes = im.annonces.filter(a => !a.accepte_par && a.de !== j.id).length;
@@ -352,11 +352,22 @@ export class UI {
     };
     next();
   }
+  /** Sur mobile : le petit message et la bulle d'aide se placent sous les pastilles, l'un sous l'autre, jamais par-dessus. */
+  placerBulles() {
+    const mobile = window.matchMedia('(max-width: 700px), (max-height: 520px) and (pointer: coarse)').matches;
+    const tt = $('#toast'), g = $('#guide');
+    if (!mobile) { tt.style.top = ''; g.style.top = ''; return; }
+    let y = 0;
+    for (const id of ['#coinsPill', '#seedsPill', '#recetteHud']) { const e = this.root.querySelector(id) as HTMLElement | null; if (e && e.offsetParent) y = Math.max(y, e.getBoundingClientRect().bottom); }
+    y = Math.max(y, 120) + 8;
+    if (!tt.classList.contains('hidden')) { tt.style.top = `${y}px`; y = tt.getBoundingClientRect().bottom + 6; }
+    g.style.top = `${y}px`;
+  }
   toast(msg: string, ms = 2200, prioritaire = false) {
     if (!$('#start').classList.contains('hidden')) return;
     if (this.fileActive && !prioritaire) return;                     // un message important est à l'écran : on ne l'écrase pas
-    const tt = $('#toast'); tt.textContent = msg; tt.classList.remove('hidden');
-    clearTimeout(this.toastTimer); this.toastTimer = window.setTimeout(() => tt.classList.add('hidden'), ms);
+    const tt = $('#toast'); tt.textContent = msg; tt.classList.remove('hidden'); this.placerBulles();
+    clearTimeout(this.toastTimer); this.toastTimer = window.setTimeout(() => { tt.classList.add('hidden'); this.placerBulles(); }, ms);
   }
   welcome(lines: string[]) {
     const s = t();
@@ -447,7 +458,7 @@ export class UI {
     this.modal(c, false);
   }
   /** Le guide des premiers pas : une phrase douce en bas de l'écran, jusqu'à l'étape suivante. */
-  guide(text: string) { if (!$('#start').classList.contains('hidden')) return; const g = $('#guide'); g.textContent = text; g.classList.remove('hidden'); }
+  guide(text: string) { if (!$('#start').classList.contains('hidden')) return; const g = $('#guide'); g.textContent = text; g.classList.remove('hidden'); this.placerBulles(); }
   guideHide() { $('#guide').classList.add('hidden'); }
   /** Ce qu'on montre selon l'étape : rien de plus que ce qui sert maintenant. */
   etape(e: number) {

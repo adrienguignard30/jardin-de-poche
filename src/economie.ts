@@ -111,7 +111,6 @@ export function garantirMarche(im: Immeuble, j: Jardin, cat: Catalogue, now: num
     const mien = essais[0]?.g;
     let cherche: Ingredient;
     if (mien) cherche = { graine: mien, quantite: debutant ? 1 : essais[0].q };
-    else if (j.points > 0) cherche = { graine: POINTS, quantite: Math.max(1, Math.min(j.points, Math.round(valeurM * (debutant ? .6 : 1)))) };
     else {                                                                     // rien à donner aujourd'hui : une plante de sa poche, à récolter
       const vite = Object.keys(j.poche).sort((a, b) => cat.graine(a).pousse_min - cat.graine(b).pousse_min)[0];
       if (!vite) continue;
