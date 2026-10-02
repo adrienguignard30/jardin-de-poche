@@ -207,6 +207,7 @@ export class Game {
     this.world.buildBalcony();
     this.world.addCritters();
     try { await EL.demarrer(); } catch (e) { console.warn('[en ligne]', e); }
+    if (EL.etatCompte().connecte && !EL.etatCompte().invite) { try { await this.recupererNuage(false); } catch (e) { console.warn('[en ligne]', e); } }
     const saved = await this.save.load();
     this.ui.parties = this.save.liste();
     this.state = saved ?? newGame(CATALOG.characters[0].id, '');
@@ -688,6 +689,7 @@ export class Game {
     for (const p of this.state.pots) { if (p.plant) P.tick(p.plant, now); this.refreshSlot(p); }
     const e = this.state.eco.jardin.etape ?? 0;
     if (e === 2 && this.state.pots.some(p => p.plant && P.isReady(p.plant))) this.etape(3);
+    if (now - this.panierVu > 1000) { this.panierVu = now; this.remplirPanier(); }
     if (now - this.ecoTimer > (this.demo ? 1500 : 5000)) {
       this.ecoTimer = now;
       const avant = { ...this.state.eco.immeuble.cours };
@@ -813,6 +815,7 @@ export class Game {
     const s = this.state, p = this.slotState(id);
     const j = s.eco.jardin;
     if (!p || p.plant || this.char.busy) return;
+    this.ui.apercuRecolte(plant);                                      // ce que tu récolteras, en image
     if (!j.poche[plant]) { if (!j.rares[plant]) return; j.rares[plant]--; if (!j.rares[plant]) delete j.rares[plant]; }   // une rare se sème une fois
     const slot = SLOTS[id];
     this.ui.refresh();
@@ -881,9 +884,21 @@ export class Game {
     const target = BASKET_SPOT.clone().add(new THREE.Vector3(0, .35, 0));
     for (let i = 0; i < Math.min(n, 6); i++) {
       const o = this.assets.get(name); o.scale.setScalar(reel ? 1 : .7);
-      const start = from.clone().add(new THREE.Vector3((Math.random() - .5) * .3, .5, (Math.random() - .5) * .3));
+      let start = from.clone().add(new THREE.Vector3((Math.random() - .5) * .3, .5, (Math.random() - .5) * .3));
       o.position.copy(start); this.world.scene.add(o);
-      const t0 = performance.now() + i * 90, dur = 650;
+      let t0 = performance.now() + i * 90, dur = 650;
+      if (i === 0) {                                                     // le premier : il le tient en main un instant, on le voit bien
+        const tient = performance.now(), garder = 1100;
+        const suivre = () => {
+          const pm = this.paume('Right');
+          if (pm) o.position.copy(pm).add(new THREE.Vector3(0, .05, 0));
+          o.rotation.y += .03;
+          if (performance.now() - tient < garder) requestAnimationFrame(suivre);
+        };
+        suivre();
+        t0 = performance.now() + garder; dur = 700;
+        setTimeout(() => { start = o.position.clone(); }, garder - 16);
+      }
       const step = () => {
         const k = Math.min(1, (performance.now() - t0) / dur);
         if (k < 0) { requestAnimationFrame(step); return; }
@@ -891,10 +906,31 @@ export class Game {
         o.position.lerpVectors(start, target, e);
         o.position.y += Math.sin(k * Math.PI) * .9;
         o.rotation.y += .12;
-        if (k < 1) requestAnimationFrame(step); else this.world.scene.remove(o);
+        if (k < 1) requestAnimationFrame(step); else { this.world.scene.remove(o); this.remplirPanier(true); }
       };
       requestAnimationFrame(step);
     }
+  }
+  /** Le panier montre ce qu'il contient : les légumes 3D des récoltes, posés dedans (5 au plus, les plus nombreux). */
+  private contenuPanier: THREE.Group | null = null; private signaturePanier = ''; private panierVu = 0;
+  private remplirPanier(force = false) {
+    const W = this.world, b = W.basket; if (!b || !this.state) return;
+    const panier = this.state.eco.jardin.panier;
+    const sig = Object.entries(panier).filter(([, n]) => n > 0).sort().map(([k, n]) => k + n).join(',');
+    if (!force && sig === this.signaturePanier) return; this.signaturePanier = sig;
+    if (this.contenuPanier) this.contenuPanier.parent?.remove(this.contenuPanier);
+    const g = new THREE.Group(); this.contenuPanier = g; W.scene.add(g);
+    const box = new THREE.Box3().setFromObject(b), c = box.getCenter(new THREE.Vector3());
+    const haut = box.max.y - (box.max.y - box.min.y) * .25, rayon = Math.min(box.max.x - box.min.x, box.max.z - box.min.z) * .28;
+    const items = Object.entries(panier).filter(([, n]) => n > 0).sort((a, b2) => b2[1] - a[1]).slice(0, 5);
+    items.forEach(([id], i) => {
+      const nom = this.assets.has(`crop_${id}_v1`) ? `crop_${id}_v1` : `crop_${id}`; if (!this.assets.has(nom)) return;
+      const o = this.assets.get(nom); const reel = nom.endsWith('_v1');
+      o.scale.setScalar(reel ? .75 : .5);
+      const a = (i / Math.max(1, items.length)) * Math.PI * 2;
+      o.position.set(c.x + Math.cos(a) * rayon * (i ? 1 : 0), haut, c.z + Math.sin(a) * rayon * (i ? 1 : 0));
+      o.rotation.y = a * 1.7; g.add(o);
+    });
   }
 
   // ---------- téléphone : vendre et acheter
@@ -920,7 +956,7 @@ export class Game {
         const k = Math.min(1, (performance.now() - t0) / dur);
         if (k < 0) { requestAnimationFrame(step); return; }
         o.position.lerpVectors(start, end, k); o.rotation.y += .25; o.rotation.x = k * 3;
-        if (k < 1) requestAnimationFrame(step); else this.world.scene.remove(o);
+        if (k < 1) requestAnimationFrame(step); else { this.world.scene.remove(o); this.remplirPanier(true); }
       };
       requestAnimationFrame(step);
     }
@@ -1560,15 +1596,22 @@ export class Game {
     const compteurs = { trocs: j.unites_echangees, recoltes: s.log.recoltes ?? 0, offerts: j.plats_offerts, recus: im.plats.filter(p => p.a === j.id).length };
     EL.sauverEnLigne(s.character as EL.Perso, data, compteurs, s.perso?.prenom || s.nickname || 'Jardinier', maintenant);
   }
-  /** Connecté avec un compte : on reprend la partie en ligne la plus récente (si elle est plus récente que celle du téléphone). */
-  private async recupererNuage() {
+  /** Connecté avec un compte : chaque partie en ligne (Léa, Marcel, Jimy) plus récente que celle du téléphone la remplace.
+   *  Ainsi, on joue sur le téléphone, on rouvre sur l'ordinateur : tout est là. */
+  private async recupererNuage(afficher = true) {
     const parties = await EL.partiesEnLigne();
     if (!parties.length) { this.sauverNuage(true); return; }
-    const p = parties.sort((a, b) => +new Date(b.maj) - +new Date(a.maj))[0];
-    const local = this.state?.savedAt ?? 0;
-    if (+new Date(p.maj) > local || this.state.character !== p.perso) {
-      this.state = p.data as GameState; await this.save.store(this.state);
-      this.ui.showStart(true, tx(charDef(this.state.character).name));
+    const locales = this.save.liste();
+    let derniere: { perso: string; t: number } | null = null;
+    for (const p of parties) {
+      const t = +new Date(p.maj);
+      if (!locales[p.perso] || t > locales[p.perso]) this.save.importer(p.data as GameState, t);
+      if (!derniere || t > derniere.t) derniere = { perso: p.perso, t };
+    }
+    this.ui.parties = this.save.liste();
+    if (derniere && afficher) {
+      const g = await this.save.loadFor(derniere.perso);
+      if (g) { this.state = g; this.ui.showStart(true, tx(charDef(g.character).name)); }
     }
   }
 

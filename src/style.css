@@ -668,8 +668,7 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
 
 /* ===== accueil : le titre qui pousse ===== */
 #start h1[data-t="title"] { display: inline-flex; align-items: flex-end; justify-content: center; flex-wrap: wrap; position: relative; }
-#start h1 .lettre { display: inline-block; transform-origin: 50% 100%; transform: scaleY(0) translateY(14px); opacity: 0;
-  animation: poussLettre .7s cubic-bezier(.3, 1.6, .5, 1) forwards, respireLettre 4s ease-in-out 2.4s infinite; }
+#start h1 .lettre { display: inline-block; position: relative; transform-origin: 50% 100%; opacity: 0; }
 #start h1 .esp { display: inline-block; width: .3em; }
 #start h1 .pousseFeuille { display: inline-block; font-size: .55em; margin-left: .1em; transform-origin: 50% 100%; transform: scale(0) rotate(-30deg);
   animation: poussFeuille .6s cubic-bezier(.3, 1.8, .5, 1) forwards, balanceFeuille 3s ease-in-out 3s infinite; }
@@ -693,3 +692,30 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
 /* le bouton de la démo accélérée : en haut à droite, sous les langues, AU-DESSUS de tout (il était caché par le panneau du bas) */
 .overlay.start .demoBtn { left: auto !important; bottom: auto !important; right: 14px; top: calc(56px + var(--sat, 0px)); z-index: 60 !important; opacity: .95; font-size: 12px; padding: 7px 12px; }
 .overlay.start .demoBtn.active { background: #2f8f4e; color: #fff; border-color: #2f8f4e; }
+
+/* ===== le titre qui pousse, version 2 : la terre apparaît, chaque lettre en sort (verte comme une pousse), des feuilles éclosent ===== */
+#start h1[data-t="title"] { padding-bottom: .18em; overflow: visible; }
+#start h1 .terre { position: absolute; left: -4%; right: -4%; bottom: 0; height: .16em; border-radius: 999px;
+  background: radial-gradient(circle at 20% 40%, #8a5a34 0 18%, transparent 19%), radial-gradient(circle at 70% 60%, #6b4426 0 14%, transparent 15%), linear-gradient(#7a4f2d, #5a3a20);
+  transform: scaleX(0); transform-origin: 50% 50%; animation: terreApparait .5s ease-out .1s forwards; }
+#start h1 .lettre { clip-path: inset(100% -30% -20% -30%); animation: sortDeTerre .95s cubic-bezier(.2, 1.35, .4, 1) var(--d) forwards, respireLettre 4.5s ease-in-out calc(var(--d) + 2s) infinite; }
+#start h1 .lettre.feuille::after { content: ''; position: absolute; left: 52%; top: -.22em; width: .34em; height: .2em; background: linear-gradient(135deg, #7ccf63, #3f9a3a);
+  border-radius: 100% 0 100% 0; transform-origin: 0% 100%; transform: rotate(-35deg) scale(0); animation: feuilleEclot .55s cubic-bezier(.3, 1.8, .5, 1) calc(var(--d) + .7s) forwards, feuilleVent 3.2s ease-in-out calc(var(--d) + 1.4s) infinite; }
+@keyframes terreApparait { to { transform: scaleX(1); } }
+@keyframes sortDeTerre {
+  0% { opacity: 1; clip-path: inset(100% -30% -20% -30%); transform: translateY(.45em) scale(.55, .35); color: #5fae4e; }
+  55% { clip-path: inset(0 -30% -20% -30%); transform: translateY(-.08em) scale(.95, 1.12); color: #5fae4e; }
+  80% { transform: translateY(.02em) scale(1.04, .97); }
+  100% { opacity: 1; clip-path: inset(-40% -30% -20% -30%); transform: none; }
+}
+@keyframes feuilleEclot { to { transform: rotate(-35deg) scale(1); } }
+@keyframes feuilleVent { 0%, 100% { transform: rotate(-35deg) scale(1); } 50% { transform: rotate(-12deg) scale(1); } }
+@media (prefers-reduced-motion: reduce) { #start h1 .lettre { animation: none; clip-path: none; opacity: 1; } #start h1 .terre { transform: none; animation: none; } }
+
+/* le légume mûr qu'on va récolter : petite image dans le choix des graines, grande carte après le semis */
+.popover .seed .mini-recolte { width: 26px; height: 26px; object-fit: contain; vertical-align: middle; margin-right: 2px; }
+.apercuRecolte { position: fixed; left: 50%; top: 40%; z-index: 55; display: flex; align-items: center; gap: 14px; padding: 12px 18px 12px 12px; background: #fffdf6; border: 1.5px solid #f2c46b; border-radius: 20px;
+  box-shadow: 0 14px 34px rgba(36,49,58,.25); transform: translate(-50%, -50%) scale(.6); opacity: 0; pointer-events: none; transition: transform .35s cubic-bezier(.3,1.6,.5,1), opacity .25s; }
+.apercuRecolte.vu { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; }
+.apercuRecolte img { width: 96px; height: 96px; object-fit: contain; } .apercuRecolte .em { font-size: 56px; }
+.apercuRecolte small { display: block; color: #8a6a2a; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; } .apercuRecolte b { font-size: 20px; color: #24313a; }

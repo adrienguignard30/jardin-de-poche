@@ -186,8 +186,12 @@ export class UI {
     for (const h of Array.from(this.root.querySelectorAll('#start h1[data-t="title"]')) as HTMLElement[]) {
       if (h.dataset.pousse === h.textContent) continue;
       const txt = h.textContent ?? ''; h.dataset.pousse = txt; h.setAttribute('aria-label', txt);
-      h.innerHTML = [...txt].map((ch, i) => ch === ' ' ? '<span class="esp"> </span>' : `<span class="lettre" style="animation-delay:${(.15 + i * .07).toFixed(2)}s">${ch}</span>`).join('')
-        + `<span class="pousseFeuille" style="animation-delay:${(.2 + txt.length * .07).toFixed(2)}s">🌱</span>`;
+      let k = 0;
+      h.innerHTML = `<span class="terre"></span>` + [...txt].map((ch, i) => {
+        if (ch === ' ') return '<span class="esp"> </span>';
+        const d = (.55 + i * .09).toFixed(2), feuille = (k++ % 3 === 1) ? ' feuille' : '';
+        return `<span class="lettre${feuille}" style="--d:${d}s">${ch}</span>`;
+      }).join('');
     }
   }
   private renderStart(hasSave: boolean) {
@@ -473,7 +477,8 @@ export class UI {
       e.innerHTML = `${c ? tx(c.name) : l.id}<small>${c?.age ? s.years(c.age) : ''}</small>`;
       e.className = 'nameTag' + (l.id === chosen ? ' chosen' : '');
       const brand = this.root.querySelector('#start .startTop .brand') as HTMLElement | null;
-      const sousTitre = brand && brand.offsetParent ? brand.getBoundingClientRect().bottom + 6 : 0;
+      const rb = brand?.getBoundingClientRect();
+      const sousTitre = rb && rb.height > 0 && !$('#start').classList.contains('hidden') ? rb.bottom + 8 : 0;
       const y = Math.max(l.y, sousTitre + 40);                           // l'étiquette fait ~40 px de haut, tracée au-dessus du point
       e.style.display = l.visible ? 'block' : 'none';
       e.style.transform = `translate(${l.x}px, ${y}px) translate(-50%, -100%)`;
@@ -571,7 +576,7 @@ export class UI {
     for (const pl of avail) {
       const g = ECO.graine(pl.id);
       const rare = !j.poche[pl.id] && j.rares[pl.id];
-      const b = el('button', 'seed' + (besoin.has(pl.id) ? ' besoin' : ''), `<span>${icon(pl.id)} ${tx(pl.name)}${besoin.has(pl.id) ? ` <small class="pr">${s.pourRecette}</small>` : ''}</span><small>${g.pousse_min >= 60 ? Math.round(g.pousse_min / 60) + ' h' : g.pousse_min + ' min'}${rare ? ` · ${s.rare} ×${j.rares[pl.id]}` : ''}</small>`);
+      const b = el('button', 'seed' + (besoin.has(pl.id) ? ' besoin' : ''), `<span><img class="mini-recolte" src="ui/recoltes/${pl.id}.png" alt="" onerror="this.replaceWith(document.createTextNode('${icon(pl.id)}'))"> ${tx(pl.name)}${besoin.has(pl.id) ? ` <small class="pr">${s.pourRecette}</small>` : ''}</span><small>${g.pousse_min >= 60 ? Math.round(g.pousse_min / 60) + ' h' : g.pousse_min + ' min'}${rare ? ` · ${s.rare} ×${j.rares[pl.id]}` : ''}</small>`);
       b.onclick = () => { this.hidePicker(); this.h.onSow(slot, pl.id); };
       p.appendChild(b);
     }
@@ -582,6 +587,15 @@ export class UI {
     p.style.top = `${Math.max(12, y - 40 - p.offsetHeight)}px`;
   }
   hidePicker() { $('#picker').classList.add('hidden'); }
+  /** Juste après le semis : ce que tu récolteras, en image (le légume mûr), quelques secondes. */
+  apercuRecolte(id: string) {
+    const pl = CATALOG.plants.find(p => p.id === id); if (!pl) return;
+    let b = document.getElementById('apercuRecolte');
+    if (!b) { b = el('div', 'apercuRecolte'); b.id = 'apercuRecolte'; document.body.appendChild(b); b.onclick = () => b!.classList.remove('vu'); }
+    b.innerHTML = `<img src="ui/recoltes/${id}.png" alt="" onerror="this.outerHTML='<span class=\'em\'>${icon(id)}</span>'"><div><small>${t().tuRecolteras}</small><b>${tx(pl.name)}</b></div>`;
+    b.classList.remove('vu'); void b.offsetWidth; b.classList.add('vu');
+    clearTimeout((b as any)._t); (b as any)._t = setTimeout(() => b!.classList.remove('vu'), 3800);
+  }
 
   // ---------- téléphone
   private skinChecked = new Set<string>();

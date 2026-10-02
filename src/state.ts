@@ -176,6 +176,10 @@ export class LocalSave implements SaveProvider {
     for (const p of ['lea', 'marcel', 'jimy']) { try { const raw = localStorage.getItem(this.cle(p)); if (raw) out[p] = (JSON.parse(raw) as GameState).savedAt ?? 1; } catch { /* ignore */ } }
     return out;
   }
+  /** Ranger une partie venue d'ailleurs (du nuage) dans la case de son personnage, sans changer « la dernière jouée ». */
+  importer(g: GameState, date: number) {
+    try { g.savedAt = date; localStorage.setItem(this.cle(g.character), JSON.stringify(g)); } catch { /* ignore */ }
+  }
   async store(s: GameState) {
     s.savedAt = Date.now();
     try { localStorage.setItem(this.cle(s.character), JSON.stringify(s)); localStorage.setItem(`${SAVE_KEY}.dernier`, s.character); } catch { /* quota ou navigation privée */ }
