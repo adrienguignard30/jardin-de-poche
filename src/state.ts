@@ -149,18 +149,41 @@ export function generateNickname(lang: 'fr' | 'en'): string {
 export interface SaveProvider {
   load(): Promise<GameState | null>;
   store(s: GameState): Promise<void>;
-  clear(): Promise<void>;
+  clear(perso?: string): Promise<void>;
 }
 export class LocalSave implements SaveProvider {
+  private cle = (perso: string) => `${SAVE_KEY}.${perso}`;
+  private migrer() {                                                    // l'ancienne sauvegarde unique devient celle de son personnage
+    try {
+      const raw = localStorage.getItem(SAVE_KEY); if (!raw) return;
+      const g = JSON.parse(raw) as GameState;
+      if (g?.character && !localStorage.getItem(this.cle(g.character))) { localStorage.setItem(this.cle(g.character), raw); localStorage.setItem(`${SAVE_KEY}.dernier`, g.character); }
+      localStorage.removeItem(SAVE_KEY);
+    } catch { /* ignore */ }
+  }
+  /** La dernière partie jouée (pour « Reprendre » en haut de l'accueil). */
   async load() {
-    try { const raw = localStorage.getItem(SAVE_KEY); return raw ? (JSON.parse(raw) as GameState) : null; }
-    catch { return null; }
+    this.migrer();
+    try { const d = localStorage.getItem(`${SAVE_KEY}.dernier`); return d ? this.loadFor(d) : null; } catch { return null; }
+  }
+  async loadFor(perso: string): Promise<GameState | null> {
+    try { const raw = localStorage.getItem(this.cle(perso)); return raw ? (JSON.parse(raw) as GameState) : null; } catch { return null; }
+  }
+  /** Les personnages qui ont déjà une partie, avec la date de sauvegarde. */
+  liste(): Record<string, number> {
+    this.migrer();
+    const out: Record<string, number> = {};
+    for (const p of ['lea', 'marcel', 'jimy']) { try { const raw = localStorage.getItem(this.cle(p)); if (raw) out[p] = (JSON.parse(raw) as GameState).savedAt ?? 1; } catch { /* ignore */ } }
+    return out;
   }
   async store(s: GameState) {
     s.savedAt = Date.now();
-    try { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); } catch { /* quota ou navigation privée */ }
+    try { localStorage.setItem(this.cle(s.character), JSON.stringify(s)); localStorage.setItem(`${SAVE_KEY}.dernier`, s.character); } catch { /* quota ou navigation privée */ }
   }
-  async clear() { try { localStorage.removeItem(SAVE_KEY); } catch { /* ignore */ } }
+  /** Effacer la partie d'un personnage (par défaut : la dernière jouée). */
+  async clear(perso?: string) {
+    try { const p = perso ?? localStorage.getItem(`${SAVE_KEY}.dernier`); if (p) localStorage.removeItem(this.cle(p)); localStorage.removeItem(`${SAVE_KEY}.dernier`); } catch { /* ignore */ }
+  }
 }
 /**
  * Supabase (étape 7) : même interface, session anonyme, table players.

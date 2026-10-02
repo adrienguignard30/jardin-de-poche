@@ -40,15 +40,35 @@ export class Showroom {
     sel.char.teleport(new THREE.Vector3(this.portrait ? 0 : -.9, 0, 1.2), 0);
     this.frameBody();
   }
+  /** La partie du corps qu'on colore : la caméra s'en approche (cheveux = la tête, chaussures = les pieds…).
+   *  Sur téléphone, le panneau couvre le bas de l'écran : la partie est placée dans le haut, bien visible. */
+  zone = '';
+  private camCible = new THREE.Vector3(); private visCible = new THREE.Vector3(); private camPrete = false;
+  focusZone(zone: string) { this.zone = zone; this.frameBody(); }
   private frameBody() {
     const sel = this.chars.find(c => c.def.id === this.focused); if (!sel) return;
-    const h = 1.95, fov = THREE.MathUtils.degToRad(this.camera.fov);
-    const dist = (h / 2) / Math.tan(fov / 2) * (this.portrait ? 1.35 : 1.12);
+    const fov = THREE.MathUtils.degToRad(this.camera.fov);
+    const Z: Record<string, { y: number; h: number }> = { cheveux: { y: 1.58, h: .62 }, peau: { y: 1.5, h: .8 }, haut: { y: 1.18, h: .95 }, bas: { y: .62, h: 1.05 }, chaussures: { y: .14, h: .6 } };
+    const z = Z[this.zone];
+    const h = z ? z.h : 1.95, cy = z ? z.y : .95;
+    const dist = (h / 2) / Math.tan(fov / 2) * (this.portrait ? (z ? 1.25 : 1.35) : 1.12);
+    const demi = dist * Math.tan(fov / 2);
+    // téléphone : le panneau occupe ~55 % du bas ; on met la partie vers 25 % du haut de l'écran
+    const viseY = this.portrait ? cy - (z ? .5 : .32) * demi : (z ? cy : .9);
     const p = sel.char.obj.position;
-    this.camera.position.set(p.x, .95, p.z + dist);
-    this.camera.lookAt(p.x, this.portrait ? .55 : .9, p.z);
+    this.camCible.set(p.x, Math.max(.35, cy + (z ? .05 : 0)), p.z + dist);
+    this.visCible.set(p.x, viseY, p.z);
+    if (!this.camPrete) { this.camera.position.copy(this.camCible); this.camera.lookAt(this.visCible); this.camPrete = true; }
+  }
+  /** En personnalisation, la caméra glisse doucement vers sa cible. */
+  private suivreCamera(dt: number) {
+    const k = Math.min(1, dt * 5);
+    this.camera.position.lerp(this.camCible, k);
+    const vis = (this.camera.userData.vis ??= this.visCible.clone()) as THREE.Vector3;
+    vis.lerp(this.visCible, k); this.camera.lookAt(vis);
   }
   unfocus() {
+    this.zone = ''; this.camPrete = false; delete this.camera.userData.vis;
     if (!this.focused) return;
     this.focused = ''; this.selected = '';
     for (const c of this.chars) { c.char.obj.visible = true; c.char.teleport(new THREE.Vector3(c.base.x, 0, 0), 0); }
@@ -144,7 +164,7 @@ export class Showroom {
     const hm = this.halo.material as THREE.MeshBasicMaterial;
     hm.opacity += ((selH ? .7 : 0) - hm.opacity) * Math.min(1, dt * 5);
     if (selH) { this.halo.position.x = selH.char.obj.position.x; this.halo.position.z = selH.char.obj.position.z; this.halo.scale.setScalar(1 + Math.sin(this.t * 2) * .04); }
-    if (this.focused) { for (const c of this.chars) c.char.update(dt); return; }
+    if (this.focused) { for (const c of this.chars) c.char.update(dt); this.suivreCamera(dt); return; }
     const want = this.portrait ? 0 : this.pan;
     const lookY = this.portrait && this.sheetOpen ? -.45 : 1.0;       // fiche ouverte sur téléphone : le personnage monte au-dessus du panneau
     if (Math.abs(want - this.panNow) > .001 || Math.abs(lookY - this.lookYNow) > .001) {

@@ -665,3 +665,27 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
 /* personnaliser : deux boutons en haut (retour à la fiche, changer de personnage) ; la pastille arc-en-ciel */
 .sheet .persoHaut { display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; }
 .sw.arc { background: conic-gradient(#ff4d4d, #ffb84d, #fff34d, #5fe36a, #4dc4ff, #7a6bff, #e64dff, #ff4d4d) !important; }
+
+/* ===== accueil : le titre qui pousse ===== */
+#start h1[data-t="title"] { display: inline-flex; align-items: flex-end; justify-content: center; flex-wrap: wrap; position: relative; }
+#start h1 .lettre { display: inline-block; transform-origin: 50% 100%; transform: scaleY(0) translateY(14px); opacity: 0;
+  animation: poussLettre .7s cubic-bezier(.3, 1.6, .5, 1) forwards, respireLettre 4s ease-in-out 2.4s infinite; }
+#start h1 .esp { display: inline-block; width: .3em; }
+#start h1 .pousseFeuille { display: inline-block; font-size: .55em; margin-left: .1em; transform-origin: 50% 100%; transform: scale(0) rotate(-30deg);
+  animation: poussFeuille .6s cubic-bezier(.3, 1.8, .5, 1) forwards, balanceFeuille 3s ease-in-out 3s infinite; }
+@keyframes poussLettre { 0% { transform: scaleY(0) translateY(14px); opacity: 0; } 60% { opacity: 1; } 100% { transform: none; opacity: 1; } }
+@keyframes respireLettre { 0%, 100% { transform: none; } 50% { transform: translateY(-1.5px); } }
+@keyframes poussFeuille { to { transform: scale(1) rotate(0); } }
+@keyframes balanceFeuille { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(8deg); } }
+@media (prefers-reduced-motion: reduce) { #start h1 .lettre, #start h1 .pousseFeuille { animation: none; transform: none; opacity: 1; } }
+/* ===== la fiche : un bouton principal vert en haut, Personnaliser dessous ; le × toujours visible ===== */
+.sheet .actionsFiche { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 8px; }
+.sheet .actionsFiche .primary.grand { width: 100%; min-height: 52px; font-size: 17px; }
+.primary.vert { background: #2f8f4e !important; box-shadow: 0 6px 16px rgba(47,143,78,.35) !important; color: #fff !important; }
+.sheet .x { position: sticky; top: 0; float: right; z-index: 5; width: 38px; height: 38px; border-radius: 50%; background: rgba(36,49,58,.1) !important; font-size: 22px; line-height: 1; }
+@media (max-width: 700px), (max-height: 520px) and (pointer: coarse) {
+  .sheet:not(.perso) .startRow { display: none; }
+  .sheet:not(.perso) .x { position: sticky; top: 0; margin: -2px -4px 0 0; }
+  .sheet.perso .persoHaut { position: sticky; top: 0; background: inherit; z-index: 5; padding-bottom: 6px; }
+  .sheet.perso > .primary { position: sticky; bottom: 0; }
+}

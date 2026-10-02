@@ -24,7 +24,7 @@ export class Game {
   assets = new Assets();
   world: World;
   ui: UI;
-  save: SaveProvider = new LocalSave();
+  save: LocalSave = new LocalSave();
   state!: GameState;
   char!: Character;
   private views = new Map<number, SlotView>();
@@ -161,10 +161,11 @@ export class Game {
       photo: id => this.photoDe(id),
       onPick: id => { this.showroom?.select(id); MUSIQUE.jouerPerso(id); },
       onFocus: (id, on) => { if (on) this.showroom?.focus(id); else this.showroom?.unfocus(); },
+      onZone: zone => this.showroom?.focusZone(zone),
       onPersoSave: (id, perso) => {                                     // la personnalisation entre dans la partie de ce personnage
         if (this.state && this.state.character === id) { this.state.perso = { ...perso, couleurs: { ...perso.couleurs } }; this.state.nickname = perso.prenom || this.state.nickname; this.save.store(this.state); this.sauverNuage(true); }
       },
-      onContinue: () => this.continueGame(),
+      onContinue: (perso?: string) => this.continueGame(perso),
       onNewGame: () => {},
       onSow: (slot, plant) => this.sow(slot, plant),
       onCuisiner: () => this.cuisiner(), onOffrir: id => this.offrir(id),
@@ -207,6 +208,7 @@ export class Game {
     this.world.addCritters();
     try { await EL.demarrer(); } catch (e) { console.warn('[en ligne]', e); }
     const saved = await this.save.load();
+    this.ui.parties = this.save.liste();
     this.state = saved ?? newGame(CATALOG.characters[0].id, '');
     if (q.get('cycle')) this.dayLength = parseFloat(q.get('cycle')!) || 120;
     if (CATALOG.timing && (CATALOG.timing as { dayLength?: number }).dayLength && !q.get('cycle')) this.dayLength = (CATALOG.timing as { dayLength?: number }).dayLength!;
@@ -324,7 +326,10 @@ export class Game {
     ctx.drawImage(cv, cv.width / 2 - size / 2, cv.height * .12, size, size, 0, 0, 160, 160);
     return out.toDataURL('image/jpeg', .82);
   }
-  private async continueGame() { await this.enterGame(); }
+  private async continueGame(perso?: string) {
+    if (perso && perso !== this.state?.character) { const g = await this.save.loadFor(perso); if (g) this.state = g; }
+    await this.enterGame();
+  }
   private async enterGame() {
     const s = this.state;
     s.eco.immeuble.annonces = s.eco.immeuble.annonces.filter(a => a.accepte_par || (a.donne.graine !== E.POINTS && a.cherche.graine !== E.POINTS));
@@ -376,7 +381,7 @@ export class Game {
     }
   }
   private async reset() {
-    await this.save.clear();
+    await this.save.clear(this.state?.character);
     location.reload();
   }
   /** Tout ce qui pourrait traîner d'une activité interrompue : objets en main, poêle, regard, gestes, pièce, sommeil. */

@@ -17,7 +17,8 @@ export interface UIHandlers {
   /** Mode personnalisation : seul ce personnage, en pied (on = true), ou retour à l'accueil (false). */
   onFocus(characterId: string, on: boolean): void;
   onPersoSave(characterId: string, perso: Perso): void;
-  onContinue(): void;
+  onZone(zone: string): void;
+  onContinue(perso?: string): void;
   onNewGame(): void;
   onSow(slot: number, plant: string): void;
   onBuySeed(plant: string): void;
@@ -167,6 +168,8 @@ export class UI {
   private chosen = 'lea';
   private confirme = false;
   private perso: Record<string, Perso> = {};
+  /** Les personnages qui ont déjà une partie (date de sauvegarde). */
+  parties: Record<string, number> = {};
   private glisserAccueil = false;
   private activerGlisserAccueil() {
     if (this.glisserAccueil) return; this.glisserAccueil = true;
@@ -178,8 +181,17 @@ export class UI {
       if (dt < 700 && Math.abs(dx) > 60 && Math.abs(dx) > 1.5 * Math.abs(dy)) this.changerPerso(dx < 0 ? 1 : -1);
     }, { passive: true });
   }
+  /** Le titre de l'accueil : les lettres sortent de terre une à une, comme des pousses, puis une feuille apparaît. */
+  private titrePousse() {
+    for (const h of Array.from(this.root.querySelectorAll('#start h1[data-t="title"]')) as HTMLElement[]) {
+      if (h.dataset.pousse === h.textContent) continue;
+      const txt = h.textContent ?? ''; h.dataset.pousse = txt; h.setAttribute('aria-label', txt);
+      h.innerHTML = [...txt].map((ch, i) => ch === ' ' ? '<span class="esp"> </span>' : `<span class="lettre" style="animation-delay:${(.15 + i * .07).toFixed(2)}s">${ch}</span>`).join('')
+        + `<span class="pousseFeuille" style="animation-delay:${(.2 + txt.length * .07).toFixed(2)}s">🌱</span>`;
+    }
+  }
   private renderStart(hasSave: boolean) {
-    this.activerGlisserAccueil(); this.majCompte(); this.chargerPersos();
+    this.activerGlisserAccueil(); this.majCompte(); this.chargerPersos(); requestAnimationFrame(() => this.titrePousse());
     const s = t();
     const body = $('#startBody');
     body.innerHTML = '';
@@ -189,9 +201,9 @@ export class UI {
     if (!d) { d = el<HTMLButtonElement>('button', 'demoBtn'); d.id = 'demoBtn'; $('#start').appendChild(d); }
     d.className = 'demoBtn' + (demo ? ' active' : ''); d.textContent = demo ? `⏩ ${s.demoOn}` : s.demoJury; d.title = s.demoOff;
     d.onclick = () => { const u = new URL(location.href); if (demo) u.searchParams.delete('demo'); else u.searchParams.set('demo', '1'); location.href = u.toString(); };
-    if (hasSave) {
-      const b = el('button', 'primary', s.continueWith(this.savedCharName || s.continue_)); agir(b, () => this.h.onContinue()); body.appendChild(b);
-      const n = el('button', 'ghost', s.newGame); agir(n, () => { this.hasSave = false; this.renderStart(false); }); body.appendChild(n);
+    if (hasSave) {                                                      // la règle des jeux : « Continuer » toujours en premier
+      const b = el('button', 'primary vert', `▶ ${s.continueWith(this.savedCharName || s.continue_)}`); agir(b, () => this.h.onContinue()); body.appendChild(b);
+      body.appendChild(el('p', 'hint', s.ouAutrePerso));
       return;
     }
     body.appendChild(el('p', 'hint', s.chooseTouch));
@@ -282,13 +294,14 @@ export class UI {
     const sh = $('#sheet'); sh.classList.remove('perso');
     const line = (k: string, v: string) => v ? `<div class="fl"><span>${k}</span><b>${v}</b></div>` : '';
     const nom = this.perso[id]?.prenom || tx(c.name);
-    sh.innerHTML = `<button class="x" aria-label="close">×</button><h3>${nom}</h3>`
-      + line(s.fAge, c.age ? s.years(c.age) : '') + line(s.fJob, tx(c.job)) + line(s.fAddress, tx(c.address)) + line(s.fView, tx(c.tagline))
-      + (c.likes ? `<div class="fl likes"><span>${s.fLikes}</span><p>${tx(c.likes)}</p></div>` : '');
-    const row = el('div', 'startRow');
-    const perso = el('button', 'ghost', `${s.personnaliser}`); perso.style.cssText = LISIBLE; perso.onclick = () => this.showCustomize(id);
-    const play = el('button', 'primary', this.hasSave ? s.newGame : s.jouerAvec(nom)); agir(play, () => this.lancer(id));
-    row.append(perso, play); sh.appendChild(row);
+    const aUnePartie = !!this.parties[id];
+    sh.innerHTML = `<button class="x" aria-label="close">×</button><h3>${nom}</h3>`;
+    const play = el('button', 'primary vert grand', aUnePartie ? `▶ ${s.reprendreMaPartie}` : `🌱 ${s.jouerAvec(nom)}`);
+    agir(play, () => aUnePartie ? this.h.onContinue(id) : this.lancer(id));
+    const perso = el('button', 'ghost', `🎨 ${s.personnaliser}`); perso.style.cssText = LISIBLE; perso.onclick = () => this.showCustomize(id);
+    const row = el('div', 'actionsFiche'); row.append(play, perso); sh.appendChild(row);
+    sh.insertAdjacentHTML('beforeend', line(s.fAge, c.age ? s.years(c.age) : '') + line(s.fJob, tx(c.job)) + line(s.fAddress, tx(c.address)) + line(s.fView, tx(c.tagline))
+      + (c.likes ? `<div class="fl likes"><span>${s.fLikes}</span><p>${tx(c.likes)}</p></div>` : ''));
     sh.prepend(this.carrousel(id));                                  // sur mobile : ‹ ● ○ ○ › en haut de la fiche
     (sh.querySelector('.x') as HTMLButtonElement).onclick = () => { sh.classList.add('hidden'); $('#startBody').classList.remove('hidden'); this.h.onSheet(false); };
     sh.classList.remove('hidden');
@@ -297,7 +310,7 @@ export class UI {
   }
   private lancer(id: string) {
     const s = t(), c = CATALOG.characters.find(x => x.id === id)!;
-    if (this.hasSave && !this.confirme) {
+    if (this.parties[id] && !this.confirme) {
       const c0 = el('div', 'platPret');
       c0.appendChild(el('h3', '', s.newGame)); c0.appendChild(el('p', 'q', s.resetConfirm));
       const oui = el('button', 'primary', s.recommencer); agir(oui, () => { this.fermerModal(); this.confirme = true; this.lancer(id); });
@@ -342,12 +355,12 @@ export class UI {
       const z = m.name.replace(/\.\d{3}$/, '').split('_').pop()!;
       const row = el('div', 'pf zone', `<span>${labels[z] ?? s.persoCouleurNom(liste.indexOf(m) + 1)}</span>`);
       const pal = el('div', 'palette');
-      const choisir = (hex: string | null) => { console.info('[couleur]', m.name, hex ?? 'origine'); if (hex) perso.couleurs[m.name] = hex; else delete perso.couleurs[m.name]; this.h.setCouleur(id, m.name, hex ?? ''); pal.querySelectorAll('.sw').forEach(x => x.classList.toggle('on', (x as HTMLElement).dataset.hex === (hex ?? ''))); };
+      const choisir = (hex: string | null) => { this.h.onZone(z); console.info('[couleur]', m.name, hex ?? 'origine'); if (hex) perso.couleurs[m.name] = hex; else delete perso.couleurs[m.name]; this.h.setCouleur(id, m.name, hex ?? ''); pal.querySelectorAll('.sw').forEach(x => x.classList.toggle('on', (x as HTMLElement).dataset.hex === (hex ?? ''))); };
       const orig = el('button', 'sw orig', '↺'); orig.title = s.zReset; orig.dataset.hex = ''; orig.onclick = () => choisir(null); pal.appendChild(orig);
       for (const hex of PAL[z] ?? PAL.haut) { const b = el('button', 'sw' + (perso.couleurs[m.name] === hex ? ' on' : '')); b.style.background = hex; b.dataset.hex = hex; b.onclick = () => choisir(hex); pal.appendChild(b); }
       if (z !== 'peau') { const arc = el('button', 'sw arc' + (perso.couleurs[m.name] === 'arc' ? ' on' : ''), ''); arc.title = '🌈'; arc.dataset.hex = 'arc'; arc.onclick = () => choisir('arc'); pal.appendChild(arc); }
       if (z !== 'peau') { const inp = el<HTMLInputElement>('input', 'sw free'); inp.type = 'color'; inp.title = s.zAutre; inp.value = perso.couleurs[m.name] && perso.couleurs[m.name] !== 'arc' ? perso.couleurs[m.name] : m.hex; inp.oninput = () => choisir(inp.value); pal.appendChild(inp); }
-      row.appendChild(pal); form.appendChild(row);
+      row.addEventListener('pointerdown', () => this.h.onZone(z)); row.appendChild(pal); form.appendChild(row);
     }
     const more = el('button', 'ghost small', s.plus); more.style.cssText = LISIBLE;
     const moreBox = el('div', 'moreBox hidden');
@@ -459,8 +472,11 @@ export class UI {
       const c = CATALOG.characters.find(x => x.id === l.id);
       e.innerHTML = `${c ? tx(c.name) : l.id}<small>${c?.age ? s.years(c.age) : ''}</small>`;
       e.className = 'nameTag' + (l.id === chosen ? ' chosen' : '');
+      const brand = this.root.querySelector('#start .startTop .brand') as HTMLElement | null;
+      const sousTitre = brand && brand.offsetParent ? brand.getBoundingClientRect().bottom + 6 : 0;
+      const y = Math.max(l.y, sousTitre + 40);                           // l'étiquette fait ~40 px de haut, tracée au-dessus du point
       e.style.display = l.visible ? 'block' : 'none';
-      e.style.transform = `translate(${l.x}px, ${l.y}px) translate(-50%, -100%)`;
+      e.style.transform = `translate(${l.x}px, ${y}px) translate(-50%, -100%)`;
     }
   }
   hideNameTags() { for (const e of this.tags.values()) e.style.display = 'none'; }
