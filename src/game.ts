@@ -451,6 +451,25 @@ export class Game {
       v.plantName = name;
     }
   }
+  /** Où mettre la main : pour récolter, à la hauteur des légumes (55 % de la plante mesurée), pour semer, sur la terre.
+   *  La main est guidée vers ce point pendant le geste, puis rendue à l'animation. */
+  private mainVersLaPlante(p: { id: number }, quoi: 'recolte' | 'semis', effet: number) {
+    const v = this.views.get(p.id); if (!v) return;
+    v.holder.updateWorldMatrix(true, true);
+    const terre = new THREE.Vector3(); v.holder.getWorldPosition(terre);
+    let y = terre.y + .03;
+    if (quoi === 'recolte') {
+      const box = new THREE.Box3().setFromObject(v.holder);
+      const h = box.isEmpty() ? .25 : Math.max(0, box.max.y - terre.y);
+      y = terre.y + THREE.MathUtils.clamp(h * .55, .08, .45);
+    }
+    const ch = this.char.obj;
+    const versLui = ch.position.clone().sub(terre).setY(0).normalize();
+    const cible = terre.clone().addScaledVector(versLui, quoi === 'recolte' ? .06 : .1).setY(y);
+    this.char.mains = { droite: () => cible };
+    this.char.ikBut = 1;
+    setTimeout(() => { this.char.ikBut = 0; }, (effet + .45) * 1000);       // la main revient à l'animation après le geste
+  }
   /** Combien de variétés existent pour une plante (plant_<id>_v1_s4, _v2_s4…). */
   private nbVarietes(id: string): number { let n = 0; while (this.assets.has(`plant_${id}_v${n + 1}_s4`)) n++; return n; }
   /** Le modèle d'une plante selon son stade et sa soif : S1 → S2 → S3 (S3_SOIF) → S4 prête (S4_SOIF). Null si pas de variété. */
@@ -781,7 +800,7 @@ export class Game {
     await this.gotoSlot(slot, 'plant');
     this.char.busy = true;
     this.hold(`seeds_${plant}`, 'seeds');
-    this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('plant'); const done = g.fin;
+    this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('plant'); const done = g.fin; this.mainVersLaPlante(p, 'semis', g.effet);
     await wait(g.effet * 1000);
     p.plant = P.sow(plant);
     p.plant.wateredAt = Date.now();          // on sème dans une terre humide
@@ -819,7 +838,7 @@ export class Game {
     const tt = t();
     await this.gotoSlot(SLOTS[p.id], 'harvest');
     this.char.busy = true;
-    this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('harvest'); const done = g.fin;
+    this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('harvest'); const done = g.fin; this.mainVersLaPlante(p, 'recolte', g.effet);
     await wait(g.effet * 1000);
     const d = plantDef(p.plant.plant), j = this.state.eco.jardin;
     const r = P.harvest(p.plant);                                          // on récolte toujours : le pot se libère

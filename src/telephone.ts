@@ -178,7 +178,6 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
     const mj = (CATALOG as any).miniJeu as { titre?: string; url?: string } | undefined;
     if (!mj?.url) { c.appendChild(el('p', 'small', s.jeuBientot)); return; }
     c.classList.add('avecJeu');
-    c.appendChild(el('div', 'ttl', mj.titre || s.jeuT));
     const cadre = el<HTMLIFrameElement>('iframe', 'cadreJeu');
     cadre.src = mj.url; cadre.allow = 'autoplay; fullscreen; gamepad'; cadre.title = mj.titre || s.jeuT;
     c.appendChild(cadre);
