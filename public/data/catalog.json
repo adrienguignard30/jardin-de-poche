@@ -394,5 +394,5 @@
   "autonomyMax": 9,
   "dayLength": 600
  },
-  "miniJeu": { "titre": "Jeu du mois", "url": "" }
+  "miniJeu": { "titre": "Plague", "url": "https://plague-game.vercel.app/" }
 }
