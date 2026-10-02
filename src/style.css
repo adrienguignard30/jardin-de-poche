@@ -689,3 +689,7 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
   .sheet.perso .persoHaut { position: sticky; top: 0; background: inherit; z-index: 5; padding-bottom: 6px; }
   .sheet.perso > .primary { position: sticky; bottom: 0; }
 }
+
+/* le bouton de la démo accélérée : en haut à droite, sous les langues, AU-DESSUS de tout (il était caché par le panneau du bas) */
+.overlay.start .demoBtn { left: auto !important; bottom: auto !important; right: 14px; top: calc(56px + var(--sat, 0px)); z-index: 60 !important; opacity: .95; font-size: 12px; padding: 7px 12px; }
+.overlay.start .demoBtn.active { background: #2f8f4e; color: #fff; border-color: #2f8f4e; }

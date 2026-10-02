@@ -199,7 +199,7 @@ export class UI {
     const demo = new URLSearchParams(location.search).get('demo') === '1';
     let d = document.getElementById('demoBtn') as HTMLButtonElement | null;
     if (!d) { d = el<HTMLButtonElement>('button', 'demoBtn'); d.id = 'demoBtn'; $('#start').appendChild(d); }
-    d.className = 'demoBtn' + (demo ? ' active' : ''); d.textContent = demo ? `⏩ ${s.demoOn}` : s.demoJury; d.title = s.demoOff;
+    d.className = 'demoBtn' + (demo ? ' active' : ''); d.textContent = demo ? s.demoOn : s.demoJury; d.title = s.demoOff;
     d.onclick = () => { const u = new URL(location.href); if (demo) u.searchParams.delete('demo'); else u.searchParams.set('demo', '1'); location.href = u.toString(); };
     if (hasSave) {                                                      // la règle des jeux : « Continuer » toujours en premier
       const b = el('button', 'primary vert', `▶ ${s.continueWith(this.savedCharName || s.continue_)}`); agir(b, () => this.h.onContinue()); body.appendChild(b);
