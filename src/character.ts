@@ -54,12 +54,7 @@ export class Character {
   private _axeHaut = -1;
   private axeHaut(): number {
     if (this._axeHaut >= 0) return this._axeHaut;
-    const ref = this.actions.get('idle') ?? this.actions.get('sit') ?? null;
-    const t = ref?.getClip().tracks.find(tr => /hips\.position$/i.test(tr.name));
-    if (!t) return (this._axeHaut = 1);
-    const v = t.values, n = v.length / 3;
-    const mean = [0, 1, 2].map(k => { let m = 0; for (let i = 0; i < n; i++) m += Math.abs(v[i * 3 + k]); return m / n; });
-    return (this._axeHaut = mean.indexOf(Math.max(...mean)));
+    return (this._axeHaut = axeVerticalDuBassin(this.obj));
   }
   /** Garde une animation sur place : on retire l'avancée horizontale du bassin (danse qui dérive, téléphone en marchant). */
   private pinInPlace(name: string) {
@@ -116,13 +111,19 @@ export class Character {
    *  l'échelle de ce personnage : sans ça, une animation venue d'un plus grand lui enfonce les pieds dans le sol. */
   private hanchesRepos = 0;
   preter(source: CharacterAsset, noms: string[], remplacer = false): string[] {
-    const hs = hauteurHanches(source.scene), ratio = hs > 0 && this.hanchesRepos > 0 ? this.hanchesRepos / hs : 1;
+    const axeMoi = this.axeHaut(), axeLui = axeVerticalDuBassin(source.scene);
+    const hMoi = hauteurBassinIdle([...this.actions.values()].map(a => a.getClip()), axeMoi), hLui = hauteurBassinIdle(source.clips, axeLui);
+    const ratio = hMoi > 0 && hLui > 0 ? hMoi / hLui : 1;
+    console.info(`[anims] emprunt : bassin ${hMoi.toFixed(2)} (moi) / ${hLui.toFixed(2)} (lui) → ×${ratio.toFixed(3)}, axes ${axeMoi}/${axeLui}`);
     const faits: string[] = [];
     for (const n of noms) {
       const clip = source.clips.find(c => c.name === n); if (!clip) continue;
       if (this.actions.has(n) && !remplacer) continue;
       const c2 = clip.clone();
-      for (const tr of c2.tracks) if (/Hips\.position$/.test(tr.name)) { const v = tr.values; for (let i = 0; i < v.length; i++) v[i] *= ratio; }
+      for (const tr of c2.tracks) if (/hips\.position$/i.test(tr.name)) {
+        const v = tr.values, n = v.length / 3;
+        for (let i = 0; i < n; i++) { const t = [v[i * 3], v[i * 3 + 1], v[i * 3 + 2]].map(x => x * ratio); const out = [0, 0, 0]; out[axeMoi] = t[axeLui]; const autres = [0, 1, 2].filter(k => k !== axeMoi), src = [0, 1, 2].filter(k => k !== axeLui); out[autres[0]] = t[src[0]]; out[autres[1]] = t[src[1]]; v[i * 3] = out[0]; v[i * 3 + 1] = out[1]; v[i * 3 + 2] = out[2]; }
+      }
       const ancien = this.actions.get(n);
       if (ancien) { ancien.stop(); this.mixer.uncacheAction(ancien.getClip()); }
       const a = this.mixer.clipAction(c2); a.enabled = true; this.actions.set(n, a);
@@ -361,4 +362,21 @@ function hauteurHanches(racine: THREE.Object3D): number {
   let h = 0;
   racine.traverse(o => { if (!h && (o as THREE.Bone).isBone && /Hips$/.test(o.name)) h = Math.abs(o.position.y) || o.position.length(); });
   return h;
+}
+/** Quel axe local du bassin pointe vers le haut : on transforme le « haut » du monde dans le repère du parent du bassin. */
+function axeVerticalDuBassin(racine: THREE.Object3D): number {
+  let hips: THREE.Object3D | null = null;
+  racine.traverse(o => { if (!hips && (o as THREE.Bone).isBone && /Hips$/.test(o.name)) hips = o; });
+  const parent = (hips as THREE.Object3D | null)?.parent; if (!parent) return 1;
+  parent.updateWorldMatrix(true, false);
+  const q = new THREE.Quaternion(); parent.getWorldQuaternion(q);
+  const haut = new THREE.Vector3(0, 1, 0).applyQuaternion(q.invert());
+  const c = [Math.abs(haut.x), Math.abs(haut.y), Math.abs(haut.z)];
+  return c.indexOf(Math.max(...c));
+}
+/** La hauteur du bassin au repos, lue sur la première image de « idle » (dans les unités des animations). */
+function hauteurBassinIdle(clips: THREE.AnimationClip[], axe: number): number {
+  const c = clips.find(x => x.name === 'idle') ?? clips.find(x => /hips\.position$/i.test(x.tracks[0]?.name ?? '')) ?? clips[0];
+  const t = c?.tracks.find(tr => /hips\.position$/i.test(tr.name)); if (!t) return 0;
+  return Math.abs(t.values[axe]);
 }
