@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --cream: #efe6d3; --zinc: #8e9aa6; --terra: #c9714b; --sage: #5fa35a; --sky: #cfe3ee;
   --ink: #24313a; --muted: #5a6a74; --panel: rgba(255, 255, 255, .78); --line: rgba(36, 49, 58, .14);
   --night: #1f2c48; --warm: #ffc66a;
@@ -727,3 +727,21 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
 
 /* mobile : le cadran de Marcel et les autocollants de Jimy ne cachent plus le haut du téléphone */
 @media (max-width: 700px), (max-height: 520px) and (pointer: coarse) { #phone.phone:not(.hidden) .dial, #phone.phone:not(.hidden) .stickers { display: none !important; } #phone.phone:not(.hidden) .screen { height: 100% !important; } }
+
+/* ===== Le téléphone de Marcel, construit comme ceux de Léa et Jimy (plus de cadran, plus de calepin, plus de bande en haut).
+   Il garde seulement ses couleurs : cadre brun foncé, boutons couleur cuir. ===== */
+.phone.skin-marcel { padding: 10px !important; border-radius: 34px !important; }
+.phone.skin-marcel .notch { display: block !important; background: #141312 !important; }
+.phone.skin-marcel .dial, .phone.skin-marcel .cord { display: none !important; }
+.phone.skin-marcel .screen { background: linear-gradient(180deg, #fbf8f1 0%, #f3efe6 100%); border-radius: 26px !important; overflow: hidden !important; font-family: inherit !important; }
+.phone.skin-marcel .content { overflow-y: auto; }
+.phone.skin-marcel .closeX { top: 6px !important; right: 8px !important; }
+.phone.skin-marcel .tabs { padding-top: 0 !important; }
+.phone.skin-marcel .home { display: flex !important; }
+.phone.skin-marcel .row { background: #fff !important; }
+@media (max-width: 700px), (max-height: 520px) and (pointer: coarse) {
+  #phone.phone.skin-marcel:not(.hidden) { padding: 0 !important; border-radius: 0 !important; }
+  #phone.phone.skin-marcel:not(.hidden) .screen { border-radius: 0 !important; }
+  #phone.phone.skin-marcel:not(.hidden) .notch, #phone.phone.skin-marcel:not(.hidden) .home { display: none !important; }
+}
+

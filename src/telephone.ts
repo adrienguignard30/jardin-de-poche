@@ -6,7 +6,7 @@ import { MUSIQUE } from './musique';
 import * as EL from './enligne';
 import { icon } from './ui';
 
-export type Onglet = 'home' | 'classement' | 'jeu' | 'recette' | 'marche' | 'bourse' | 'boutique' | 'carnet' | 'recus' | 'voisins' | 'notifs' | 'musique' | 'reglages';
+export type Onglet = 'home' | 'panier' | 'classement' | 'jeu' | 'recette' | 'marche' | 'bourse' | 'boutique' | 'carnet' | 'recus' | 'voisins' | 'notifs' | 'musique' | 'reglages';
 export interface TelHandlers {
   onCuisiner(): void; onOffrir(jardinId: string): void;
   onTroc(donne: E.Ingredient, cherche: E.Ingredient): void; onAccepter(annonceId: string): void; onRetirer(annonceId: string): void;
@@ -43,6 +43,7 @@ export function ficheRecette(re: E.Recette): HTMLElement {
 // ---------- les applis du téléphone : icône dessinée (trait), couleur, badge
 const SVG = (d: string) => `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 export const APPS: { id: Onglet; couleur: string; svg: string }[] = [
+  { id: 'panier', couleur: '#b5793a', svg: SVG('<path d="M3 10h18l-2 10H5L3 10z"/><path d="M7 10l5-6 5 6"/><line x1="9" y1="14" x2="9" y2="17"/><line x1="12" y1="14" x2="12" y2="17"/><line x1="15" y1="14" x2="15" y2="17"/>') },
   { id: 'recette', couleur: '#f08a24', svg: SVG('<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/>') },
   { id: 'bourse', couleur: '#1f8a8a', svg: SVG('<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>') },
   { id: 'marche', couleur: '#3f9a5a', svg: SVG('<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>') },
@@ -89,6 +90,9 @@ function graphique(pts: { x: string; cours: number; demande: number; cultiv: num
     + `<div class="legende"><span><i style="background:#1f8a8a"></i>${leg.cours}</span><span><i style="background:#f2c77a"></i>${leg.demande}</span><span><i style="background:#7a5ac9"></i>${leg.cultiv}</span></div>`;
   return w;
 }
+/** La recette du catalogue économique, par son identifiant. */
+function CATALOG_RECETTE(id: string) { return ECO.recettes.find(r => r.id === id); }
+
 export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h: TelHandlers, precedent?: Record<string, number>, cherche?: string) {
   const s = t(), j = st.eco.jardin, im = st.eco.immeuble;
   c.innerHTML = '';
@@ -190,6 +194,25 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
       if (!rangs.length) { liste.appendChild(el('p', 'small', s.classementVide)); return; }
       for (const r of rangs) liste.appendChild(el('div', 'row rang' + (r.moi ? ' moi' : ''), `<span class="n">${r.rang <= 3 ? ['🥇', '🥈', '🥉'][r.rang - 1] : r.rang}</span><span class="nom">${r.nom.replace(/[<>&]/g, '')}${r.moi ? ` <i>(${s.toi})</i>` : ''}</span><b>${r.score}</b>`));
     });
+    return;
+  }
+  if (onglet === 'panier') {                                              // ce qu'il y a dans le panier, en images
+    const items = Object.entries(j.panier).filter(([, q]) => q > 0).sort((a, b) => b[1] - a[1]);
+    const re = j.recette && !j.recette.faite ? CATALOG_RECETTE(j.recette.recette) : undefined;
+    const besoin = new Set((re?.ingredients ?? []).map(i => i.graine));
+    const boite = el('div', 'fenPanier');
+    if (!items.length) boite.appendChild(el('p', 'small', s.panierVide));
+    const g = el('div', 'grillePanier');
+    for (const [id, q] of items) {
+      const pl = CATALOG.plants.find(p => p.id === id);
+      const cel = el('div', 'casePanier' + (besoin.has(id) ? ' pourRecette' : ''));
+      const im2 = el<HTMLImageElement>('img', ''); im2.src = `ui/recoltes/${id}.png`; im2.alt = '';
+      im2.onerror = () => im2.replaceWith(el('span', 'em', icon(id)));
+      cel.append(im2, el('b', '', `×${q}`), el('small', '', pl ? tx(pl.name) : id));
+      if (besoin.has(id)) cel.appendChild(el('i', 'tagRecette', s.pourRecette));
+      g.appendChild(cel);
+    }
+    boite.appendChild(g); c.appendChild(boite);
     return;
   }
   if (onglet === 'jeu') {                                                  // le jeu du mois : un autre jeu, dans son cadre, avec SA musique

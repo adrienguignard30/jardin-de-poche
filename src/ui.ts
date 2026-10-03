@@ -52,6 +52,28 @@ function agir(b: HTMLElement, fn: () => unknown) {
 const LISIBLE = 'color:#24313a;background:rgba(36,49,58,.08);border:1px solid rgba(36,49,58,.2);font-weight:600;';
 const el = <T extends HTMLElement = HTMLElement>(tag: string, cls = '', html = '') => { const e = document.createElement(tag) as T; if (cls) e.className = cls; if (html) e.innerHTML = html; return e; };
 
+const STYLE_PANIER = `
+.pill.panier { cursor: pointer; display: inline-flex; align-items: center; gap: 4px; z-index: 6; background: #fff; border: 1px solid rgba(36,49,58,.14); box-shadow: 0 3px 0 rgba(36,49,58,.10), 0 6px 16px rgba(0,0,0,.12); }
+.pill.panier .pan { font-size: 18px; } .pill.panier b { font-size: 15px; }
+.pill.panier.bump { animation: bumpPanier .35s cubic-bezier(.3,1.8,.5,1); }
+@keyframes bumpPanier { 0% { transform: scale(1); } 50% { transform: scale(1.22); } 100% { transform: scale(1); } }
+.legumeVole { position: fixed; z-index: 70; pointer-events: none; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; font-size: 34px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.25)); }
+.legumeVole img { width: 100%; height: 100%; object-fit: contain; }
+.fenPanier { min-width: min(380px, 86vw); }
+.fenPanier .grillePanier { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 10px; margin-top: 10px; }
+.fenPanier .casePanier { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 6px; background: #fffaf0; border: 1px solid rgba(36,49,58,.08); border-radius: 14px; text-align: center; }
+.fenPanier .casePanier img { width: 64px; height: 64px; object-fit: contain; } .fenPanier .casePanier .em { font-size: 40px; line-height: 64px; }
+.fenPanier .casePanier b { font-size: 15px; color: #24313a; } .fenPanier .casePanier small { font-size: 12px; color: #5b6b75; }
+.fenPanier .casePanier.pourRecette { border: 2px solid #f2c46b; background: #fff7e3; } .fenPanier .tagRecette { font-style: normal; font-size: 10px; font-weight: 800; color: #b07a12; text-transform: uppercase; letter-spacing: .04em; }
+@media (max-width: 700px), (orientation: portrait) {
+  .pill.recetteHud { flex-wrap: nowrap !important; gap: 6px !important; padding: 6px 10px !important; max-width: calc(100vw - 28px) !important; font-size: 12px !important; }
+  .recetteHud:has(b) em { display: none; }
+  .recetteHud b { flex-basis: auto !important; flex: 0 1 auto; min-width: 0; max-width: 40vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px !important; }
+  .recetteHud span { white-space: nowrap; font-size: 12px !important; }
+}
+`;
+if (typeof document !== 'undefined' && !document.getElementById('stylePanier')) { const st = document.createElement('style'); st.id = 'stylePanier'; st.textContent = STYLE_PANIER; document.head.appendChild(st); }
+
 export class UI {
   root = $('#ui');
   private state: GameState | null = null;
@@ -77,6 +99,7 @@ export class UI {
         <div class="pill coins"><span class="ico">🪙</span><b id="coins">0</b></div>
         <div class="pill clock" id="clock"><span class="ico" id="clockIco">☀️</span><b id="clockTxt">08:00</b></div>
         <div class="pill seeds" id="seedsPill" title=""></div>
+        <div class="pill panier" id="panierPill" title=""><span class="pan">🧺</span><b id="panierNb">0</b></div>
         <div class="pill recetteHud hidden" id="recetteHud"></div>
         <div class="topRight"><div class="pill son" id="sonPill"><button id="btnSon" aria-label="musique"></button><input type="range" id="sonVol" min="0" max="100" step="1"></div><button class="pill icon" id="btnHome" title="">🏠</button><button class="pill icon" id="btnSettings" title="">⚙️</button></div>
         <button class="phoneBtn" id="btnPhone"><span class="ico">📱</span><span class="badge" id="basketBadge">0</span></button>
@@ -117,6 +140,8 @@ export class UI {
     $('#fermerMobile').onclick = () => this.togglePhone(false);
     $('#btnSettings').onclick = () => this.openSettings();
     $('#seedsPill').onclick = () => { this.phoneTab = 'boutique'; this.togglePhone(true); };
+    $('#panierPill').onclick = (e) => { e.stopPropagation(); this.montrerPanier(); };
+    window.addEventListener('resize', () => this.placerPanier());
     $('#recetteHud').onclick = () => this.ouvrir('recette');
     // la musique : toucher le haut-parleur coupe / remet ; le curseur règle le volume
     const majSon = () => {
@@ -386,7 +411,7 @@ export class UI {
   /** Les personnalisations (prénom, couleurs, âge, métier), gardées sur l'appareil pour chaque personnage. */
   private sauverPersos() { try { localStorage.setItem('jdp.persos', JSON.stringify(this.perso)); } catch { /* ignore */ } }
   private chargerPersos() { try { const p = JSON.parse(localStorage.getItem('jdp.persos') || '{}'); if (p && typeof p === 'object') Object.assign(this.perso, p); } catch { /* ignore */ } }
-  hideStart() { $('#start').classList.add('hidden'); $('#hud').classList.remove('hidden'); this.hideNameTags(); }
+  hideStart() { $('#start').classList.add('hidden'); $('#hud').classList.remove('hidden'); this.hideNameTags(); requestAnimationFrame(() => this.placerPanier()); setTimeout(() => this.placerPanier(), 400); }
 
   // ---------- HUD
   bind(state: GameState) { this.state = state; this.refresh(); }
@@ -409,6 +434,8 @@ export class UI {
     } else rh.classList.add('hidden');
     const poche = Object.keys(j.poche);
     $('#seedsPill').innerHTML = `<em>${t().seeds}</em>` + (poche.length ? poche.map(k => `<span>${icon(k)}<b>${j.panier[k] ?? 0}</b></span>`).join('') : `<span>🌱<b>0</b></span>`) + '<i class="chev">›</i>';
+    if (!this.panierAnime) $('#panierNb').textContent = String(Object.values(j.panier).reduce((a, b) => a + Math.max(0, b), 0));
+    this.placerPanier();
     $('#btnPhone').classList.toggle('alert', alerte);
     let hint = document.getElementById('sellHint');
     if (!hint) { hint = el('div', 'sellHint hidden'); hint.id = 'sellHint'; $('#hud').appendChild(hint); hint.onclick = () => { this.phoneTab = 'recette'; this.togglePhone(true); }; }
@@ -502,6 +529,62 @@ export class UI {
   }
   hideCard() { document.getElementById('infoCard')?.classList.add('hidden'); }
   private compteurAnime = false;
+  private panierAnime = false;
+  /** Les légumes récoltés volent depuis le balcon jusqu'au panier de l'écran (images des légumes), puis il rebondit. */
+  volerAuPanier(id: string, x: number, y: number, n: number) {
+    const cible = $('#panierPill').getBoundingClientRect();
+    const tx_ = cible.left + cible.width / 2, ty_ = cible.top + cible.height / 2;
+    const nb = $('#panierNb'), depart = +(nb.textContent || 0);
+    this.panierAnime = true;
+    const total = () => Object.values(this.state?.eco.jardin.panier ?? {}).reduce((a, b) => a + Math.max(0, b), 0);
+    for (let i = 0; i < n; i++) {
+      const c = el('div', 'legumeVole'); this.root.appendChild(c);
+      const im = el<HTMLImageElement>('img', ''); im.src = `ui/recoltes/${id}.png`; im.alt = '';
+      im.onerror = () => { im.remove(); c.textContent = icon(id); };
+      c.appendChild(im);
+      const dx = (Math.random() - .5) * 90, dy = -40 - Math.random() * 50;
+      c.style.left = `${x}px`; c.style.top = `${y}px`;
+      c.animate([
+        { transform: 'translate(-50%,-50%) scale(.5)', opacity: 0 },
+        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1.15)`, opacity: 1, offset: .35 },
+        { transform: `translate(calc(-50% + ${tx_ - x}px), calc(-50% + ${ty_ - y}px)) scale(.45)`, opacity: .9 },
+      ], { duration: 950 + i * 90, easing: 'cubic-bezier(.3,.7,.4,1)', fill: 'forwards' }).onfinish = () => {
+        c.remove();
+        nb.textContent = String(i === n - 1 ? total() : Math.max(depart, Math.min(total(), depart + i + 1)));
+        const pill = $('#panierPill'); pill.classList.remove('bump'); void pill.offsetWidth; pill.classList.add('bump');
+        if (i === n - 1) this.panierAnime = false;
+      };
+    }
+  }
+  /** Le panier se range juste à droite de la pastille des graines (jamais sur les pièces) ; s'il n'y a pas la place, dessous. */
+  placerPanier() {
+    const pp = this.root.querySelector('#panierPill') as HTMLElement | null, gr = this.root.querySelector('#seedsPill') as HTMLElement | null;
+    if (!pp || !gr) return;
+    const r = gr.getBoundingClientRect(), w = pp.getBoundingClientRect().width || 70;
+    if (!r.width || !r.height) return;                                   // pastille des graines pas encore affichée
+    pp.style.position = 'fixed'; pp.style.right = 'auto'; pp.style.bottom = 'auto';
+    if (r.right + 8 + w <= window.innerWidth - 8) { pp.style.left = `${Math.round(r.right + 8)}px`; pp.style.top = `${Math.round(r.top)}px`; }
+    else { pp.style.left = `${Math.round(r.left)}px`; pp.style.top = `${Math.round(r.bottom + 8)}px`; }
+  }
+  /** Ce qu'il y a dans le panier : l'image et le nom de chaque légume, avec la quantité. */
+  montrerPanier() {
+    const s = t(), j = this.state?.eco.jardin; if (!j) return;
+    const items = Object.entries(j.panier).filter(([, q]) => q > 0).sort((a, b) => b[1] - a[1]);
+    const c = el('div', 'fenPanier');
+    c.appendChild(el('h3', '', `🧺 ${s.monPanier}`));
+    if (!items.length) c.appendChild(el('p', 'small', s.panierVide));
+    const g = el('div', 'grillePanier');
+    for (const [id, q] of items) {
+      const pl = CATALOG.plants.find(p => p.id === id);
+      const cel = el('div', 'casePanier');
+      const im = el<HTMLImageElement>('img', ''); im.src = `ui/recoltes/${id}.png`; im.alt = '';
+      im.onerror = () => im.replaceWith(el('span', 'em', icon(id)));
+      cel.append(im, el('b', '', `×${q}`), el('small', '', pl ? tx(pl.name) : id));
+      g.appendChild(cel);
+    }
+    c.appendChild(g);
+    this.modal(c, true);
+  }
   /** Des pièces partent de (x, y) et volent jusqu'au compteur ; il compte en montant, puis rebondit. */
   piecesVolent(x: number, y: number, de: number, a: number, fin?: () => void) {
     const cible = $('#coins').getBoundingClientRect();
