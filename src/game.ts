@@ -362,6 +362,8 @@ export class Game {
     this.char = new Character(this.assets, asset);
     this.char.applyMesures(this.reglages(c.id));
     await this.preterAnimations(c.id);                                 // les animations corrigées (voir l'analyse du 3 octobre)
+    this.calibrerGestes();
+    { const u = new URLSearchParams(location.search).get('pieds'); this.char.decalerPieds(u !== null ? +u : ((c as any).pieds ?? 0)); }   // ?pieds=0.03 pour tester, puis la valeur dans catalog.json
     { const u = new URLSearchParams(location.search).get('bras'); this.char.brasOffset = u !== null ? +u : ((c as any).bras_offset ?? 0); }
     await this.chargerMoyennes(c.id);
     if (s.perso?.couleurs) this.teinter(this.char.obj, s.perso.couleurs, c.id);
@@ -565,6 +567,30 @@ export class Game {
       }
       this.char.exclure(id === 'marcel' ? ['dance', 'dance_marcel'] : ['dance_marcel']);
     } catch (e) { console.warn('[animations empruntées]', e); }
+  }
+  /** La rambarde devant le personnage : un rayon vers l'avant, à hauteur de hanche, trouve sa distance ; un rayon
+   *  vers le bas trouve le haut de la barre. Deux rayons, une fois par scène : rien de lourd. */
+  private rambardeDevant(x: number, z: number, ry: number): { dist: number; haut: number } | null {
+    try {
+      const W = this.world as any, env = W.envGroup as THREE.Object3D | undefined; if (!env) return null;
+      const dir = new THREE.Vector3(Math.sin(ry), 0, Math.cos(ry));
+      const h = new THREE.Raycaster(new THREE.Vector3(x, FL + .95, z), dir, .05, 1.6).intersectObject(env, true)[0]; if (!h) return null;
+      const top = new THREE.Raycaster(h.point.clone().add(new THREE.Vector3(0, .8, 0)), new THREE.Vector3(0, -1, 0), 0, 1.2).intersectObject(env, true)[0];
+      return { dist: h.distance, haut: top ? top.point.y : h.point.y + .05 };
+    } catch { return null; }
+  }
+  /** Calibrage des gestes : on lit, dans l'animation elle-même, où est la main droite au moment de l'effet (semer,
+   *  récolter, arroser), et on en déduit à quelle distance et de quel côté le personnage doit se tenir du pot.
+   *  Avant, ces valeurs venaient d'une mesure faite dans Blender pour un seul personnage : avec une animation
+   *  empruntée ou un autre gabarit, la main tombait à côté du pot. */
+  private calibrerGestes() {
+    for (const n of ['plant', 'harvest', 'water']) {
+      const g = this.char.gestures[n]; if (!g) continue;
+      const m = this.char.mainDansLeGeste(g.anim ?? n, g.effet, 'Right'); if (!m) continue;
+      const avant = m.z, cote = -m.x;                                  // repère du personnage : il regarde vers +z, sa droite est en -x
+      if (avant > .15 && avant < 1.2) { g.distance = avant; g.cote = cote; }
+      console.info(`[gestes] ${n} : main à ${avant.toFixed(2)} m devant, ${cote.toFixed(2)} m à droite, ${m.y.toFixed(2)} m de haut`);
+    }
   }
   /** AUDIT DES ANIMATIONS DANS LE JEU (adresse avec ?audit=1) : chaque animation est rejouée image par image,
    *  telle que le jeu la joue (empruntée ou non, à la taille du personnage, sur le vrai sol, avec la vraie hauteur
@@ -1194,14 +1220,18 @@ export class Game {
     if (this.char.currentName !== 'idle') this.char.play('idle', .3);
     let tasse: THREE.Object3D | null = null;
     switch (quoi) {
-      case 'saluer': this.char.mains = { droite: () => pt(.18, 1.72, .32 + Math.sin(t() * 9) * .1) }; break;                         // « coucou »
+      case 'saluer': this.char.mains = { droite: () => pt(.32, 1.48, .36 + Math.sin(t() * 9) * .1) }; break;                        // « coucou » : à hauteur d'épaule, devant (plus haut, le coude se retournait)
       case 'etirer': this.char.mains = { droite: () => pt(.05, 1.35 + .6 * k(), .16), gauche: () => pt(.05, 1.35 + .6 * k(), -.16) }; break;
       case 'bailler': this.char.mains = { droite: () => pt(.12, 1.52 + .1 * k(), .05), gauche: () => pt(.05, 1.3 + .55 * k(), -.2) }; this.char.regard = pt(2, 3.5, 0); break;   // une main devant la bouche
       case 'hanches': this.char.mains = { droite: () => pt(-.02, .98, .2), gauche: () => pt(-.02, .98, -.2) }; break;                // les poings sur les hanches
       case 'dos': this.char.mains = { droite: () => pt(-.2, .95, .06), gauche: () => pt(-.2, .95, -.06) }; break;                     // les mains dans le dos
       case 'tete': this.char.mains = { droite: () => pt(.02, 1.66 + Math.sin(t() * 7) * .02, .1 + Math.sin(t() * 7) * .03) }; break;  // se gratter la tête
       case 'applaudir': this.char.mains = { droite: () => pt(.3, 1.3, .04 + Math.abs(Math.sin(t() * 6)) * .12), gauche: () => pt(.3, 1.3, -.04 - Math.abs(Math.sin(t() * 6)) * .12) }; break;
-      case 'rambarde': this.char.mains = { droite: () => pt(.52, 1.02, .25), gauche: () => pt(.52, 1.02, -.25) }; break;           // accoudé à la rambarde
+      case 'rambarde': {                                                 // accoudé à la vraie rambarde (mesurée), sinon à 52 cm devant
+        const r = this.rambardeDevant(ch.position.x, ch.position.z, ch.rotation.y);
+        const av = r ? Math.max(.25, r.dist - .03) : .52, h = r ? r.haut - ch.position.y + .02 : 1.02;
+        this.char.mains = { droite: () => pt(av, h, .25), gauche: () => pt(av, h, -.25) }; break;
+      }
       case 'pointer': this.char.mains = { droite: () => { const c = cible?.(); if (!c) return pt(.5, 1.5, .2); const e = pt(0, 1.45, .18); return e.add(c.clone().sub(e).normalize().multiplyScalar(.7)); } }; break;
       case 'cafe': {                                                    // une tasse : il la porte à la bouche de temps en temps
         tasse = new THREE.Group();
@@ -1426,7 +1456,7 @@ export class Game {
       }
       if (token !== this.autoToken) return;
       const t0 = performance.now(), me = this.char.obj.position.clone();
-      const geste = Math.random() < .6 ? this.gesteBras(this.gameHour() < 11 ? 'cafe' : 'dos', 9000) : null;   // un café le matin, sinon les mains dans le dos
+      const geste = Math.random() < .6 ? this.gesteBras('dos', 9000) : null;                                // les mains dans le dos (le café est retiré : la tasse flottait)
       await vivre(9000, () => {                                     // il balaie la vue par la fenêtre, de gauche à droite, au loin
         const t = (performance.now() - t0) / 1000, a = face + Math.sin(t * .45) * .6;
         return me.clone().add(new THREE.Vector3(Math.sin(a) * 25, 1.6 + Math.sin(t * .8) * 1.5, Math.cos(a) * 25));

@@ -132,6 +132,22 @@ export class Character {
     }
     return faits;
   }
+  /** Remonter (ou descendre) le modèle de quelques centimètres : si les semelles s'enfoncent dans le sol, on relève. */
+  private decalagePieds = 0;
+  decalerPieds(m: number) { const d = m - this.decalagePieds; this.decalagePieds = m; for (const c of this.obj.children) c.position.y += d; }
+  /** Où est une main (repère du personnage) à un instant donné d'une animation : sert à placer le personnage pour que
+   *  la main tombe au-dessus du pot. On évalue la pose « à blanc », puis on remet le repos. */
+  mainDansLeGeste(name: string, t: number, cote: 'Right' | 'Left' = 'Right'): THREE.Vector3 | null {
+    const a = this.actions.get(name); const main = this.bone(cote + 'Hand'); if (!a || !main) return null;
+    const actifs = [...this.actions.values()].filter(x => x.isRunning()).map(x => ({ a: x, w: x.getEffectiveWeight(), t: x.time }));
+    this.mixer.stopAllAction(); a.reset().setEffectiveWeight(1).play(); this.mixer.setTime(Math.min(t, a.getClip().duration - .01));
+    this.obj.updateMatrixWorld(true);
+    const p = this.obj.worldToLocal(main.getWorldPosition(new THREE.Vector3()));
+    this.mixer.stopAllAction();
+    for (const x of actifs) { x.a.reset().setEffectiveWeight(x.w).play(); x.a.time = x.t; }
+    this.mixer.update(0); this.obj.updateMatrixWorld(true);
+    return p;
+  }
   /** Retirer des animations abîmées (elles ne seront plus jamais jouées). */
   exclure(noms: string[]) { for (const n of noms) { const a = this.actions.get(n); if (a) { a.stop(); this.actions.delete(n); } } }
   /** Le nom de toutes les animations de ce personnage (pour la revue des animations). */
