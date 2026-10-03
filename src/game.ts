@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+﻿import * as THREE from 'three';
 import { Assets } from './assets';
 import { World, SLOTS, FL, POT_SCALE, FACADE_FRONT, freePoint, segmentBlocked, CHAIR_SPOT, LADDER_SPOT, ROOF_STAND, START_SPOT, BASKET_SPOT, LAYOUT, TUNE, HAND, mountTunePanel, type Slot, type Layout } from './world';
 import { Character, type Reglages } from './character';
@@ -873,7 +873,7 @@ export class Game {
     this.ui.refresh();
     await this.gotoSlot(slot, 'plant');
     this.char.busy = true;
-    this.hold(`seeds_${plant}`, 'seeds');
+    // (plus de sachet de graines dans la main : il se placait dans les bras)
     this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('plant'); const done = g.fin;
     await wait(g.effet * 1000);
     p.plant = P.sow(plant);
