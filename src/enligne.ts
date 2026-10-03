@@ -1,4 +1,4 @@
-// =============================================================================================
+﻿// =============================================================================================
 //  EN LIGNE : comptes, sauvegardes dans le nuage, classement (Supabase).
 //  Tout est facultatif : sans les clés du projet (fichier .env.local / réglages Vercel), le jeu reste 100 % local.
 //  - « Jouer tout de suite » : un compte invité invisible (on peut le garder pour toujours, ou en faire un vrai compte).
@@ -148,7 +148,7 @@ export async function jetonAntiRobot(): Promise<string | undefined> {
   return new Promise((ok, ko) => {
     const boite = document.createElement('div'); boite.style.cssText = 'position:fixed;left:-9999px;top:0'; document.body.appendChild(boite);
     const fin = (f: () => void) => { try { ts.remove(id); } catch { /* ignore */ } boite.remove(); f(); };
-    const id = ts.render(boite, { sitekey: CLE_TURNSTILE, size: 'invisible', callback: (t: string) => fin(() => ok(t)), 'error-callback': () => fin(() => ko(new Error('captcha'))) });
+    const id = ts.render(boite, { sitekey: CLE_TURNSTILE, callback: (t: string) => fin(() => ok(t)), 'error-callback': () => fin(() => ko(new Error('captcha'))) });
     setTimeout(() => fin(() => ko(new Error('captcha'))), 15000);
   });
 }
