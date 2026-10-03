@@ -111,6 +111,8 @@ export class Character {
   }
 
   has(name: string) { return this.actions.has(name); }
+  /** Le nom de toutes les animations de ce personnage (pour la revue des animations). */
+  nomsAnimations(): string[] { return [...this.actions.keys()]; }
   /** Toutes les variantes d'une animation : dance, dance_2, dance_3… (téléchargées en plus sur Mixamo). */
   variantes(base: string): string[] { return [...this.actions.keys()].filter(k => k === base || new RegExp(`^${base}_[a-z0-9_]+$`).test(k)); }
   /** Un os du squelette par la fin de son nom (Hips, Head, RightHand…). */

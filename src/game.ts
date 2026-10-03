@@ -345,6 +345,8 @@ export class Game {
   }
   private async enterGame() {
     const s = this.state;
+    if (this.world.basket) this.world.basket.visible = false;           // le panier est à l'écran et dans le téléphone
+    setTimeout(() => this.panneauAnimations(), 1500);
     s.eco.immeuble.annonces = s.eco.immeuble.annonces.filter(a => a.accepte_par || (a.donne.graine !== E.POINTS && a.cherche.graine !== E.POINTS));
     const c = charDef(s.character);
     MUSIQUE.jouerPerso(c.id);
@@ -501,6 +503,45 @@ export class Game {
     this.char.mains = { droite: () => cible };
     this.char.ikBut = 1;
     setTimeout(() => { this.char.ikBut = 0; }, (effet + .45) * 1000);       // la main revient à l'animation après le geste
+  }
+  /** REVUE DES ANIMATIONS (adresse avec ?anims=1) : la liste de toutes les animations du personnage ; ▶ la joue seule,
+   *  sans aucun guidage des mains ; ✓ / ✗ et une note ; « Copier le rapport » donne la liste à m'envoyer. */
+  private panneauAnimations() {
+    if (new URLSearchParams(location.search).get('anims') !== '1' || document.getElementById('revueAnims')) return;
+    const perso = this.state.character, noms = this.char.nomsAnimations().sort();
+    const avis: Record<string, { ok?: boolean; note: string }> = {};
+    let vitesse = 1;
+    const box = document.createElement('div'); box.id = 'revueAnims';
+    box.style.cssText = 'position:fixed;right:10px;top:70px;bottom:10px;width:min(360px,94vw);overflow:auto;z-index:80;background:rgba(255,253,246,.97);border:1px solid rgba(0,0,0,.12);border-radius:14px;padding:10px;font:13px system-ui,sans-serif;color:#24313a;box-shadow:0 10px 30px rgba(0,0,0,.2)';
+    const btn = (txt: string, f: () => void, css = '') => { const b = document.createElement('button'); b.textContent = txt; b.style.cssText = 'margin:2px;padding:4px 8px;border-radius:8px;border:1px solid rgba(0,0,0,.15);background:#fff;cursor:pointer;' + css; b.onclick = f; return b; };
+    const figer = () => { this.autoToken++; this.char.busy = true; this.char.mains = null; this.char.ikBut = 0; this.char.regard = null; };
+    const titre = document.createElement('div'); titre.innerHTML = `<b>Revue des animations — ${perso}</b> (${noms.length})`; box.appendChild(titre);
+    const barre = document.createElement('div');
+    barre.append(
+      btn('↻ tourner', () => { this.char.obj.rotation.y += Math.PI / 2; }),
+      btn('vitesse ×1', function (this: void) { vitesse = vitesse === 1 ? .5 : vitesse === .5 ? .25 : 1; (barre.children[1] as HTMLButtonElement).textContent = `vitesse ×${vitesse}`; }),
+      btn('📋 Copier le rapport', () => {
+        const lignes = [`Revue des animations — ${perso} — ${new Date().toLocaleString('fr-FR')}`];
+        for (const n of noms) { const a = avis[n]; if (a && (a.ok !== undefined || a.note)) lignes.push(`${a.ok === true ? '✓' : a.ok === false ? '✗' : '·'} ${n}${a.note ? ' — ' + a.note : ''}`); }
+        const txt = lignes.join('\n');
+        navigator.clipboard?.writeText(txt).then(() => this.ui.toast('Rapport copié : colle-le dans la conversation', 3000, true)).catch(() => { const ta = document.createElement('textarea'); ta.value = txt; box.appendChild(ta); ta.select(); });
+      }, 'background:#2f8f4e;color:#fff;border-color:#2f8f4e;font-weight:700'),
+      btn('reprendre la vie normale', () => { this.char.busy = false; this.char.play('idle', .3); this.scheduleAutonomy(); }),
+    );
+    box.appendChild(barre);
+    for (const n of noms) {
+      avis[n] = { note: '' };
+      const ligne = document.createElement('div'); ligne.style.cssText = 'display:flex;align-items:center;gap:4px;padding:4px 0;border-top:1px solid rgba(0,0,0,.06);flex-wrap:wrap';
+      const nom = document.createElement('span'); nom.textContent = n; nom.style.cssText = 'flex:1;min-width:120px;font-family:ui-monospace,monospace;font-size:12px';
+      const ok = btn('✓', () => { avis[n].ok = true; ok.style.background = '#d8f0dc'; ko.style.background = '#fff'; });
+      const ko = btn('✗', () => { avis[n].ok = false; ko.style.background = '#fde0da'; ok.style.background = '#fff'; });
+      const note = document.createElement('input'); note.placeholder = 'ce qui ne va pas'; note.style.cssText = 'flex-basis:100%;padding:4px 6px;border:1px solid rgba(0,0,0,.15);border-radius:6px;font-size:12px';
+      note.oninput = () => { avis[n].note = note.value.trim(); };
+      ligne.append(btn('▶', () => { figer(); this.char.play(n, .2, vitesse); nom.style.fontWeight = '800'; }), nom, ok, ko, note);
+      box.appendChild(ligne);
+    }
+    document.body.appendChild(box);
+    figer(); this.char.play('idle', .2);
   }
   /** Combien de variétés existent pour une plante (plant_<id>_v1_s4, _v2_s4…). */
   private nbVarietes(id: string): number { let n = 0; while (this.assets.has(`plant_${id}_v${n + 1}_s4`)) n++; return n; }
@@ -833,7 +874,7 @@ export class Game {
     await this.gotoSlot(slot, 'plant');
     this.char.busy = true;
     this.hold(`seeds_${plant}`, 'seeds');
-    this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('plant'); const done = g.fin; this.mainVersLaPlante(p, 'semis', g.effet);
+    this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('plant'); const done = g.fin;
     await wait(g.effet * 1000);
     p.plant = P.sow(plant);
     p.plant.wateredAt = Date.now();          // on sème dans une terre humide
@@ -871,7 +912,7 @@ export class Game {
     const tt = t();
     await this.gotoSlot(SLOTS[p.id], 'harvest');
     this.char.busy = true;
-    this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('harvest'); const done = g.fin; this.mainVersLaPlante(p, 'recolte', g.effet);
+    this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('harvest'); const done = g.fin;
     await wait(g.effet * 1000);
     const d = plantDef(p.plant.plant), j = this.state.eco.jardin;
     const r = P.harvest(p.plant);                                          // on récolte toujours : le pot se libère

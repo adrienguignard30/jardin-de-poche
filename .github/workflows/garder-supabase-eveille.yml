@@ -1,0 +1,19 @@
+# Un projet Supabase gratuit se met en pause après 7 jours sans activité.
+# Ce petit robot de GitHub l'appelle une fois par jour (fonction « ping » de la base) : il ne s'endort jamais.
+# La clé utilisée est la clé PUBLIQUE du jeu (la même que dans le navigateur des joueurs).
+name: Garder Supabase éveillé
+on:
+  schedule:
+    - cron: '17 6 * * *'      # tous les jours à 6 h 17 (heure de Londres)
+  workflow_dispatch:           # bouton « Run workflow » pour le tester à la main
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Appeler la base
+        run: |
+          curl -fsS -X POST "https://jbwlhapwszsuwirspybg.supabase.co/rest/v1/rpc/ping" \
+            -H "apikey: sb_publishable_Q8e86m330gqO-yRG3zawGA_JVEz2WvB" \
+            -H "Content-Type: application/json" -d '{}'
+          echo ""
+          echo "Base réveillée"
