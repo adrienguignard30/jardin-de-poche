@@ -724,3 +724,6 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
 /* erreurs du compte : bien visibles (encadré rouge qui secoue) */
 .fenCompte .warn:not(:empty) { background: #fde6df; color: #b3382c; border: 1.5px solid #f0a593; border-radius: 10px; padding: 8px 10px; font-weight: 700; animation: secoue .35s; }
 @keyframes secoue { 0%, 100% { transform: none; } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+/* mobile : le cadran de Marcel et les autocollants de Jimy ne cachent plus le haut du téléphone */
+@media (max-width: 700px), (max-height: 520px) and (pointer: coarse) { #phone.phone:not(.hidden) .dial, #phone.phone:not(.hidden) .stickers { display: none !important; } #phone.phone:not(.hidden) .screen { height: 100% !important; } }

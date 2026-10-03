@@ -74,8 +74,10 @@ export function aideDebutant(im: Immeuble, j: Jardin, cat: Catalogue, now: numbe
     v.poche[m.graine] = v.poche[m.graine] ?? 1;
     const mien = Object.entries(j.panier).filter(([g, q]) => q > 0 && !besoin.has(g)).sort((x, y) => y[1] - x[1])[0]?.[0];
     const prix = Math.max(1, Math.round(valeur(im, m) * .8));
-    const cherche: Ingredient = mien ? { graine: mien, quantite: 1 } : { graine: POINTS, quantite: Math.min(Math.max(1, j.points), prix) };
-    if (cherche.graine === POINTS && j.points < 1) continue;                 // rien pour payer : on attendra une récolte
+    const vite = Object.keys(j.poche).find(g => !besoin.has(g)) ?? Object.keys(j.poche)[0];   // rien en trop : une graine de sa poche, à récolter
+    if (!mien && !vite) continue;
+    const cherche: Ingredient = mien ? { graine: mien, quantite: 1 } : { graine: vite!, quantite: 1 };
+    void prix;
     im.annonces = im.annonces.filter(a => !(a.id.includes('_aide') && a.donne.graine === m.graine && !a.accepte_par));
     im.annonces.push({ id: `a${now}_${m.graine}_aide`, de: v.id, donne: { graine: m.graine, quantite: m.quantite }, cherche, cree_a: now, expire_a: now + 24 * H });
     n++;

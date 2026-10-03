@@ -579,7 +579,8 @@ export class UI {
     for (const pl of avail) {
       const g = ECO.graine(pl.id);
       const rare = !j.poche[pl.id] && j.rares[pl.id];
-      const b = el('button', 'seed' + (besoin.has(pl.id) ? ' besoin' : ''), `<span><img class="mini-recolte" src="ui/recoltes/${pl.id}.png" alt="" onerror="this.replaceWith(document.createTextNode('${icon(pl.id)}'))"> ${tx(pl.name)}${besoin.has(pl.id) ? ` <small class="pr">${s.pourRecette}</small>` : ''}</span><small>${g.pousse_min >= 60 ? Math.round(g.pousse_min / 60) + ' h' : g.pousse_min + ' min'}${rare ? ` · ${s.rare} ×${j.rares[pl.id]}` : ''}</small>`);
+      const b = el('button', 'seed' + (besoin.has(pl.id) ? ' besoin' : ''), `<span><img class="mini-recolte" src="ui/recoltes/${pl.id}.png" alt=""> ${tx(pl.name)}${besoin.has(pl.id) ? ` <small class="pr">${s.pourRecette}</small>` : ''}</span><small>${g.pousse_min >= 60 ? Math.round(g.pousse_min / 60) + ' h' : g.pousse_min + ' min'}${rare ? ` · ${s.rare} ×${j.rares[pl.id]}` : ''}</small>`);
+      const im = b.querySelector('img'); if (im) im.onerror = () => im.replaceWith(document.createTextNode(icon(pl.id)));   // pas encore d'image : l'emoji
       b.onclick = () => { this.hidePicker(); this.h.onSow(slot, pl.id); };
       p.appendChild(b);
     }
@@ -595,7 +596,8 @@ export class UI {
     const pl = CATALOG.plants.find(p => p.id === id); if (!pl) return;
     let b = document.getElementById('apercuRecolte');
     if (!b) { b = el('div', 'apercuRecolte'); b.id = 'apercuRecolte'; document.body.appendChild(b); b.onclick = () => b!.classList.remove('vu'); }
-    b.innerHTML = `<img src="ui/recoltes/${id}.png" alt="" onerror="this.outerHTML='<span class=\'em\'>${icon(id)}</span>'"><div><small>${t().tuRecolteras}</small><b>${tx(pl.name)}</b></div>`;
+    b.innerHTML = `<img src="ui/recoltes/${id}.png" alt=""><div><small>${t().tuRecolteras}</small><b>${tx(pl.name)}</b></div>`;
+    const im = b.querySelector('img'); if (im) im.onerror = () => { const e = document.createElement('span'); e.className = 'em'; e.textContent = icon(id); im.replaceWith(e); };
     b.classList.remove('vu'); void b.offsetWidth; b.classList.add('vu');
     clearTimeout((b as any)._t); (b as any)._t = setTimeout(() => b!.classList.remove('vu'), 3800);
   }
@@ -623,13 +625,18 @@ export class UI {
     }
   }
   /** Ranger le téléphone sans rien déclencher (utilisé en quittant ou en entrant dans une partie). */
-  rangerTelephone() { $('#phone').classList.add('hidden'); this.phoneTab = 'home'; this.cherche = undefined; MUSIQUE.pauseJeu(false); }
+  /** Le jeu du mois (un autre jeu 3D, avec sa musique) est DÉTRUIT dès qu'on quitte son appli ou qu'on range le téléphone.
+   *  Avant, il restait caché mais continuait de tourner : deux jeux 3D et deux musiques en même temps. */
+  private eteindreJeuDuMois() {
+    this.root.querySelectorAll('iframe.cadreJeu').forEach(f => { try { (f as HTMLIFrameElement).src = 'about:blank'; } catch { /* ignore */ } f.remove(); });
+  }
+  rangerTelephone() { this.eteindreJeuDuMois(); $('#phone').classList.add('hidden'); this.phoneTab = 'home'; this.cherche = undefined; MUSIQUE.pauseJeu(false); }
   togglePhone(force?: boolean) {
     const ph = $('#phone');
     const open = force ?? ph.classList.contains('hidden');
     this.applySkin();
     ph.classList.toggle('hidden', !open);
-    if (!open) MUSIQUE.pauseJeu(false);                              // téléphone rangé : notre musique reprend
+    if (!open) { this.eteindreJeuDuMois(); MUSIQUE.pauseJeu(false); }  // téléphone rangé : le jeu du mois s'éteint, notre musique reprend
     this.hidePicker();
     if (open) this.renderPhone(true); else this.phoneTab = 'home';
     this.refresh();

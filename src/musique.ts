@@ -49,11 +49,17 @@ class Musique {
     // vidéo, et la musique se fait entendre même en mode silencieux, au volume « média » du téléphone.
     try { (navigator as any).audioSession && ((navigator as any).audioSession.type = 'playback'); } catch { /* ancien navigateur */ }
     try {
-      const muet = document.createElement('audio');
-      muet.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
-      muet.loop = true; muet.setAttribute('playsinline', ''); (muet as any).playsInline = true; muet.volume = .01;
-      muet.play().catch(() => { /* refusé : tant pis */ });
-      this.muet = muet;
+      // Ce <audio> ne sert qu'à iOS (mode silencieux de l'iPhone). Avant, il contenait 0 octet de son et tournait en boucle
+      // à l'infini sur TOUS les appareils : sur Windows, Chrome et Edge rebouclaient des milliers de fois par seconde,
+      // le moteur audio de Windows saturait et tout le PC se figeait (bug introduit le 1er octobre au soir).
+      const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (ios) {
+        const muet = document.createElement('audio');
+        muet.src = URL.createObjectURL(silenceWav(1));                 // 1 seconde de vrai silence, fabriquée ici
+        muet.loop = true; muet.setAttribute('playsinline', ''); (muet as any).playsInline = true; muet.volume = .01;
+        muet.play().catch(() => { /* refusé : tant pis */ });
+        this.muet = muet;
+      }
     } catch { /* ignore */ }
     try {
       this.ac = new AudioContext();
@@ -169,3 +175,14 @@ class Musique {
   surChangement(f: () => void) { this.auditeurs.push(f); }
 }
 export const MUSIQUE = new Musique();
+
+/** Un fichier WAV de silence de `secondes` secondes (8 kHz, 8 bits, mono), fabriqué en mémoire. */
+function silenceWav(secondes: number): Blob {
+  const n = Math.round(8000 * secondes), b = new ArrayBuffer(44 + n), v = new DataView(b);
+  const txt = (o: number, t: string) => { for (let i = 0; i < t.length; i++) v.setUint8(o + i, t.charCodeAt(i)); };
+  txt(0, 'RIFF'); v.setUint32(4, 36 + n, true); txt(8, 'WAVE'); txt(12, 'fmt '); v.setUint32(16, 16, true);
+  v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, 8000, true); v.setUint32(28, 8000, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true);
+  txt(36, 'data'); v.setUint32(40, n, true);
+  new Uint8Array(b, 44).fill(128);
+  return new Blob([b], { type: 'audio/wav' });
+}

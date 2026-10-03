@@ -51,8 +51,8 @@ export const APPS: { id: Onglet; couleur: string; svg: string }[] = [
   { id: 'recus', couleur: '#d86f8a', svg: SVG('<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>') },
   { id: 'voisins', couleur: '#7a5ac9', svg: SVG('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>') },
   { id: 'notifs', couleur: '#e0533a', svg: SVG('<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>') },
-  { id: 'classement', couleur: '#f2a33a', svg: SVG('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>') },
   { id: 'jeu', couleur: '#7b1fa2', svg: SVG('<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="16" cy="11.5" r="1" fill="currentColor"/><circle cx="18.5" cy="13.5" r="1" fill="currentColor"/>') },
+  { id: 'classement', couleur: '#f2a33a', svg: SVG('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>') },
   { id: 'musique', couleur: '#c2185b', svg: SVG('<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>') },
   { id: 'reglages', couleur: '#6b7780', svg: SVG('<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>') },
 ];
@@ -92,6 +92,7 @@ function graphique(pts: { x: string; cours: number; demande: number; cultiv: num
 export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h: TelHandlers, precedent?: Record<string, number>, cherche?: string) {
   const s = t(), j = st.eco.jardin, im = st.eco.immeuble;
   c.innerHTML = '';
+  c.querySelectorAll('iframe.cadreJeu').forEach(f => { try { (f as HTMLIFrameElement).src = 'about:blank'; } catch { /* ignore */ } f.remove(); });
   c.classList.toggle('homeScreen', onglet === 'home'); c.classList.remove('avecBarre', 'avecJeu');
   const zoneA = c.parentElement?.querySelector('#telAction') as HTMLElement | null; if (zoneA) { zoneA.innerHTML = ''; zoneA.classList.add('hidden'); }
   c.dataset.rendu = String(++RENDUS);
@@ -370,7 +371,7 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
       else c.appendChild(el('p', 'small warn', s.personnePoste(nomG(cible ?? mq[0].graine).toLowerCase())));
     }
     // 2. proposer un échange : je cherche (ce qui manque) contre ce que je donne (mes légumes en trop ; les points, c'est pour la Boutique). Tout reste équilibré :
-    //    changer une quantité recalcule l'autre ; les compteurs tournent en rond (au-delà du max → 1, sous 1 → max) ; « Max » va au plus.
+    //    les deux quantités sont libres ; les compteurs tournent en rond (au-delà du max → 1, sous 1 → max) ; « Max » va au plus.
     const dons: [string, number][] = Object.keys(j.panier).filter(g => surplus(g) > 0).map(g => [g, surplus(g)] as [string, number]);
     c.appendChild(el('div', 'ttl', s.proposerTroc));
     if (!dons.length) c.appendChild(el('p', 'small warn', s.rienADonner));
@@ -385,7 +386,7 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
       ETAT_TROC.venuPour = cherche;
       const coursDe = (g: string) => g === E.POINTS ? 1 : (im.cours[g] ?? 1);
       const maxD = () => dons.find(d => d[0] === selD.value)?.[1] ?? 1;
-      const maxC = () => Math.max(1, Math.floor(maxD() * coursDe(selD.value) * (1 + E.REGLES.ECART_TROC_MAX) / coursDe(selC.value)));
+      const maxC = () => 20;                                                 // ce que je cherche : libre (le verdict dit si c'est juste)
       let qD = ETAT_TROC.d === selD.value && ETAT_TROC.qD ? ETAT_TROC.qD : 1, qC = ETAT_TROC.c === selC.value && ETAT_TROC.qC ? ETAT_TROC.qC : 1;
       const eq = el('p', 'small');
       const pub = el('button', 'primary', s.publier);
@@ -403,8 +404,7 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
         eq.className = 'small ' + (dansLesClous ? '' : 'warn');
         pub.classList.toggle('off', !dansLesClous); sauver();
       };
-      const depuisC = () => { qD = Math.max(1, Math.min(maxD(), Math.ceil(coursDe(selC.value) * qC / coursDe(selD.value)))); maj(); };   // je change ce que je cherche → ce que je donne suit
-      const depuisD = () => { qC = Math.max(1, Math.min(maxC(), Math.round(coursDe(selD.value) * qD / coursDe(selC.value)))); maj(); };  // je change ce que je donne → ce que je cherche suit
+      const depuisC = () => maj(), depuisD = () => maj();                    // chaque compteur est indépendant
       const compteur = (get: () => number, set: (v: number) => void, max: () => number, apres: () => void) => {
         const w = el('div', 'stepper');
         const m = el('button', 'st', '−'), v = el('b', '', String(get())), p = el('button', 'st', '+'), mx = el('button', 'st max', s.maxBtn);
