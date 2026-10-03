@@ -347,12 +347,13 @@ export class Game {
     const s = this.state;
     if (this.world.basket) this.world.basket.visible = false;           // le panier est à l'écran et dans le téléphone
     setTimeout(() => this.panneauAnimations(), 1500);
+    setTimeout(() => { try { this.auditAnimations(); } catch (e) { console.warn('[audit]', e); } }, 2500);
     s.eco.immeuble.annonces = s.eco.immeuble.annonces.filter(a => a.accepte_par || (a.donne.graine !== E.POINTS && a.cherche.graine !== E.POINTS));
     const c = charDef(s.character);
     MUSIQUE.jouerPerso(c.id);
     this.autoToken++; this.remiseAZero();
     if (EL.EN_LIGNE && !EL.etatCompte().connecte) EL.jouerInvite(s.nickname || s.perso?.prenom || 'Jardinier').catch(() => { /* hors ligne : on joue en local */ });
-    this.ui.setProgress(0, 1, tx(c.name));
+    this.ui.chantier(true, tx(c.name));                                  // le croquis se dessine pendant qu'on construit la maison
     await this.world.setView(CATALOG.views[s.view] ?? CATALOG.views.tour);
     const asset = await this.assets.loadCharacter(c.id, c.file);
     if (this.char) this.world.scene.remove(this.char.obj);
@@ -382,6 +383,7 @@ export class Game {
     this.applyNightMode(this.ui.nightMode);
     this.ui.bind(s);
     this.ui.preloadSkin();
+    this.ui.chantier(false);
     this.ui.hideStart();
     this.inside = false; this.sleeping = false;
     this.running = true;
@@ -563,6 +565,63 @@ export class Game {
       }
       this.char.exclure(id === 'marcel' ? ['dance', 'dance_marcel'] : ['dance_marcel']);
     } catch (e) { console.warn('[animations empruntées]', e); }
+  }
+  /** AUDIT DES ANIMATIONS DANS LE JEU (adresse avec ?audit=1) : chaque animation est rejouée image par image,
+   *  telle que le jeu la joue (empruntée ou non, à la taille du personnage, sur le vrai sol, avec la vraie hauteur
+   *  des pots), et on mesure : pieds sous le sol, flotte, main sous la terre du pot, coude à l'envers, saut à la
+   *  boucle. Le rapport s'affiche dans un cadre, avec un bouton pour le copier. */
+  private auditAnimations() {
+    if (new URLSearchParams(location.search).get('audit') !== '1') return;
+    const ch = this.char, perso = this.state.character;
+    this.autoToken++; ch.busy = true; ch.mains = null; ch.ikBut = 0; ch.regard = null;
+    const os = { hips: ch.bone('Hips'), tete: ch.bone('Head'), piedG: ch.bone('LeftFoot'), piedD: ch.bone('RightFoot'), orteilG: ch.bone('LeftToeBase'), orteilD: ch.bone('RightToeBase'),
+      mainG: ch.bone('LeftHand'), mainD: ch.bone('RightHand'), brasG: ch.bone('LeftArm'), brasD: ch.bone('RightArm'), avbG: ch.bone('LeftForeArm'), avbD: ch.bone('RightForeArm') };
+    const sol = FL, v = new THREE.Vector3(), pos = (b: THREE.Object3D | null) => b ? b.getWorldPosition(v.clone()) : null;
+    let terre = sol + .30; { const vue = [...this.views.values()][0]; if (vue) { vue.holder.updateWorldMatrix(true, true); terre = pos(vue.holder)!.y; } }
+    const lignes = [`AUDIT DANS LE JEU — ${perso} — ${new Date().toLocaleString('fr-FR')}`, `sol à ${sol.toFixed(2)} m, terre des pots à ${(terre - sol).toFixed(2)} m au-dessus du sol`, ''];
+    const cm = (m: number) => Math.round(m * 100);
+    const sauve = { pos: ch.obj.position.clone(), rot: ch.obj.rotation.y };
+    ch.obj.position.set(0, sol, 2); ch.obj.rotation.y = Math.PI;
+    for (const n of ch.nomsAnimations().sort()) {
+      const a = (ch as any).actions.get(n) as THREE.AnimationAction; if (!a) continue;
+      const clip = a.getClip(), N = Math.max(2, Math.round(clip.duration * 30) + 1);
+      ch.mixer.stopAllAction(); a.reset().setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; a.enabled = true; a.setEffectiveWeight(1); a.play();
+      let sous = 0, flotte = 0, mainBasse = Infinity, coude = { G: 0, D: 0 }, prem: Map<string, THREE.Quaternion> | null = null, dern: Map<string, THREE.Quaternion> | null = null;
+      const assis = /sit|sleep|gainage/i.test(n), bas = /plant|harvest|water|pickup/i.test(n);
+      for (let f = 0; f < N; f++) {
+        ch.mixer.setTime(clip.duration * f / (N - 1)); ch.obj.updateMatrixWorld(true);
+        const pieds = [os.piedG, os.piedD, os.orteilG, os.orteilD].map(pos).filter(Boolean) as THREE.Vector3[];
+        if (pieds.length && !assis) { const b = Math.min(...pieds.map(p => p.y)) - sol; sous = Math.min(sous, b); if (b > .07) flotte++; }
+        for (const m of [os.mainG, os.mainD]) { const p = pos(m); if (p) mainBasse = Math.min(mainBasse, p.y - sol); }
+        const avant = new THREE.Vector3(Math.sin(ch.obj.rotation.y), 0, Math.cos(ch.obj.rotation.y));
+        for (const c of ['G', 'D'] as const) {
+          const e = pos((os as any)['bras' + c]), co = pos((os as any)['avb' + c]), mn = pos((os as any)['main' + c]);
+          if (!e || !co || !mn) continue;
+          const u = co.clone().sub(e), w = mn.clone().sub(co), pli = u.angleTo(w) * 180 / Math.PI;
+          const ligne = mn.clone().sub(e).normalize(), proj = e.clone().add(ligne.clone().multiplyScalar(co.clone().sub(e).dot(ligne))), pointe = co.clone().sub(proj);
+          if (pli > 35 && pointe.length() > .015) { pointe.normalize(); if (pointe.dot(avant) > .45 && w.dot(avant) < -.08) coude[c]++; }
+        }
+        const rots = new Map<string, THREE.Quaternion>(); for (const [k, b] of Object.entries(os)) if (b) rots.set(k, b.quaternion.clone());
+        if (f === 0) prem = rots; if (f === N - 1) dern = rots;
+      }
+      const pb: string[] = [];
+      if (sous < -.02) pb.push(`pieds sous le sol (${-cm(sous)} cm)`);
+      if (!assis && flotte / N > .5) pb.push(`flotte (${Math.round(flotte / N * 100)} % du temps)`);
+      if (mainBasse < Infinity) { if (bas && mainBasse < terre - sol - .04) pb.push(`la main descend à ${cm(mainBasse)} cm du sol, sous la terre du pot (${cm(terre - sol)} cm)`); else if (!assis && mainBasse < .04) pb.push(`une main touche le sol`); }
+      for (const c of ['G', 'D'] as const) if (coude[c] / N > .1) pb.push(`coude ${c === 'G' ? 'gauche' : 'droit'} à l'envers ${Math.round(coude[c] / N * 100)} % du temps`);
+      if (/idle|walk|dance|sit|sleep|phone|sport/.test(n) && prem && dern) { let ecart = 0; for (const [k, q] of prem) { const q2 = dern.get(k); if (q2) ecart = Math.max(ecart, q.angleTo(q2) * 180 / Math.PI); } if (ecart > 35) pb.push(`saute en rebouclant (${Math.round(ecart)}°)`); }
+      lignes.push(`${pb.length ? '✗' : '✓'} ${n} (${clip.duration.toFixed(1)} s)${pb.length ? ' — ' + pb.join(' ; ') : ''}`);
+    }
+    ch.mixer.stopAllAction(); ch.obj.position.copy(sauve.pos); ch.obj.rotation.y = sauve.rot; ch.play('idle', .2);
+    const texte = lignes.join('\n');
+    const box = document.createElement('div'); box.id = 'auditAnims';
+    box.style.cssText = 'position:fixed;left:10px;right:10px;bottom:10px;max-height:60vh;overflow:auto;z-index:90;background:rgba(255,253,246,.97);border:1px solid rgba(0,0,0,.12);border-radius:14px;padding:10px 12px;font:12px ui-monospace,Consolas,monospace;color:#24313a;white-space:pre-wrap;box-shadow:0 10px 30px rgba(0,0,0,.25)';
+    const b = document.createElement('button'); b.textContent = '📋 Copier le rapport'; b.style.cssText = 'display:block;margin:0 0 8px;padding:6px 12px;border-radius:8px;border:0;background:#2f8f4e;color:#fff;font-weight:700;cursor:pointer';
+    b.onclick = () => navigator.clipboard?.writeText(texte).then(() => this.ui.toast('Rapport copié', 2000, true));
+    const x = document.createElement('button'); x.textContent = '✕'; x.style.cssText = 'position:absolute;top:8px;right:10px;border:0;background:none;font-size:16px;cursor:pointer';
+    x.onclick = () => { box.remove(); ch.busy = false; this.scheduleAutonomy(); };
+    box.append(x, b, document.createTextNode(texte)); document.body.appendChild(box);
+    console.info(texte);
   }
   /** Combien de variétés existent pour une plante (plant_<id>_v1_s4, _v2_s4…). */
   private nbVarietes(id: string): number { let n = 0; while (this.assets.has(`plant_${id}_v${n + 1}_s4`)) n++; return n; }

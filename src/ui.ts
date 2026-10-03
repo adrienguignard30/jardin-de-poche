@@ -53,6 +53,17 @@ const LISIBLE = 'color:#24313a;background:rgba(36,49,58,.08);border:1px solid rg
 const el = <T extends HTMLElement = HTMLElement>(tag: string, cls = '', html = '') => { const e = document.createElement(tag) as T; if (cls) e.className = cls; if (html) e.innerHTML = html; return e; };
 
 const STYLE_PANIER = `
+/* ===== le chargement : un croquis du balcon qui se dessine en boucle, des pousses qui grandissent ===== */
+#loading .croquis { width: min(320px, 70vw); height: auto; color: #6b4f2a; margin: 6px auto 10px; display: block; opacity: .9; }
+#loading .croquis .t { stroke-dasharray: 1200; stroke-dashoffset: 1200; animation: dessine 7s linear infinite; }
+#loading .croquis .t2 { animation-delay: .6s; } #loading .croquis .t3 { animation-delay: 1.2s; } #loading .croquis .t4 { animation-delay: 1.9s; } #loading .croquis .t5 { animation-delay: 2.4s; }
+#loading .croquis .pousse { stroke: #3f9a3a; stroke-width: 2.6; transform-box: fill-box; transform-origin: 50% 100%; transform: scale(0); animation: pousseCroquis 7s cubic-bezier(.3,1.5,.5,1) infinite; }
+#loading .croquis .p2 { animation-delay: .4s; } #loading .croquis .p3 { animation-delay: .8s; }
+@keyframes dessine { 0% { stroke-dashoffset: 1200; } 45% { stroke-dashoffset: 0; } 85% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 1200; } }
+@keyframes pousseCroquis { 0%, 38% { transform: scale(0); } 55% { transform: scale(1.05); } 85% { transform: scale(1); } 100% { transform: scale(0); } }
+#loading .chantierMot { color: #6b4f2a; font-weight: 700; min-height: 1.4em; }
+#loading.chantier { z-index: 45; }
+
 .pill.panier { cursor: pointer; display: inline-flex; align-items: center; gap: 4px; z-index: 6; background: #fff; border: 1px solid rgba(36,49,58,.14); box-shadow: 0 3px 0 rgba(36,49,58,.10), 0 6px 16px rgba(0,0,0,.12); }
 .pill.panier .pan { font-size: 18px; } .pill.panier b { font-size: 15px; }
 .pill.panier.bump { animation: bumpPanier .35s cubic-bezier(.3,1.8,.5,1); }
@@ -87,7 +98,17 @@ export class UI {
     this.root.innerHTML = `
       <div id="loading" class="overlay">
         <div class="brand"><div class="logo">🪴</div><h1 data-t="title"></h1><p class="tag" data-t="tagline"></p></div>
-        <div class="bar"><div class="fill"></div></div><p class="small" id="loadLabel"></p>
+        <svg class="croquis" viewBox="0 0 320 200" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<path class="t t1" d="M30 180 L30 60 Q30 40 50 40 L270 40 Q290 40 290 60 L290 180"/>
+<path class="t t2" d="M60 70 h60 v45 h-60 z M200 70 h60 v45 h-60 z M90 70 v45 M230 70 v45 M60 92 h60 M200 92 h60"/>
+<path class="t t3" d="M20 135 h280 M35 135 v45 M60 135 v45 M85 135 v45 M110 135 v45 M135 135 v45 M160 135 v45 M185 135 v45 M210 135 v45 M235 135 v45 M260 135 v45 M285 135 v45 M20 180 h280"/>
+<path class="t t4" d="M70 180 l5 -24 h30 l5 24 z M140 180 l5 -24 h30 l5 24 z M210 180 l5 -24 h30 l5 24 z"/>
+<path class="pousse p1" d="M92 156 q-2 -14 6 -22 q-10 2 -14 -8 q12 -2 14 8 q4 -12 14 -10 q-8 6 -10 14"/>
+<path class="pousse p2" d="M162 156 q-2 -14 6 -22 q-10 2 -14 -8 q12 -2 14 8 q4 -12 14 -10 q-8 6 -10 14"/>
+<path class="pousse p3" d="M232 156 q-2 -14 6 -22 q-10 2 -14 -8 q12 -2 14 8 q4 -12 14 -10 q-8 6 -10 14"/>
+<circle class="t t5" cx="40" cy="22" r="9"/><path class="t t5" d="M40 6 v5 M40 33 v5 M24 22 h5 M51 22 h5 M29 11 l3 3 M48 30 l3 3 M51 11 l-3 3 M32 30 l-3 3"/>
+</svg>
+        <div class="bar"><div class="fill"></div></div><p class="small" id="loadLabel"></p><p class="small chantierMot" id="loadMot"></p>
       </div>
       <div id="start" class="overlay start hidden">
         <div class="langs"><button data-lang="fr">Français</button><button data-lang="en">English</button></div>
@@ -173,9 +194,23 @@ export class UI {
   }
 
   // ---------- chargement
+  private motsT = 0;
   setProgress(done: number, total: number, label: string) {
     $('#loading .fill').style.width = `${Math.round((done / Math.max(1, total)) * 100)}%`;
     $('#loadLabel').textContent = label ? `${t().loading} ${label}` : t().loading;
+    this.motsDuChantier();
+  }
+  /** Pendant un chargement, le croquis se dessine en boucle et un mot change toutes les 2,5 s : on voit que ça vit. */
+  private motsDuChantier() {
+    const mots = t().chantierMots, e = document.getElementById('loadMot'); if (!e) return;
+    const maj = () => { e.textContent = mots[Math.floor(Date.now() / 2500) % mots.length]; };
+    maj(); clearInterval(this.motsT); this.motsT = window.setInterval(maj, 2500);
+  }
+  /** L'entrée dans une partie : le croquis par-dessus l'accueil, le temps que la maison se construise. */
+  chantier(on: boolean, nom = '') {
+    const l = $('#loading');
+    if (on) { l.classList.remove('hidden'); l.classList.add('chantier'); this.setProgress(0, 1, nom); }
+    else { l.classList.add('hidden'); l.classList.remove('chantier'); clearInterval(this.motsT); }
   }
   private hasSave = false;
   private savedCharName = '';
@@ -288,7 +323,7 @@ export class UI {
       let r: string | null;
       try { r = mode === 'creer' ? await EL.creerCompte(ps.value, mdp.value, nom, await EL.jetonAntiRobot()) : await EL.seConnecter(ps.value, mdp.value, await EL.jetonAntiRobot()); }
       catch (e) { r = String((e as Error)?.message ?? e); }
-      if (r) { err.textContent = ''; void err.offsetWidth; err.textContent = s.errCompte[r] ?? (r.includes('captcha') ? s.errCompte.robot : r); return; }
+      if (r) { err.textContent = ''; void err.offsetWidth; err.textContent = s.errCompte[r] ?? (r.toLowerCase().includes('captcha') ? `${s.errCompte.robot} (${r})` : r); return; }   // le détail aide à trouver la cause
       this.fermerModal(); this.toast(mode === 'creer' ? s.compteOk : s.connexionOk, 3500, true); this.majCompte();
       if (mode === 'connecter') this.h.onConnecte();
     });
