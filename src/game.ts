@@ -1,4 +1,4 @@
-﻿import * as THREE from 'three';
+import * as THREE from 'three';
 import { Assets } from './assets';
 import { World, SLOTS, FL, POT_SCALE, FACADE_FRONT, freePoint, segmentBlocked, CHAIR_SPOT, LADDER_SPOT, ROOF_STAND, START_SPOT, BASKET_SPOT, LAYOUT, TUNE, HAND, mountTunePanel, type Slot, type Layout } from './world';
 import { Character, type Reglages } from './character';
@@ -360,6 +360,7 @@ export class Game {
     if (this.world.ciel) this.world.ciel.onPassage = (sp) => this.montrerLeCiel(sp);
     this.char = new Character(this.assets, asset);
     this.char.applyMesures(this.reglages(c.id));
+    await this.preterAnimations(c.id);                                 // les animations corrigées (voir l'analyse du 3 octobre)
     { const u = new URLSearchParams(location.search).get('bras'); this.char.brasOffset = u !== null ? +u : ((c as any).bras_offset ?? 0); }
     await this.chargerMoyennes(c.id);
     if (s.perso?.couleurs) this.teinter(this.char.obj, s.perso.couleurs, c.id);
@@ -542,6 +543,26 @@ export class Game {
     }
     document.body.appendChild(box);
     figer(); this.char.play('idle', .2);
+  }
+  /** Corrections des animations, d'après l'analyse automatique du 3 octobre :
+   *  - le sport n'existe que chez Jimy : Léa et Marcel l'empruntent (à leur taille) ;
+   *  - le « planter » de Jimy descend la main jusqu'au sol (elle s'enfonce dans le pot) : il prend celui de Léa ;
+   *  - le « ramasser » copié de Léa enfonçait les pieds de Jimy et Marcel de 4 cm : recopié à leur taille ;
+   *  - la danse de Marcel (pieds qui glissent, coude à l'envers) est retirée, pour tout le monde. */
+  private async preterAnimations(id: string) {
+    const charger = async (pid: string) => { const d = CATALOG.characters.find(x => x.id === pid); return d ? await this.assets.loadCharacter(d.id, d.file) : null; };
+    try {
+      if (id !== 'jimy') { const j = await charger('jimy'); if (j) this.char.preter(j, ['sport_squat', 'sport_gainage', 'regard_epaule']); }
+      if (id !== 'lea') {
+        const l = await charger('lea');
+        if (l) {
+          const faits = this.char.preter(l, id === 'jimy' ? ['plant', 'pickup'] : ['pickup'], true);
+          const gl = (this.reglages('lea') as any)?.gestes?.plant;
+          if (faits.includes('plant') && gl) this.char.gestures.plant = { ...gl, anim: 'plant' };   // le minutage du geste de Léa va avec son animation
+        }
+      }
+      this.char.exclure(id === 'marcel' ? ['dance', 'dance_marcel'] : ['dance_marcel']);
+    } catch (e) { console.warn('[animations empruntées]', e); }
   }
   /** Combien de variétés existent pour une plante (plant_<id>_v1_s4, _v2_s4…). */
   private nbVarietes(id: string): number { let n = 0; while (this.assets.has(`plant_${id}_v${n + 1}_s4`)) n++; return n; }
@@ -873,7 +894,7 @@ export class Game {
     this.ui.refresh();
     await this.gotoSlot(slot, 'plant');
     this.char.busy = true;
-    // (plus de sachet de graines dans la main : il se placait dans les bras)
+    // (plus de sachet de graines dans la main : depuis la réparation des squelettes, il se plaçait dans les bras)
     this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('plant'); const done = g.fin;
     await wait(g.effet * 1000);
     p.plant = P.sow(plant);
@@ -1175,7 +1196,7 @@ export class Game {
     this.dansant = true; this.char.busy = true;                        // la séance ne se coupe pas
     for (const n of exos) {
       const d = this.char.clipDuree(n); if (!d) continue;
-      const fois = d < 3 ? 3 : d < 6 ? 2 : 1;                          // les exercices courts sont répétés
+      const fois = n === 'sport_gainage' ? 1 : d < 3 ? 3 : d < 6 ? 2 : 1;   // les exercices courts sont répétés (pas le gainage : il sautait en recommençant)
       for (let i = 0; i < fois; i++) { await this.char.once(n, d); }
       this.char.play('idle', .4); await wait(700);                     // une petite pause entre deux exercices
     }

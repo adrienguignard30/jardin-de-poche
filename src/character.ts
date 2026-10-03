@@ -106,11 +106,33 @@ export class Character {
       a.enabled = true;
       this.actions.set(clip.name, a);
     }
+    this.hanchesRepos = hauteurHanches(this.obj);                     // avant toute animation : la pose de repos
     this.obj.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) this.meshes.push(m); });
     this.play('idle');
   }
 
   has(name: string) { return this.actions.has(name); }
+  /** Emprunter des animations à un autre personnage (même squelette Mixamo). Le déplacement du bassin est mis à
+   *  l'échelle de ce personnage : sans ça, une animation venue d'un plus grand lui enfonce les pieds dans le sol. */
+  private hanchesRepos = 0;
+  preter(source: CharacterAsset, noms: string[], remplacer = false): string[] {
+    const hs = hauteurHanches(source.scene), ratio = hs > 0 && this.hanchesRepos > 0 ? this.hanchesRepos / hs : 1;
+    const faits: string[] = [];
+    for (const n of noms) {
+      const clip = source.clips.find(c => c.name === n); if (!clip) continue;
+      if (this.actions.has(n) && !remplacer) continue;
+      const c2 = clip.clone();
+      for (const tr of c2.tracks) if (/Hips\.position$/.test(tr.name)) { const v = tr.values; for (let i = 0; i < v.length; i++) v[i] *= ratio; }
+      const ancien = this.actions.get(n);
+      if (ancien) { ancien.stop(); this.mixer.uncacheAction(ancien.getClip()); }
+      const a = this.mixer.clipAction(c2); a.enabled = true; this.actions.set(n, a);
+      if (/^(dance|sport_)|regard_epaule/.test(n)) this.pinInPlace(n);
+      faits.push(n);
+    }
+    return faits;
+  }
+  /** Retirer des animations abîmées (elles ne seront plus jamais jouées). */
+  exclure(noms: string[]) { for (const n of noms) { const a = this.actions.get(n); if (a) { a.stop(); this.actions.delete(n); } } }
   /** Le nom de toutes les animations de ce personnage (pour la revue des animations). */
   nomsAnimations(): string[] { return [...this.actions.keys()]; }
   /** Toutes les variantes d'une animation : dance, dance_2, dance_3… (téléchargées en plus sur Mixamo). */
@@ -123,6 +145,7 @@ export class Character {
   }
   private resolve(name: string): THREE.AnimationAction | null {
     for (const n of FALLBACK[name] ?? [name]) { const a = this.actions.get(n); if (a) return a; }
+    if (name === 'dance') { const v = this.variantes('dance')[0]; if (v) return this.actions.get(v)!; }   // sa danse retirée : une autre
     return this.actions.values().next().value ?? null;
   }
 
@@ -331,4 +354,11 @@ export class Character {
       }
     }
   }
+}
+
+/** La hauteur du bassin (os « Hips ») dans la pose de repos, dans le repère du squelette. */
+function hauteurHanches(racine: THREE.Object3D): number {
+  let h = 0;
+  racine.traverse(o => { if (!h && (o as THREE.Bone).isBone && /Hips$/.test(o.name)) h = Math.abs(o.position.y) || o.position.length(); });
+  return h;
 }
