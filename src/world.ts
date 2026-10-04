@@ -80,6 +80,27 @@ export function segmentBlocked(a: THREE.Vector3, b: THREE.Vector3, ignore?: stri
   }
   return false;
 }
+/** Graphe de visibilité autour des obstacles : chaque segment est contrôlé,
+ * y compris la jonction avec le couloir qui était auparavant supposée libre. */
+export function cheminBalcon(a: THREE.Vector3, cible: THREE.Vector3, ignore?: string): THREE.Vector3[] {
+  const b = freePoint(cible, ignore); if (!segmentBlocked(a, b, ignore)) return [b];
+  const points = [a.clone(), b];
+  for (const o of obstacles(ignore)) for (let i = 0; i < 16; i++) {
+    const t = i * Math.PI / 8, p = new THREE.Vector3(o.x + Math.cos(t) * (o.r + .055), a.y, o.z + Math.sin(t) * (o.r + .055));
+    if (freePoint(p, ignore).distanceTo(p) < .005) points.push(p);
+  }
+  const d = points.map(() => Infinity), avant = points.map(() => -1), visite = new Set<number>(); d[0] = 0;
+  for (;;) {
+    let u = -1; for (let i = 0; i < points.length; i++) if (!visite.has(i) && (u < 0 || d[i] < d[u])) u = i;
+    if (u < 0 || !Number.isFinite(d[u])) throw new Error('Aucun trajet libre sur le balcon');
+    if (u === 1) break; visite.add(u);
+    for (let v = 1; v < points.length; v++) {
+      if (visite.has(v) || segmentBlocked(points[u], points[v], ignore)) continue;
+      const nd = d[u] + points[u].distanceTo(points[v]); if (nd < d[v]) { d[v] = nd; avant[v] = u; }
+    }
+  }
+  const chemin: THREE.Vector3[] = []; for (let v = 1; v !== 0; v = avant[v]) chemin.unshift(points[v]); return chemin;
+}
 const BACK_Z = FACADE_FRONT + 0.34, FRONT_Z = 0.56;
 export const CORRIDOR_Z = 0.0;
 [-0.9, 0, 0.9].forEach((x, i) => SLOTS.push({ id: i, pos: new THREE.Vector3(x * W, FL, BACK_Z), stand: new THREE.Vector3(x * W, FL, CORRIDOR_Z), face: Math.PI, roof: false }));
@@ -523,6 +544,70 @@ export class World {
    *  face avant de la façade sur la ligne du mur, dalle du balcon à FL et collée à la façade. */
   /** Repère de l'assemblage Blender → jeu : X = x, Y = z + FL, Z = -y + ligne de façade. */
   private fromLayout(v: number[]): THREE.Vector3 { return new THREE.Vector3(v[0], v[2] + FL, -v[1] + FACADE_FRONT); }
+  /** Trajets dans la pièce / sur le toit-terrasse, autour du mobilier chargé. */
+  cheminMeubles(a: THREE.Vector3, cible: THREE.Vector3): THREE.Vector3[] {
+    this.envGroup.updateMatrixWorld(true);
+    const boites: THREE.Box3[] = [], sol = new THREE.Box3();
+    this.envGroup.traverse(o => { if ((o as THREE.Mesh).isMesh && /floor|wood_deck/i.test(o.name)) sol.union(new THREE.Box3().setFromObject(o)); });
+    const dansLaPiece = (p: THREE.Vector3) => (sol.isEmpty() || (p.x > sol.min.x + .3 && p.x < sol.max.x - .3 && p.z > sol.min.z + .3)) && p.z < FACADE_FRONT - .1;
+    this.envGroup.traverse(o => {
+      if (!/^(asm_furniture_armchair|asm_rooftop_furniture_sofa|asm_furniture_bed|asm_rooftop_furniture_outdoor_kitchen|(?:asm_)?kitchen_counter)/i.test(o.name)) return;
+      let parent = o.parent; while (parent && parent !== this.envGroup) { if (/^(asm_furniture_armchair|asm_rooftop_furniture_sofa|asm_furniture_bed|asm_rooftop_furniture_outdoor_kitchen|(?:asm_)?kitchen_counter)/i.test(parent.name)) return; parent = parent.parent; }
+      const b = new THREE.Box3().setFromObject(o).expandByScalar(.20);
+      if (b.max.y > FL + .3) boites.push(b);
+    });
+    const dedans = (p: THREE.Vector3, b: THREE.Box3) => p.x > b.min.x && p.x < b.max.x && p.z > b.min.z && p.z < b.max.z;
+    const libre = (p: THREE.Vector3) => !boites.some(b => dedans(p, b));
+    const b = cible.clone();
+    for (const o of boites) if (dedans(b, o)) {
+      const sorties = [new THREE.Vector3(o.min.x - .01, b.y, b.z), new THREE.Vector3(o.max.x + .01, b.y, b.z), new THREE.Vector3(b.x, b.y, o.min.z - .01), new THREE.Vector3(b.x, b.y, o.max.z + .01)].filter(libre);
+      sorties.sort((p, q) => p.distanceTo(b) - q.distanceTo(b)); if (sorties[0]) b.copy(sorties[0]);
+    }
+    const bloque = (p: THREE.Vector3, q: THREE.Vector3) => boites.some(o => {
+      // Un personnage qui vient de se lever sort d'abord de son propre siège.
+      if (dedans(p, o) && p.distanceTo(a) < .001) return false;
+      let lo = 0, hi = 1;
+      for (const axe of ['x', 'z'] as const) {
+        const d = q[axe] - p[axe];
+        if (Math.abs(d) < 1e-8) { if (p[axe] <= o.min[axe] || p[axe] >= o.max[axe]) return false; }
+        else { const t1 = (o.min[axe] - p[axe]) / d, t2 = (o.max[axe] - p[axe]) / d; lo = Math.max(lo, Math.min(t1, t2)); hi = Math.min(hi, Math.max(t1, t2)); }
+      }
+      return lo < hi && hi > 0 && lo < 1;
+    });
+    if (!bloque(a, b)) return [b];
+    const points = [a.clone(), b];
+    for (const o of boites) for (const x of [o.min.x - .01, o.max.x + .01]) for (const z of [o.min.z - .01, o.max.z + .01]) {
+      const p = new THREE.Vector3(x, a.y, z);
+      if (libre(p) && dansLaPiece(p)) points.push(p);
+    }
+    const d = points.map(() => Infinity), avant = points.map(() => -1), vus = new Set<number>(); d[0] = 0;
+    for (;;) {
+      let u = -1; for (let i = 0; i < points.length; i++) if (!vus.has(i) && (u < 0 || d[i] < d[u])) u = i;
+      if (u < 0 || !Number.isFinite(d[u])) throw new Error('Aucun trajet libre autour des meubles');
+      if (u === 1) break; vus.add(u);
+      for (let v = 1; v < points.length; v++) if (!vus.has(v) && !bloque(points[u], points[v])) {
+        const nd = d[u] + points[u].distanceTo(points[v]); if (nd < d[v]) { d[v] = nd; avant[v] = u; }
+      }
+    }
+    const chemin: THREE.Vector3[] = []; for (let v = 1; v !== 0; v = avant[v]) chemin.unshift(points[v]); return chemin;
+  }
+  /** Réserver le volume des danses et exercices : enveloppe mesurée sur les
+   * trois corps (X < 95,1 cm, Z < 97,5 cm), plus 7 cm de marge. */
+  pointActivite(cible: THREE.Vector3): THREE.Vector3 {
+    const rx = 1.02, rz = 1.05, meubles: THREE.Box3[] = [], sol = new THREE.Box3();
+    this.envGroup.updateMatrixWorld(true);
+    this.envGroup.traverse(o => {
+      if ((o as THREE.Mesh).isMesh && /floor|wood_deck/i.test(o.name)) sol.union(new THREE.Box3().setFromObject(o));
+      if (/^(asm_furniture_armchair|asm_rooftop_furniture_sofa|asm_furniture_bed|asm_rooftop_furniture_outdoor_kitchen|(?:asm_)?kitchen_counter)/i.test(o.name)) meubles.push(new THREE.Box3().setFromObject(o));
+    });
+    if (sol.isEmpty()) return cible.clone();
+    const libre = (p: THREE.Vector3) => p.x - rx > sol.min.x && p.x + rx < sol.max.x && p.z - rz > sol.min.z && p.z + rz < sol.max.z && !meubles.some(b => p.x + rx > b.min.x && p.x - rx < b.max.x && p.z + rz > b.min.z && p.z - rz < b.max.z);
+    const choix: THREE.Vector3[] = [];
+    for (let x = sol.min.x + rx + .01; x < sol.max.x - rx; x += .1) for (let z = sol.min.z + rz + .01; z < sol.max.z - rz; z += .1) { const p = new THREE.Vector3(x, FL, z); if (libre(p)) choix.push(p); }
+    choix.sort((a, b) => a.distanceToSquared(cible) - b.distanceToSquared(cible));
+    if (!choix.length) throw new Error('Pas de surface libre pour la danse ou le sport');
+    return choix[0];
+  }
   /** Applique un layout_<perso>.json écrit par jdp_assemblage.py : tout est posé là où tu l'as mis dans Blender. */
   applyLayout(L: Layout) {
     this.perso = L.character ?? ''; this.decaleMarcel = false;
@@ -573,6 +658,41 @@ export class World {
     const lit = ((L as any).lits ?? [])[0]; if (lit) this.bedSpot.copy(this.fromLayout([lit.loc[0], lit.loc[1], lit.h + .02]));   // le dessus du matelas, mesuré
     const bedSide = sp('spot_bed_side'); if (bedSide) this.bedSide.copy(bedSide);
     const arm = sp('spot_armchair'); if (arm) this.armchairSpot = { pos: arm.setY(FL), face: (L.spots.spot_armchair.rz || 0) * Math.PI / 180 };
+    // Les anciens repères du layout précèdent les déplacements du mobilier.
+    // Reprendre les surfaces du décor chargé, sans déplacer les meubles.
+    const nom = (s: string) => THREE.PropertyBinding.sanitizeNodeName(s);
+    this.sieges = this.sieges.flatMap(q => {
+      let meuble: THREE.Object3D | null = null;
+      this.envGroup.traverse(o => { if (nom(o.name) === nom(q.nom)) meuble = o; });
+      if (!meuble || q.h <= 0) return [];
+      const surface = new THREE.Box3();
+      (meuble as THREE.Object3D).traverse(o => {
+        const m = o as THREE.Mesh; if (!m.isMesh) return;
+        const mats = Array.isArray(m.material) ? m.material : [m.material];
+        if (/seat|cushion|sofa_base/i.test(m.name + ' ' + mats.map(a => a.name).join(' '))) surface.union(boxOf(m));
+      });
+      if (surface.isEmpty()) return [];
+      const centre = surface.getCenter(new THREE.Vector3());
+      return [{ ...q, h: surface.max.y - FL, pos: centre.setY(surface.max.y) }];
+    });
+    const fauteuil = this.sieges.find(q => q.genre !== 'canape');
+    this.armchairSpot = fauteuil ? { pos: fauteuil.pos.clone().setY(FL), face: fauteuil.face } : null;
+    const canape = this.sieges.find(q => q.genre === 'canape');
+    this.canapeSpot = canape ? { pos: canape.pos.clone().setY(FL), look: canape.pos.clone().add(new THREE.Vector3(Math.sin(canape.face), 0, Math.cos(canape.face))) } : null;
+    const matelas = new THREE.Box3(), couverture = new THREE.Box3();
+    this.envGroup.traverse(o => {
+      const m = o as THREE.Mesh; if (!m.isMesh) return;
+      const mats = Array.isArray(m.material) ? m.material : [m.material], label = m.name + ' ' + mats.map(a => a.name).join(' ');
+      if (/mattress|matelas/i.test(label)) matelas.union(boxOf(m));
+      if (/blanket|couverture/i.test(label)) couverture.union(boxOf(m));
+      if (/kitchen_counter/i.test(label)) this.kitchenTop = Math.max(this.kitchenTop, boxOf(m).max.y);
+    });
+    if (!matelas.isEmpty()) {
+      this.bedSpot.copy(matelas.getCenter(new THREE.Vector3()));
+      this.bedSpot.y = Math.max(matelas.max.y, couverture.isEmpty() ? -Infinity : couverture.max.y) + .001;
+      this.bedSide.set(matelas.min.x - .35, FL, this.bedSpot.z);
+    }
+    if (this.kitchenSpot) this.kitchenSpot.addScaledVector(this.kitchenLook.clone().sub(this.kitchenSpot).setY(0).normalize(), .23);
     const chair = sp('spot_chair'); if (chair) { CHAIR_SPOT.pos.copy(chair.setY(FL)); CHAIR_SPOT.face = (L.spots.spot_chair.rz || 0) * Math.PI / 180; }
     this.chaiseDansLaZone();
     const basket = sp('spot_basket'); if (basket) BASKET_SPOT.copy(basket.setY(FL));
@@ -868,7 +988,7 @@ export class World {
     for (let i = 0; i < 9; i++) {
       const x = (i / 8 - .5) * 2 * LAYOUT.halfW * .8;
       const hb = hauteur(x, LAYOUT.corridorZ); if (hb !== null) bal.push(hb);
-      if (this.hasRoom) { const hp = hauteur(x, this.insideSpot.z); if (hp !== null) pie.push(hp); }
+      const hp = hauteur(x, this.insideSpot.z); if (hp !== null) pie.push(hp);
     }
     this.solBalcon = THREE.MathUtils.clamp(mediane(bal), -.08, .2);
     this.solPiece = THREE.MathUtils.clamp(mediane(pie), -.08, .2);
@@ -895,13 +1015,16 @@ export class World {
       // le panier et les pots eux-mêmes). Si un mur est plus près que le bord de l'objet, on le ramène devant.
       const sx = Math.sign(p.x) || 1, d: number[] = [];
       const exclus = new Set<THREE.Object3D>([this.chair, this.basket].filter(Boolean) as THREE.Object3D[]);
-      const cibles = this.scene.children.filter(o => !exclus.has(o) && !(o as THREE.Sprite).isSprite && o.type !== 'Points');
+      // Le personnage et les volumes de clic ne sont pas des murs. Le rayon
+      // précédent frappait notamment Marcel à 58 cm et ramenait sa chaise
+      // de 2,78 m à 20 cm du centre du balcon.
+      const cibles = [this.envGroup];
       ray.camera = this.camera;
       for (const hy of [1.3, 1.6, 1.9]) {
         ray.set(new THREE.Vector3(0, FL + hy, p.z), new THREE.Vector3(sx, 0, 0)); ray.far = Math.abs(p.x) + 1.5;
         let touches: THREE.Intersection[] = [];
         try { touches = ray.intersectObjects(cibles, true); } catch (e) { console.warn('[murs] rayon impossible', e); }
-        const h = touches.find(i => { let o: THREE.Object3D | null = i.object; while (o) { if (exclus.has(o) || o.userData?.pot) return false; o = o.parent; } return (i.object as THREE.Mesh).isMesh && !(i.object as THREE.Sprite).isSprite; });
+        const h = touches.find(i => { let o: THREE.Object3D | null = i.object; while (o) { if (!o.visible || exclus.has(o) || o.userData?.pot) return false; o = o.parent; } return (i.object as THREE.Mesh).isMesh && !(i.object as THREE.SkinnedMesh).isSkinnedMesh; });
         d.push(h ? h.distance : Infinity);
       }
       d.sort((a, b) => a - b); const mur = d[1];                         // la médiane des trois : un mur arrête les trois rayons

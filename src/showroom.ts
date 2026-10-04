@@ -35,6 +35,8 @@ export class Showroom {
   focus(id: string) {
     const sel = this.chars.find(c => c.def.id === id); if (!sel) return;
     this.focused = id; this.selected = id; this.dancing = '';
+    this.routeEpoch++; this.route = []; this.demande = null;
+    for (const c of this.chars) c.char.annulerMarche();
     for (const c of this.chars) { c.char.obj.visible = c === sel; }
     sel.char.play('idle', .3);
     sel.char.teleport(new THREE.Vector3(this.portrait ? 0 : -.9, 0, 1.2), 0);
@@ -112,7 +114,7 @@ export class Showroom {
     this.camera.position.set(this.panNow, 1.35, portrait ? 7.4 : 5.6);
     this.camera.lookAt(this.panNow, 1.0, 0);
     this.camera.updateProjectionMatrix();
-    this.chars.forEach((c, i) => { const x = (i - (this.chars.length - 1) / 2) * (portrait ? 1.15 : 1.55); c.base.x = x; if (!this.focused) c.char.obj.position.x = x; });
+    this.chars.forEach((c, i) => { const x = (i - (this.chars.length - 1) / 2) * (portrait ? 1.15 : 1.55); c.base.x = x; if (!this.focused && !this.selected && !this.enRoute) c.char.teleport(new THREE.Vector3(x, 0, 0), 0); });
     if (this.focused) { const sel = this.chars.find(c => c.def.id === this.focused); if (sel) sel.char.obj.position.x = portrait ? 0 : -.9; this.frameBody(); }
   }
 
@@ -127,21 +129,55 @@ export class Showroom {
     return null;
   }
   private dancing = '';
+  private demande: string | null = null;
+  private enRoute = false;
+  private routeEpoch = 0;
+  private route: THREE.Vector3[][] = [];
+  private danseTimer: ReturnType<typeof setTimeout> | undefined;
   select(id: string) {
-    this.selected = id;
-    const sel = this.chars.find(c => c.def.id === id); if (!sel) return;
-    this.dancing = id;
-    // le choisi vient au milieu, devant nous, et danse ; les deux autres se placent derrière, de chaque côté, et le regardent
-    const gap = this.portrait ? 1.15 : 1.5;
-    sel.char.goTo(new THREE.Vector3(0, 0, .75)).then(() => { if (this.dancing === id) sel.char.play('dance', .3); });
-    setTimeout(() => { if (this.dancing === id) { this.dancing = ''; sel.char.play('idle', .5); } }, 6500);
-    const others = this.chars.filter(c => c !== sel).sort((a, b) => a.base.x - b.base.x);
-    others.forEach((c, i) => c.char.goTo(new THREE.Vector3(i === 0 ? -gap : gap, 0, -.35)));
+    if (!this.chars.some(c => c.def.id === id)) return;
+    this.selected = id; this.demande = id; this.dancing = '';
+    clearTimeout(this.danseTimer);
+    void this.trajets();
   }
   /** Fiche fermée : chacun retourne à sa place. */
   deselect() {
     this.selected = ''; this.dancing = '';
-    for (const c of this.chars) { c.char.goTo(new THREE.Vector3(c.base.x, 0, 0)); }
+    this.demande = ''; clearTimeout(this.danseTimer); void this.trajets();
+  }
+  private async trajets() {
+    if (this.enRoute || this.focused) return;
+    this.enRoute = true; const epoch = this.routeEpoch;
+    const phase = async (points: THREE.Vector3[]) => {
+      await Promise.all(this.chars.map((c, i) => c.char.goTo(points[i], 0)));
+      return epoch === this.routeEpoch;
+    };
+    try {
+      while (this.demande !== null && epoch === this.routeEpoch) {
+        const id = this.demande; this.demande = null;
+        for (const c of this.chars) c.char.play('idle', .25);
+        // Revenir par le même itinéraire avant une nouvelle permutation.
+        for (let i = this.route.length - 2; i >= 0; i--) if (!await phase(this.route[i])) return;
+        this.route = [];
+        if (!id) { await phase(this.chars.map(c => c.base.clone())); continue; }
+        const index = this.chars.findIndex(c => c.def.id === id), g = this.portrait ? 1.15 : 1.5;
+        const v = (x: number, z: number) => new THREE.Vector3(x, 0, z);
+        const base = [v(-1.55, 0), v(0, 0), v(1.55, 0)];
+        if (!await phase(base)) return; this.route.push(base);
+        const phases = index === 0
+          ? [[v(-1.55, 1.5), v(0, -1.5), v(1.55, 0)], [v(0, 1.5), v(-g, -1.5), v(g, -.35)], [v(0, .75), v(-g, -.35), v(g, -.35)]]
+          : index === 2
+          ? [[v(-1.55, 0), v(0, -1.5), v(1.55, 1.5)], [v(-g, -.35), v(g, -1.5), v(0, 1.5)], [v(-g, -.35), v(g, -.35), v(0, .75)]]
+          : [[v(-1.55, 0), v(0, 1.5), v(1.55, 0)], [v(-g, -.35), v(0, 1.5), v(g, -.35)], [v(-g, -.35), v(0, .75), v(g, -.35)]];
+        for (const p of phases) { if (!await phase(p)) return; this.route.push(p); }
+        if (this.demande === null && this.selected === id) {
+          const c = this.chars[index].char; this.dancing = id;
+          // Sur portrait, les marges de la danse sont trop larges pour les voisins.
+          c.play(this.portrait ? 'idle' : this.chars[index].def.id === 'lea' ? 'dance' : c.variantes('dance').find(n => n !== 'dance') ?? 'idle', .3);
+          this.danseTimer = setTimeout(() => { if (this.dancing === id) { this.dancing = ''; c.play('idle', .5); } }, 6500);
+        }
+      }
+    } finally { this.enRoute = false; if (this.demande !== null && !this.focused) void this.trajets(); }
   }
   sheetOpen = false;
   private lookAt(c: { char: Character }, target: THREE.Vector3, dt: number) {
@@ -176,7 +212,7 @@ export class Showroom {
       c.char.update(dt);
       if (c.char.busy) continue;                     // en train de marcher : il gère lui-même son orientation
       if (sel && c !== sel) this.lookAt(c, sel.char.obj.position, dt);
-      else if (c === sel) { const want = Math.sin(this.t * .6) * .12; c.char.obj.rotation.y += (want - c.char.obj.rotation.y) * Math.min(1, dt * 3); }
+      else if (c === sel) { c.char.obj.rotation.y += -c.char.obj.rotation.y * Math.min(1, dt * 3); }
       else { const want = c.base.x < 0 ? .3 : c.base.x > 0 ? -.3 : 0; c.char.obj.rotation.y += (want - c.char.obj.rotation.y) * Math.min(1, dt * 2); }
     }
     if (this.backdrop) this.backdrop.position.x = Math.sin(this.t * .05) * 1.5;

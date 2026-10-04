@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Assets, type CharacterAsset } from './assets';
 import { BIBLIO } from './bibliotheque';
+import { clone as skeletonClone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 
 export interface Reglages {
   vitesse?: number; walk_timescale?: number;
@@ -31,6 +32,7 @@ export class Character {
   mixer: THREE.AnimationMixer;
   private actions = new Map<string, THREE.AnimationAction>();
   private current: THREE.AnimationAction | null = null;
+  private actionEpoch = 0;
   currentName = '';
   speed = 1.15;
   walkScale = 1;
@@ -40,8 +42,8 @@ export class Character {
   sleepCfg: { anim: string; installe_a: number; dos_z: number } | null = null;
   applyMesures(r: Reglages | undefined) {
     if (!r) return;
-    if (r.vitesse) this.speed = r.vitesse;
-    if (r.walk_timescale) this.walkScale = r.walk_timescale;
+    if (r.vitesse && !this.deLaBibliotheque) this.speed = r.vitesse;
+    if (r.walk_timescale && !this.deLaBibliotheque) this.walkScale = r.walk_timescale;
     if (r.gestes) this.gestures = r.gestes;
     if (r.assis) this.sitCfg = r.assis;
     if (r.couche) this.sleepCfg = r.couche;
@@ -68,6 +70,19 @@ export class Character {
       const up = this.axeHaut();                               // l'axe vertical, lu une fois pour toutes sur la respiration au repos
       for (const k of [0, 1, 2]) { if (k === up) continue; const v0 = v[k]; for (let i = 0; i < n; i++) v[i * 3 + k] = v0; }
     }
+    // Les jambes du repos déplacent encore les pieds de 9 cm, même bassin fixe.
+    if (/^idle(?:_\d+)?$/.test(name)) for (const t of clip.tracks) {
+      if (/hips\.position$/i.test(t.name)) {
+        const p = Array.from(t.values.slice(0, 3));
+        for (let i = 0; i < t.values.length; i += 3) t.values.set(p, i);
+      } else if (/(?:hips|(?:left|right)(?:upleg|leg|foot|toebase))\.quaternion$/i.test(t.name)) {
+        const q = Array.from(t.values.slice(0, 4));
+        for (let i = 0; i < t.values.length; i += 4) t.values.set(q, i);
+      } else if (/(?:spine\d*|neck|head)\.quaternion$/i.test(t.name)) {
+        const repos = new THREE.Quaternion().fromArray(t.values), q = new THREE.Quaternion();
+        for (let i = 0; i < t.values.length; i += 4) q.fromArray(t.values, i).slerp(repos, .90).toArray(t.values, i);
+      }
+    }
     PINNED.add(clip);
   }
   /** Un geste mesuré : on joue seulement le passage utile, à vitesse normale. Renvoie quand faire l'effet et la fin. */
@@ -86,16 +101,23 @@ export class Character {
     a.fadeIn(.22).play();
     if (this.current && this.current !== a) this.current.fadeOut(.22);
     this.current = a; this.currentName = name;
-    const fin = new Promise<void>(res => setTimeout(() => { this.play('idle', .3); res(); }, len * 1000));
+    const epoch = ++this.actionEpoch;
+    const fin = new Promise<void>(res => setTimeout(() => { if (epoch === this.actionEpoch) this.play('idle', .3); res(); }, len * 1000));
     return { effet: Math.max(0, g.effet - g.debut), fin };
   }
   busy = false;                         // en train de marcher ou de faire une action
   private walking: { target: THREE.Vector3; face?: number; resolve: () => void } | null = null;
   private fade = { value: 1, target: 1 };
   private meshes: THREE.Mesh[] = [];
+  private sonde!: THREE.Object3D;
+  private sondeMixer!: THREE.AnimationMixer;
+  private correctionSol = 0;
+  planSol = 0;
 
   constructor(assets: Assets, asset: CharacterAsset) {
-    this.obj = assets.instantiate(asset);
+    // Le placement au sol vit au-dessus des nœuds importés : le mixer peut
+    // réécrire leurs positions, mais ne doit jamais effacer ce décalage.
+    this.obj = new THREE.Group(); this.obj.add(assets.instantiate(asset));
     this.mixer = new THREE.AnimationMixer(this.obj);
     let clips = asset.clips.length ? asset.clips : BIBLIO.clips;     // un corps « nu » joue la bibliothèque
     this.deLaBibliotheque = !asset.clips.length;
@@ -108,6 +130,8 @@ export class Character {
     this.hanchesRepos = hauteurHanches(this.obj);                     // avant toute animation : la pose de repos
     if (this.deLaBibliotheque) for (const n of this.actions.keys()) if (/^idle/.test(n)) this.pinInPlace(n);   // Breathing Idle balance le bassin de 19 cm : fixé sur place
     this.obj.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) this.meshes.push(m); });
+    this.sonde = skeletonClone(this.obj);
+    this.sondeMixer = new THREE.AnimationMixer(this.sonde);
     this.play('idle');
   }
 
@@ -183,16 +207,79 @@ export class Character {
     return out;
   }
   /** Où est un os (repère du personnage) à un instant d'une animation, évalué « à blanc ». */
-  private osDansLeGeste(name: string, t: number, os: string): THREE.Vector3 | null {
-    const a = this.actions.get(name); const b = this.bone(os); if (!a || !b) return null;
-    const actifs = [...this.actions.values()].filter(x => x.isRunning()).map(x => ({ a: x, w: x.getEffectiveWeight(), t: x.time }));
-    this.mixer.stopAllAction(); a.reset().setEffectiveWeight(1).play(); this.mixer.setTime(Math.min(Math.max(0, t), a.getClip().duration - .01));
+  osDansLeGeste(name: string, t: number, os: string): THREE.Vector3 | null {
+    if (!this.poseSonde(name, t)) return null;
+    let b: THREE.Object3D | null = null;
+    this.sonde.traverse(o => { if ((o as THREE.Bone).isBone && o.name.endsWith(os)) b = o; });
+    return b ? (b as THREE.Object3D).getWorldPosition(new THREE.Vector3()) : null;
+  }
+  private poseSonde(name: string, t: number): boolean {
+    const a = this.actions.get(name); if (!a) return false;
+    this.sondeMixer.stopAllAction();
+    const p = this.sondeMixer.clipAction(a.getClip());
+    p.reset().setLoop(THREE.LoopOnce, 1).setEffectiveWeight(1).play(); p.clampWhenFinished = true;
+    this.sondeMixer.setTime(THREE.MathUtils.clamp(t, 0, a.getClip().duration));
+    this.sonde.updateMatrixWorld(true); return true;
+  }
+  /** Surface réelle du vêtement déformé, et non centre d'un os. */
+  surfacePose(name: string, t: number, zone: 'chaussures' | 'assise' | 'dos' | 'couchage'): number {
+    if (!this.poseSonde(name, t)) return 0;
+    return this.surface(this.sonde, zone);
+  }
+  private surface(root: THREE.Object3D, zone: 'chaussures' | 'assise' | 'dos' | 'couchage' | 'support'): number {
+    root.updateMatrixWorld(true);
+    let min = Infinity; const p = new THREE.Vector3();
+    root.traverse(o => {
+      const m = o as THREE.SkinnedMesh; if (!m.isSkinnedMesh) return;
+      const mats = Array.isArray(m.material) ? m.material : [m.material];
+      const motif = zone === 'support' || zone === 'couchage' ? /./ : zone === 'chaussures' ? /chaussures/ : zone === 'assise' ? /_bas$/ : /_haut$/;
+      if (!mats.some(mat => motif.test(mat.name))) return;
+      m.skeleton.update(); const positions = m.geometry.attributes.position;
+      // Zones proximales dans la pose de repos : exclure mollets, manches et col.
+      const h = this.hanchesRepos;
+      for (let i = 0; i < positions.count; i++) {
+        const y = positions.getY(i), x = positions.getX(i);
+        if (zone === 'assise' && (y < h - .18 || y > h + .04 || Math.abs(x) > .32)) continue;
+        if (zone === 'dos' && (y < h + .10 || y > h + .40 || Math.abs(x) > .20)) continue;
+        if (zone === 'couchage' && y < h - .18) continue;
+        m.getVertexPosition(i, p); m.localToWorld(p); root.worldToLocal(p);
+        min = Math.min(min, p.y);
+      }
+    });
+    return Number.isFinite(min) ? min : 0;
+  }
+  /** Recaler les semelles au sol seulement pour le repos et la marche. Les sauts
+   * et les poses sur un meuble conservent leur hauteur propre. */
+  stabiliserSol(name = this.currentName) {
+    if (!this.deLaBibliotheque) return;
+    const meuble = /^(sit|sleep)(?:_|$)/.test(name);
+    const debout = /^(idle|walk)(?:_|$)/.test(name);
+    const bas = this.surface(this.obj, debout ? 'chaussures' : 'support') - this.correctionSol;
+    const aerien = /^(dance|sport_jacks|sport_jogging|jacks_|joie)/.test(name);
+    const next = meuble ? 0 : aerien ? Math.max(0, this.planSol - bas) : this.planSol - bas;
+    const d = next - this.correctionSol;
+    for (const c of this.obj.children) c.position.y += d;
+    this.correctionSol = next; this.obj.updateMatrixWorld(true);
+  }
+  hauteurSemelles(): number { return this.surface(this.obj, 'chaussures'); }
+  hauteurSupport(): number { return this.surface(this.obj, 'support'); }
+  rayonTeteDroite(): number {
     this.obj.updateMatrixWorld(true);
-    const p = this.obj.worldToLocal(b.getWorldPosition(new THREE.Vector3()));
-    this.mixer.stopAllAction();
-    for (const x of actifs) { x.a.reset().setEffectiveWeight(x.w).play(); x.a.time = x.t; }
-    this.mixer.update(0); this.obj.updateMatrixWorld(true);
-    return p;
+    const tete = this.bone('Head'); if (!tete) return .12;
+    const centre = this.obj.worldToLocal(tete.getWorldPosition(new THREE.Vector3()));
+    let r = 0; const p = new THREE.Vector3();
+    this.obj.traverse(o => {
+      const m = o as THREE.SkinnedMesh; if (!m.isSkinnedMesh) return;
+      const mats = Array.isArray(m.material) ? m.material : [m.material]; if (!mats.some(mat => /_peau$/.test(mat.name))) return;
+      const index = m.geometry.attributes.skinIndex, poids = m.geometry.attributes.skinWeight;
+      if (!index || !poids) return; m.skeleton.update();
+      const ids = new Set(m.skeleton.bones.map((b, i) => /Head/.test(b.name) ? i : -1));
+      for (let i = 0; i < index.count; i++) {
+        let w = 0; for (let k = 0; k < 4; k++) if (ids.has(index.getComponent(i, k))) w += poids.getComponent(i, k);
+        if (w < .5) continue;
+        m.getVertexPosition(i, p); m.localToWorld(p); this.obj.worldToLocal(p); r = Math.max(r, centre.x - p.x);
+      }
+    }); return THREE.MathUtils.clamp(r, .08, .25);
   }
   /** Les réglages mesurés sur les animations de la bibliothèque (à la place des mesures Blender de l'ancien corps) :
    *  - gestes : le moment « utile » = la main droite au plus bas (planter) ou au plus loin devant (récolter), 35 % pour arroser ;
@@ -200,11 +287,11 @@ export class Character {
   mesurerSurLaBibliotheque() {
     if (!this.deLaBibliotheque) return;
     const paume = (name: string, t: number) => { const h = this.osDansLeGeste(name, t, 'RightHand'), m = this.osDansLeGeste(name, t, 'RightHandMiddle1'); return h && m ? h.multiplyScalar(.35).addScaledVector(m, .65) : h; };
-    const chercher = (name: string, mode: 'bas' | 'loin', seuil = .35): number => {
+    const chercher = (name: string, mode: 'bas' | 'loin', seuil = .35, doigt = false): number => {
       const a = this.actions.get(name); if (!a) return 0;
       const d = a.getClip().duration; let meilleur = d * .5, score = mode === 'bas' ? Infinity : -Infinity, prec: number | null = null;
       for (let t = .2; t < d - .2; t += .05) {
-        const m = paume(name, t); if (!m) continue;
+        const m = doigt ? this.osDansLeGeste(name, t, 'RightHandMiddle4') : paume(name, t); if (!m) continue;
         if (mode === 'bas' && prec !== null && prec > seuil && m.y <= seuil) return t;   // la paume franchit la hauteur du légume en descendant
         prec = m.y;
         const v = mode === 'bas' ? m.y : Math.hypot(m.x, m.z) - m.y * .3;
@@ -218,7 +305,8 @@ export class Character {
     if (this.actions.has('pickup')) {
       const d = this.actions.get('pickup')!.getClip().duration, effet = chercher('pickup', 'bas');
       const fin = Math.min(d, effet + 1.3);                             // on ne joue pas les 9 s : la main redescend et on enchaîne
-      g.plant = { anim: 'pickup', debut: 0, fin, effet, distance: .55, cote: 0 };
+      const semis = chercher('pickup', 'bas', .26, true);
+      g.plant = { anim: 'pickup', debut: 0, fin: Math.min(d, semis + 1.3), effet: semis, distance: .55, cote: 0 };
       g.harvest = { anim: 'pickup', debut: 0, fin, effet, distance: .55, cote: 0 };
       g.pickup = { anim: 'pickup', debut: 0, fin, effet, distance: .55, cote: 0 };
     }
@@ -227,6 +315,20 @@ export class Character {
     const hanche = (name: string, t: number) => { const h = this.osDansLeGeste(name, t, 'Hips'); return h ? h.y : 0; };
     if (this.actions.has('sit')) this.sitCfg = { anim: 'sit', installe_a: 0, cuisses_z: hanche('sit', .3), chaise_ok: true };
     if (this.actions.has('sleep')) this.sleepCfg = { anim: 'sleep', installe_a: 0, dos_z: hanche('sleep', .3) };
+    if (this.actions.has('walk')) {
+      const vitesses: number[] = [], dt = 1 / 30, d = this.actions.get('walk')!.getClip().duration;
+      for (const os of ['LeftFoot', 'RightFoot']) {
+        const poses: THREE.Vector3[] = [];
+        for (let t = 0; t < d; t += dt) { const p = this.osDansLeGeste('walk', t, os); if (p) poses.push(p); }
+        const bas = Math.min(...poses.map(p => p.y));
+        for (let i = 1; i < poses.length; i++) { const v = -(poses[i].z - poses[i - 1].z) / dt;
+          if (poses[i].y < bas + .025 && v > .2 && v < 2.5) vitesses.push(v); }
+      }
+      vitesses.sort((a, b) => a - b);
+      if (vitesses.length) this.speed = vitesses[Math.floor(vitesses.length / 2)];
+      this.walkScale = 1;
+      console.info(`[marche] vitesse des appuis ${this.speed.toFixed(4)} m/s, clip ×1`);
+    }
     // tout ce qui se joue sur place : danses, sport, jardinage (le kit Mixamo garde ses déplacements), gestes
     for (const n of this.actions.keys()) if (/^(dance|sport_|jardin_)|^(plant|water|harvest|pickup|idle|phone|cafe|etirer|bailler|saluer|applaudir|regard|pointer|reflechir|mains_hanches|bonjour|pouce|joie|rire|surprise|ennui|rambarde|cuisiner|yoga)/.test(n)) this.pinInPlace(n);
     console.info('[mesures] sur la bibliothèque :', Object.entries(g).map(([k, v]) => `${k} effet ${v.effet.toFixed(1)} s`).join(', '), `| assise ${this.sitCfg?.cuisses_z?.toFixed(2)} | couché ${this.sleepCfg?.dos_z?.toFixed(2)}`);
@@ -237,20 +339,18 @@ export class Character {
   /** Où est une main (repère du personnage) à un instant donné d'une animation : sert à placer le personnage pour que
    *  la main tombe au-dessus du pot. On évalue la pose « à blanc », puis on remet le repos. */
   mainDansLeGeste(name: string, t: number, cote: 'Right' | 'Left' = 'Right'): THREE.Vector3 | null {
-    const a = this.actions.get(name); const main = this.bone(cote + 'Hand'); if (!a || !main) return null;
-    const actifs = [...this.actions.values()].filter(x => x.isRunning()).map(x => ({ a: x, w: x.getEffectiveWeight(), t: x.time }));
-    this.mixer.stopAllAction(); a.reset().setEffectiveWeight(1).play(); this.mixer.setTime(Math.min(t, a.getClip().duration - .01));
-    this.obj.updateMatrixWorld(true);
-    const p = this.obj.worldToLocal(main.getWorldPosition(new THREE.Vector3()));
-    this.mixer.stopAllAction();
-    for (const x of actifs) { x.a.reset().setEffectiveWeight(x.w).play(); x.a.time = x.t; }
-    this.mixer.update(0); this.obj.updateMatrixWorld(true);
-    return p;
+    return this.osDansLeGeste(name, t, cote + 'Hand');
   }
   /** Retirer des animations abîmées (elles ne seront plus jamais jouées). */
   exclure(noms: string[]) { for (const n of noms) { const a = this.actions.get(n); if (a) { a.stop(); this.actions.delete(n); } } }
   /** Le nom de toutes les animations de ce personnage (pour la revue des animations). */
   nomsAnimations(): string[] { return [...this.actions.keys()]; }
+  poserAnimation(name: string, t: number) {
+    const a = this.actions.get(name); if (!a) return;
+    this.mixer.stopAllAction(); a.reset().setLoop(THREE.LoopOnce, 1).setEffectiveWeight(1).play(); a.clampWhenFinished = true;
+    this.current = a; this.currentName = name;
+    this.mixer.setTime(THREE.MathUtils.clamp(t, 0, a.getClip().duration)); this.stabiliserSol(name); this.obj.updateMatrixWorld(true);
+  }
   /** Toutes les variantes d'une animation : dance, dance_2, dance_3… (téléchargées en plus sur Mixamo). */
   variantes(base: string): string[] { return [...this.actions.keys()].filter(k => k === base || new RegExp(`^${base}_[a-z0-9_]+$`).test(k)); }
   /** Un os du squelette par la fin de son nom (Hips, Head, RightHand…). */
@@ -281,7 +381,8 @@ export class Character {
     }
     const a = this.resolve(name);
     if (!a) return;
-    if (this.current === a && this.currentName === name) return;
+    if (this.current === a && this.currentName === name && a.isRunning()) return;
+    this.actionEpoch++;
     a.reset().setLoop(THREE.LoopRepeat, Infinity);
     a.clampWhenFinished = false;
     a.timeScale = timeScale;
@@ -293,6 +394,10 @@ export class Character {
   /** Joue une action une fois (plant, water, harvest, pickup) et rend la main à la fin. */
   /** La durée d'une animation (en secondes), 0 si elle n'existe pas. */
   clipDuree(name: string): number { const a = this.resolve(name); return a ? a.getClip().duration : 0; }
+  estBoucle(name: string): boolean {
+    return !/(_start|_end|_down|_up|_stop)$|^(get_up|stand_up|turn_|lie_down)|^sport_/.test(name)
+      && /^(idle|walk|dance|sit|sleep|phone|carry)(?:_|$)/.test(name);
+  }
   once(name: string, maxSec = 4): Promise<void> {
     const a = this.resolve(name);
     if (!a) return Promise.resolve();
@@ -300,17 +405,20 @@ export class Character {
       const dur = Math.min(a.getClip().duration, maxSec);
       a.reset().setLoop(THREE.LoopOnce, 1);
       a.clampWhenFinished = true;
-      a.timeScale = a.getClip().duration > maxSec ? a.getClip().duration / maxSec : 1;
+      a.timeScale = 1; // Un délai de scène coupe le geste, il n'accélère jamais le corps.
       a.fadeIn(.18).play();
       if (this.current && this.current !== a) this.current.fadeOut(.18);
       this.current = a; this.currentName = name;
-      const done = () => { this.play('idle', .25); res(); };
+      const epoch = ++this.actionEpoch;
+      const done = () => { if (epoch === this.actionEpoch) this.play('idle', .25); res(); };
       setTimeout(done, dur * 1000 + 80);
     });
   }
 
   /** Marche en ligne droite jusqu'au point, puis se tourne vers `face` (angle Y). */
   goTo(target: THREE.Vector3, face?: number): Promise<void> {
+    this.solAssis = null;
+    if (this.walking) { const w = this.walking; this.walking = null; w.resolve(); }
     const d = target.clone().sub(this.obj.position);
     d.y = 0;
     if (d.length() < .05) {
@@ -319,7 +427,6 @@ export class Character {
     }
     this.busy = true;
     this.play('walk');
-    if (this.walking) { const w = this.walking; this.walking = null; w.resolve(); }   // nouvelle destination : on libère l'ancienne promesse
     return new Promise(res => { this.walking = { target: target.clone(), face, resolve: res }; });
   }
 
@@ -332,20 +439,52 @@ export class Character {
   }
 
   teleport(p: THREE.Vector3, face?: number) {
+    this.solAssis = null;
+    this.annulerMarche(); this.faceCible = null;
     this.obj.position.copy(p);
     if (face !== undefined) this.obj.rotation.y = face;
+  }
+  annulerMarche() {
+    this.actionEpoch++;
+    const w = this.walking; this.walking = null;
+    if (w) { this.busy = false; w.resolve(); }
   }
   setFade(target: number) { this.fade.target = target; }
 
   /** Les mains peuvent suivre des cibles dans le monde (remuer la poêle, saupoudrer), par-dessus l'animation en cours. */
-  mains: { droite?: () => THREE.Vector3; gauche?: () => THREE.Vector3 } | null = null;
+  mains: { droite?: () => THREE.Vector3; gauche?: () => THREE.Vector3; paumes?: boolean; doigts?: boolean; orientationDroite?: () => THREE.Quaternion } | null = null;
   private ikPoids = 0; ikBut = 0;
   private ikOs: Record<string, THREE.Object3D | null> = {};
   private os(n: string) { return (this.ikOs[n] ??= this.bone(n)); }
+  solAssis: number | null = null;
+  private poserPiedsAssis() {
+    if (this.solAssis === null) return;
+    const p = new THREE.Vector3();
+    for (const cote of ['Left', 'Right'] as const) {
+      const pied = this.os(cote + 'Foot'); if (!pied) continue;
+      let min = Infinity;
+      this.obj.updateMatrixWorld(true);
+      this.obj.traverse(o => {
+        const m = o as THREE.SkinnedMesh; if (!m.isSkinnedMesh) return;
+        const mats = Array.isArray(m.material) ? m.material : [m.material]; if (!mats.some(x => /chaussures/.test(x.name))) return;
+        m.skeleton.update(); const a = m.geometry.attributes.position;
+        for (let i = 0; i < a.count; i++) {
+          if ((a.getX(i) > 0) !== (cote === 'Left')) continue;
+          m.getVertexPosition(i, p); m.localToWorld(p); min = Math.min(min, p.y);
+        }
+      });
+      if (!Number.isFinite(min)) continue;
+      const q = pied.getWorldQuaternion(new THREE.Quaternion());
+      const cible = pied.getWorldPosition(new THREE.Vector3()); cible.y += this.solAssis - min;
+      this.chaineIK(cote, cible, 1, true);
+      pied.quaternion.copy(pied.parent!.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(q));
+      pied.updateMatrixWorld(true);
+    }
+  }
   /** IK à deux os, exacte, avec un « pôle » : le coude part vers le bas, un peu vers l'extérieur et un peu vers l'arrière,
    *  comme un vrai bras (l'ancienne méthode pouvait plier le coude à l'envers). */
-  private chaineIK(cote: 'Right' | 'Left', cible: THREE.Vector3, poids: number) {
-    const bras = this.os(cote + 'Arm'), avant = this.os(cote + 'ForeArm'), main = this.os(cote + 'Hand');
+  private chaineIK(cote: 'Right' | 'Left', cible: THREE.Vector3, poids: number, jambe = false) {
+    const bras = this.os(cote + (jambe ? 'UpLeg' : 'Arm')), avant = this.os(cote + (jambe ? 'Leg' : 'ForeArm')), main = this.os(cote + (jambe ? 'Foot' : 'Hand'));
     if (!bras || !avant || !main) return;
     const S = new THREE.Vector3(), E0 = new THREE.Vector3(), W0 = new THREE.Vector3();
     bras.getWorldPosition(S); avant.getWorldPosition(E0); main.getWorldPosition(W0);
@@ -356,7 +495,7 @@ export class Character {
     // le pôle : bas + extérieur + arrière, dans le repère du personnage
     const fw = new THREE.Vector3(Math.sin(this.obj.rotation.y), 0, Math.cos(this.obj.rotation.y));
     const droite = new THREE.Vector3(-fw.z, 0, fw.x).multiplyScalar(cote === 'Right' ? 1 : -1);
-    const pole = new THREE.Vector3(0, -1, 0).addScaledVector(droite, .55).addScaledVector(fw, -.35);
+    const pole = jambe ? fw.clone().addScaledVector(droite, .12) : new THREE.Vector3(0, -1, 0).addScaledVector(droite, .55).addScaledVector(fw, -.35);
     const pp = pole.sub(dir.clone().multiplyScalar(pole.dot(dir))).normalize();   // le pôle, dans le plan perpendiculaire à l'axe épaule → cible
     const cosA = THREE.MathUtils.clamp((a * a + d * d - b * b) / (2 * a * d), -1, 1);
     const coude = S.clone().addScaledVector(dir, a * cosA).addScaledVector(pp, a * Math.sqrt(1 - cosA * cosA));
@@ -429,12 +568,29 @@ export class Character {
       this.obj.rotation.y += pas; if (Math.abs(d) < .01) this.faceCible = null;
     }
     this.mixer.update(dt);
+    this.stabiliserSol();
+    this.poserPiedsAssis();
     this.abaisserBras();
     this.ikPoids += (this.ikBut - this.ikPoids) * Math.min(1, dt * 5);
     if (this.mains && this.ikPoids > .01) {
       this.obj.updateMatrixWorld(true);
-      if (this.mains.droite) this.chaineIK('Right', this.mains.droite(), this.ikPoids);
-      if (this.mains.gauche) this.chaineIK('Left', this.mains.gauche(), this.ikPoids);
+      for (const [cote, fn] of [['Right', this.mains.droite], ['Left', this.mains.gauche]] as const) {
+        if (!fn) continue;
+        const but = fn();
+        const orientation = cote === 'Right' ? this.mains.orientationDroite?.() : undefined;
+        const orienter = () => {
+          const main = this.os(cote + 'Hand'); if (!orientation || !main?.parent) return;
+          main.quaternion.copy(main.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(orientation));
+          main.updateMatrixWorld(true);
+        };
+        for (let i = 0; i < (this.mains.paumes ? 12 : 1); i++) {
+          orienter();
+          const cible = but.clone(), main = this.os(cote + 'Hand'), doigt = this.os(cote + (this.mains.doigts ? 'HandMiddle4' : 'HandMiddle1'));
+          if (this.mains.paumes && main && doigt) cible.sub(doigt.getWorldPosition(new THREE.Vector3()).sub(main.getWorldPosition(new THREE.Vector3())).multiplyScalar(this.mains.doigts ? 1 : .65));
+          this.chaineIK(cote, cible, this.ikPoids);
+        }
+        orienter();
+      }
     } else if (this.ikBut === 0 && this.ikPoids <= .01) this.mains = null;
     this.tournerTete(dt);
     if (this.breathing) { this.breathT += dt; const k = 1 + Math.sin(this.breathT * 1.6) * .006; this.obj.scale.set(this.obj.scale.x, this.obj.scale.x * k, this.obj.scale.x); }

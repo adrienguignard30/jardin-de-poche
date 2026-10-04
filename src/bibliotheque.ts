@@ -1,7 +1,7 @@
 // =============================================================================================
 //  LA BIBLIOTHÈQUE D'ANIMATIONS — un squelette (Mixamo X Bot), toutes les animations, aucun corps.
 //  Les corps (char_*_v2.glb) n'ont pas d'animation : ils reçoivent celles-ci. Même squelette, mêmes noms d'os,
-//  même taille (1,80 m) : rien n'est mis à l'échelle, rien n'est copié d'un personnage à l'autre.
+//  proportions propres : Character convertit les rotations et la translation du bassin au repos du corps.
 // =============================================================================================
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -18,6 +18,7 @@ export const BIBLIO = {
   async charger(url: string) {
     try {
       const g = await new GLTFLoader().loadAsync(url);
+      this.hanches = 0; this.repos.clear();
       this.clips = g.animations; this.prete = true;
       g.scene.updateMatrixWorld(true);
       g.scene.traverse(o => {
