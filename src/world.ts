@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Ciel } from './ciel';
 import { Assets } from './assets';
 import { SkyLife } from './sky';
+import { styliserInterieur } from './interieur';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import type { ViewDef } from './state';
 
@@ -659,7 +660,8 @@ export class World {
     const bedSide = sp('spot_bed_side'); if (bedSide) this.bedSide.copy(bedSide);
     const arm = sp('spot_armchair'); if (arm) this.armchairSpot = { pos: arm.setY(FL), face: (L.spots.spot_armchair.rz || 0) * Math.PI / 180 };
     // Les anciens repères du layout précèdent les déplacements du mobilier.
-    // Reprendre les surfaces du décor chargé, sans déplacer les meubles.
+    // Reprendre les surfaces du décor chargé ; la profondeur des assises doit
+    // laisser les mollets devant le coussin, sans changer les personnages.
     const nom = (s: string) => THREE.PropertyBinding.sanitizeNodeName(s);
     this.sieges = this.sieges.flatMap(q => {
       let meuble: THREE.Object3D | null = null;
@@ -673,6 +675,20 @@ export class World {
       });
       if (surface.isEmpty()) return [];
       const centre = surface.getCenter(new THREE.Vector3());
+      const facteur = this.perso === 'marcel' ? .50 : this.perso === 'lea' ? .60 : q.genre === 'canape' ? .85 : 1;
+      const objet = meuble as THREE.Object3D;
+      if (facteur !== 1 && objet.parent) {
+        const parent = objet.parent, pivot = new THREE.Group(); pivot.name = 'assise_adaptee';
+        pivot.position.copy(parent.worldToLocal(centre.clone()));
+        pivot.quaternion.copy(parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), q.face)));
+        parent.add(pivot); pivot.attach(objet); pivot.scale.z = facteur;
+        pivot.updateMatrixWorld(true);
+        if (this.perso === 'marcel') objet.traverse(o => {
+          const m = o as THREE.Mesh; if (!m.isMesh || !/back/i.test(m.name) || !m.parent) return;
+          const p = m.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(-Math.sin(q.face) * .10, 0, -Math.cos(q.face) * .10));
+          m.position.copy(m.parent.worldToLocal(p)); m.updateMatrixWorld(true);
+        });
+      }
       return [{ ...q, h: surface.max.y - FL, pos: centre.setY(surface.max.y) }];
     });
     const fauteuil = this.sieges.find(q => q.genre !== 'canape');
@@ -702,6 +718,7 @@ export class World {
     for (const [i, v] of this.views.entries()) v.position.copy(SLOTS[i].pos);
     if (L.camera) { TUNE.camPitch = L.camera.pitch; TUNE.camDist = L.camera.dist; TUNE.lookY = FL + L.camera.look_z; this.lookAt.x = L.camera.x ?? 0; this.baseX = this.lookAt.x; this.fovPaysage = L.camera.fov ?? 42; this.applyTune(); }
     this.roofGroup.visible = false;                       // avec un décor assemblé, le toit vient du décor
+    styliserInterieur(this.envGroup, this.perso);
   }
   setEnvironment(env?: { apartment?: string; balcony?: string; extra?: string; roof?: boolean; room?: boolean }, layout?: Layout | null) {
     this.hasRoom = env?.room !== false;
@@ -975,6 +992,13 @@ export class World {
   /** Le vrai sol sous les pieds : on lance quelques rayons vers le bas sur la ligne du balcon et dans la pièce, et on garde
    *  la surface la plus haute proche de la dalle (terrasse en bois, tapis…). Le jeu pose le personnage dessus. */
   solBalcon = 0; solPiece = 0;
+  solAuPoint(p: THREE.Vector3): number {
+    const ray = new THREE.Raycaster(new THREE.Vector3(p.x, FL + .35, p.z), new THREE.Vector3(0, -1, 0), 0, .6);
+    const sols: THREE.Mesh[] = [];
+    this.envGroup.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh && /floor|parquet|deck|rug|tapis/i.test(m.name)) sols.push(m); });
+    const contact = ray.intersectObjects(sols, false)[0];
+    return contact?.point.y ?? FL + (p.z < FACADE_FRONT - .1 ? this.solPiece : this.solBalcon);
+  }
   mesurerSol() {
     const ray = new THREE.Raycaster(); const bas = new THREE.Vector3(0, -1, 0);
     this.envGroup.updateMatrixWorld(true);

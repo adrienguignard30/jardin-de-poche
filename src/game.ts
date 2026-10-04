@@ -382,6 +382,7 @@ export class Game {
     this.world.setEnvironment(c.env, layout);
     // Le layout et les rayons du décor changent CHAIR_SPOT : installer ensuite.
     this.world.mesurerSol();
+    this.char.solSousPied = p => this.world.solAuPoint(p);
     await this.installerChaisePliante(c.id);
     await Promise.all(['arrosoir', 'arrosoir_vert', 'telephone', 'assiette', 'tasse'].map(n => BIBLIO.accessoire(n)));
     this.char.teleport(START_SPOT, 0);
@@ -1155,8 +1156,8 @@ export class Game {
       // Le torse du pickup avance davantage que la main : une approche à 60°
       // conserve au moins 3 cm entre l'enveloppe du corps et la rambarde.
       const id = this.state.character;
-      const face = (id === 'lea' && geste === 'plant' || id === 'marcel' && geste === 'plant' ? -1 : 1) * Math.PI / 3;
-      const recul = id === 'marcel' ? (geste === 'harvest' && SLOTS.indexOf(slot) === 0 ? .15 : .10) : id === 'jimy' || geste === 'harvest' ? .05 : 0;
+      const face = (id === 'lea' && geste === 'plant' ? -1 : 1) * Math.PI / 3;
+      const recul = id === 'marcel' ? (geste === 'plant' ? (SLOTS.indexOf(slot) === 0 ? .23 : .15) : SLOTS.indexOf(slot) === 0 ? .15 : .10) : id === 'jimy' || geste === 'harvest' ? .05 : .025;
       const main = new THREE.Vector3(-(g.cote ?? 0), 0, g.distance).applyAxisAngle(new THREE.Vector3(0, 1, 0), face);
       const pos = new THREE.Vector3(slot.pos.x - main.x, FL, slot.pos.z - main.z - recul);
       return { pos: freePoint(pos, `pot${SLOTS.indexOf(slot)}`), face };
@@ -2061,7 +2062,7 @@ export class Game {
     if (this.running) {
       if (!this.auditEnCours && !this.pauseRevue) this.char.update(dt);
       const W = this.world, y = this.char.obj.position.y, dedans = this.char.obj.position.z < FACADE_FRONT - .1;
-      const sol = FL + (dedans ? W.solPiece : W.solBalcon);
+      const sol = W.solAuPoint(this.char.obj.position);
       if (this.char.solAssis === null && !/^(sit|sleep)(?:_|$)/.test(this.char.currentName) && (Math.abs(y - FL) < .03 || Math.abs(y - sol) < .03)) this.char.obj.position.y = sol;
       if (this.tel) this.placerTel();                                   // après l'animation : les mains sont à leur vraie place
       { const t = this.char.bone('Head'), p = new THREE.Vector3(); if (t) t.getWorldPosition(p); else p.copy(this.char.obj.position).setY(this.char.obj.position.y + 1.4); this.world.voirLaTete(p); }
@@ -2071,7 +2072,7 @@ export class Game {
         if (this.char.mains?.paumes) for (const [cote, fn] of [['Right', this.char.mains.droite], ['Left', this.char.mains.gauche]] as const) {
           const p = this.char.mains.doigts ? this.char.bone(cote + 'HandMiddle4')?.getWorldPosition(new THREE.Vector3()) : this.paume(cote); if (p && fn) erreurs.push(`contact ${cote} ${(p.distanceTo(fn()) * 1000).toFixed(1)} mm`);
         }
-        const sol = FL + (this.char.obj.position.z < FACADE_FRONT - .1 ? W.solPiece : W.solBalcon);
+        const sol = W.solAuPoint(this.char.obj.position);
         if (el) el.textContent = `${this.state.character} — ${this.char.currentName} — semelle ${((this.char.hauteurSemelles() + this.char.obj.position.y - sol) * 1000).toFixed(1)} mm — ${erreurs.join(' / ')}`;
       }
       this.tickAll();
