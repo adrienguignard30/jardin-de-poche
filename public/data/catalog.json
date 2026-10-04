@@ -1,9 +1,11 @@
-{
+﻿{
+  "bibliotheque": "models/animations.glb",
+  "bibliotheque_extra": "models/animations-extra.glb",
  "version": 1,
  "characters": [
   {
    "id": "lea",
-   "file": "models/char_lea.glb",
+   "file": "models/char_lea_v2.glb",
    "name": {
     "fr": "Léa",
     "en": "Léa"
@@ -54,7 +56,7 @@
   },
   {
    "id": "marcel",
-   "file": "models/char_marcel.glb",
+   "file": "models/char_marcel_v2.glb",
    "name": {
     "fr": "Marcel",
     "en": "Marcel"
@@ -105,7 +107,7 @@
   },
   {
    "id": "jimy",
-   "file": "models/char_jimy.glb",
+   "file": "models/char_jimy_v2.glb",
    "name": {
     "fr": "Jimy",
     "en": "Jimy"

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { Assets, type CharacterAsset } from './assets';
+import { BIBLIO } from './bibliotheque';
 
 export interface Reglages {
   vitesse?: number; walk_timescale?: number;
@@ -96,12 +97,16 @@ export class Character {
   constructor(assets: Assets, asset: CharacterAsset) {
     this.obj = assets.instantiate(asset);
     this.mixer = new THREE.AnimationMixer(this.obj);
-    for (const clip of asset.clips) {
+    let clips = asset.clips.length ? asset.clips : BIBLIO.clips;     // un corps « nu » joue la bibliothèque
+    this.deLaBibliotheque = !asset.clips.length;
+    if (this.deLaBibliotheque && BIBLIO.hanches > 0) clips = this.retarget(clips);   // X Bot → ce corps (diagnostic Codex, 4 octobre)
+    for (const clip of clips) {
       const a = this.mixer.clipAction(clip);
       a.enabled = true;
       this.actions.set(clip.name, a);
     }
     this.hanchesRepos = hauteurHanches(this.obj);                     // avant toute animation : la pose de repos
+    if (this.deLaBibliotheque) for (const n of this.actions.keys()) if (/^idle/.test(n)) this.pinInPlace(n);   // Breathing Idle balance le bassin de 19 cm : fixé sur place
     this.obj.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) this.meshes.push(m); });
     this.play('idle');
   }
@@ -131,6 +136,100 @@ export class Character {
       faits.push(n);
     }
     return faits;
+  }
+  /** Ce personnage joue la bibliothèque commune (corps sans animation). */
+  deLaBibliotheque = false;
+  /** RETARGET X Bot → ce corps. Même nom d'os ne veut pas dire même proportion ni même repère de repos :
+   *  - les translations d'os restent celles du corps (sinon ses bras prennent la longueur de ceux de X Bot) ;
+   *  - seule la translation du bassin est copiée, mise à l'échelle autour du repos de chaque squelette ;
+   *  - chaque rotation animée est convertie entre les deux poses de repos : q_corps = A · q_source · B,
+   *    A = inv(Qmonde_parent_corps) · Qmonde_parent_source, B = inv(Qmonde_os_source) · Qmonde_os_corps. */
+  private retarget(clips: THREE.AnimationClip[]): THREE.AnimationClip[] {
+    this.obj.updateMatrixWorld(true);
+    const corps = new Map<string, { qW: THREE.Quaternion; p: THREE.Vector3; parent: string }>();
+    this.obj.traverse(o => { if (o.name) corps.set(o.name, { qW: o.getWorldQuaternion(new THREE.Quaternion()), p: o.position.clone(), parent: o.parent?.name ?? '' }); });
+    const hS = BIBLIO.repos.get([...BIBLIO.repos.keys()].find(k => /Hips$/.test(k)) ?? ''), hC = [...corps.entries()].find(([k]) => /Hips$/.test(k));
+    const ratio = hS && hC && hS.p.y > 0 ? hC[1].p.y / hS.p.y : 1;
+    const A = new Map<string, THREE.Quaternion>(), Bm = new Map<string, THREE.Quaternion>();
+    for (const [nom, c] of corps) {
+      const sN = BIBLIO.repos.get(nom); if (!sN) continue;
+      const pc = corps.get(c.parent), ps = BIBLIO.repos.get(sN.parent);
+      const qpc = pc ? pc.qW : new THREE.Quaternion(), qps = ps ? ps.qW : new THREE.Quaternion();
+      A.set(nom, qpc.clone().invert().multiply(qps));
+      Bm.set(nom, sN.qW.clone().invert().multiply(c.qW));
+    }
+    const q = new THREE.Quaternion();
+    const out = clips.map(clip => {
+      const pistes: THREE.KeyframeTrack[] = [];
+      for (const tr0 of clip.tracks) {
+        const m = tr0.name.match(/^(.*)\.(quaternion|position|scale)$/); if (!m) continue;
+        const nom = m[1], prop = m[2];
+        if (!corps.has(nom)) continue;
+        if (prop === 'scale') continue;
+        const tr = tr0.clone();
+        if (prop === 'position') {
+          if (!/Hips$/.test(nom)) continue;                              // les longueurs d'os restent celles du corps
+          const v = tr.values, p0 = hS!.p, pc0 = hC![1].p;
+          for (let i = 0; i < v.length; i += 3) { v[i] = pc0.x + ratio * (v[i] - p0.x); v[i + 1] = pc0.y + ratio * (v[i + 1] - p0.y); v[i + 2] = pc0.z + ratio * (v[i + 2] - p0.z); }
+        } else {
+          const a = A.get(nom)!, b = Bm.get(nom)!, v = tr.values;
+          for (let i = 0; i < v.length; i += 4) { q.fromArray(v, i); q.premultiply(a).multiply(b).normalize(); q.toArray(v, i); }
+        }
+        pistes.push(tr);
+      }
+      return new THREE.AnimationClip(clip.name, clip.duration, pistes);
+    });
+    console.info(`[retarget] bassin ${hC ? hC[1].p.y.toFixed(3) : '?'} / ${hS ? hS.p.y.toFixed(3) : '?'} → ×${ratio.toFixed(3)}, ${corps.size} nœuds`);
+    return out;
+  }
+  /** Où est un os (repère du personnage) à un instant d'une animation, évalué « à blanc ». */
+  private osDansLeGeste(name: string, t: number, os: string): THREE.Vector3 | null {
+    const a = this.actions.get(name); const b = this.bone(os); if (!a || !b) return null;
+    const actifs = [...this.actions.values()].filter(x => x.isRunning()).map(x => ({ a: x, w: x.getEffectiveWeight(), t: x.time }));
+    this.mixer.stopAllAction(); a.reset().setEffectiveWeight(1).play(); this.mixer.setTime(Math.min(Math.max(0, t), a.getClip().duration - .01));
+    this.obj.updateMatrixWorld(true);
+    const p = this.obj.worldToLocal(b.getWorldPosition(new THREE.Vector3()));
+    this.mixer.stopAllAction();
+    for (const x of actifs) { x.a.reset().setEffectiveWeight(x.w).play(); x.a.time = x.t; }
+    this.mixer.update(0); this.obj.updateMatrixWorld(true);
+    return p;
+  }
+  /** Les réglages mesurés sur les animations de la bibliothèque (à la place des mesures Blender de l'ancien corps) :
+   *  - gestes : le moment « utile » = la main droite au plus bas (planter) ou au plus loin devant (récolter), 35 % pour arroser ;
+   *  - assise : hauteur du bassin dans « sit » ; couchage : hauteur du bassin dans « sleep ». */
+  mesurerSurLaBibliotheque() {
+    if (!this.deLaBibliotheque) return;
+    const paume = (name: string, t: number) => { const h = this.osDansLeGeste(name, t, 'RightHand'), m = this.osDansLeGeste(name, t, 'RightHandMiddle1'); return h && m ? h.multiplyScalar(.35).addScaledVector(m, .65) : h; };
+    const chercher = (name: string, mode: 'bas' | 'loin', seuil = .35): number => {
+      const a = this.actions.get(name); if (!a) return 0;
+      const d = a.getClip().duration; let meilleur = d * .5, score = mode === 'bas' ? Infinity : -Infinity, prec: number | null = null;
+      for (let t = .2; t < d - .2; t += .05) {
+        const m = paume(name, t); if (!m) continue;
+        if (mode === 'bas' && prec !== null && prec > seuil && m.y <= seuil) return t;   // la paume franchit la hauteur du légume en descendant
+        prec = m.y;
+        const v = mode === 'bas' ? m.y : Math.hypot(m.x, m.z) - m.y * .3;
+        if (mode === 'bas' ? v < score : v > score) { score = v; meilleur = t; }
+      }
+      return meilleur;
+    };
+    const g: Record<string, { anim: string; debut: number; fin: number; effet: number; distance: number; cote?: number }> = {};
+    // semer et récolter : « pickup » (se pencher, main à ~33 cm du sol = la hauteur de nos pots) ; les animations à genoux
+    // du kit jardinage travaillent au sol (7 cm), trop bas pour des pots à 26 cm (mesures Codex, 4 octobre)
+    if (this.actions.has('pickup')) {
+      const d = this.actions.get('pickup')!.getClip().duration, effet = chercher('pickup', 'bas');
+      const fin = Math.min(d, effet + 1.3);                             // on ne joue pas les 9 s : la main redescend et on enchaîne
+      g.plant = { anim: 'pickup', debut: 0, fin, effet, distance: .55, cote: 0 };
+      g.harvest = { anim: 'pickup', debut: 0, fin, effet, distance: .55, cote: 0 };
+      g.pickup = { anim: 'pickup', debut: 0, fin, effet, distance: .55, cote: 0 };
+    }
+    if (this.actions.has('water')) { const d = this.actions.get('water')!.getClip().duration; g.water = { anim: 'water', debut: 0, fin: d, effet: d * .35, distance: .55, cote: 0 }; }
+    if (Object.keys(g).length) this.gestures = { ...this.gestures, ...g };
+    const hanche = (name: string, t: number) => { const h = this.osDansLeGeste(name, t, 'Hips'); return h ? h.y : 0; };
+    if (this.actions.has('sit')) this.sitCfg = { anim: 'sit', installe_a: 0, cuisses_z: hanche('sit', .3), chaise_ok: true };
+    if (this.actions.has('sleep')) this.sleepCfg = { anim: 'sleep', installe_a: 0, dos_z: hanche('sleep', .3) };
+    // tout ce qui se joue sur place : danses, sport, jardinage (le kit Mixamo garde ses déplacements), gestes
+    for (const n of this.actions.keys()) if (/^(dance|sport_|jardin_)|^(plant|water|harvest|pickup|idle|phone|cafe|etirer|bailler|saluer|applaudir|regard|pointer|reflechir|mains_hanches|bonjour|pouce|joie|rire|surprise|ennui|rambarde|cuisiner|yoga)/.test(n)) this.pinInPlace(n);
+    console.info('[mesures] sur la bibliothèque :', Object.entries(g).map(([k, v]) => `${k} effet ${v.effet.toFixed(1)} s`).join(', '), `| assise ${this.sitCfg?.cuisses_z?.toFixed(2)} | couché ${this.sleepCfg?.dos_z?.toFixed(2)}`);
   }
   /** Remonter (ou descendre) le modèle de quelques centimètres : si les semelles s'enfoncent dans le sol, on relève. */
   private decalagePieds = 0;

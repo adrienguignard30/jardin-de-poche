@@ -1,0 +1,835 @@
+{
+  "version": 1,
+  "personnage": "lea",
+  "source": "jardin.blend",
+  "unites": "mètres ; degrés autour de +Y",
+  "position_definition": "centre horizontal de la boîte au niveau de sa base, comme le placement des groupes du jeu ; exception ouverture de fenêtre : centre de l’ouverture ; position_origine_source garde l’origine réelle du nœud ; assise = Y mondial du dessus",
+  "conversion_jeu": {
+    "source_code": "src/world.ts:fromLayout/applyLayout",
+    "FL": 1.37,
+    "FACADE_FRONT": -0.87,
+    "origine_assemblage_blender": [
+      0,
+      -40,
+      -0.0
+    ],
+    "methode": "lecture environments.glb existant et application du placement de chaque groupe du layout, portes refermées après recalage ; position null si objet non chargé",
+    "translation_groupes": {
+      "apartment_01_classic_paris": [
+        0.079519,
+        1.24,
+        -3.112998
+      ],
+      "balcony_01_classic": [
+        0.079519,
+        0.81,
+        -0.014999
+      ]
+    }
+  },
+  "avertissements": [
+    "Non chargé dans le jeu : asm_lamp_base",
+    "Aucune géométrie mesurable de type table identifiée dans cette collection ; aucune entrée fictive ajoutée.",
+    "Aucune géométrie mesurable de type porte identifiée dans cette collection ; aucune entrée fictive ajoutée."
+  ],
+  "meubles": [
+    {
+      "nom": "asm_furniture_bed",
+      "type": "lit",
+      "source": "asm_furniture_bed",
+      "sources_composants": [
+        "asm_bed_blanket",
+        "asm_bed_frame",
+        "asm_bed_mattress",
+        "asm_bed_pillow1",
+        "asm_bed_pillow2"
+      ],
+      "position": [
+        2.284341,
+        1.37,
+        -2.400025
+      ],
+      "taille": {
+        "largeur": 2.738985,
+        "hauteur": 0.675,
+        "profondeur": 2.24873
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        2.284341,
+        1.7075,
+        -2.400025
+      ],
+      "boite_jeu": {
+        "min": [
+          0.914849,
+          1.37,
+          -3.52439
+        ],
+        "max": [
+          3.653834,
+          2.045,
+          -1.275661
+        ]
+      },
+      "position_blender": [
+        1.848846,
+        -37.000004,
+        0.0
+      ],
+      "projection_blender_non_contractuelle": [
+        1.848846,
+        1.37,
+        -3.869996
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_01_classic_paris",
+      "sol_local_blender_m": -0.0,
+      "notes": [],
+      "position_origine_source": [
+        1.84909,
+        1.37,
+        -3.869899
+      ],
+      "rotation_blender_source": 0.0,
+      "assise": 1.875,
+      "assise_sol_local_m": 0.505,
+      "assise_blender_m": 0.505,
+      "assise_methode": "dessus du composant explicitement nommé",
+      "assise_sources": [
+        "asm_bed_mattress"
+      ],
+      "assise_confiance": "composant identifié",
+      "sol_local_jeu_m": 1.37,
+      "face": 0.0,
+      "face_methode": "avant -Y Blender par défaut ; vérifier si mobilier symétrique",
+      "places": [
+        [
+          2.284341,
+          1.875,
+          -2.499389
+        ]
+      ],
+      "places_precision": "centres géométriques d’accueil ; Hips n’est pas un point de peau en contact",
+      "matelas_taille_m": {
+        "largeur": 2.572986,
+        "profondeur": 1.919998
+      },
+      "direction_tete_lit_deg": 180.0,
+      "valeur_layout_existante": {
+        "nom": "asm_furniture_bed",
+        "loc": [
+          2.284,
+          1.369
+        ],
+        "tete": null,
+        "h": 0.64
+      },
+      "ecart_hauteur_layout_cm": -13.5
+    },
+    {
+      "nom": "asm_furniture_bookshelf",
+      "type": "bibliotheque",
+      "source": "asm_furniture_bookshelf",
+      "sources_composants": [
+        "asm_book_0_0",
+        "asm_book_0_1",
+        "asm_book_0_2",
+        "asm_book_0_3",
+        "asm_book_0_4",
+        "asm_book_1_0",
+        "asm_book_1_1",
+        "asm_book_1_2",
+        "asm_book_1_3",
+        "asm_book_1_4",
+        "asm_book_2_0",
+        "asm_book_2_1",
+        "asm_book_2_2",
+        "asm_book_2_3",
+        "asm_book_2_4",
+        "asm_book_3_0",
+        "asm_book_3_1",
+        "asm_book_3_2",
+        "asm_book_3_3",
+        "asm_book_3_4",
+        "asm_bookshelf_body",
+        "asm_bookshelf_shelf",
+        "asm_bookshelf_shelf.001",
+        "asm_bookshelf_shelf.002",
+        "asm_bookshelf_shelf.003"
+      ],
+      "position": [
+        -2.292587,
+        1.37,
+        -5.302844
+      ],
+      "taille": {
+        "largeur": 1.659991,
+        "hauteur": 2.0,
+        "profondeur": 0.479996
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        -2.292587,
+        2.37,
+        -5.302844
+      ],
+      "boite_jeu": {
+        "min": [
+          -3.122582,
+          1.37,
+          -5.542842
+        ],
+        "max": [
+          -1.462591,
+          3.37,
+          -5.062846
+        ]
+      },
+      "position_blender": [
+        -2.292831,
+        -35.567059,
+        0.0
+      ],
+      "projection_blender_non_contractuelle": [
+        -2.292831,
+        1.37,
+        -5.302941
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_01_classic_paris",
+      "sol_local_blender_m": -0.0,
+      "notes": [],
+      "position_origine_source": [
+        -2.292587,
+        1.37,
+        -5.302844
+      ],
+      "rotation_blender_source": 0.0
+    },
+    {
+      "nom": "asm_furniture_rug",
+      "type": "autre",
+      "source": "asm_furniture_rug",
+      "sources_composants": [
+        "asm_rug",
+        "asm_rug_center"
+      ],
+      "position": [
+        -0.800223,
+        1.37,
+        -2.3949
+      ],
+      "taille": {
+        "largeur": 2.987984,
+        "hauteur": 0.0445,
+        "profondeur": 1.199997
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        -0.800223,
+        1.39225,
+        -2.3949
+      ],
+      "boite_jeu": {
+        "min": [
+          -2.294215,
+          1.37,
+          -2.994899
+        ],
+        "max": [
+          0.693769,
+          1.4145,
+          -1.794902
+        ]
+      },
+      "position_blender": [
+        0.047756,
+        -38.475002,
+        0.0
+      ],
+      "projection_blender_non_contractuelle": [
+        0.047756,
+        1.37,
+        -2.394998
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_01_classic_paris",
+      "sol_local_blender_m": -0.0,
+      "notes": [],
+      "position_origine_source": [
+        0.048,
+        1.37,
+        -2.3949
+      ],
+      "rotation_blender_source": 0.0
+    },
+    {
+      "nom": "asm_furniture_armchair.003",
+      "type": "fauteuil",
+      "source": "asm_furniture_armchair.003",
+      "sources_composants": [
+        "asm_armchair_arm.001",
+        "asm_armchair_arm.004",
+        "asm_armchair_back.002",
+        "asm_armchair_seat.002"
+      ],
+      "position": [
+        -2.513441,
+        1.37,
+        -3.917008
+      ],
+      "taille": {
+        "largeur": 1.705239,
+        "hauteur": 1.03,
+        "profondeur": 1.051281
+      },
+      "rotation": 119.1138,
+      "position_centre_boite": [
+        -2.513441,
+        1.885,
+        -3.917008
+      ],
+      "boite_jeu": {
+        "min": [
+          -3.366061,
+          1.37,
+          -4.442649
+        ],
+        "max": [
+          -1.660822,
+          2.4,
+          -3.391368
+        ]
+      },
+      "position_blender": [
+        -1.874649,
+        -38.875004,
+        0.0
+      ],
+      "projection_blender_non_contractuelle": [
+        -1.874649,
+        1.37,
+        -1.994996
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_01_classic_paris",
+      "sol_local_blender_m": -0.0,
+      "notes": [],
+      "position_origine_source": [
+        -1.874405,
+        1.37,
+        -1.994899
+      ],
+      "rotation_blender_source": 142.8945,
+      "assise": 1.69,
+      "assise_sol_local_m": 0.32,
+      "assise_blender_m": 0.32,
+      "assise_methode": "dessus du composant explicitement nommé",
+      "assise_sources": [
+        "asm_armchair_seat.002"
+      ],
+      "assise_confiance": "composant identifié",
+      "sol_local_jeu_m": 1.37,
+      "face": 37.76,
+      "face_methode": "dos/tête de lit→centre assise",
+      "places": [
+        [
+          -2.511142,
+          1.69,
+          -3.909346
+        ]
+      ],
+      "places_precision": "centres géométriques d’accueil ; Hips n’est pas un point de peau en contact",
+      "valeur_layout_existante": {
+        "nom": "asm_furniture_armchair.003",
+        "genre": "fauteuil",
+        "loc": [
+          -2.459,
+          2.966
+        ],
+        "face": [
+          0.548,
+          -0.837
+        ],
+        "dedans": true,
+        "dossier": true,
+        "h": 0.318
+      },
+      "ecart_hauteur_layout_cm": 0.2
+    },
+    {
+      "nom": "asm_lamp_base",
+      "type": "lampe",
+      "source": "asm_lamp_base",
+      "sources_composants": [
+        "asm_lamp_base"
+      ],
+      "position": null,
+      "taille": {
+        "largeur": 0.4,
+        "hauteur": 0.08,
+        "profondeur": 0.4
+      },
+      "rotation": 0.0,
+      "position_centre_boite": null,
+      "boite_jeu": null,
+      "position_blender": [
+        0.0,
+        0.0,
+        0.04
+      ],
+      "projection_blender_non_contractuelle": [
+        0.0,
+        1.41,
+        -40.869999
+      ],
+      "present_dans_jeu": false,
+      "groupe_jeu": null,
+      "sol_local_blender_m": 0.0,
+      "notes": [
+        "Absent des groupes GLB chargés par ce layout ; position jeu non définie. La projection Blender n’est pas une position effectivement utilisée."
+      ],
+      "position_origine_source": null,
+      "rotation_blender_source": 0.0
+    },
+    {
+      "nom": "kitchen_sink.002",
+      "type": "cuisine",
+      "source": "kitchen_sink.002",
+      "sources_composants": [
+        "kitchen_sink.002"
+      ],
+      "position": [
+        0.347479,
+        2.372071,
+        -5.167121
+      ],
+      "taille": {
+        "largeur": 0.52,
+        "hauteur": 0.04,
+        "profondeur": 0.379997
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        0.347479,
+        2.392071,
+        -5.167121
+      ],
+      "boite_jeu": {
+        "min": [
+          0.087479,
+          2.372071,
+          -5.35712
+        ],
+        "max": [
+          0.607478,
+          2.412071,
+          -4.977122
+        ]
+      },
+      "position_blender": [
+        0.347234,
+        -35.702782,
+        1.022071
+      ],
+      "projection_blender_non_contractuelle": [
+        0.347234,
+        2.392071,
+        -5.167218
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_01_classic_paris",
+      "sol_local_blender_m": -0.0,
+      "notes": [],
+      "position_origine_source": [
+        0.347479,
+        2.392071,
+        -5.167121
+      ],
+      "rotation_blender_source": 0.0
+    },
+    {
+      "nom": "kitchen_door.003",
+      "type": "cuisine",
+      "source": "kitchen_door.003",
+      "sources_composants": [
+        "kitchen_door.003"
+      ],
+      "position": [
+        0.64748,
+        1.482071,
+        -4.89712
+      ],
+      "taille": {
+        "largeur": 0.62,
+        "hauteur": 0.72,
+        "profondeur": 0.035004
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        0.64748,
+        1.842071,
+        -4.89712
+      ],
+      "boite_jeu": {
+        "min": [
+          0.33748,
+          1.482071,
+          -4.914622
+        ],
+        "max": [
+          0.95748,
+          2.202071,
+          -4.879619
+        ]
+      },
+      "position_blender": [
+        0.647236,
+        -35.972782,
+        0.472071
+      ],
+      "projection_blender_non_contractuelle": [
+        0.647236,
+        1.842071,
+        -4.897218
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_01_classic_paris",
+      "sol_local_blender_m": -0.0,
+      "notes": [],
+      "position_origine_source": [
+        0.64748,
+        1.842071,
+        -4.89712
+      ],
+      "rotation_blender_source": 0.0
+    },
+    {
+      "nom": "kitchen_door.004",
+      "type": "cuisine",
+      "source": "kitchen_door.004",
+      "sources_composants": [
+        "kitchen_door.004"
+      ],
+      "position": [
+        -0.072521,
+        1.482071,
+        -4.89712
+      ],
+      "taille": {
+        "largeur": 0.62,
+        "hauteur": 0.72,
+        "profondeur": 0.035004
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        -0.072521,
+        1.842071,
+        -4.89712
+      ],
+      "boite_jeu": {
+        "min": [
+          -0.382521,
+          1.482071,
+          -4.914622
+        ],
+        "max": [
+          0.237479,
+          2.202071,
+          -4.879619
+        ]
+      },
+      "position_blender": [
+        -0.072766,
+        -35.972782,
+        0.472071
+      ],
+      "projection_blender_non_contractuelle": [
+        -0.072766,
+        1.842071,
+        -4.897218
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_01_classic_paris",
+      "sol_local_blender_m": -0.0,
+      "notes": [],
+      "position_origine_source": [
+        -0.072521,
+        1.842071,
+        -4.89712
+      ],
+      "rotation_blender_source": 0.0
+    },
+    {
+      "nom": "kitchen_door.005",
+      "type": "cuisine",
+      "source": "kitchen_door.005",
+      "sources_composants": [
+        "kitchen_door.005"
+      ],
+      "position": [
+        -0.792521,
+        1.482071,
+        -4.89712
+      ],
+      "taille": {
+        "largeur": 0.62,
+        "hauteur": 0.72,
+        "profondeur": 0.035004
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        -0.792521,
+        1.842071,
+        -4.89712
+      ],
+      "boite_jeu": {
+        "min": [
+          -1.102521,
+          1.482071,
+          -4.914622
+        ],
+        "max": [
+          -0.482521,
+          2.202071,
+          -4.879619
+        ]
+      },
+      "position_blender": [
+        -0.792765,
+        -35.972782,
+        0.472071
+      ],
+      "projection_blender_non_contractuelle": [
+        -0.792765,
+        1.842071,
+        -4.897218
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_01_classic_paris",
+      "sol_local_blender_m": -0.0,
+      "notes": [],
+      "position_origine_source": [
+        -0.792521,
+        1.842071,
+        -4.89712
+      ],
+      "rotation_blender_source": 0.0
+    },
+    {
+      "nom": "kitchen_counter.002",
+      "type": "cuisine",
+      "source": "kitchen_counter.002",
+      "sources_composants": [
+        "kitchen_counter.002"
+      ],
+      "position": [
+        -0.072521,
+        2.282071,
+        -5.19712
+      ],
+      "taille": {
+        "largeur": 2.22,
+        "hauteur": 0.1,
+        "profondeur": 0.620003
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        -0.072521,
+        2.332071,
+        -5.19712
+      ],
+      "boite_jeu": {
+        "min": [
+          -1.182521,
+          2.282071,
+          -5.507121
+        ],
+        "max": [
+          1.037479,
+          2.382071,
+          -4.887118
+        ]
+      },
+      "position_blender": [
+        -0.072766,
+        -35.672783,
+        0.962071
+      ],
+      "projection_blender_non_contractuelle": [
+        -0.072766,
+        2.332071,
+        -5.197217
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_01_classic_paris",
+      "sol_local_blender_m": -0.0,
+      "notes": [],
+      "position_origine_source": [
+        -0.072521,
+        2.332071,
+        -5.19712
+      ],
+      "rotation_blender_source": 0.0
+    },
+    {
+      "nom": "kitchen_base.002",
+      "type": "cuisine",
+      "source": "kitchen_base.002",
+      "sources_composants": [
+        "kitchen_base.002"
+      ],
+      "position": [
+        -0.072522,
+        1.372071,
+        -5.207122
+      ],
+      "taille": {
+        "largeur": 2.15,
+        "hauteur": 0.92,
+        "profondeur": 0.580002
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        -0.072522,
+        1.832071,
+        -5.207122
+      ],
+      "boite_jeu": {
+        "min": [
+          -1.147522,
+          1.372071,
+          -5.497123
+        ],
+        "max": [
+          1.002478,
+          2.292071,
+          -4.917121
+        ]
+      },
+      "position_blender": [
+        -0.072766,
+        -35.662781,
+        0.462071
+      ],
+      "projection_blender_non_contractuelle": [
+        -0.072766,
+        1.832071,
+        -5.207219
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_01_classic_paris",
+      "sol_local_blender_m": -0.0,
+      "notes": [],
+      "position_origine_source": [
+        -0.072521,
+        1.832071,
+        -5.207122
+      ],
+      "rotation_blender_source": 0.0
+    },
+    {
+      "nom": "peinture-lea",
+      "type": "tableau",
+      "source": "peinture-lea",
+      "sources_composants": [
+        "peinture-lea"
+      ],
+      "position": [
+        2.761538,
+        1.894959,
+        -5.523974
+      ],
+      "taille": {
+        "largeur": 1.385178,
+        "hauteur": 1.846904,
+        "profondeur": 0.0
+      },
+      "rotation": 180.0,
+      "position_centre_boite": [
+        2.761538,
+        2.818411,
+        -5.523974
+      ],
+      "boite_jeu": {
+        "min": [
+          2.068949,
+          1.894959,
+          -5.523974
+        ],
+        "max": [
+          3.454126,
+          3.741863,
+          -5.523974
+        ]
+      },
+      "position_blender": [
+        2.761293,
+        -35.345928,
+        1.448411
+      ],
+      "projection_blender_non_contractuelle": [
+        2.761293,
+        2.818411,
+        -5.524072
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_01_classic_paris",
+      "sol_local_blender_m": -0.0,
+      "notes": [],
+      "position_origine_source": [
+        2.761538,
+        2.818411,
+        -5.523974
+      ],
+      "rotation_blender_source": 0.0,
+      "hauteur_centre": 2.818411,
+      "hauteur_centre_sol_local_m": 1.448411,
+      "valeur_layout_existante": {
+        "nom": "peinture-lea",
+        "loc": [
+          2.761,
+          4.654
+        ],
+        "normale": [
+          0,
+          -1
+        ],
+        "taille": [
+          1.39,
+          1.85
+        ],
+        "h": 1.448
+      },
+      "ecart_hauteur_layout_cm": 0.041
+    },
+    {
+      "nom": "ouverture 1 dans asm_a1_back",
+      "type": "fenetre",
+      "source": "asm_a1_back",
+      "position": [
+        0.048,
+        2.825,
+        -5.60963
+      ],
+      "taille": {
+        "largeur": 3.66858,
+        "hauteur": 1.35,
+        "profondeur": 0.080002
+      },
+      "rotation": 0,
+      "hauteur_centre": 2.825,
+      "hauteur_centre_sol_local_m": 1.455,
+      "present_dans_jeu": true,
+      "methode": "absence de collision dans le mur, composante intérieure ; limites recalées aux sommets du mur",
+      "precision_grille_cm": [
+        4.586,
+        2.5
+      ],
+      "notes": [
+        "Ouverture géométrique, pas un objet fenêtre séparé."
+      ]
+    }
+  ]
+}

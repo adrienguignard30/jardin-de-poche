@@ -5,6 +5,7 @@ import { Character, type Reglages } from './character';
 import { UI, icon } from './ui';
 import { MUSIQUE } from './musique';
 import * as EL from './enligne';
+import { BIBLIO } from './bibliotheque';
 import { t, tx, lang, quantite, liste } from './i18n';
 import { CATALOG, ECO, loadCatalog, plantDef, itemDef, charDef, newGame, prixProchainPot, LocalSave, generateNickname, type GameState, type PotState, type SaveProvider, type Perso } from './state';
 import * as E from './economie';
@@ -199,6 +200,7 @@ export class Game {
   // ---------- démarrage
   async boot() {
     await loadCatalog();
+    if ((CATALOG as any).bibliotheque) { this.ui.setProgress(0, 1, 'animations'); await BIBLIO.charger((CATALOG as any).bibliotheque); if ((CATALOG as any).bibliotheque_extra) BIBLIO.chargerExtra((CATALOG as any).bibliotheque_extra); }
     const q = new URLSearchParams(location.search);
     if (q.get('fast')) P.setSpeed(parseFloat(q.get('fast')!) || 5);
     if (q.get('demo') === '1') { P.setSpeed(90); this.demo = true; }        // mode démo : tout 90 fois plus vite
@@ -237,7 +239,7 @@ export class Game {
     }
     this.showroom = new Showroom(this.assets);
     await this.showroom.load(label => this.ui.setProgress(1, 1, label));
-    for (const c of this.showroom.chars) { c.char.applyMesures(this.reglages(c.def.id)); const u = new URLSearchParams(location.search).get('bras'); c.char.brasOffset = u !== null ? +u : ((c.def as any).bras_offset ?? 0); await this.chargerMoyennes(c.def.id); }
+    for (const c of this.showroom.chars) { c.char.applyMesures(this.reglages(c.def.id)); if (c.char.deLaBibliotheque) { c.char.mesurerSurLaBibliotheque(); if (c.def.id !== 'lea') c.char.exclure(['dance', 'dance_14', 'dance_15']); } const u = new URLSearchParams(location.search).get('bras'); c.char.brasOffset = u !== null ? +u : ((c.def as any).bras_offset ?? 0); await this.chargerMoyennes(c.def.id); }
     await this.teinterAccueil();
     this.showroom.resize(window.innerWidth / window.innerHeight);
     window.addEventListener('resize', () => this.showroom?.resize(window.innerWidth / window.innerHeight));
@@ -361,8 +363,10 @@ export class Game {
     if (this.world.ciel) this.world.ciel.onPassage = (sp) => this.montrerLeCiel(sp);
     this.char = new Character(this.assets, asset);
     this.char.applyMesures(this.reglages(c.id));
-    await this.preterAnimations(c.id);                                 // les animations corrigées (voir l'analyse du 3 octobre)
+    if (this.char.deLaBibliotheque) { this.char.mesurerSurLaBibliotheque(); if (c.id !== 'lea') this.char.exclure(['dance', 'dance_14', 'dance_15']); }   // les réglages viennent des animations elles-mêmes ; la danse hip-hop féminine, la danse du ventre et le ballet restent à Léa
+    else await this.preterAnimations(c.id);                             // (ancien corps avec ses propres animations)
     this.calibrerGestes();
+    await this.installerChaisePliante(c.id);
     { const u = new URLSearchParams(location.search).get('pieds'); this.char.decalerPieds(u !== null ? +u : ((c as any).pieds ?? 0)); }   // ?pieds=0.03 pour tester, puis la valeur dans catalog.json
     { const u = new URLSearchParams(location.search).get('bras'); this.char.brasOffset = u !== null ? +u : ((c as any).bras_offset ?? 0); }
     await this.chargerMoyennes(c.id);
@@ -586,11 +590,26 @@ export class Game {
   private calibrerGestes() {
     for (const n of ['plant', 'harvest', 'water']) {
       const g = this.char.gestures[n]; if (!g) continue;
-      const m = this.char.mainDansLeGeste(g.anim ?? n, g.effet, 'Right'); if (!m) continue;
+      const h = this.char.mainDansLeGeste(g.anim ?? n, g.effet, 'Right'), mi = (this.char as any).osDansLeGeste?.(g.anim ?? n, g.effet, 'RightHandMiddle1') as THREE.Vector3 | null;
+      const m = h && mi ? h.clone().multiplyScalar(.35).addScaledVector(mi, .65) : h; if (!m) continue;   // la paume, pas le poignet
       const avant = m.z, cote = -m.x;                                  // repère du personnage : il regarde vers +z, sa droite est en -x
       if (avant > .15 && avant < 1.2) { g.distance = avant; g.cote = cote; }
       console.info(`[gestes] ${n} : main à ${avant.toFixed(2)} m devant, ${cote.toFixed(2)} m à droite, ${m.y.toFixed(2)} m de haut`);
     }
+  }
+  /** La chaise pliante (accessoires de Codex) remplace la chaise du balcon : assise à 45 cm, tournée dans le sens de la
+   *  longueur du balcon. Hauteur et place assise exactes calculées par Codex (diagnostic-chaise-pliante, 4 octobre). */
+  private chaisePliante: THREE.Object3D | null = null;
+  private static CHAISE = { lea: { yaw: -Math.PI / 2, sy: 1.0714, dx: .032, dy: .093, dz: .002 }, marcel: { yaw: Math.PI / 2, sy: 1.0198, dx: .001, dy: .147, dz: -.001 }, jimy: { yaw: Math.PI / 2, sy: 1.098, dx: -.030, dy: .150, dz: -.001 } } as Record<string, { yaw: number; sy: number; dx: number; dy: number; dz: number }>;
+  private async installerChaisePliante(id: string) {
+    if (!this.char.deLaBibliotheque) return;
+    const o = await BIBLIO.accessoire('chaise_pliante'); if (!o) return;
+    const r = Game.CHAISE[id] ?? Game.CHAISE.lea;
+    if (this.chaisePliante) this.chaisePliante.parent?.remove(this.chaisePliante);
+    o.position.copy(CHAIR_SPOT.pos); o.position.y = FL; o.rotation.set(0, r.yaw, 0); o.scale.set(1, r.sy, 1);
+    this.world.scene.add(o); this.chaisePliante = o;
+    if (this.world.chair) this.world.chair.visible = false;
+    CHAIR_SPOT.face = r.yaw;
   }
   /** AUDIT DES ANIMATIONS DANS LE JEU (adresse avec ?audit=1) : chaque animation est rejouée image par image,
    *  telle que le jeu la joue (empruntée ou non, à la taille du personnage, sur le vrai sol, avec la vraie hauteur
@@ -747,9 +766,8 @@ export class Game {
     const p = this.paume('Right'); if (!p) return;
     a.verse += ((a.versement) - a.verse) * Math.min(1, dt * 4);             // s'incliner en douceur
     a.o.position.copy(p);
-    const vers = a.cible.clone().sub(p); vers.y = 0; if (vers.lengthSq() < 1e-4) vers.set(Math.sin(this.char.obj.rotation.y), 0, Math.cos(this.char.obj.rotation.y));
-    a.o.rotation.set(0, Math.atan2(vers.x, vers.z), 0);                      // le bec vers le pot
-    a.o.rotateX(-.15 + a.verse * .85);                                        // relevé au repos, incliné pour verser (~40°)
+    a.o.rotation.set(0, this.char.obj.rotation.y, 0);                        // droit, le bec dans l'axe du corps (il tournait avec la main)
+    a.o.rotateX(a.verse * .70);                                               // incliné seulement pour verser (~40°)
     if (a.versement > .5 && a.verse > .5 && Math.random() < .7) {              // l'eau : des gouttes qui partent du bec vers le pot
       const bec = a.o.localToWorld(a.o.userData.bec.clone());
       this.world.gouttes(bec, a.cible);
@@ -773,10 +791,10 @@ export class Game {
     this.char.obj.updateMatrixWorld(true);
     const d = this.paume('Right'), g = this.paume('Left');
     if (!d) return;
-    const p = g && d.distanceTo(g) < .3 ? d.clone().add(g).multiplyScalar(.5) : d.clone();   // deux mains proches : entre les deux
+    const p = this.char.deLaBibliotheque ? d.clone() : (g && d.distanceTo(g) < .3 ? d.clone().add(g).multiplyScalar(.5) : d.clone());   // nouveaux corps : main droite seulement
     const tete = this.char.bone('Head'); const h = new THREE.Vector3(); if (tete) tete.getWorldPosition(h); else h.copy(p).add(new THREE.Vector3(0, .4, 0));
     const versTete = h.clone().sub(p).normalize();
-    this.tel.position.copy(p).addScaledVector(versTete, .025);           // posé sur les paumes, pas dedans
+    this.tel.position.copy(p).addScaledVector(versTete, this.char.deLaBibliotheque ? .033 : .025);   // posé sur la paume, pas dedans (coque 1 cm + marge)
     this.tel.lookAt(h);                                                   // l'écran regarde le visage
   }
   private porte: THREE.Object3D | null = null;
@@ -1217,6 +1235,18 @@ export class Game {
       return ch.position.clone().addScaledVector(f, av).addScaledVector(d, cote).setY(ch.position.y + haut);
     };
     const t = () => (performance.now() - t0) / 1000, k = () => Math.sin(Math.min(1, (performance.now() - t0) / ms) * Math.PI);
+    const CLIP: Record<string, string> = { saluer: 'saluer', etirer: 'etirer', hanches: 'mains_hanches', dos: 'idle_3', tete: 'reflechir', applaudir: 'applaudir', bailler: 'bailler', cafe: 'cafe', pointer: 'pointer' };   // (rambarde : l'animation Mixamo est « dos au mur », on garde les mains sur la vraie rambarde)
+    if (this.char.deLaBibliotheque && this.char.has(CLIP[quoi])) {    // que du propre : la vraie animation
+      const n = CLIP[quoi], d = this.char.clipDuree(n);
+      if (cible) this.char.regard = cible();
+      let tasse: THREE.Object3D | null = null, vivant = true;
+      if (quoi === 'cafe') {                                             // la tasse : dans la main gauche, droite, l'anse vers le corps
+        tasse = await BIBLIO.accessoire('tasse'); if (tasse) { this.world.scene.add(tasse); const suivre = () => { if (!vivant || !tasse) return; const g = this.paume('Left'); if (g) { tasse.position.copy(g); tasse.rotation.set(0, this.char.obj.rotation.y + Math.PI, 0); } requestAnimationFrame(suivre); }; suivre(); }
+      }
+      await this.char.once(n, Math.max(d, ms / 1000));
+      vivant = false; if (tasse) this.world.scene.remove(tasse);
+      this.char.play('idle', .3); this.char.regard = null; return;
+    }
     if (this.char.currentName !== 'idle') this.char.play('idle', .3);
     let tasse: THREE.Object3D | null = null;
     switch (quoi) {
@@ -1643,7 +1673,8 @@ export class Game {
     const W = this.world;
     await this.char.goTo(W.bedSide.clone(), Math.PI); if (token !== this.autoToken) return;
     const bed = W.bedSpot, dos = this.char.sleepCfg?.dos_z ?? 0;
-    this.char.teleport(new THREE.Vector3(bed.x, bed.y - dos, bed.z), Math.PI);
+    if (this.char.deLaBibliotheque) { const dy = ({ lea: .529, marcel: .638, jimy: .551 } as Record<string, number>)[this.state.character] ?? .55; this.char.teleport(new THREE.Vector3(bed.x, FL + dy, bed.z), 4.2245); }   // torse sur le matelas (Codex)
+    else this.char.teleport(new THREE.Vector3(bed.x, bed.y - dos, bed.z), Math.PI);
     this.char.play('sleep', .4);
     const t0 = Date.now(); while (Date.now() - t0 < 16000) { await wait(400); if (token !== this.autoToken) break; }
     this.char.play('idle', .4);
@@ -1681,7 +1712,13 @@ export class Game {
     const cfg = this.char.sitCfg;
     await wait(cfg ? Math.min(4000, cfg.installe_a * 1000 + 450) : 500); if (token !== this.autoToken) { this.char.play('idle'); return; }   // après le fondu : la pose est la vraie
     const hips = this.char.bone('Hips');
-    if (hips) {
+    if (this.chaisePliante && anim === 'sit') {                          // place exacte sur la chaise pliante (Codex)
+      const r = Game.CHAISE[this.state.character] ?? Game.CHAISE.lea;
+      const end = CHAIR_SPOT.pos.clone().add(new THREE.Vector3(r.dx, r.dy, r.dz)).setY(FL + r.dy);
+      const start = this.char.obj.position.clone();
+      for (let k = 0; k <= 1.001; k += .1) { this.char.obj.position.lerpVectors(start, end, Math.min(1, k)); await wait(30); }
+      this.char.obj.rotation.y = r.yaw;
+    } else if (hips) {
       const seat = this.world.seatPoint();
       const hp = new THREE.Vector3(); hips.getWorldPosition(hp);
       const delta = seat.clone().sub(hp);

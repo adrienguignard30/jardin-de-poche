@@ -1,0 +1,870 @@
+{
+  "version": 1,
+  "personnage": "jimy",
+  "source": "jardin.blend",
+  "unites": "mètres ; degrés autour de +Y",
+  "position_definition": "centre horizontal de la boîte au niveau de sa base, comme le placement des groupes du jeu ; exception ouverture de fenêtre : centre de l’ouverture ; position_origine_source garde l’origine réelle du nœud ; assise = Y mondial du dessus",
+  "conversion_jeu": {
+    "source_code": "src/world.ts:fromLayout/applyLayout",
+    "FL": 1.37,
+    "FACADE_FRONT": -0.87,
+    "origine_assemblage_blender": [
+      32,
+      -40,
+      0.847
+    ],
+    "methode": "lecture environments.glb existant et application du placement de chaque groupe du layout, portes refermées après recalage ; position null si objet non chargé",
+    "translation_groupes": {
+      "apartment_04_rooftop": [
+        -5.017431,
+        0.269,
+        -4.050001
+      ],
+      "balcony_04_rooftop": [
+        -5.019067,
+        0.81,
+        -0.147998
+      ]
+    }
+  },
+  "avertissements": [
+    "Non chargé dans le jeu : asm_rooftop_furniture_chair_01_seat",
+    "Non chargé dans le jeu : asm_rooftop_furniture_chair_02_seat",
+    "Non chargé dans le jeu : asm_rooftop_furniture_chair_03_backbar",
+    "Non chargé dans le jeu : asm_rooftop_furniture_chair_04_seat",
+    "Non chargé dans le jeu : asm_bed_headboard.002",
+    "Aucune fenêtre ou ouverture identifiée pour jimy ; porte-fenêtre disponible séparément si présente.",
+    "Aucune géométrie mesurable de type table identifiée dans cette collection ; aucune entrée fictive ajoutée."
+  ],
+  "meubles": [
+    {
+      "nom": "asm_a4_door_left_HINGE",
+      "type": "porte",
+      "source": "asm_a4_door_left_HINGE",
+      "sources_composants": [
+        "asm_a4_door_left_BAR_0.5",
+        "asm_a4_door_left_BAR_1.0",
+        "asm_a4_door_left_HANDLE"
+      ],
+      "position": [
+        -1.87073,
+        0.478609,
+        -0.602665
+      ],
+      "taille": {
+        "largeur": 1.145866,
+        "hauteur": 0.8385,
+        "profondeur": 0.055001
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        -1.87073,
+        0.897859,
+        -0.602665
+      ],
+      "boite_jeu": {
+        "min": [
+          -2.443663,
+          0.478609,
+          -0.630166
+        ],
+        "max": [
+          -1.297797,
+          1.317109,
+          -0.575165
+        ]
+      },
+      "position_blender": [
+        30.761366,
+        -40.18,
+        -0.527097
+      ],
+      "projection_blender_non_contractuelle": [
+        -1.238634,
+        -0.004097,
+        -0.69
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_04_rooftop",
+      "sol_local_blender_m": 0.847,
+      "notes": [],
+      "position_origine_source": [
+        -1.238819,
+        -0.003891,
+        -0.690168
+      ],
+      "rotation_blender_source": -89.9242
+    },
+    {
+      "nom": "asm_a4_door_right_HINGE",
+      "type": "porte",
+      "source": "asm_a4_door_right_HINGE",
+      "sources_composants": [
+        "asm_a4_door_right_BAR_0.5",
+        "asm_a4_door_right_BAR_1.0",
+        "asm_a4_door_right_HANDLE"
+      ],
+      "position": [
+        1.920737,
+        0.478609,
+        -0.800345
+      ],
+      "taille": {
+        "largeur": 1.145866,
+        "hauteur": 0.8385,
+        "profondeur": 0.055003
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        1.920737,
+        0.897859,
+        -0.800345
+      ],
+      "boite_jeu": {
+        "min": [
+          1.347804,
+          0.478609,
+          -0.827847
+        ],
+        "max": [
+          2.49367,
+          1.317109,
+          -0.772844
+        ]
+      },
+      "position_blender": [
+        33.289009,
+        -39.982323,
+        -0.527097
+      ],
+      "projection_blender_non_contractuelle": [
+        1.289009,
+        -0.004097,
+        -0.887677
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_04_rooftop",
+      "sol_local_blender_m": 0.847,
+      "notes": [],
+      "position_origine_source": [
+        1.288824,
+        -0.003891,
+        -0.887846
+      ],
+      "rotation_blender_source": 89.9242
+    },
+    {
+      "nom": "asm_rooftop_furniture_outdoor_kitchen",
+      "type": "cuisine",
+      "source": "asm_rooftop_furniture_outdoor_kitchen",
+      "sources_composants": [
+        "asm_kitchen_base.001",
+        "asm_kitchen_counter.001",
+        "asm_kitchen_grill",
+        "asm_kitchen_sink.001",
+        "asm_kitchen_woodfront"
+      ],
+      "position": [
+        1.585388,
+        1.312065,
+        -6.48629
+      ],
+      "taille": {
+        "largeur": 2.473743,
+        "hauteur": 1.21,
+        "profondeur": 0.712666
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        1.585388,
+        1.917066,
+        -6.48629
+      ],
+      "boite_jeu": {
+        "min": [
+          0.348516,
+          1.312065,
+          -6.842623
+        ],
+        "max": [
+          2.82226,
+          2.522066,
+          -6.129957
+        ]
+      },
+      "position_blender": [
+        34.047302,
+        -34.480209,
+        0.78886
+      ],
+      "projection_blender_non_contractuelle": [
+        2.047302,
+        1.31186,
+        -6.389791
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_04_rooftop",
+      "sol_local_blender_m": 0.847,
+      "notes": [],
+      "position_origine_source": [
+        2.047116,
+        1.312066,
+        -6.389958
+      ],
+      "rotation_blender_source": 0.0
+    },
+    {
+      "nom": "asm_rooftop_furniture_sofa",
+      "type": "canape",
+      "source": "asm_rooftop_furniture_sofa",
+      "sources_composants": [
+        "asm_sofa_arm.002",
+        "asm_sofa_arm.003",
+        "asm_sofa_back.001",
+        "asm_sofa_base.001"
+      ],
+      "position": [
+        -1.702223,
+        1.482066,
+        -5.094957
+      ],
+      "taille": {
+        "largeur": 1.988415,
+        "hauteur": 1.12,
+        "profondeur": 0.830002
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        -1.702223,
+        2.042066,
+        -5.094957
+      ],
+      "boite_jeu": {
+        "min": [
+          -2.69643,
+          1.482066,
+          -5.509958
+        ],
+        "max": [
+          -0.708015,
+          2.602066,
+          -4.679956
+        ]
+      },
+      "position_blender": [
+        30.297966,
+        -35.780212,
+        0.78886
+      ],
+      "projection_blender_non_contractuelle": [
+        -1.702034,
+        1.31186,
+        -5.089787
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_04_rooftop",
+      "sol_local_blender_m": 0.847,
+      "notes": [],
+      "position_origine_source": [
+        -1.702224,
+        1.312066,
+        -5.089958
+      ],
+      "rotation_blender_source": 0.0,
+      "assise": 1.820356,
+      "assise_sol_local_m": 0.45186,
+      "assise_blender_m": 1.29886,
+      "assise_methode": "rayons verticaux ; bande plane dominante à 1 cm",
+      "assise_sources": [
+        "asm_sofa_arm.002",
+        "asm_sofa_arm.003",
+        "asm_sofa_back.001",
+        "asm_sofa_base.001"
+      ],
+      "assise_confiance": "surface géométrique déduite",
+      "sol_local_jeu_m": null,
+      "face": 0.0082,
+      "face_methode": "dos/tête de lit→centre assise",
+      "places": [
+        [
+          -2.252178,
+          1.820356,
+          -5.094881
+        ],
+        [
+          -1.702179,
+          1.820356,
+          -5.094961
+        ],
+        [
+          -1.15218,
+          1.820356,
+          -5.095041
+        ]
+      ],
+      "places_precision": "centres géométriques d’accueil ; Hips n’est pas un point de peau en contact",
+      "valeur_layout_existante": {
+        "nom": "asm_rooftop_furniture_sofa",
+        "genre": "canape",
+        "loc": [
+          -1.702,
+          4.106
+        ],
+        "face": [
+          -0.0,
+          -1.0
+        ],
+        "dedans": true,
+        "dossier": true,
+        "h": 0.449
+      },
+      "ecart_hauteur_layout_cm": 0.136
+    },
+    {
+      "nom": "asm_furniture_bookshelf.002",
+      "type": "bibliotheque",
+      "source": "asm_furniture_bookshelf.002",
+      "sources_composants": [
+        "asm_book_1_2.002",
+        "asm_book_1_3.002",
+        "asm_book_1_4.002",
+        "asm_book_2_0.002",
+        "asm_book_2_1.002",
+        "asm_book_2_2.002",
+        "asm_book_2_3.002",
+        "asm_book_2_4.002"
+      ],
+      "position": [
+        -1.17563,
+        0.757066,
+        -3.880171
+      ],
+      "taille": {
+        "largeur": 0.631914,
+        "hauteur": 0.67,
+        "profondeur": 0.110001
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        -1.17563,
+        1.092066,
+        -3.880171
+      ],
+      "boite_jeu": {
+        "min": [
+          -1.491587,
+          0.757066,
+          -3.935171
+        ],
+        "max": [
+          -0.859673,
+          1.427066,
+          -3.825171
+        ]
+      },
+      "position_blender": [
+        30.824558,
+        -36.849998,
+        -0.50114
+      ],
+      "projection_blender_non_contractuelle": [
+        -1.175442,
+        0.02186,
+        -4.020001
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_04_rooftop",
+      "sol_local_blender_m": 0.847,
+      "notes": [],
+      "position_origine_source": [
+        -1.175629,
+        0.022066,
+        -4.02017
+      ],
+      "rotation_blender_source": 0.0
+    },
+    {
+      "nom": "asm_furniture_bed.001",
+      "type": "lit",
+      "source": "asm_furniture_bed.001",
+      "sources_composants": [
+        "asm_bed_frame.001",
+        "asm_bed_mattress.001",
+        "asm_bed_pillow1.001",
+        "asm_bed_pillow2.001"
+      ],
+      "position": [
+        2.080303,
+        1.375388,
+        -2.815569
+      ],
+      "taille": {
+        "largeur": 1.968605,
+        "hauteur": 0.675,
+        "profondeur": 2.050003
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        2.080303,
+        1.712888,
+        -2.815569
+      ],
+      "boite_jeu": {
+        "min": [
+          1.096001,
+          1.375388,
+          -3.84057
+        ],
+        "max": [
+          3.064606,
+          2.050388,
+          -1.790567
+        ]
+      },
+      "position_blender": [
+        17.808102,
+        -37.0,
+        -0.50114
+      ],
+      "projection_blender_non_contractuelle": [
+        -14.191898,
+        0.02186,
+        -3.87
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_04_rooftop",
+      "sol_local_blender_m": 0.847,
+      "notes": [
+        "Origine source très éloignée de la géométrie : utiliser position/places, pas position_origine_source."
+      ],
+      "position_origine_source": [
+        -14.192083,
+        0.022066,
+        -3.870169
+      ],
+      "rotation_blender_source": 0.0,
+      "assise": 1.880388,
+      "assise_sol_local_m": 0.510183,
+      "assise_blender_m": 1.357183,
+      "assise_methode": "dessus du composant explicitement nommé",
+      "assise_sources": [
+        "asm_bed_mattress.001"
+      ],
+      "assise_confiance": "composant identifié",
+      "sol_local_jeu_m": null,
+      "face": 0.0,
+      "face_methode": "avant -Y Blender par défaut ; vérifier si mobilier symétrique",
+      "places": [
+        [
+          2.080303,
+          1.880388,
+          -2.815569
+        ]
+      ],
+      "places_precision": "centres géométriques d’accueil ; Hips n’est pas un point de peau en contact",
+      "matelas_taille_m": {
+        "largeur": 1.849297,
+        "profondeur": 1.919998
+      },
+      "direction_tete_lit_deg": 180.0,
+      "valeur_layout_existante": {
+        "nom": "asm_furniture_bed.001",
+        "loc": [
+          2.08,
+          1.851
+        ],
+        "tete": null,
+        "h": 0.51
+      },
+      "ecart_hauteur_layout_cm": 0.039
+    },
+    {
+      "nom": "asm_rooftop_furniture_chair_01_seat",
+      "type": "chaise",
+      "source": "asm_rooftop_furniture_chair_01_seat",
+      "sources_composants": [
+        "asm_rooftop_furniture_chair_01_backbar",
+        "asm_rooftop_furniture_chair_01_backbar.001",
+        "asm_rooftop_furniture_chair_01_backbar.002",
+        "asm_rooftop_furniture_chair_01_backpost",
+        "asm_rooftop_furniture_chair_01_backpost.001",
+        "asm_rooftop_furniture_chair_01_leg",
+        "asm_rooftop_furniture_chair_01_leg.001",
+        "asm_rooftop_furniture_chair_01_leg.002",
+        "asm_rooftop_furniture_chair_01_leg.003",
+        "asm_rooftop_furniture_chair_01_seat"
+      ],
+      "position": null,
+      "taille": {
+        "largeur": 0.48,
+        "hauteur": 1.27,
+        "profondeur": 0.48
+      },
+      "rotation": 0.0,
+      "position_centre_boite": null,
+      "boite_jeu": null,
+      "position_blender": [
+        0.0,
+        0.0,
+        0.48
+      ],
+      "projection_blender_non_contractuelle": [
+        -32.0,
+        1.003,
+        -40.869999
+      ],
+      "present_dans_jeu": false,
+      "groupe_jeu": null,
+      "sol_local_blender_m": 0.0,
+      "notes": [
+        "Absent des groupes GLB chargés par ce layout ; position jeu non définie. La projection Blender n’est pas une position effectivement utilisée."
+      ],
+      "position_origine_source": null,
+      "rotation_blender_source": 0.0,
+      "assise": null,
+      "assise_sol_local_m": 0.53,
+      "assise_blender_m": 0.53,
+      "assise_methode": "dessus du composant explicitement nommé",
+      "assise_sources": [
+        "asm_rooftop_furniture_chair_01_seat"
+      ],
+      "assise_confiance": "composant identifié",
+      "sol_local_jeu_m": null,
+      "face": 0.0,
+      "face_methode": "dos/tête de lit→centre assise",
+      "places": [],
+      "places_precision": "centres géométriques d’accueil ; Hips n’est pas un point de peau en contact"
+    },
+    {
+      "nom": "asm_rooftop_furniture_chair_02_seat",
+      "type": "chaise",
+      "source": "asm_rooftop_furniture_chair_02_seat",
+      "sources_composants": [
+        "asm_rooftop_furniture_chair_02_backbar",
+        "asm_rooftop_furniture_chair_02_backbar.001",
+        "asm_rooftop_furniture_chair_02_backbar.002",
+        "asm_rooftop_furniture_chair_02_backpost",
+        "asm_rooftop_furniture_chair_02_backpost.001",
+        "asm_rooftop_furniture_chair_02_leg",
+        "asm_rooftop_furniture_chair_02_leg.001",
+        "asm_rooftop_furniture_chair_02_leg.002",
+        "asm_rooftop_furniture_chair_02_leg.003",
+        "asm_rooftop_furniture_chair_02_seat"
+      ],
+      "position": null,
+      "taille": {
+        "largeur": 0.48,
+        "hauteur": 1.27,
+        "profondeur": 0.48
+      },
+      "rotation": 0.0,
+      "position_centre_boite": null,
+      "boite_jeu": null,
+      "position_blender": [
+        0.0,
+        0.0,
+        0.48
+      ],
+      "projection_blender_non_contractuelle": [
+        -32.0,
+        1.003,
+        -40.869999
+      ],
+      "present_dans_jeu": false,
+      "groupe_jeu": null,
+      "sol_local_blender_m": 0.0,
+      "notes": [
+        "Absent des groupes GLB chargés par ce layout ; position jeu non définie. La projection Blender n’est pas une position effectivement utilisée."
+      ],
+      "position_origine_source": null,
+      "rotation_blender_source": 0.0,
+      "assise": null,
+      "assise_sol_local_m": 0.53,
+      "assise_blender_m": 0.53,
+      "assise_methode": "dessus du composant explicitement nommé",
+      "assise_sources": [
+        "asm_rooftop_furniture_chair_02_seat"
+      ],
+      "assise_confiance": "composant identifié",
+      "sol_local_jeu_m": null,
+      "face": 0.0,
+      "face_methode": "dos/tête de lit→centre assise",
+      "places": [],
+      "places_precision": "centres géométriques d’accueil ; Hips n’est pas un point de peau en contact"
+    },
+    {
+      "nom": "asm_rooftop_furniture_chair_03_backbar",
+      "type": "chaise",
+      "source": "asm_rooftop_furniture_chair_03_backbar",
+      "sources_composants": [
+        "asm_rooftop_furniture_chair_03_backbar",
+        "asm_rooftop_furniture_chair_03_backbar.001",
+        "asm_rooftop_furniture_chair_03_backbar.002",
+        "asm_rooftop_furniture_chair_03_backpost",
+        "asm_rooftop_furniture_chair_03_backpost.001",
+        "asm_rooftop_furniture_chair_03_leg",
+        "asm_rooftop_furniture_chair_03_leg.001",
+        "asm_rooftop_furniture_chair_03_leg.002",
+        "asm_rooftop_furniture_chair_03_leg.003"
+      ],
+      "position": null,
+      "taille": {
+        "largeur": 0.43,
+        "hauteur": 1.27,
+        "profondeur": 0.44
+      },
+      "rotation": 0.0,
+      "position_centre_boite": null,
+      "boite_jeu": null,
+      "position_blender": [
+        0.0,
+        0.2,
+        0.76
+      ],
+      "projection_blender_non_contractuelle": [
+        -32.0,
+        1.283,
+        -41.07
+      ],
+      "present_dans_jeu": false,
+      "groupe_jeu": null,
+      "sol_local_blender_m": 0.0,
+      "notes": [
+        "Absent des groupes GLB chargés par ce layout ; position jeu non définie. La projection Blender n’est pas une position effectivement utilisée.",
+        "Assise manquante parmi les morceaux de chaise."
+      ],
+      "position_origine_source": null,
+      "rotation_blender_source": 0.0,
+      "assise": null,
+      "face": null,
+      "places": []
+    },
+    {
+      "nom": "asm_rooftop_furniture_chair_04_seat",
+      "type": "chaise",
+      "source": "asm_rooftop_furniture_chair_04_seat",
+      "sources_composants": [
+        "asm_rooftop_furniture_chair_04_backbar",
+        "asm_rooftop_furniture_chair_04_backbar.001",
+        "asm_rooftop_furniture_chair_04_backbar.002",
+        "asm_rooftop_furniture_chair_04_backpost",
+        "asm_rooftop_furniture_chair_04_backpost.001",
+        "asm_rooftop_furniture_chair_04_leg",
+        "asm_rooftop_furniture_chair_04_leg.001",
+        "asm_rooftop_furniture_chair_04_leg.002",
+        "asm_rooftop_furniture_chair_04_leg.003",
+        "asm_rooftop_furniture_chair_04_seat"
+      ],
+      "position": null,
+      "taille": {
+        "largeur": 0.48,
+        "hauteur": 1.27,
+        "profondeur": 0.48
+      },
+      "rotation": 0.0,
+      "position_centre_boite": null,
+      "boite_jeu": null,
+      "position_blender": [
+        0.0,
+        0.0,
+        0.48
+      ],
+      "projection_blender_non_contractuelle": [
+        -32.0,
+        1.003,
+        -40.869999
+      ],
+      "present_dans_jeu": false,
+      "groupe_jeu": null,
+      "sol_local_blender_m": 0.0,
+      "notes": [
+        "Absent des groupes GLB chargés par ce layout ; position jeu non définie. La projection Blender n’est pas une position effectivement utilisée."
+      ],
+      "position_origine_source": null,
+      "rotation_blender_source": 0.0,
+      "assise": null,
+      "assise_sol_local_m": 0.53,
+      "assise_blender_m": 0.53,
+      "assise_methode": "dessus du composant explicitement nommé",
+      "assise_sources": [
+        "asm_rooftop_furniture_chair_04_seat"
+      ],
+      "assise_confiance": "composant identifié",
+      "sol_local_jeu_m": null,
+      "face": 0.0,
+      "face_methode": "dos/tête de lit→centre assise",
+      "places": [],
+      "places_precision": "centres géométriques d’accueil ; Hips n’est pas un point de peau en contact"
+    },
+    {
+      "nom": "asm_rooftop_rug",
+      "type": "autre",
+      "source": "asm_rooftop_rug",
+      "sources_composants": [
+        "asm_rooftop_rug"
+      ],
+      "position": [
+        -1.533712,
+        1.424566,
+        -4.389959
+      ],
+      "taille": {
+        "largeur": 2.44339,
+        "hauteur": 0.025,
+        "profondeur": 2.050003
+      },
+      "rotation": 0.0,
+      "position_centre_boite": [
+        -1.533712,
+        1.437066,
+        -4.389959
+      ],
+      "boite_jeu": {
+        "min": [
+          -2.755407,
+          1.424566,
+          -5.414961
+        ],
+        "max": [
+          -0.312017,
+          1.449566,
+          -3.364958
+        ]
+      },
+      "position_blender": [
+        30.466475,
+        -36.480209,
+        0.91386
+      ],
+      "projection_blender_non_contractuelle": [
+        -1.533525,
+        1.43686,
+        -4.389791
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_04_rooftop",
+      "sol_local_blender_m": 0.847,
+      "notes": [],
+      "position_origine_source": [
+        -1.533713,
+        1.437066,
+        -4.389958
+      ],
+      "rotation_blender_source": 0.0
+    },
+    {
+      "nom": "asm_bed_headboard.002",
+      "type": "lit",
+      "source": "asm_bed_headboard.002",
+      "sources_composants": [
+        "asm_bed_headboard.002"
+      ],
+      "position": null,
+      "taille": {
+        "largeur": 1.65,
+        "hauteur": 1.15,
+        "profondeur": 0.12
+      },
+      "rotation": 0.0,
+      "position_centre_boite": null,
+      "boite_jeu": null,
+      "position_blender": [
+        0.0,
+        0.96,
+        0.785
+      ],
+      "projection_blender_non_contractuelle": [
+        -32.0,
+        1.308,
+        -41.830002
+      ],
+      "present_dans_jeu": false,
+      "groupe_jeu": null,
+      "sol_local_blender_m": 0.21,
+      "notes": [
+        "Absent des groupes GLB chargés par ce layout ; position jeu non définie. La projection Blender n’est pas une position effectivement utilisée.",
+        "Aucune surface plane fiable identifiée."
+      ],
+      "position_origine_source": null,
+      "rotation_blender_source": 0.0,
+      "assise": null,
+      "face": null,
+      "places": []
+    },
+    {
+      "nom": "peinture-jimy",
+      "type": "tableau",
+      "source": "peinture-jimy",
+      "sources_composants": [
+        "peinture-jimy"
+      ],
+      "position": [
+        -0.256789,
+        2.944903,
+        -6.291309
+      ],
+      "taille": {
+        "largeur": 0.979368,
+        "hauteur": 1.354092,
+        "profondeur": 0.21413
+      },
+      "rotation": 180.0,
+      "position_centre_boite": [
+        -0.256789,
+        3.621949,
+        -6.291309
+      ],
+      "boite_jeu": {
+        "min": [
+          -0.746473,
+          2.944903,
+          -6.398375
+        ],
+        "max": [
+          0.232895,
+          4.298995,
+          -6.184244
+        ]
+      },
+      "position_blender": [
+        31.741781,
+        -34.593773,
+        3.089707
+      ],
+      "projection_blender_non_contractuelle": [
+        -0.258219,
+        3.612707,
+        -6.276227
+      ],
+      "present_dans_jeu": true,
+      "groupe_jeu": "apartment_04_rooftop",
+      "sol_local_blender_m": 0.847,
+      "notes": [],
+      "position_origine_source": [
+        -0.258404,
+        3.612913,
+        -6.276396
+      ],
+      "rotation_blender_source": 0.0,
+      "hauteur_centre": 3.621949,
+      "hauteur_centre_sol_local_m": 2.251743,
+      "valeur_layout_existante": {
+        "nom": "peinture-jimy",
+        "loc": [
+          -0.257,
+          5.421
+        ],
+        "normale": [
+          0,
+          -1
+        ],
+        "taille": [
+          0.98,
+          1.35
+        ],
+        "h": 2.252
+      },
+      "ecart_hauteur_layout_cm": -0.005
+    }
+  ]
+}
