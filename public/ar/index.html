@@ -49,19 +49,19 @@
   <div class="carte">
     <div class="scene"><model-viewer id="lea" src="lea.glb" ios-src="lea.usdz" alt="Léa" ar ar-modes="scene-viewer quick-look webxr" ar-scale="auto" autoplay disable-zoom auto-rotate shadow-intensity="1" exposure="1.05" camera-orbit="0deg 84deg 4.9m" camera-target="0m 0.95m 0m" loading="eager"></model-viewer><span class="astuce"><span class="en">👆 Tap to turn it</span><span class="fr">👆 Touche pour le tourner</span></span></div>
     <h2>Léa</h2><p><span class="en">The balcony gardener of the 3rd floor.</span><span class="fr">La jardinière du troisième étage.</span></p>
-    <button class="bouton" onclick="document.getElementById('lea').activateAR()">📱 <span class="en">View in your space</span><span class="fr">Voir chez toi</span></button>
+    <button class="bouton" onclick="ouvrirAR('lea', event)">📱 <span class="en">View in your space</span><span class="fr">Voir chez toi</span></button>
     <button class="bouton anim" data-pour="lea" onclick="basculerAnim('lea', this)">🎬 <span class="en">Animation: ON</span><span class="fr">Animation : ON</span></button>
   </div>
   <div class="carte">
     <div class="scene"><model-viewer id="jimy" src="jimy.glb" ios-src="jimy.usdz" alt="Jimy" ar ar-modes="scene-viewer quick-look webxr" ar-scale="auto" autoplay disable-zoom auto-rotate shadow-intensity="1" exposure="1.05" camera-orbit="0deg 84deg 4.9m" camera-target="0m 0.95m 0m"></model-viewer><span class="astuce"><span class="en">👆 Tap to turn it</span><span class="fr">👆 Touche pour le tourner</span></span></div>
     <h2>Jimy</h2><p><span class="en">Reggae and tomatoes on the rooftop.</span><span class="fr">Reggae et tomates sur le toit.</span></p>
-    <button class="bouton" onclick="document.getElementById('jimy').activateAR()">📱 <span class="en">View in your space</span><span class="fr">Voir chez toi</span></button>
+    <button class="bouton" onclick="ouvrirAR('jimy', event)">📱 <span class="en">View in your space</span><span class="fr">Voir chez toi</span></button>
     <button class="bouton anim" data-pour="jimy" onclick="basculerAnim('jimy', this)">🎬 <span class="en">Animation: ON</span><span class="fr">Animation : ON</span></button>
   </div>
   <div class="carte">
     <div class="scene"><model-viewer id="marcel" src="marcel.glb" ios-src="marcel.usdz" alt="Marcel" ar ar-modes="scene-viewer quick-look webxr" ar-scale="auto" autoplay disable-zoom auto-rotate shadow-intensity="1" exposure="1.05" camera-orbit="0deg 84deg 4.9m" camera-target="0m 0.95m 0m"></model-viewer><span class="astuce"><span class="en">👆 Tap to turn it</span><span class="fr">👆 Touche pour le tourner</span></span></div>
     <h2>Marcel</h2><p><span class="en">The retired neighbour who cooks for everyone.</span><span class="fr">Le voisin retraité qui cuisine pour tout le monde.</span></p>
-    <button class="bouton" onclick="document.getElementById('marcel').activateAR()">📱 <span class="en">View in your space</span><span class="fr">Voir chez toi</span></button>
+    <button class="bouton" onclick="ouvrirAR('marcel', event)">📱 <span class="en">View in your space</span><span class="fr">Voir chez toi</span></button>
     <button class="bouton anim" data-pour="marcel" onclick="basculerAnim('marcel', this)">🎬 <span class="en">Animation: ON</span><span class="fr">Animation : ON</span></button>
   </div>
 </div>
@@ -83,11 +83,15 @@
       mv.setAttribute('ios-src', u || who + '.usdz');
     }
   };
+  // « Voir chez toi » : la réalité augmentée s'ouvre directement, sans sélectionner le personnage.
+  // Sur iPhone, si l'ouverture par le visualiseur échoue, on ouvre le fichier USDZ lui-même (Safari l'affiche en AR).
+  window.ouvrirAR = (who, e) => { if (e) e.stopPropagation(); const mv = document.getElementById(who);
+    try { mv.activateAR(); } catch (err) { const u = mv.getAttribute('ios-src'); if (u && /iPhone|iPad/.test(navigator.userAgent)) location.href = u; } };
   // toucher un personnage : on peut le tourner (et seulement lui) ; toucher ailleurs : la page défile normalement
   const scenes = [...document.querySelectorAll('.scene')];
   const activer = sc => scenes.forEach(x => { const on = x === sc; x.classList.toggle('actif', on); x.querySelector('model-viewer').cameraControls = on; });
   scenes.forEach(sc => sc.addEventListener('click', e => { if (!sc.classList.contains('actif')) { e.preventDefault(); activer(sc); } }));
-  document.addEventListener('click', e => { if (!e.target.closest('.scene')) activer(null); });
+  document.addEventListener('click', e => { if (!e.target.closest('.scene, button')) activer(null); });
   // revenir au jeu : le bouton, ou un geste sur téléphone (glisser vers la droite, ou tirer vers le bas tout en haut de la page)
   const versLeJeu = () => { try { if (document.referrer && new URL(document.referrer).origin === location.origin) { history.back(); return; } } catch (e) {} location.href = '/'; };
   document.getElementById('retour').onclick = versLeJeu;
