@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+﻿import * as THREE from 'three';
 
 // Tout est dessiné à la volée (canvas), aucun fichier. Les sprites vivent loin derrière le décor.
 function canvas(w: number, h: number, draw: (c: CanvasRenderingContext2D, w: number, h: number) => void): THREE.CanvasTexture {
@@ -81,7 +81,7 @@ export class SkyLife {
     this.plane = new Flyer(this.group, planeTex, 6, 1.9); this.trail = sprite(trailTex, 40, 1.2, .7); this.trail.visible = false; this.group.add(this.trail);
     this.balloon = sprite(balloonTex, 4.2, 7); this.balloon.position.set(52, horizonY + 14, -95); this.group.add(this.balloon);
     this.gag = new Flyer(this.group, gagTex, 7, 1.75);
-    this.loadGagImage();
+    // (chat en traineau retire du ciel)
   }
 
   /** Si tu déposes ui/gag_chat_traineau.png (fond vert), elle remplace la silhouette en emojis. */
@@ -124,7 +124,7 @@ export class SkyLife {
     (this.plane.s.material as THREE.SpriteMaterial).opacity = 1 - .6 * night;
     // le gag : très rarement, une silhouette qui glisse le long des toits lointains
     this.gagTimer -= dt;
-    if (this.gagTimer <= 0 && night < .5) { this.gagTimer = 70 + this.rng() * 60; const y = this.horizonY + 1.2; this.gag.start(new THREE.Vector3(60, y, -58), new THREE.Vector3(-60, y, -58), 40); }
+    if (false /* chat en traineau retire */ && this.gagTimer <= 0 && night < .5) { this.gagTimer = 70 + this.rng() * 60; const y = this.horizonY + 1.2; this.gag.start(new THREE.Vector3(60, y, -58), new THREE.Vector3(-60, y, -58), 40); }
     this.gag.update(dt, .06);
   }
 }

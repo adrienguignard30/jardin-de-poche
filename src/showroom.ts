@@ -146,38 +146,17 @@ export class Showroom {
     this.demande = ''; clearTimeout(this.danseTimer); void this.trajets();
   }
   private async trajets() {
-    if (this.enRoute || this.focused) return;
-    this.enRoute = true; const epoch = this.routeEpoch;
-    const phase = async (points: THREE.Vector3[]) => {
-      await Promise.all(this.chars.map((c, i) => c.char.goTo(points[i], 0)));
-      return epoch === this.routeEpoch;
-    };
+    if (this.focused) return;
+    const epoch = ++this.routeEpoch, id = this.demande;
+    this.demande = null; this.route = []; this.enRoute = true;
+    // Chaque personnage garde sa colonne : changement immédiat, sans permutation.
+    for (const c of this.chars) c.char.annulerMarche();
     try {
-      while (this.demande !== null && epoch === this.routeEpoch) {
-        const id = this.demande; this.demande = null;
-        for (const c of this.chars) c.char.play('idle', .25);
-        // Revenir par le même itinéraire avant une nouvelle permutation.
-        for (let i = this.route.length - 2; i >= 0; i--) if (!await phase(this.route[i])) return;
-        this.route = [];
-        if (!id) { await phase(this.chars.map(c => c.base.clone())); continue; }
-        const index = this.chars.findIndex(c => c.def.id === id), g = this.portrait ? 1.15 : 1.5;
-        const v = (x: number, z: number) => new THREE.Vector3(x, 0, z);
-        const base = [v(-1.55, 0), v(0, 0), v(1.55, 0)];
-        if (!await phase(base)) return; this.route.push(base);
-        const phases = index === 0
-          ? [[v(-1.55, 1.5), v(0, -1.5), v(1.55, 0)], [v(0, 1.5), v(-g, -1.5), v(g, -.35)], [v(0, .75), v(-g, -.35), v(g, -.35)]]
-          : index === 2
-          ? [[v(-1.55, 0), v(0, -1.5), v(1.55, 1.5)], [v(-g, -.35), v(g, -1.5), v(0, 1.5)], [v(-g, -.35), v(g, -.35), v(0, .75)]]
-          : [[v(-1.55, 0), v(0, 1.5), v(1.55, 0)], [v(-g, -.35), v(0, 1.5), v(g, -.35)], [v(-g, -.35), v(0, .75), v(g, -.35)]];
-        for (const p of phases) { if (!await phase(p)) return; this.route.push(p); }
-        if (this.demande === null && this.selected === id) {
-          const c = this.chars[index].char; this.dancing = id;
-          // Sur portrait, les marges de la danse sont trop larges pour les voisins.
-          c.play(this.portrait ? 'idle' : this.chars[index].def.id === 'lea' ? 'dance' : c.variantes('dance').find(n => n !== 'dance') ?? 'idle', .3);
-          this.danseTimer = setTimeout(() => { if (this.dancing === id) { this.dancing = ''; c.play('idle', .5); } }, 6500);
-        }
-      }
-    } finally { this.enRoute = false; if (this.demande !== null && !this.focused) void this.trajets(); }
+      await Promise.all(this.chars.map(c => c.char.goTo(
+        new THREE.Vector3(c.base.x, 0, c.def.id === id ? .4 : 0), 0)));
+      if (epoch !== this.routeEpoch) return;
+      for (const c of this.chars) c.char.play('idle', .4);
+    } finally { if (epoch === this.routeEpoch) this.enRoute = false; }
   }
   sheetOpen = false;
   private lookAt(c: { char: Character }, target: THREE.Vector3, dt: number) {

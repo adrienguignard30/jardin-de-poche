@@ -1,4 +1,5 @@
-import { t, tx, lang, setLang, fmtTime, type Lang } from './i18n';
+﻿import { t, tx, lang, setLang, fmtTime, type Lang } from './i18n';
+import { remplirClassement, STYLE_CLASSEMENT } from './classement';
 import { CATALOG, ECO, type GameState, type CharacterDef, type Perso } from './state';
 import * as E from './economie';
 import { MUSIQUE } from './musique';
@@ -53,6 +54,7 @@ const LISIBLE = 'color:#24313a;background:rgba(36,49,58,.08);border:1px solid rg
 const el = <T extends HTMLElement = HTMLElement>(tag: string, cls = '', html = '') => { const e = document.createElement(tag) as T; if (cls) e.className = cls; if (html) e.innerHTML = html; return e; };
 
 const STYLE_PANIER = `
+${STYLE_CLASSEMENT}
 /* ===== le chargement : un croquis du balcon qui se dessine en boucle, des pousses qui grandissent ===== */
 #loading .croquis { width: min(320px, 70vw); height: auto; color: #6b4f2a; margin: 6px auto 10px; display: block; opacity: .9; }
 #loading .croquis .t { stroke-dasharray: 1200; stroke-dashoffset: 1200; animation: dessine 7s linear infinite; }
@@ -206,6 +208,14 @@ export class UI {
     const maj = () => { e.textContent = mots[Math.floor(Date.now() / 2500) % mots.length]; };
     maj(); clearInterval(this.motsT); this.motsT = window.setInterval(maj, 2500);
   }
+  /** Le classement, depuis l'accueil (même contenu que l'appli du téléphone). */
+  ouvrirClassement() {
+    const c = el('div', 'fenClassement'); c.appendChild(el('h2', '', `🏆 ${t().classementT}`));
+    const zone = el('div', ''); c.appendChild(zone); remplirClassement(zone);
+    this.modal(c, true);
+    const echap = (e: KeyboardEvent) => { if (e.key === 'Escape') { this.fermerModal(); removeEventListener('keydown', echap); } };   // Échap ferme aussi
+    addEventListener('keydown', echap);
+  }
   /** L'entrée dans une partie : le croquis par-dessus l'accueil, le temps que la maison se construise. */
   chantier(on: boolean, nom = '') {
     const l = $('#loading');
@@ -214,8 +224,9 @@ export class UI {
   }
   private hasSave = false;
   private savedCharName = '';
-  showStart(hasSave: boolean, savedCharName = '') {
+  showStart(hasSave: boolean, savedCharName = '', savedCharId = '') {
     this.hasSave = hasSave; this.savedCharName = savedCharName;
+    if (savedCharId) this.chosen = savedCharId;
     $('#loading').classList.add('hidden');
     $('#start').classList.remove('hidden');
     // rien du jeu ne reste à l'écran : ni guide, ni bulles, ni cartes, ni téléphone
@@ -265,9 +276,12 @@ export class UI {
     if (!d) { d = el<HTMLButtonElement>('button', 'demoBtn'); d.id = 'demoBtn'; $('#start').appendChild(d); }
     d.className = 'demoBtn' + (demo ? ' active' : ''); d.textContent = demo ? s.demoOn : s.demoJury; d.title = s.demoOff;
     d.onclick = () => { const u = new URL(location.href); if (demo) u.searchParams.delete('demo'); else u.searchParams.set('demo', '1'); location.href = u.toString(); };
+    const boutonClassement = () => { const c = el('button', 'btnClassementAccueil', `🏆 ${s.classementT}`); c.onclick = () => this.ouvrirClassement(); return c; };
     if (hasSave) {                                                      // la règle des jeux : « Continuer » toujours en premier
       const b = el('button', 'primary vert', `▶ ${s.continueWith(this.savedCharName || s.continue_)}`); agir(b, () => this.h.onContinue()); body.appendChild(b);
       body.appendChild(el('p', 'hint', s.ouAutrePerso));
+      body.appendChild(boutonClassement());
+      this.majChoixAccueil(this.chosen);
       return;
     }
     body.appendChild(el('p', 'hint', s.chooseTouch));
@@ -278,6 +292,8 @@ export class UI {
     go.onclick = () => { const c = CATALOG.characters.find(x => x.id === this.chosen)!; this.h.onStart(this.chosen, nameInput.value.trim(), this.perso[this.chosen] ?? { prenom: nameInput.value.trim() || tx(c.name), age: c.age, metier: tx(c.job), couleurs: {} }); };
     row.append(nameInput, go);
     body.appendChild(row);
+    body.appendChild(boutonClassement());
+    if (this.sheetId) this.majChoixAccueil(this.chosen);
   }
   /** Fiche d'un personnage, ouverte quand on le touche sur l'accueil. */
   private sheetId = '';
@@ -306,7 +322,7 @@ export class UI {
     const infoM = el('p', 'small aideChamp', `${s.mdpAide} <b class="cpt">0/8</b>`);
     const err = el('p', 'small warn', '');
     const go = el('button', 'primary', s.creerBtn);
-    c.append(ps, infoP, mdp, infoM, err, go);
+    const oeil = el<HTMLButtonElement>("button", "oeilMdp", "\u{1F441}"); oeil.type = "button"; oeil.setAttribute("aria-label", "afficher le mot de passe"); oeil.onclick = () => { const voir = mdp.type === "password"; mdp.type = voir ? "text" : "password"; oeil.textContent = voir ? "\u{1F648}" : "\u{1F441}"; mdp.focus(); }; const champMdp = el("div", "champMdp"); champMdp.append(mdp, oeil); if (!document.getElementById("styleMdp")) { const st = document.createElement("style"); st.id = "styleMdp"; st.textContent = ".champMdp { position: relative; width: 100%; } .champMdp .champ { padding-right: 50px !important; box-sizing: border-box; } .champMdp .oeilMdp { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border: 0; border-radius: 10px; background: transparent; font-size: 20px; line-height: 1; cursor: pointer; padding: 0; } .champMdp .oeilMdp:hover { background: rgba(36,49,58,.06); }"; document.head.appendChild(st); } c.append(ps, infoP, champMdp, infoM, err, go);
     const choisir = (m: 'creer' | 'connecter') => { mode = m; o1.classList.toggle('on', m === 'creer'); o2.classList.toggle('on', m === 'connecter'); go.textContent = m === 'creer' ? s.creerBtn : s.connecterBtn; mdp.autocomplete = m === 'creer' ? 'new-password' : 'current-password'; infoP.textContent = s.pseudoAide; err.textContent = ''; };
     o1.onclick = () => choisir('creer'); o2.onclick = () => choisir('connecter');
     let t0 = 0;
@@ -356,6 +372,7 @@ export class UI {
   showSheet(id: string) {
     const c = CATALOG.characters.find(x => x.id === id); if (!c) return;
     this.sheetId = id; this.chosen = id;
+    this.majChoixAccueil(id);
     const s = t();
     const sh = $('#sheet'); sh.classList.remove('perso');
     const line = (k: string, v: string) => v ? `<div class="fl"><span>${k}</span><b>${v}</b></div>` : '';
@@ -373,6 +390,17 @@ export class UI {
     sh.classList.remove('hidden');
     if (window.innerWidth < 640 || window.innerHeight > window.innerWidth) $('#startBody').classList.add('hidden');
     this.h.onSheet(true);
+  }
+  /** Le bouton du bas suit le choix courant, même quand une autre partie existe. */
+  private majChoixAccueil(id: string) {
+    const c = CATALOG.characters.find(x => x.id === id); if (!c) return;
+    const s = t(), nom = this.perso[id]?.prenom || tx(c.name), reprise = !!this.parties[id];
+    const body = $('#startBody');
+    const classement = body.querySelector('.btnClassementAccueil');
+    const bouton = el('button', 'primary vert', reprise ? `▶ ${s.continueWith(nom)}` : `🌱 ${s.jouerAvec(nom)}`);
+    agir(bouton, () => reprise ? this.h.onContinue(id) : this.lancer(id));
+    body.replaceChildren(bouton, el('p', 'hint', s.ouAutrePerso));
+    if (classement) body.appendChild(classement);
   }
   private lancer(id: string) {
     const s = t(), c = CATALOG.characters.find(x => x.id === id)!;

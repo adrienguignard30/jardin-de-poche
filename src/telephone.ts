@@ -4,6 +4,7 @@ import * as E from './economie';
 import { t, tx, lang, quantite } from './i18n';
 import { MUSIQUE } from './musique';
 import * as EL from './enligne';
+import { remplirClassement } from './classement';
 import { icon } from './ui';
 
 export type Onglet = 'home' | 'panier' | 'classement' | 'jeu' | 'recette' | 'marche' | 'bourse' | 'boutique' | 'carnet' | 'recus' | 'voisins' | 'notifs' | 'musique' | 'reglages';
@@ -181,21 +182,7 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
     }
     return;
   }
-  if (onglet === 'classement') {                                          // les meilleurs de l'immeuble… du monde
-    if (!EL.EN_LIGNE) { c.appendChild(el('p', 'small', s.classementHorsLigne)); return; }
-    const cats: [EL.Categorie, string][] = [['trocs', s.catTrocs], ['recoltes', s.catRecoltes], ['offerts', s.catOfferts], ['recus', s.catRecus]];
-    const choix = (window as any).__catClassement as EL.Categorie ?? 'trocs';
-    const onglets = el('div', 'ongletsClassement');
-    for (const [k, nom] of cats) { const b = el('button', 'og' + (k === choix ? ' on' : ''), nom); b.onclick = () => { (window as any).__catClassement = k; h.onApp('classement'); }; onglets.appendChild(b); }
-    c.appendChild(onglets);
-    const liste = el('div', 'listeClassement', `<p class="small">…</p>`); c.appendChild(liste);
-    EL.classement(choix).then(rangs => {
-      liste.innerHTML = '';
-      if (!rangs.length) { liste.appendChild(el('p', 'small', s.classementVide)); return; }
-      for (const r of rangs) liste.appendChild(el('div', 'row rang' + (r.moi ? ' moi' : ''), `<span class="n">${r.rang <= 3 ? ['🥇', '🥈', '🥉'][r.rang - 1] : r.rang}</span><span class="nom">${r.nom.replace(/[<>&]/g, '')}${r.moi ? ` <i>(${s.toi})</i>` : ''}</span><b>${r.score}</b>`));
-    });
-    return;
-  }
+  if (onglet === 'classement') { remplirClassement(c); return; }        // podium, liste, ta place (classement.ts)
   if (onglet === 'panier') {                                              // ce qu'il y a dans le panier, en images
     const items = Object.entries(j.panier).filter(([, q]) => q > 0).sort((a, b) => b[1] - a[1]);
     const re = j.recette && !j.recette.faite ? CATALOG_RECETTE(j.recette.recette) : undefined;

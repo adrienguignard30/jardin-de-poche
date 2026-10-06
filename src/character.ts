@@ -60,10 +60,15 @@ export class Character {
     return (this._axeHaut = axeVerticalDuBassin(this.obj));
   }
   /** Garde une animation sur place : on retire l'avancée horizontale du bassin (danse qui dérive, téléphone en marchant). */
+  private trajetsHanches = new Map<string, { temps: number[]; valeurs: number[] }>();
   private pinInPlace(name: string) {
     const a = this.actions.get(name); if (!a) return;
     const clip = a.getClip();
     if (PINNED.has(clip)) return;
+    if (/^(sit_down|stand_up)$/.test(name)) {
+      const t = clip.tracks.find(t => /hips\.position$/i.test(t.name));
+      if (t) this.trajetsHanches.set(name, { temps: Array.from(t.times), valeurs: Array.from(t.values) });
+    }
     for (const t of clip.tracks) {
       if (!/hips\.position$/i.test(t.name)) continue;
       const v = t.values, n = v.length / 3;
@@ -95,6 +100,7 @@ export class Character {
     }
     const len = Math.max(.6, g.fin - g.debut);
     if (this.deLaBibliotheque && /^(plant|harvest|pickup|water)$/.test(name)) this.fixerAppuis();
+    this.raccorderPose(.35);
     this.dernierGeste = name; this.appuisFin = 0;
     a.reset().setLoop(THREE.LoopOnce, 1);
     a.clampWhenFinished = true;
@@ -104,11 +110,11 @@ export class Character {
     if (this.current && this.current !== a) this.current.fadeOut(.22);
     this.current = a; this.currentName = name;
     const epoch = ++this.actionEpoch;
-    const fin = new Promise<void>(res => setTimeout(() => { if (epoch === this.actionEpoch) this.play('idle', .3); res(); }, len * 1000));
+    const fin = this.attendreAnimation(len, epoch, true);
     return { effet: Math.max(0, g.effet - g.debut), fin };
   }
   busy = false;                         // en train de marcher ou de faire une action
-  private walking: { target: THREE.Vector3; face?: number; resolve: () => void } | null = null;
+  private walking: { target: THREE.Vector3; face?: number; arrivee?: boolean; resolve: () => void } | null = null;
   private fade = { value: 1, target: 1 };
   private meshes: THREE.Mesh[] = [];
   private sonde!: THREE.Object3D;
@@ -219,6 +225,16 @@ export class Character {
     this.sonde.traverse(o => { if ((o as THREE.Bone).isBone && o.name.endsWith(os)) b = o; });
     return b ? (b as THREE.Object3D).getWorldPosition(new THREE.Vector3()) : null;
   }
+  priseDansLeGeste(name: string, t: number, cote: 'Right' | 'Left') {
+    if (!this.poseSonde(name, t)) return null;
+    let main: THREE.Object3D | null = null;
+    const doigts = new Map<string, THREE.Quaternion>();
+    this.sonde.traverse(o => {
+      if (o.name.endsWith(cote + 'Hand')) main = o;
+      if (new RegExp(cote + 'Hand(?:Thumb|Index|Middle|Ring|Pinky)\\d+$').test(o.name)) doigts.set(o.name, o.quaternion.clone());
+    });
+    return main ? { orientation: (main as THREE.Object3D).getWorldQuaternion(new THREE.Quaternion()), doigts } : null;
+  }
   private poseSonde(name: string, t: number): boolean {
     const a = this.actions.get(name); if (!a) return false;
     this.sondeMixer.stopAllAction();
@@ -261,7 +277,7 @@ export class Character {
     const meuble = /^(sit|sleep)(?:_|$)/.test(name);
     const debout = /^(idle|walk)(?:_|$)/.test(name);
     const bas = this.surface(this.obj, debout ? 'chaussures' : 'support') - this.correctionSol;
-    const aerien = /^(dance|sport_jacks|sport_jogging|jacks_|joie)/.test(name);
+    const aerien = /^(dance|sport_jacks|sport_jogging|jacks_|joie)/.test(name) || Boolean(this.raccord?.aerien);
     const next = meuble ? 0 : aerien ? Math.max(0, this.planSol - bas) : this.planSol - bas;
     const d = next - this.correctionSol;
     for (const c of this.obj.children) c.position.y += d;
@@ -319,6 +335,7 @@ export class Character {
     if (this.actions.has('water')) { const d = this.actions.get('water')!.getClip().duration; g.water = { anim: 'water', debut: 0, fin: d, effet: d * .35, distance: .55, cote: 0 }; }
     if (Object.keys(g).length) this.gestures = { ...this.gestures, ...g };
     const hanche = (name: string, t: number) => { const h = this.osDansLeGeste(name, t, 'Hips'); return h ? h.y : 0; };
+    for (const n of ['sit_down', 'stand_up']) this.pinInPlace(n);
     if (this.actions.has('sit')) this.sitCfg = { anim: 'sit', installe_a: 0, cuisses_z: hanche('sit', .3), chaise_ok: true };
     if (this.actions.has('sleep')) this.sleepCfg = { anim: 'sleep', installe_a: 0, dos_z: hanche('sleep', .3) };
     if (this.actions.has('walk')) {
@@ -371,6 +388,42 @@ export class Character {
     return this.actions.values().next().value ?? null;
   }
 
+  private raccord: { t: number; duree: number; aerien: boolean; pose: { os: THREE.Object3D; p: THREE.Vector3; q: THREE.Quaternion }[] } | null = null;
+  private raccorderPose(duree: number) {
+    if (duree <= 0 || !this.current) { this.raccord = null; return; }
+    const pose: { os: THREE.Object3D; p: THREE.Vector3; q: THREE.Quaternion }[] = [];
+    this.obj.traverse(os => { if ((os as THREE.Bone).isBone) pose.push({ os, p: os.position.clone(), q: os.quaternion.clone() }); });
+    this.raccord = { t: 0, duree, aerien: /^(dance|sport_jacks|sport_jogging)/.test(this.currentName), pose };
+  }
+  private appliquerRaccord(dt: number) {
+    const r = this.raccord; if (!r) return;
+    r.t += dt;
+    const poids = THREE.MathUtils.smoothstep(r.t, 0, r.duree);
+    for (const { os, p, q } of r.pose) { os.position.lerp(p, 1 - poids); os.quaternion.slerp(q, 1 - poids); }
+    this.obj.updateMatrixWorld(true);
+    if (r.t >= r.duree) this.raccord = null;
+  }
+  /** Un exercice répété conserve son action et sa phase, sans idle entre deux cycles. */
+  repeter(name: string, tours: number): Promise<void> {
+    const a = this.resolve(name); if (!a) return Promise.resolve();
+    this.raccorderPose(.4); this.actionEpoch++;
+    a.reset().setLoop(THREE.LoopRepeat, Math.max(1, tours)); a.clampWhenFinished = true;
+    a.timeScale = 1; a.setEffectiveWeight(1).fadeIn(.3).play();
+    if (this.current && this.current !== a) this.current.fadeOut(.3);
+    this.current = a; this.currentName = name;
+    const epoch = this.actionEpoch;
+    return new Promise<void>(res => {
+      const fini = (e: { action: THREE.AnimationAction }) => {
+        if (e.action !== a) return;
+        this.mixer.removeEventListener('finished', fini); res();
+      };
+      this.mixer.addEventListener('finished', fini);
+      // Une annulation ne doit pas laisser la scène suspendue.
+      const verifier = () => { if (epoch !== this.actionEpoch) { this.mixer.removeEventListener('finished', fini); res(); } else if (a.isRunning()) setTimeout(verifier, 250); };
+      setTimeout(verifier, 250);
+    });
+  }
+
   private breathing = false;
   private breathT = 0;
   /** Joue une animation en boucle (idle, walk, sit, sleep, phone, dance). */
@@ -390,6 +443,9 @@ export class Character {
     const a = this.resolve(name);
     if (!a) return;
     if (this.current === a && this.currentName === name && a.isRunning()) return;
+    // Laisser redescendre les bras après un exercice ou une danse.
+    if (name === 'idle' && /^(sport_|dance|jacks_)/.test(this.currentName)) fadeSec = Math.max(fadeSec, .85);
+    this.raccorderPose(fadeSec);
     this.actionEpoch++;
     a.reset().setLoop(THREE.LoopRepeat, Infinity);
     a.clampWhenFinished = false;
@@ -406,33 +462,35 @@ export class Character {
     return !/(_start|_end|_down|_up|_stop)$|^(get_up|stand_up|turn_|lie_down)|^sport_/.test(name)
       && /^(idle|walk|dance|sit|sleep|phone|carry)(?:_|$)/.test(name);
   }
-  once(name: string, maxSec = 4): Promise<void> {
-    const a = this.resolve(name);
-    if (!a) return Promise.resolve();
-    return new Promise(res => {
-      const dur = Math.min(a.getClip().duration, maxSec);
-      a.reset().setLoop(THREE.LoopOnce, 1);
-      a.clampWhenFinished = true;
-      a.timeScale = 1; // Un délai de scène coupe le geste, il n'accélère jamais le corps.
-      a.fadeIn(.18).play();
-      if (this.current && this.current !== a) this.current.fadeOut(.18);
-      this.current = a; this.currentName = name;
-      const epoch = ++this.actionEpoch;
-      const done = () => { if (epoch === this.actionEpoch) this.play('idle', .25); res(); };
-      setTimeout(done, dur * 1000 + 80);
-    });
+  private finAction: { reste: number; epoch: number; retourIdle: boolean; resolve: () => void } | null = null;
+  private attendreAnimation(duree: number, epoch: number, retourIdle: boolean) {
+    this.finAction?.resolve();
+    return new Promise<void>(resolve => { this.finAction = { reste: duree, epoch, retourIdle, resolve }; });
+  }
+  once(name: string, maxSec = 4, retourIdle = true): Promise<void> {
+    const a = this.resolve(name); if (!a) return Promise.resolve();
+    const dur = Math.min(a.getClip().duration, maxSec);
+    this.raccorderPose(.35);
+    a.reset().setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; a.timeScale = 1;
+    a.fadeIn(.18).play();
+    if (this.current && this.current !== a) this.current.fadeOut(.18);
+    this.current = a; this.currentName = name;
+    const epoch = ++this.actionEpoch;
+    return this.attendreAnimation(dur, epoch, retourIdle);
   }
 
   /** Marche en ligne droite jusqu'au point, puis se tourne vers `face` (angle Y). */
   goTo(target: THREE.Vector3, face?: number): Promise<void> {
-    this.appuisGeste = null;
+    this.appuisGeste = null; this.mouvementOrigine = null;
     this.solAssis = null;
     if (this.walking) { const w = this.walking; this.walking = null; w.resolve(); }
     const d = target.clone().sub(this.obj.position);
     d.y = 0;
+    this.faceCible = null;
     if (d.length() < .05) {
-      if (face !== undefined) this.obj.rotation.y = face;
-      return Promise.resolve();
+      if (face === undefined) return Promise.resolve();
+      this.busy = true; this.play('idle');
+      return new Promise(res => { this.walking = { target: this.obj.position.clone(), face, arrivee: true, resolve: res }; });
     }
     this.busy = true;
     this.play('walk');
@@ -448,8 +506,10 @@ export class Character {
   }
 
   teleport(p: THREE.Vector3, face?: number) {
-    this.appuisGeste = null;
+    this.appuisGeste = null; this.mouvementOrigine = null;
     this.solAssis = null;
+    this.coudePrecedent.clear(); this.coudesDebutFrame.clear();
+    this.forcesBras.clear();
     this.annulerMarche(); this.faceCible = null;
     this.obj.position.copy(p);
     if (face !== undefined) this.obj.rotation.y = face;
@@ -462,11 +522,15 @@ export class Character {
   setFade(target: number) { this.fade.target = target; }
 
   /** Les mains peuvent suivre des cibles dans le monde (remuer la poêle, saupoudrer), par-dessus l'animation en cours. */
-  mains: { droite?: () => THREE.Vector3; gauche?: () => THREE.Vector3; paumes?: boolean; doigts?: boolean; orientationDroite?: () => THREE.Quaternion } | null = null;
-  private ikPoids = 0; ikBut = 0;
+  mains: { droite?: () => THREE.Vector3; gauche?: () => THREE.Vector3; paumes?: boolean; doigts?: boolean; orientationDroite?: () => THREE.Quaternion; priseDroite?: Map<string, THREE.Quaternion> } | null = null;
+  private priseDouce = false; private ikProgression = 0; private ikPoids = 0; ikBut = 0;
   private ikOs: Record<string, THREE.Object3D | null> = {};
   private torse: { mesh: THREE.SkinnedMesh; indices: number[] }[] = [];
   private torseLarge = false;
+  private rayonAvantBras: Record<'Right' | 'Left', number> = { Right: .035, Left: .035 };
+  private coudePrecedent = new Map<string, THREE.Vector3>();
+  private coudesDebutFrame = new Map<string, THREE.Vector3>();
+  private pasCoude = .08;
   private preparerVolumeTorse() {
     const box = new THREE.Box3(), p = new THREE.Vector3();
     this.obj.updateMatrixWorld(true);
@@ -486,12 +550,28 @@ export class Character {
       this.torse.push({ mesh: m, indices });
     });
     this.torseLarge = !box.isEmpty() && box.max.z - box.min.z > .36;
+    if (this.torseLarge) for (const cote of ['Right', 'Left'] as const) {
+      const a = this.bone(cote + 'ForeArm'), b = this.bone(cote + 'Hand'); if (!a || !b) continue;
+      const ligne = new THREE.Line3(a.getWorldPosition(new THREE.Vector3()), b.getWorldPosition(new THREE.Vector3())), rayons: number[] = [];
+      this.obj.traverse(o => {
+        const m = o as THREE.SkinnedMesh; if (!m.isSkinnedMesh) return;
+        m.skeleton.update(); const si = m.geometry.attributes.skinIndex, sw = m.geometry.attributes.skinWeight;
+        for (let i = 0; i < si.count; i++) {
+          let w = 0; for (let k = 0; k < 4; k++) if (m.skeleton.bones[si.getComponent(i, k)].name.endsWith(cote + 'ForeArm')) w += sw.getComponent(i, k);
+          if (w < .65) continue;
+          const v = m.getVertexPosition(i, new THREE.Vector3()); m.localToWorld(v);
+          rayons.push(v.distanceTo(ligne.closestPointToPoint(v, false, new THREE.Vector3())));
+        }
+      });
+      rayons.sort((a, b) => a - b);
+      if (rayons.length) this.rayonAvantBras[cote] = rayons[Math.floor(rayons.length * .95)] + .003;
+    }
   }
   private contourTorse: THREE.Vector3[] = [];
   private couRepos = new Map<string, THREE.Quaternion>();
   private mesurerVolumeTorse() {
     this.contourTorse = [];
-    if (!this.torseLarge || !/^(idle|plant|harvest|pickup|water|carry|phone|cafe|sit)/.test(this.currentName)) return;
+    if (!this.torseLarge || !/^(idle(?:_|$)|walk(?:_|$)|run(?:_|$)|plant$|harvest$|pickup$|water$|carry(?:_|$)|phone(?:_|$)|cafe(?:_|$)|sit(?:_|$)|stand_up$)/.test(this.currentName)) return;
     this.obj.updateMatrixWorld(true);
     for (const { mesh, indices } of this.torse) {
       mesh.skeleton.update();
@@ -500,30 +580,50 @@ export class Character {
       }
     }
   }
-  private mainHorsDuTorse(cote: 'Right' | 'Left', monde: THREE.Vector3) {
+  private mainHorsDuTorse(cote: 'Right' | 'Left', monde: THREE.Vector3, rayon = 0) {
     if (!this.contourTorse.length) return monde;
     const p = this.obj.worldToLocal(monde.clone());
-    const tranche = this.contourTorse.filter(q => Math.abs(q.y - p.y) < .04);
+    const tranche = this.contourTorse.filter(q => Math.abs(q.y - p.y) < .04 + rayon);
     if (!tranche.length) return monde;
-    const box = new THREE.Box3().setFromPoints(tranche);
+    const box = new THREE.Box3().setFromPoints(tranche).expandByScalar(rayon);
     // Entrer progressivement dans la zone de dégagement évite un saut du poignet.
-    const poids = THREE.MathUtils.smoothstep(p.z, box.min.z - .12, box.min.z + .02)
-      * (1 - THREE.MathUtils.smoothstep(p.z, box.max.z - .02, box.max.z + .12))
-      * THREE.MathUtils.smoothstep(p.x, box.min.x - .12, box.min.x + .02)
-      * (1 - THREE.MathUtils.smoothstep(p.x, box.max.x - .02, box.max.x + .12));
-    const dehors = cote === 'Right' ? Math.min(p.x, box.min.x - .055) : Math.max(p.x, box.max.x + .055);
+    const bas = Math.min(...this.contourTorse.map(q => q.y)), haut = Math.max(...this.contourTorse.map(q => q.y));
+    const poids = THREE.MathUtils.smoothstep(p.y, bas - .05, bas) * (1 - THREE.MathUtils.smoothstep(p.y, haut, haut + .05))
+      * THREE.MathUtils.smoothstep(p.z, box.min.z - .10, box.min.z)
+      * (1 - THREE.MathUtils.smoothstep(p.z, box.max.z, box.max.z + .10))
+      * THREE.MathUtils.smoothstep(p.x, box.min.x - .10, box.min.x)
+      * (1 - THREE.MathUtils.smoothstep(p.x, box.max.x, box.max.x + .10));
+    const marge = Math.max(.005, .055 - rayon);
+    const dehors = cote === 'Right' ? Math.min(p.x, box.min.x - marge) : Math.max(p.x, box.max.x + marge);
     p.x = THREE.MathUtils.lerp(p.x, dehors, poids);
     return this.obj.localToWorld(p);
   }
-  private degagerBrasLibres() {
-    if (!this.contourTorse.length) return;
+  private forcesBras = new Map<'Right' | 'Left', number>();
+  private degagerBrasLibres(dt: number) {
     for (const cote of ['Right', 'Left'] as const) {
-      if (this.mains && this.ikPoids > .01 && (cote === 'Right' ? this.mains.droite : this.mains.gauche)) continue;
+      if (this.mains && this.ikBut > 0 && (cote === 'Right' ? this.mains.droite : this.mains.gauche)) {
+        this.forcesBras.delete(cote);
+        continue;
+      }
       const main = this.os(cote + 'Hand'); if (!main) continue;
       const p = main.getWorldPosition(new THREE.Vector3()), cible = this.mainHorsDuTorse(cote, p);
       const coude = this.os(cote + 'ForeArm')?.getWorldPosition(new THREE.Vector3());
-      const coudeDedans = coude && coude.distanceToSquared(this.mainHorsDuTorse(cote, coude)) > 1e-6;
-      if (p.distanceToSquared(cible) > 1e-6 || coudeDedans) this.chaineIK(cote, cible, 1);
+      const rayon = this.rayonAvantBras[cote];
+      const distanceCoude = coude ? coude.distanceTo(this.mainHorsDuTorse(cote, coude, rayon)) : 0;
+      let distanceSegment = 0;
+      if (coude) for (const k of [.25, .5, .75]) {
+        const point = coude.clone().lerp(p, k);
+        distanceSegment = Math.max(distanceSegment, point.distanceTo(this.mainHorsDuTorse(cote, point, rayon)));
+      }
+      if (distanceSegment > .001) {
+        const exterieur = new THREE.Vector3(-Math.cos(this.obj.rotation.y), 0, Math.sin(this.obj.rotation.y)).multiplyScalar(cote === 'Right' ? 1 : -1);
+        cible.addScaledVector(exterieur, Math.min(.08, distanceSegment));
+      }
+      const force = THREE.MathUtils.smoothstep(Math.max(p.distanceTo(cible), distanceCoude, distanceSegment), 0, .02);
+      const precedent = this.forcesBras.get(cote) ?? 0;
+      const poids = THREE.MathUtils.lerp(precedent, force, 1 - Math.exp(-dt * 10));
+      this.forcesBras.set(cote, poids);
+      if (poids > .001) this.chaineIK(cote, cible, poids);
     }
   }
   private os(n: string) { return (this.ikOs[n] ??= this.bone(n)); }
@@ -575,7 +675,7 @@ export class Character {
       if (!Number.isFinite(min)) continue;
       const q = pied.getWorldQuaternion(new THREE.Quaternion());
       const cible = pied.getWorldPosition(new THREE.Vector3());
-      const sol = /^sit/.test(this.currentName) && this.solSousPied ? this.solSousPied(cible) : this.solAssis;
+      const sol = /^(sit|stand_up)/.test(this.currentName) && this.solSousPied ? this.solSousPied(cible) : this.solAssis;
       cible.y += sol - min;
       this.chaineIK(cote, cible, 1, true);
       pied.quaternion.copy(pied.parent!.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(q));
@@ -597,10 +697,39 @@ export class Character {
     const fw = new THREE.Vector3(Math.sin(this.obj.rotation.y), 0, Math.cos(this.obj.rotation.y));
     const droite = new THREE.Vector3(-fw.z, 0, fw.x).multiplyScalar(cote === 'Right' ? 1 : -1);
     const large = this.contourTorse.length > 0;
-    const pole = jambe ? fw.clone().addScaledVector(droite, .12) : new THREE.Vector3(0, -1, 0).addScaledVector(droite, large ? 1.15 : .55).addScaledVector(fw, large ? .20 : -.35);
-    const pp = pole.sub(dir.clone().multiplyScalar(pole.dot(dir))).normalize();   // le pôle, dans le plan perpendiculaire à l'axe épaule → cible
+    const guide = this.mains && this.ikBut > 0 && (cote === 'Right' ? this.mains.droite : this.mains.gauche);
+    const pole = jambe ? fw.clone().addScaledVector(droite, .12) : guide ? E0.clone().sub(S) : new THREE.Vector3(0, -1, 0).addScaledVector(droite, large ? 1.15 : .55).addScaledVector(fw, large ? .20 : -.35);
+    let pp = pole.sub(dir.clone().multiplyScalar(pole.dot(dir)));
+    if (pp.lengthSq() < 1e-8) { pp = new THREE.Vector3(0, -1, 0).addScaledVector(droite, .55); pp.addScaledVector(dir, -pp.dot(dir)); }
+    pp.normalize();   // le pôle, dans le plan perpendiculaire à l'axe épaule → cible
     const cosA = THREE.MathUtils.clamp((a * a + d * d - b * b) / (2 * a * d), -1, 1);
-    const coude = S.clone().addScaledVector(dir, a * cosA).addScaledVector(pp, a * Math.sqrt(1 - cosA * cosA));
+    const centre = S.clone().addScaledVector(dir, a * cosA), rayon = a * Math.sqrt(1 - cosA * cosA);
+    let coude = centre.clone().addScaledVector(pp, rayon);
+    if (!jambe && large) {
+      // Même cible de main, mais choisir un coude dont l'avant-bras contourne le ventre.
+      const travers = new THREE.Vector3().crossVectors(dir, pp).normalize();
+      let meilleur = Infinity;
+      const precedent = guide ? this.coudesDebutFrame.get(cote) : undefined;
+      const ancien = precedent ? this.obj.localToWorld(precedent.clone()).sub(centre) : null;
+      const anglePrecedent = ancien ? Math.atan2(ancien.dot(travers), ancien.dot(pp)) : 0;
+      for (const angle of [anglePrecedent, 0, .4, -.4, .8, -.8, 1.2, -1.2, 1.6, -1.6, 2, -2, 2.4, -2.4, 2.8, -2.8, Math.PI]) {
+        const essai = centre.clone().addScaledVector(pp, Math.cos(angle) * rayon).addScaledVector(travers, Math.sin(angle) * rayon);
+        let score = precedent ? this.obj.worldToLocal(essai.clone()).distanceToSquared(precedent) * .002 : angle * angle * 1e-6;
+        for (const point of [essai, ...[.25, .5, .75].map(k => essai.clone().lerp(cible, k))]) {
+          score += 100 * point.distanceToSquared(this.mainHorsDuTorse(cote, point, this.rayonAvantBras[cote]));
+        }
+        if (score < meilleur) { meilleur = score; coude = essai; }
+        if (!precedent && angle === 0 && score < 1e-8) break;
+      }
+      if (ancien && rayon > 1e-5) {
+        const choisi = coude.clone().sub(centre);
+        const angleChoisi = Math.atan2(choisi.dot(travers), choisi.dot(pp));
+        const ecart = Math.atan2(Math.sin(angleChoisi - anglePrecedent), Math.cos(angleChoisi - anglePrecedent));
+        const angle = anglePrecedent + THREE.MathUtils.clamp(ecart, -this.pasCoude, this.pasCoude);
+        coude = centre.clone().addScaledVector(pp, Math.cos(angle) * rayon).addScaledVector(travers, Math.sin(angle) * rayon);
+      }
+    }
+    if (!jambe && large) this.coudePrecedent.set(cote, this.obj.worldToLocal(coude.clone()));
     const tourner = (os: THREE.Object3D, de: THREE.Vector3, vers: THREE.Vector3) => {
       const q = new THREE.Quaternion().setFromUnitVectors(de.normalize(), vers.normalize());
       const bq = new THREE.Quaternion(), pq = new THREE.Quaternion();
@@ -628,7 +757,8 @@ export class Character {
     const avant = new THREE.Vector3(Math.sin(this.obj.rotation.y), 0, Math.cos(this.obj.rotation.y));
     let dir = this.dernierRegard.clone().sub(tp); if (dir.lengthSq() < 1e-4) return; dir.normalize();
     // limites : 65° de côté, 30° en haut ou en bas
-    const yaw = THREE.MathUtils.clamp(Math.atan2(dir.x, dir.z) - Math.atan2(avant.x, avant.z), -Math.PI, Math.PI);
+    const deltaYaw = Math.atan2(dir.x, dir.z) - Math.atan2(avant.x, avant.z);
+    const yaw = Math.atan2(Math.sin(deltaYaw), Math.cos(deltaYaw));
     const yawL = THREE.MathUtils.clamp(((yaw + Math.PI * 3) % (Math.PI * 2)) - Math.PI, -1.13, 1.13);
     const limite = /^(plant|harvest|pickup|water)$/.test(this.currentName) || this.appuisGeste ? .26 : .52;
     const pitch = THREE.MathUtils.clamp(Math.asin(THREE.MathUtils.clamp(dir.y, -1, 1)), -limite, limite);
@@ -646,6 +776,17 @@ export class Character {
     }
   }
   /** Se tourner en douceur, sur place, vers une direction (au lieu de pivoter d'un coup). */
+  private mouvementOrigine: { debut: THREE.Vector3; fin: THREE.Vector3; t: number; duree: number; clip?: string } | null = null;
+  deplacerOrigine(fin: THREE.Vector3, duree: number, clip?: string) { this.mouvementOrigine = { debut: this.obj.position.clone(), fin: fin.clone(), t: 0, duree, clip }; }
+  private progressionOrigine(clip: string | undefined, t: number, axe: number, fallback: number) {
+    const r = clip && this.trajetsHanches.get(clip); if (!r) return fallback;
+    const dernier = r.temps.length - 1, debut = r.valeurs[axe], fin = r.valeurs[dernier * 3 + axe];
+    if (Math.abs(fin - debut) < .01) return fallback;
+    let i = 0; while (i < dernier && r.temps[i + 1] < t) i++;
+    const j = Math.min(dernier, i + 1), u = j === i ? 1 : THREE.MathUtils.clamp((t - r.temps[i]) / (r.temps[j] - r.temps[i]), 0, 1);
+    const valeur = THREE.MathUtils.lerp(r.valeurs[i * 3 + axe], r.valeurs[j * 3 + axe], u);
+    return THREE.MathUtils.clamp((valeur - debut) / (fin - debut), 0, 1);
+  }
   private faceCible: number | null = null;
   tourner(face: number) { this.faceCible = face; }
   /** Correction des bras : si le squelette venu de Mixamo tient les bras trop hauts dans toutes les animations, on abaisse
@@ -671,67 +812,108 @@ export class Character {
       this.obj.rotation.y += pas; if (Math.abs(d) < .01) this.faceCible = null;
     }
     this.mixer.update(dt);
+    if (this.mouvementOrigine) {
+      const r = this.mouvementOrigine; r.t += dt;
+      const lisse = THREE.MathUtils.smoothstep(r.t, 0, r.duree);
+      const plan = this.progressionOrigine(r.clip, r.t, 2, lisse), haut = this.progressionOrigine(r.clip, r.t, 1, lisse);
+      this.obj.position.lerpVectors(r.debut, r.fin, plan); this.obj.position.y = THREE.MathUtils.lerp(r.debut.y, r.fin.y, haut);
+      if (r.t >= r.duree) this.mouvementOrigine = null;
+    }
+    // Le déplacement et le raccord précèdent les contraintes en coordonnées mondiales.
+    if (this.walking) {
+      const w = this.walking;
+      if (!w.arrivee) {
+        const d = w.target.clone().sub(this.obj.position); d.y = 0;
+        const len = d.length(), step = this.speed * dt;
+        if (len > step) {
+          const dy = Math.atan2(Math.sin(Math.atan2(d.x, d.z) - this.obj.rotation.y), Math.cos(Math.atan2(d.x, d.z) - this.obj.rotation.y));
+          this.obj.rotation.y += THREE.MathUtils.clamp(dy, -dt * 3.2, dt * 3.2);
+        }
+        if (len <= step) {
+          this.obj.position.copy(w.target); w.arrivee = true;
+          this.play('idle');
+        } else this.obj.position.add(d.normalize().multiplyScalar(step));
+      }
+      if (w.arrivee) {
+        const dy = w.face === undefined ? 0 : Math.atan2(Math.sin(w.face - this.obj.rotation.y), Math.cos(w.face - this.obj.rotation.y));
+        const pas = Math.min(Math.abs(dy), dt * 3.2);
+        this.obj.rotation.y += Math.sign(dy) * pas;
+        if (Math.abs(dy) <= pas + 1e-6) {
+          this.walking = null; this.busy = false; w.resolve();
+        }
+      }
+    }
+    this.appliquerRaccord(dt);
     if (this.currentName === 'idle' && this.appuisGeste) {
-      this.appuisFin = Math.max(0, this.appuisFin - dt); if (!this.appuisFin) this.appuisGeste = null;
+      this.appuisFin = Math.max(0, this.appuisFin - dt);
+      if (!this.appuisFin && !this.raccord) this.appuisGeste = null;
     }
     const jardinage = /^(plant|harvest|pickup|water)$/.test(this.currentName) || this.currentName === 'idle' && this.appuisGeste;
     if (jardinage) {
       const eau = this.currentName === 'water' || this.currentName === 'idle' && this.dernierGeste === 'water';
       for (const nom of eau ? ['Spine', 'Spine1', 'Spine2', 'Neck', 'Head'] : ['Neck', 'Head']) {
         const os = this.os(nom); if (!os) continue;
-        const repos = this.couRepos.get(os.name); if (repos) os.quaternion.slerp(repos, nom.startsWith('Spine') ? .8 : 1);
+        const repos = this.couRepos.get(os.name); if (!repos) continue;
+        if (eau) os.quaternion.slerp(repos, nom.startsWith('Spine') ? .35 : .85);
+        else { const angle = repos.angleTo(os.quaternion); if (angle > .40) os.quaternion.slerp(repos, 1 - .40 / angle); }
       }
       this.obj.updateMatrixWorld(true);
     }
-    this.stabiliserSol();
+    if (!this.mouvementOrigine && this.solAssis === null) this.stabiliserSol();
     this.poserPiedsAssis();
     this.poserAppuisGeste();
     this.abaisserBras();
     this.mesurerVolumeTorse();
-    this.degagerBrasLibres();
-    this.ikPoids += (this.ikBut - this.ikPoids) * Math.min(1, dt * 5);
+    this.coudesDebutFrame = new Map([...this.coudePrecedent].map(([n, p]) => [n, p.clone()]));
+    this.pasCoude = Math.min(.2, dt * 5);
+    this.degagerBrasLibres(dt);
+    // Le téléphone monte et descend sans impulsion au début du guidage.
+    if (this.mains && this.ikBut > 0) this.priseDouce = /^phone(?:_|$)/.test(this.currentName);
+    if (this.priseDouce) {
+      const ciblePrise = THREE.MathUtils.clamp(this.ikBut, 0, 1);
+      this.ikProgression += THREE.MathUtils.clamp(ciblePrise - this.ikProgression, -dt / .55, dt / .55);
+      this.ikPoids = THREE.MathUtils.smoothstep(this.ikProgression, 0, 1);
+    } else {
+      this.ikPoids += (this.ikBut - this.ikPoids) * Math.min(1, dt * 5);
+      this.ikProgression = this.ikPoids;
+    }
     if (this.mains && this.ikPoids > .01) {
       this.obj.updateMatrixWorld(true);
       for (const [cote, fn] of [['Right', this.mains.droite], ['Left', this.mains.gauche]] as const) {
         if (!fn) continue;
+        if (cote === 'Right' && this.mains.priseDroite) this.obj.traverse(o => { const q = this.mains?.priseDroite?.get(o.name); if (q) o.quaternion.slerp(q, this.ikPoids); });
+        this.obj.updateMatrixWorld(true);
         const but = fn(); // Les cibles des objets suivent leur trajectoire continue ; seul le coude est dégagé.
         const orientation = cote === 'Right' ? this.mains.orientationDroite?.() : undefined;
+        const iterations = this.mains.paumes ? 12 : 1;
+        // Résoudre la prise, puis interpoler la chaîne UNE fois vers l'animation.
+        const poseAvant = ['Arm', 'ForeArm', 'Hand'].map(n => this.os(cote + n)).filter((o): o is THREE.Object3D => !!o).map(os => ({ os, q: os.quaternion.clone() }));
         const orienter = () => {
           const main = this.os(cote + 'Hand'); if (!orientation || !main?.parent) return;
           main.quaternion.copy(main.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(orientation));
           main.updateMatrixWorld(true);
         };
-        for (let i = 0; i < (this.mains.paumes ? 12 : 1); i++) {
+        for (let i = 0; i < iterations; i++) {
           orienter();
           const cible = but.clone(), main = this.os(cote + 'Hand'), doigt = this.os(cote + (this.mains.doigts ? 'HandMiddle4' : 'HandMiddle1'));
           if (this.mains.paumes && main && doigt) cible.sub(doigt.getWorldPosition(new THREE.Vector3()).sub(main.getWorldPosition(new THREE.Vector3())).multiplyScalar(this.mains.doigts ? 1 : .65));
-          this.chaineIK(cote, cible, this.ikPoids);
+          this.chaineIK(cote, cible, 1);
         }
         orienter();
+        for (const { os, q } of poseAvant) os.quaternion.copy(q.slerp(os.quaternion, this.ikPoids));
+        this.obj.updateMatrixWorld(true);
       }
+      this.obj.updateMatrixWorld(true);
     } else if (this.ikBut === 0 && this.ikPoids <= .01) this.mains = null;
-    this.tournerTete(dt);
+    if (!jardinage) this.tournerTete(dt);
     if (this.breathing) { this.breathT += dt; const k = 1 + Math.sin(this.breathT * 1.6) * .006; this.obj.scale.set(this.obj.scale.x, this.obj.scale.x * k, this.obj.scale.x); }
     else if (this.obj.scale.y !== this.obj.scale.x) this.obj.scale.y = this.obj.scale.x;
-    if (this.walking) {
-      const w = this.walking;
-      const d = w.target.clone().sub(this.obj.position); d.y = 0;
-      const len = d.length();
-      const step = this.speed * dt;
-      const yawTarget = Math.atan2(d.x, d.z);
-      let dy = yawTarget - this.obj.rotation.y;
-      dy = Math.atan2(Math.sin(dy), Math.cos(dy));
-      this.obj.rotation.y += dy * Math.min(1, dt * 10);
-      if (len <= step) {
-        this.obj.position.x = w.target.x; this.obj.position.z = w.target.z; this.obj.position.y = w.target.y;
-        if (w.face !== undefined) this.obj.rotation.y = w.face;
-        this.walking = null;
-        this.busy = false;
-        this.play('idle');
-        w.resolve();
-      } else {
-        d.normalize().multiplyScalar(step);
-        this.obj.position.add(d);
+    if (this.finAction) {
+      const fin = this.finAction; fin.reste -= dt;
+      if (fin.epoch !== this.actionEpoch || fin.reste <= 1e-6) {
+        this.finAction = null;
+        if (fin.epoch === this.actionEpoch && fin.retourIdle) this.play('idle', .4);
+        fin.resolve();
       }
     }
     if (this.fade.value !== this.fade.target) {

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Potager de Poche — meet the characters in AR</title>
+<meta name="description" content="Léa, Jimy and Marcel in augmented reality: open on your phone and put them on your table.">
+<meta property="og:title" content="Potager de Poche — the characters in AR">
+<meta property="og:description" content="Open on your phone and put Léa, Jimy and Marcel on your table.">
+<meta property="og:image" content="https://jardin-de-poche.vercel.app/partage-carre.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jardin-de-poche.vercel.app/partage-x.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪴</text></svg>">
+<script type="module" src="model-viewer.min.js"></script>
+<style>
+  :root { --encre: #24313a; --creme: #fffdf6; --vert: #2f8f4e; --sat: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Nunito", "Segoe UI", system-ui, sans-serif; color: var(--encre); background: linear-gradient(#cfe4f0, #eef3e4 55%, #f6ead6); min-height: 100vh; padding: calc(18px + var(--sat)) 16px 40px; }
+  header { text-align: center; max-width: 720px; margin: 0 auto 18px; }
+  h1 { margin: 0; font-size: clamp(26px, 6vw, 40px); letter-spacing: -.5px; }
+  h1 small { display: block; font-size: .5em; font-weight: 700; color: #5b6b75; margin-top: 4px; }
+  p.aide { margin: 10px auto 0; max-width: 560px; color: #41525c; line-height: 1.45; }
+  .perso { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; max-width: 1100px; margin: 0 auto; }
+  .carte { background: var(--creme); border-radius: 22px; box-shadow: 0 12px 34px rgba(36,49,58,.14); overflow: hidden; display: flex; flex-direction: column; }
+  model-viewer { width: 100%; height: 380px; background: radial-gradient(circle at 50% 80%, #e9f1ea, #f8fbf7 60%); --poster-color: transparent; }
+  .carte h2 { margin: 12px 16px 2px; font-size: 22px; }
+  .carte p { margin: 0 16px 12px; color: #5b6b75; font-size: 14px; }
+  .bouton { display: inline-flex; align-items: center; gap: 8px; margin: 0 16px 16px; padding: 12px 18px; border: 0; border-radius: 999px; background: var(--vert); color: #fff; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 6px 18px rgba(47,143,78,.35); }
+  .bouton:active { transform: translateY(1px); }
+  .bouton.anim { background: #fff; color: var(--encre); box-shadow: 0 4px 14px rgba(36,49,58,.12); border: 1px solid rgba(36,49,58,.12); margin-top: -6px; }
+  model-viewer::part(default-ar-button) { display: none; }
+  footer { text-align: center; margin-top: 28px; font-size: 14px; color: #5b6b75; }
+  footer a { color: var(--vert); font-weight: 800; text-decoration: none; }
+  .fr { display: none; } html[lang="fr"] .fr { display: initial; } html[lang="fr"] .en { display: none; }
+  .langs { text-align: center; margin: 0 0 10px; } .langs button { border: 0; background: rgba(36,49,58,.08); border-radius: 999px; padding: 6px 12px; font-weight: 700; cursor: pointer; margin: 0 3px; }
+</style>
+</head>
+<body>
+<div class="langs"><button onclick="document.documentElement.lang='en'">English</button><button onclick="document.documentElement.lang='fr'">Français</button></div>
+<header>
+  <h1>Potager de Poche <small><span class="en">Meet the characters in augmented reality</span><span class="fr">Les personnages en réalité augmentée</span></small></h1>
+  <p class="aide"><span class="en">On a phone, tap <b>View in your space</b>: Léa, Jimy or Marcel appears on your table, life-size or small. On a computer, turn them with the mouse.</span><span class="fr">Sur un téléphone, touche <b>Voir chez toi</b> : Léa, Jimy ou Marcel apparaît sur ta table, grandeur nature ou en petit. Sur ordinateur, fais-les tourner à la souris.</span></p>
+</header>
+<div class="perso">
+  <div class="carte">
+    <model-viewer id="lea" src="lea.glb" ios-src="lea.usdz" alt="Léa" ar ar-modes="scene-viewer quick-look webxr" ar-scale="auto" autoplay camera-controls auto-rotate shadow-intensity="1" exposure="1.05" camera-orbit="0deg 84deg 4.9m" camera-target="0m 0.95m 0m" loading="eager"></model-viewer>
+    <h2>Léa</h2><p><span class="en">The balcony gardener of the 3rd floor.</span><span class="fr">La jardinière du troisième étage.</span></p>
+    <button class="bouton" onclick="document.getElementById('lea').activateAR()">📱 <span class="en">View in your space</span><span class="fr">Voir chez toi</span></button>
+    <button class="bouton anim" data-pour="lea" onclick="basculerAnim('lea', this)">🎬 <span class="en">Animation: ON</span><span class="fr">Animation : ON</span></button>
+  </div>
+  <div class="carte">
+    <model-viewer id="jimy" src="jimy.glb" ios-src="jimy.usdz" alt="Jimy" ar ar-modes="scene-viewer quick-look webxr" ar-scale="auto" autoplay camera-controls auto-rotate shadow-intensity="1" exposure="1.05" camera-orbit="0deg 84deg 4.9m" camera-target="0m 0.95m 0m"></model-viewer>
+    <h2>Jimy</h2><p><span class="en">Reggae and tomatoes on the rooftop.</span><span class="fr">Reggae et tomates sur le toit.</span></p>
+    <button class="bouton" onclick="document.getElementById('jimy').activateAR()">📱 <span class="en">View in your space</span><span class="fr">Voir chez toi</span></button>
+    <button class="bouton anim" data-pour="jimy" onclick="basculerAnim('jimy', this)">🎬 <span class="en">Animation: ON</span><span class="fr">Animation : ON</span></button>
+  </div>
+  <div class="carte">
+    <model-viewer id="marcel" src="marcel.glb" ios-src="marcel.usdz" alt="Marcel" ar ar-modes="scene-viewer quick-look webxr" ar-scale="auto" autoplay camera-controls auto-rotate shadow-intensity="1" exposure="1.05" camera-orbit="0deg 84deg 4.9m" camera-target="0m 0.95m 0m"></model-viewer>
+    <h2>Marcel</h2><p><span class="en">The retired neighbour who cooks for everyone.</span><span class="fr">Le voisin retraité qui cuisine pour tout le monde.</span></p>
+    <button class="bouton" onclick="document.getElementById('marcel').activateAR()">📱 <span class="en">View in your space</span><span class="fr">Voir chez toi</span></button>
+    <button class="bouton anim" data-pour="marcel" onclick="basculerAnim('marcel', this)">🎬 <span class="en">Animation: ON</span><span class="fr">Animation : ON</span></button>
+  </div>
+</div>
+<footer><span class="en">Play the game: </span><span class="fr">Jouer : </span><a href="https://jardin-de-poche.vercel.app">jardin-de-poche.vercel.app</a></footer>
+<script>
+  // la langue : celle du navigateur, le bouton change
+  if ((navigator.language || '').toLowerCase().startsWith('fr')) document.documentElement.lang = 'fr';
+  // animation ON / OFF : en 3D on met en pause ; pour la realite augmentee on prend le fichier fixe (lea-fixe.glb / lea-fixe.usdz) s'il existe
+  const animOn = { lea: true, jimy: true, marcel: true };
+  const existe = async (u) => { try { return (await fetch(u, { method: 'HEAD' })).ok; } catch { return false; } };
+  window.basculerAnim = async (who, b) => {
+    const mv = document.getElementById(who); animOn[who] = !animOn[who];
+    b.querySelector('.en').textContent = 'Animation: ' + (animOn[who] ? 'ON' : 'OFF'); b.querySelector('.fr').textContent = 'Animation : ' + (animOn[who] ? 'ON' : 'OFF');
+    if (animOn[who]) { mv.src = who + '.glb'; mv.setAttribute('ios-src', who + '.usdz'); mv.autoplay = true; mv.play && mv.play(); }
+    else {
+      const g = (await existe(who + '-fixe.glb')) ? who + '-fixe.glb' : null, u = (await existe(who + '-fixe.usdz')) ? who + '-fixe.usdz' : null;
+      if (g) mv.src = g; else { mv.autoplay = false; mv.pause && mv.pause(); }
+      mv.setAttribute('ios-src', u || who + '.usdz');
+    }
+  };
+  // sans caméra AR (ordinateur), le bouton explique quoi faire
+  document.querySelectorAll('model-viewer').forEach(mv => mv.addEventListener('load', () => { if (!mv.canActivateAR) mv.parentElement.querySelector('.bouton').style.display = 'none'; }));   // pas de bouton sur ordinateur
+</script>
+</body>
+</html>

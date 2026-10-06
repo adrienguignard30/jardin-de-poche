@@ -244,7 +244,7 @@ export class Game {
     await this.teinterAccueil();
     this.showroom.resize(window.innerWidth / window.innerHeight);
     window.addEventListener('resize', () => this.showroom?.resize(window.innerWidth / window.innerHeight));
-    this.ui.showStart(!!saved, saved ? tx(charDef(saved.character).name) : '');
+    this.ui.showStart(!!saved, saved ? tx(charDef(saved.character).name) : '', saved?.character ?? '');
     this.loop();
   }
   /** Sur l'accueil : toucher un personnage le fait danser et ouvre sa fiche. */
@@ -417,6 +417,7 @@ export class Game {
   /** Tout ce qui pourrait traîner d'une activité interrompue : objets en main, poêle, regard, gestes, pièce, sommeil. */
   private remiseAZero() {
     this.pauseRevue = false; this.sceneRevue = false;
+    this.jardinageJoueur = false; this.preparationJoueur = null; this.approcheAssise = null; this.dansant = false;
     document.getElementById('controleScenes')?.remove(); document.getElementById('auditAnims')?.remove();
     // chaque rangement est indépendant : l'un qui échoue n'empêche jamais d'entrer dans le jeu
     const sur = (f: () => void) => { try { f(); } catch (e) { console.warn('[remise à zéro]', e); } };
@@ -433,7 +434,8 @@ export class Game {
     this.autoToken++;
     clearTimeout(this.autoTimer);
     this.remiseAZero();
-    this.ui.showStart(true, tx(charDef(this.state.character).name));
+    this.ui.parties = this.save.liste();
+    this.ui.showStart(true, tx(charDef(this.state.character).name), this.state.character);
   }
 
   // ---------- pots et plantes en 3D
@@ -756,11 +758,11 @@ export class Game {
       }; bar.append(b);
     };
     ajouter('Semis', async token => { const p = this.state.pots[0]; await this.gotoSlot(SLOTS[p.id], 'plant'); if (token !== this.autoToken) return; this.char.busy = true; const g = this.char.geste('plant'); this.mainVersLaPlante(p, 'semis', g.effet); await g.fin; });
-    ajouter('Arrosage', async token => { const p = this.state.pots[0]; await this.gotoSlot(SLOTS[p.id], 'water'); if (token !== this.autoToken) return; this.char.busy = true; const cible = this.views.get(p.id)!.holder.getWorldPosition(new THREE.Vector3()); this.tenirArrosoir(cible); const g = this.char.geste('water'); this.verser(g.effet); await g.fin; });
+    ajouter('Arrosage', async token => { const p = this.state.pots[0]; await this.gotoSlot(SLOTS[p.id], 'water'); if (token !== this.autoToken) return; this.char.busy = true; const cible = this.views.get(p.id)!.holder.getWorldPosition(new THREE.Vector3()); this.tenirArrosoir(cible); const g = this.char.geste('water'); this.verser(g.effet); await g.fin; if (token === this.autoToken) this.lacherArrosoir(); });
     ajouter('Récolte', async token => { const p = this.state.pots[0]; await this.gotoSlot(SLOTS[p.id], 'harvest'); if (token !== this.autoToken) return; this.char.busy = true; const g = this.char.geste('harvest'); this.mainVersLaPlante(p, 'recolte', g.effet); await wait(g.effet * 1000); if (token === this.autoToken) this.flyCrops(p.plant?.plant ?? CATALOG.plants[0].id, SLOTS[p.id].pos, 1); await g.fin; });
     ajouter('Téléphone', () => { this.char.play('phone'); this.tenirTel(); });
     ajouter('Café', () => this.gesteBras('cafe', this.char.clipDuree('cafe') * 1000));
-    ajouter('Assiette', () => { this.char.play('carry'); this.porter('prop_plate'); });
+    ajouter('Assiette', () => { this.char.play('idle'); this.porter('prop_plate'); });
     ajouter('Rambarde', async token => { if (await this.approcherRambarde(token, 0)) await this.gesteBras('rambarde', 12000); });
     ajouter('Chaise', token => this.goSit(token, 'sit'));
     ajouter('Chaise 2', token => this.goSit(token, 'sit_2'));
@@ -773,10 +775,11 @@ export class Game {
       const f = this.world.fenetres[0];
       if (this.world.hasRoom) await this.marcherMeubles((f?.pos ?? this.world.insideSpot).clone().setY(FL), f?.dehors ?? 0);
       if (token !== this.autoToken) return;
+      this.world.ciel?.passageFenetre(6000);
       await this.char.once('regard_autour', 6); await this.goOutside(token);
     });
     ajouter('Cuisine', token => this.sceneCuisine(token));
-    ajouter('Offrir', async token => { this.char.play('carry'); this.porter('prop_plate'); await wait(1500); if (token !== this.autoToken) return; const o = this.porte; if (o) { this.world.flyAway(o.getWorldPosition(new THREE.Vector3()), o); this.porte = null; this.char.ikBut = 0; this.char.mains = null; } });
+    ajouter('Offrir', async token => { this.char.play('idle'); this.porter('prop_plate'); await wait(1500); if (token !== this.autoToken) return; const o = this.porte; if (o) { this.world.flyAway(o.getWorldPosition(new THREE.Vector3()), o); this.porte = null; this.char.ikBut = 0; this.char.mains = null; } });
     ajouter('Tableau', token => this.goTableau(token));
     ajouter('Danse', token => this.danser(token));
     ajouter('Sport', token => this.seanceSport(token));
@@ -786,13 +789,16 @@ export class Game {
   private mainsCuisine(pan: THREE.Vector3, t0: number, saupoudre: () => boolean) {
     const ch = this.char.obj, f = new THREE.Vector3(Math.sin(ch.rotation.y), 0, Math.cos(ch.rotation.y));
     const r = new THREE.Vector3(-f.z, 0, f.x);
+    let dernier = performance.now(), poudre = 0;
     this.char.mains = {
       paumes: true,
       droite: () => {
-        const t = (performance.now() - t0) / 1000;
-        return pan.clone().addScaledVector(f, saupoudre() ? -.04 : Math.cos(t * 5) * .035)
-          .addScaledVector(r, saupoudre() ? Math.sin(t * 11) * .03 : Math.sin(t * 5) * .035)
-          .add(new THREE.Vector3(0, saupoudre() ? .26 : .025, 0));
+        const maintenant = performance.now(), dt = Math.max(0, (maintenant - dernier) / 1000); dernier = maintenant;
+        poudre += (Number(saupoudre()) - poudre) * Math.min(1, dt * 5);
+        const t = (maintenant - t0) / 1000;
+        return pan.clone().addScaledVector(f, THREE.MathUtils.lerp(Math.cos(t * 5) * .035, -.04, poudre))
+          .addScaledVector(r, THREE.MathUtils.lerp(Math.sin(t * 5) * .035, Math.sin(t * 11) * .03, poudre))
+          .add(new THREE.Vector3(0, THREE.MathUtils.lerp(.025, .26, poudre), 0));
       },
       gauche: () => pan.clone().addScaledVector(f, -.22).add(new THREE.Vector3(0, -.025, 0)),
     };
@@ -808,7 +814,7 @@ export class Game {
     const poele = this.fabriquerPoele(); poele.position.copy(pan); poele.rotation.y = this.char.obj.rotation.y + Math.PI / 2; W.scene.add(poele);
     this.mainsCuisine(pan.clone().add(new THREE.Vector3(0, .06, 0)), performance.now(), () => false);
     await wait(7000); poele.parent?.remove(poele);
-    if (token === this.autoToken) { this.char.ikBut = 0; this.char.mains = null; }
+    if (token === this.autoToken) this.char.ikBut = 0;
   }
   /** Combien de variétés existent pour une plante (plant_<id>_v1_s4, _v2_s4…). */
   private nbVarietes(id: string): number { let n = 0; while (this.assets.has(`plant_${id}_v${n + 1}_s4`)) n++; return n; }
@@ -908,18 +914,23 @@ export class Game {
     const tenu = this.arrosoir, char = this.char;
     if (!tenu) return;
     const depart = this.paume('Right')?.clone(); if (!depart) return;
-    const orientation = char.bone('RightHand')?.getWorldQuaternion(new THREE.Quaternion());
     const debut = performance.now(), g = char.gestures.water;
+    const prise = char.priseDansLeGeste('water', g?.effet ?? char.clipDuree('water') * .35, 'Right');
+    const reference = new THREE.Quaternion().setFromEuler(new THREE.Euler(.70, 0, 0, 'YXZ'));
+    const grip = prise ? reference.invert().multiply(prise.orientation) : new THREE.Quaternion();
     const duree = g ? g.fin - g.debut : char.clipDuree('water');
     // Contrôler aussi les entrées/sorties : l'ancien arrêt de l'IK à effet+1,1 s
     // rendait le bras au clip brut pendant ses 2,5 dernières secondes.
-    char.mains = { paumes: true, orientationDroite: orientation ? () => orientation : undefined, droite: () => {
+    char.mains = { paumes: true, priseDroite: prise?.doigts, orientationDroite: () => tenu.o.getWorldQuaternion(new THREE.Quaternion()).multiply(grip), droite: () => {
       const t = (performance.now() - debut) / 1000;
       const k = THREE.MathUtils.smoothstep(t, 0, .75) * (1 - THREE.MathUtils.smoothstep(t, Math.max(.75, duree - .75), duree));
       const p = char.obj.position, yaw = Math.atan2(tenu.cible.x - p.x, tenu.cible.z - p.z);
       const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(tenu.verse * .70, yaw, 0, 'YXZ'));
       const bec = (tenu.o.userData.bec as THREE.Vector3).clone().applyQuaternion(q);
-      return depart.clone().lerp(tenu.cible.clone().add(new THREE.Vector3(0, .50, 0)).sub(bec), k);
+      const dehors = new THREE.Vector3(-Math.cos(char.obj.rotation.y), 0, Math.sin(char.obj.rotation.y));
+      const hauteur = this.state.character === 'marcel' ? .62 : .50;
+      const cible = depart.clone().lerp(tenu.cible.clone().add(new THREE.Vector3(0, hauteur, 0)).sub(bec), k).addScaledVector(dehors, Math.sin(Math.PI * k) * .06);
+      return cible;
     } }; char.ikBut = 1;
     setTimeout(() => { if (!tenu || this.arrosoir !== tenu || char !== this.char) return;
       tenu.versement = 1;
@@ -927,14 +938,18 @@ export class Game {
     setTimeout(() => { if (this.arrosoir === tenu) tenu.versement = 0; }, effet * 1000 + 1100);
   }
   private lacherArrosoir() { if (this.arrosoir) { this.arrosoir.o.parent?.remove(this.arrosoir.o); this.arrosoir = null; this.char.ikBut = 0; } }
+  private avancerArrosoir(dt: number) {
+    const a = this.arrosoir; if (!a || !this.char) return;
+    a.verse += (a.versement - a.verse) * Math.min(1, dt * 4);
+    const origine = this.char.obj.position;
+    a.o.rotation.set(a.verse * .70, Math.atan2(a.cible.x - origine.x, a.cible.z - origine.z), 0, 'YXZ');
+    a.o.updateMatrixWorld(true);
+  }
   private placerArrosoir(dt: number) {
     const a = this.arrosoir; if (!a || !this.char) return;
+    this.avancerArrosoir(dt);
     const p = this.paume('Right'); if (!p) return;
-    a.verse += ((a.versement) - a.verse) * Math.min(1, dt * 4);             // s'incliner en douceur
-    a.o.position.copy(p);
-    const origine = this.char.obj.position;
-    a.o.rotation.set(0, Math.atan2(a.cible.x - origine.x, a.cible.z - origine.z), 0);
-    a.o.rotateX(a.verse * .70);                                               // incliné seulement pour verser (~40°)
+    a.o.position.copy(p);                                               // incliné seulement pour verser (~40°)
     if (a.versement > .5 && a.verse > .5 && Math.random() < .7) {              // l'eau : des gouttes qui partent du bec vers le pot
       const bec = a.o.localToWorld(a.o.userData.bec.clone());
       this.world.gouttes(bec, a.cible);
@@ -943,39 +958,59 @@ export class Game {
   private tel: THREE.Object3D | null = null;
   private poeleEnCours: THREE.Object3D | null = null;
   /** Le téléphone : dans le monde, recalé à chaque image entre ses paumes (ou dans sa main droite), l'écran tourné vers son visage. */
+  private telLecture = false;
+  private telPrise: THREE.Quaternion | null = null;
+  private telContact = 0;
+  private cibleTelephone() {
+    const h = this.char.bone('Head')?.getWorldPosition(new THREE.Vector3()) ?? this.char.obj.position.clone().add(new THREE.Vector3(0, 1.5, 0));
+    const droite = new THREE.Vector3(-1, 0, 0).applyQuaternion(this.char.obj.quaternion);
+    if (this.telLecture) return h.addScaledVector(new THREE.Vector3(0, 0, 1).applyQuaternion(this.char.obj.quaternion), this.state.character === 'marcel' ? .28 : .30).addScaledVector(droite, .085).add(new THREE.Vector3(0, -.34, 0));
+    return h.addScaledVector(droite, this.char.rayonTeteDroite() + this.telContact + .012).add(new THREE.Vector3(0, .035, 0));
+  }
+  private orientationTelephone(paume = this.cibleTelephone()) {
+    const h = this.char.bone('Head')?.getWorldPosition(new THREE.Vector3()) ?? paume.clone().add(new THREE.Vector3(0, .4, 0));
+    const normal = h.sub(paume).normalize();
+    const droite = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), normal).normalize();
+    if (droite.lengthSq() < 1e-6) droite.set(1, 0, 0).applyQuaternion(this.char.obj.quaternion);
+    const haut = new THREE.Vector3().crossVectors(normal, droite).normalize();
+    return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(droite, haut, normal));
+  }
   private tenirTel() {
     this.lacherTel(); this.tel = this.fabriquerTel(); this.world.scene.add(this.tel);
+    this.telLecture = this.phoneOpen && this.char.has('phone_2');
+    this.telContact = ({ lea: .03478, marcel: .030642, jimy: .033179 } as Record<string, number>)[this.state.character] ?? .033;
+    if (BIBLIO.accessoires.has('telephone')) this.telContact -= .005; // pivot au dos, plutôt qu'au centre de la coque
     if (this.char.deLaBibliotheque) {
-      this.char.mains = { paumes: true, droite: () => {
-        const h = this.char.bone('Head')?.getWorldPosition(new THREE.Vector3()) ?? this.char.obj.position.clone().add(new THREE.Vector3(0, 1.5, 0));
-        const droite = new THREE.Vector3(-1, 0, 0).applyQuaternion(this.char.obj.quaternion);
-        const contact = ({ lea: .03478, marcel: .030642, jimy: .033179 } as Record<string, number>)[this.state.character] ?? .033;
-        return h.addScaledVector(droite, this.char.rayonTeteDroite() + contact + .009).add(new THREE.Vector3(0, .10, 0));
-      } }; this.char.ikBut = 1;
+      const clip = this.telLecture ? 'phone_2' : 'phone', t = Math.min(2.36, this.char.clipDuree(clip) * .25);
+      const prise = this.char.priseDansLeGeste(clip, t, 'Right');
+      const ph = this.char.osDansLeGeste(clip, t, 'RightHand'), pm = this.char.osDansLeGeste(clip, t, 'RightHandMiddle1'), th = this.char.osDansLeGeste(clip, t, 'Head');
+      this.telPrise = null;
+      if (prise && ph && pm && th) {
+        const normal = th.sub(ph.lerp(pm, .65)).normalize();
+        const droite = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), normal).normalize();
+        const haut = new THREE.Vector3().crossVectors(normal, droite).normalize();
+        this.telPrise = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(droite, haut, normal)).invert().multiply(prise.orientation);
+      }
+      const gripReference = this.telPrise?.clone() ?? new THREE.Quaternion();
+      this.char.mains = { paumes: true, droite: () => this.cibleTelephone(), orientationDroite: () => this.orientationTelephone().multiply(gripReference), priseDroite: prise?.doigts };
+      this.char.ikBut = 1;
     }
     this.placerTel();
   }
-  private lacherTel() { if (this.tel) { this.tel.parent?.remove(this.tel); this.tel = null; this.char.ikBut = 0; } }
+  private lacherTel() { if (this.tel) { this.tel.parent?.remove(this.tel); this.tel = null; this.char.ikBut = 0; } this.telPrise = null; }
   private paume(cote: 'Right' | 'Left'): THREE.Vector3 | null {
     const poignet = this.char.bone(cote + 'Hand'), doigt = this.char.bone(cote + 'HandMiddle1');
     if (!poignet) return null;
-    const a = new THREE.Vector3(); poignet.getWorldPosition(a);
-    if (!doigt) return a;
-    const b = new THREE.Vector3(); doigt.getWorldPosition(b);
-    return a.lerp(b, .65);                                              // le creux de la main, entre poignet et doigts
+    const a = poignet.getWorldPosition(new THREE.Vector3());
+    return doigt ? a.lerp(doigt.getWorldPosition(new THREE.Vector3()), .65) : a;
   }
   private placerTel() {
     if (!this.tel || !this.char) return;
     this.char.obj.updateMatrixWorld(true);
-    const d = this.paume('Right'), g = this.paume('Left');
-    if (!d) return;
-    const p = this.char.deLaBibliotheque ? d.clone() : (g && d.distanceTo(g) < .3 ? d.clone().add(g).multiplyScalar(.5) : d.clone());   // nouveaux corps : main droite seulement
-    const tete = this.char.bone('Head'); const h = new THREE.Vector3(); if (tete) tete.getWorldPosition(h); else h.copy(p).add(new THREE.Vector3(0, .4, 0));
-    if (this.char.deLaBibliotheque) h.y += .10;
-    const versTete = h.clone().sub(p).normalize();
-    const contact = ({ lea: .03478, marcel: .030642, jimy: .033179 } as Record<string, number>)[this.state.character] ?? .033;
-    this.tel.position.copy(p).addScaledVector(versTete, this.char.deLaBibliotheque ? contact : .025);
-    this.tel.lookAt(h);                                                   // l'écran regarde le visage
+    const p = this.paume('Right'); if (!p) return;
+    const q = this.orientationTelephone(p);
+    this.tel.position.copy(p).addScaledVector(new THREE.Vector3(0, 0, 1).applyQuaternion(q), this.telContact);
+    this.tel.quaternion.copy(q);
   }
   private porte: THREE.Object3D | null = null;
   private assiettePosee: THREE.Object3D | null = null; private poseTimer = 0;
@@ -1087,10 +1122,47 @@ export class Game {
     const cours = this.state.eco.immeuble.cours[pl.plant] ?? d.harvest;
     return `<b>${icon(pl.plant)} ${tx(d.name)}</b>${time}${water}<div class="st">${tt.harvestsDone(pl.harvests, d.harvests)} · ${cours} ${tt.points} / ${lang() === 'fr' ? 'unité' : 'unit'}</div>`;
   }
-  private tapSlot(id: number, x: number, y: number) {
+  private jardinageJoueur = false;
+  private preparationJoueur: Promise<void> | null = null;
+  private approcheAssise: { pos: THREE.Vector3; face: number } | null = null;
+  /** Le joueur reprend la main ; une séance autonome ne conserve ni ses drapeaux ni ses contacts. */
+  private async preparerActionJoueur(): Promise<boolean> {
+    if (this.jardinageJoueur) return false;
+    const personnage = this.char;
+    if (!this.preparationJoueur) {
+      const token = ++this.autoToken, ch = this.char;
+      clearTimeout(this.autoTimer);
+      this.preparationJoueur = (async () => {
+        const n = ch.currentName;
+        ch.annulerMarche(); ch.regard = null; ch.ikBut = 0;
+        this.lacherArrosoir(); this.lacherTel(); this.release();
+        this.poeleEnCours?.parent?.remove(this.poeleEnCours); this.poeleEnCours = null;
+        this.dansant = false;
+        const sortie = /^(sport_gainage|plank_)/.test(n) ? 'plank_end' : /^(sport_pompes|pushup_)/.test(n) ? 'pushup_end' : /^(sport_abdos|situp_)/.test(n) ? 'situp_end' : null;
+        if (this.approcheAssise) {
+          const a = this.approcheAssise;
+          await this.relever(token, a.pos, a.face);
+        } else if (n === 'sleep') {
+          // Une sieste interrompue doit quitter le matelas avant toute marche.
+          this.sleeping = false; ch.solAssis = null;
+          ch.teleport(this.world.bedSide.clone(), 0); ch.play('idle', .85);
+          await wait(850);
+        } else if (sortie && ch.has(sortie)) {
+          await ch.once(sortie, ch.clipDuree(sortie), false);
+        } else ch.play('idle', .4);
+        if (token !== this.autoToken || ch !== this.char) return;
+        ch.planSol = 0; ch.busy = false;
+        if (sortie) ch.play('idle', .35);
+      })();
+    }
+    const attente = this.preparationJoueur;
+    try { await attente; } finally { if (this.preparationJoueur === attente) this.preparationJoueur = null; }
+    return personnage === this.char && !this.jardinageJoueur;
+  }
+  private async tapSlot(id: number, x: number, y: number) {
     const p = this.slotState(id); if (!p) return;
     this.lastPlayerAction = Date.now();
-    this.autoToken++;
+    if (!await this.preparerActionJoueur()) return;
     if (this.sleeping) this.wakeUp();
     if (!p.plant) { this.ui.showPicker(id, x, y); return; }
     const pl = p.plant;
@@ -1193,17 +1265,23 @@ export class Game {
   private async sow(id: number, plant: string) {
     const s = this.state, p = this.slotState(id);
     const j = s.eco.jardin;
-    if (!p || p.plant || this.char.busy) return;
+    if (!p || p.plant || !await this.preparerActionJoueur()) return;
+    if (this.jardinageJoueur) return;
+    const token = this.autoToken, personnage = this.char;
+    this.jardinageJoueur = true;
+    try {
     this.ui.apercuRecolte(plant);                                      // ce que tu récolteras, en image
     if (!j.poche[plant]) { if (!j.rares[plant]) return; j.rares[plant]--; if (!j.rares[plant]) delete j.rares[plant]; }   // une rare se sème une fois
     const slot = SLOTS[id];
     this.ui.refresh();
     await this.gotoSlot(slot, 'plant');
+    if (token !== this.autoToken || personnage !== this.char) return;
     this.char.busy = true;
     // (plus de sachet de graines dans la main : depuis la réparation des squelettes, il se plaçait dans les bras)
     this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('plant'); const done = g.fin;
     this.mainVersLaPlante(p, 'semis', g.effet);
     await wait(g.effet * 1000);
+    if (token !== this.autoToken || personnage !== this.char) return;
     p.plant = P.sow(plant);
     p.plant.wateredAt = Date.now();          // on sème dans une terre humide
     if ((s.eco.jardin.etape ?? 0) < 5) p.plant.acc = Math.max(1, plantDef(plant).grow / 90);   // l'accueil : chaque première pousse mûrit en 90 s
@@ -1212,17 +1290,29 @@ export class Game {
     this.ui.toast(t().planted(tx(plantDef(plant).name)));
     this.dernierSeme = plant;
     if ((s.eco.jardin.etape ?? 0) <= 1) this.etape(1);
-    await done; this.char.regard = null; this.char.busy = false; this.release();
+    await done; if (token !== this.autoToken || personnage !== this.char) return; this.char.regard = null; this.char.busy = false; this.release();
     this.persist();
+    } finally {
+      if (personnage === this.char) {
+        this.jardinageJoueur = false;
+        if (token === this.autoToken) { personnage.busy = false; if (this.phoneOpen && this.running) void this.phoneGesture(true); }
+      }
+    }
   }
   private async doWater(p: PotState) {
-    if (this.char.busy || !p.plant) return;
+    if (!p.plant || !await this.preparerActionJoueur()) return;
+    if (this.jardinageJoueur) return;
+    const token = this.autoToken, personnage = this.char;
+    this.jardinageJoueur = true;
+    try {
     await this.gotoSlot(SLOTS[p.id], 'water');
+    if (token !== this.autoToken || personnage !== this.char) return;
     this.char.busy = true;
     this.tenirArrosoir(SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .25, 0)));
     this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('water'); const done = g.fin;
     this.verser(g.effet);
     await wait(g.effet * 1000);
+    if (token !== this.autoToken || personnage !== this.char) return;
     P.water(p.plant);
     this.refreshSlot(p);
     if (this.state.items.includes('can_green')) {
@@ -1232,17 +1322,29 @@ export class Game {
     }
     this.ui.toast(t().watered);
     this.etape(2);
-    await done; this.char.regard = null; this.char.busy = false; this.release(); this.lacherArrosoir();
+    await done; if (token !== this.autoToken || personnage !== this.char) return; this.char.regard = null; this.char.busy = false; this.release(); this.lacherArrosoir();
     this.persist();
+    } finally {
+      if (personnage === this.char) {
+        this.jardinageJoueur = false;
+        if (token === this.autoToken) { personnage.busy = false; if (this.phoneOpen && this.running) void this.phoneGesture(true); }
+      }
+    }
   }
   private async doHarvest(p: PotState) {
-    if (this.char.busy || !p.plant) return;
+    if (!p.plant || !await this.preparerActionJoueur()) return;
     const tt = t();
+    if (this.jardinageJoueur) return;
+    const token = this.autoToken, personnage = this.char;
+    this.jardinageJoueur = true;
+    try {
     await this.gotoSlot(SLOTS[p.id], 'harvest');
+    if (token !== this.autoToken || personnage !== this.char) return;
     this.char.busy = true;
     this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('harvest'); const done = g.fin;
     this.mainVersLaPlante(p, 'recolte', g.effet);
     await wait(g.effet * 1000);
+    if (token !== this.autoToken || personnage !== this.char) return;
     const d = plantDef(p.plant.plant), j = this.state.eco.jardin;
     const r = P.harvest(p.plant);                                          // on récolte toujours : le pot se libère
     this.state.log.recoltes = (this.state.log.recoltes ?? 0) + r.count;
@@ -1253,8 +1355,14 @@ export class Game {
     this.ui.refresh();
     this.ui.toast(tt.harvested(tx(d.name), r.count));
     this.etape(4);
-    await done; this.char.regard = null; this.char.busy = false;
+    await done; if (token !== this.autoToken || personnage !== this.char) return; this.char.regard = null; this.char.busy = false;
     this.persist();
+    } finally {
+      if (personnage === this.char) {
+        this.jardinageJoueur = false;
+        if (token === this.autoToken) { personnage.busy = false; if (this.phoneOpen && this.running) void this.phoneGesture(true); }
+      }
+    }
   }
   /** Les fruits volent du pot au panier. */
   private flyCrops(plant: string, from: THREE.Vector3, n: number, variete = 1) {
@@ -1279,13 +1387,18 @@ export class Game {
   // ---------- téléphone : vendre et acheter
   private phoneOpen = false;
   /** Téléphone ouvert : le personnage le sort et reste dessus tant que l'écran est ouvert. */
-  private phoneGesture(open: boolean) {
+  private async phoneGesture(open: boolean) {
     this.phoneOpen = open;
     if (!this.char || !this.running) return;
     this.lastPlayerAction = Date.now();
-    this.autoToken++;
-    if (open) { if (this.sleeping) this.wakeUp(); if (!this.char.busy) { this.char.play('phone'); this.tenirTel(); } }
-    else { if (this.char.currentName === 'phone') this.char.play('idle'); this.lacherTel(); }
+    if (open) {
+      if (!await this.preparerActionJoueur() || !this.phoneOpen || !this.running) return;
+      if (this.sleeping) this.wakeUp();
+      this.char.play(this.char.has('phone_2') ? 'phone_2' : 'phone'); this.tenirTel();
+    } else {
+      if (/^phone(?:_2)?$/.test(this.char.currentName)) this.char.play('idle');
+      this.lacherTel();
+    }
   }
   private flyCoins(n: number) {
     if (!this.assets.has('prop_coin')) return;
@@ -1362,21 +1475,23 @@ export class Game {
     if (this.char.busy || e.platEnCours) return;
     if (!E.peutCuisiner(e.jardin, ECO)) { this.ui.toast(tt.cuisinerPasEncore); return; }
     this.ui.togglePhone(false);
-    this.autoToken++; const token = this.autoToken;
+    this.autoToken++; const token = this.autoToken, personnage = this.char;
+    const valide = () => token === this.autoToken && personnage === this.char;
+    let poele: THREE.Object3D | null = null;
+    try {
     this.char.busy = true;
-    await this.goInside(token);
+    await this.goInside(token); if (!valide()) return;
     const W = this.world;
     if (W.kitchenSpot) {                                             // à la cuisinière de ta maison (sur la terrasse pour Jimy)
       const f = Math.atan2(W.kitchenLook.x - W.kitchenSpot.x, W.kitchenLook.z - W.kitchenSpot.z);
-      if (!W.hasRoom) await this.char.goTo(new THREE.Vector3(this.char.obj.position.x, FL, LAYOUT.corridorZ));
-      await this.marcherMeubles(W.kitchenSpot.clone(), f);
-    } else this.char.obj.rotation.y = Math.PI;                       // sinon dos à nous
+      if (!W.hasRoom) { await this.char.goTo(new THREE.Vector3(this.char.obj.position.x, FL, LAYOUT.corridorZ)); if (!valide()) return; }
+      await this.marcherMeubles(W.kitchenSpot.clone(), f); if (!valide()) return;
+    } else { this.char.tourner(Math.PI); await wait(1000); if (!valide()) return; }                       // sinon dos à nous
     const c = charDef(this.state.character);
     const re = ECO.recette(e.jardin.recette!.recette);
     this.ui.toast(c.universe === 'woman' ? tt.enCuisine : tt.ilCuisine, 3000);
     const fwd = new THREE.Vector3(Math.sin(this.char.obj.rotation.y), 0, Math.cos(this.char.obj.rotation.y));
     // la poêle : sur la cuisinière devant lui, ou dans sa main s'il n'y a pas de cuisine
-    let poele: THREE.Object3D | null = null;
     const pan = this.char.obj.position.clone().addScaledVector(fwd, .30);
     const cols = re.ingredients.map(i => ECO.graine(i.graine).couleur ?? '#7fae4a');
     if (W.kitchenSpot) { poele = this.fabriquerPoele(cols); this.poeleEnCours = poele; pan.y = W.kitchenTop + .005; poele.position.copy(pan); poele.rotation.y = this.char.obj.rotation.y + Math.PI / 2; W.scene.add(poele); }
@@ -1391,17 +1506,17 @@ export class Game {
     let saupoudre = false;
     this.mainsCuisine(pan, t0, () => saupoudre);
     W.coeurs(() => pan.clone().add(new THREE.Vector3(0, .12, 0)), 3000, 420);   // quelques cœurs montent avec la vapeur
-    await wait(3200);
+    await wait(3200); if (!valide()) return;
     const amour = lang() === 'en' ? re.amour_en : re.amour_fr;              // l'ingrédient le plus important
     if (amour) {
       saupoudre = true; this.ui.toast(amour.charAt(0).toUpperCase() + amour.slice(1), 2600);
       const main = this.char.bone('RightHand');
       W.coeurs(() => { const v = new THREE.Vector3(); if (main) main.getWorldPosition(v); else v.copy(pan).add(new THREE.Vector3(0, .25, 0)); return v; }, 2400);
-      await wait(1600); saupoudre = false;
+      await wait(1600); if (!valide()) return; saupoudre = false;
     }
-    await wait(DUREE - 3200 - (amour ? 1600 : 0));
-    this.char.ikBut = 0; await wait(450);
-    this.char.play('idle', .3); await wait(300);
+    await wait(DUREE - 3200 - (amour ? 1600 : 0)); if (!valide()) return;
+    this.char.ikBut = 0; await wait(450); if (!valide()) return;
+    this.char.play('idle', .3); await wait(300); if (!valide()) return;
     if (poele) poele.parent?.remove(poele); this.poeleEnCours = null;
     const plat = E.cuisiner(e.immeuble, e.jardin, ECO, this.ecoNow());
     if (plat) {
@@ -1414,9 +1529,15 @@ export class Game {
       this.montrerPlat();                                              // le plat est prêt : on le montre tout de suite
       await this.danser(token);                                        // et c'est la fête, au milieu du salon, jusqu'au bout
     }
+    if (!valide()) return;
     this.char.busy = false;
     this.persist();
     this.scheduleAutonomy();
+    } finally {
+      poele?.parent?.remove(poele);
+      if (this.poeleEnCours === poele) this.poeleEnCours = null;
+      if (valide()) { personnage.ikBut = 0; personnage.busy = false; }
+    }
   }
   /** Des gestes fabriqués par le jeu : les mains sont guidées vers des points autour du corps (comme en cuisine),
    *  par-dessus la pose debout. Chaque geste est court, lisible de loin, et ne demande aucune animation téléchargée. */
@@ -1431,10 +1552,12 @@ export class Game {
     const CLIP: Record<string, string> = { saluer: 'saluer', etirer: 'etirer', hanches: 'mains_hanches', dos: 'idle_3', tete: 'reflechir', applaudir: 'applaudir', bailler: 'bailler', cafe: 'cafe', pointer: 'pointer' };   // (rambarde : l'animation Mixamo est « dos au mur », on garde les mains sur la vraie rambarde)
     if (this.char.deLaBibliotheque && this.char.has(CLIP[quoi])) {    // que du propre : la vraie animation
       const n = CLIP[quoi], d = this.char.clipDuree(n);
-      if (cible) this.char.regard = cible();
+      this.char.regard = cible?.() ?? null;
+      // Une animation native ne doit pas hériter du guidage des mains du geste précédent.
+      this.char.ikBut = 0;
       let tasse: THREE.Object3D | null = null, vivant = true;
       if (quoi === 'cafe') {                                             // la tasse : dans la main gauche, droite, l'anse vers le corps
-        tasse = await BIBLIO.accessoire('tasse'); if (tasse) { this.world.scene.add(tasse); const suivre = () => { if (!vivant || !tasse) return; if (token !== this.autoToken || personnage !== this.char) { vivant = false; tasse.parent?.remove(tasse); return; } const g = this.paume('Left'); if (g) { tasse.position.copy(g); tasse.rotation.set(0, this.char.obj.rotation.y + Math.PI, 0); } requestAnimationFrame(suivre); }; suivre(); }
+        tasse = await BIBLIO.accessoire('tasse'); if (token !== this.autoToken || personnage !== this.char) return; if (tasse) { this.world.scene.add(tasse); const suivre = () => { if (!vivant || !tasse) return; if (token !== this.autoToken || personnage !== this.char) { vivant = false; tasse.parent?.remove(tasse); return; } const g = this.paume('Left'); if (g) { tasse.position.copy(g); tasse.rotation.set(0, this.char.obj.rotation.y + Math.PI, 0); } requestAnimationFrame(suivre); }; suivre(); }
       }
       await this.char.once(n, Math.max(d, ms / 1000));
       vivant = false; if (tasse) this.world.scene.remove(tasse);
@@ -1476,11 +1599,14 @@ export class Game {
     if (token !== this.autoToken || personnage !== this.char) { if (tasse) tasse.parent?.remove(tasse); return; }
     this.char.ikBut = 0; await wait(400);
     if (tasse) this.world.scene.remove(tasse);
+    if (token !== this.autoToken || personnage !== this.char) return;
     if (quoi === 'bailler') this.char.regard = null;
   }
   /** Un dessin passe dans le ciel : s'il est libre, le personnage le suit des yeux et le montre du doigt. */
   private montrerLeCiel(sp: THREE.Sprite) {
     if (!this.running || this.char.busy || this.sleeping || this.phoneOpen || this.sceneRevue) return;
+    const personnage = this.char, token = this.autoToken;
+    const valide = () => this.running && personnage === this.char && token === this.autoToken;
     // nous fait-il face ? (son regard est tourné vers la caméra, à 60° près)
     const cam = this.world.camera.position, me = this.char.obj.position;
     const versCam = Math.atan2(cam.x - me.x, cam.z - me.z);
@@ -1488,17 +1614,18 @@ export class Game {
     if (ecart < 1.05 && this.char.has('regard_epaule')) {
       this.char.busy = true;
       setTimeout(() => {
-        const d = this.char.clipDuree('regard_epaule');
-        this.char.once('regard_epaule', d).then(() => { this.char.play('idle', .4); this.char.busy = false; });
+        if (!valide()) return;
+        const d = personnage.clipDuree('regard_epaule');
+        personnage.once('regard_epaule', d).then(() => { if (!valide()) return; personnage.play('idle', .4); personnage.busy = false; });
       }, 1800);
       return;
     }
     this.char.busy = true;
-    const suivre = setInterval(() => { this.char.regard = sp.position.clone(); }, 100);
-    setTimeout(() => this.gesteBras('pointer', 3200, () => sp.position.clone()).then(() => { clearInterval(suivre); this.char.regard = null; this.char.busy = false; }), 2500);
+    const suivre = setInterval(() => { if (!valide()) { clearInterval(suivre); return; } personnage.regard = sp.position.clone(); }, 100);
+    setTimeout(() => { if (!valide()) { clearInterval(suivre); return; } void this.gesteBras('pointer', 3200, () => sp.position.clone()).then(() => { clearInterval(suivre); if (!valide()) return; personnage.regard = null; personnage.busy = false; }); }, 2500);
   }
   /** Une séance de gym : sur la piste (au milieu du salon, ou sur le toit), tous les exercices disponibles à la suite,
-   *  chacun répété, puis un étirement. Rien ne l'interrompt tant qu'elle n'est pas finie. */
+   *  chacun répété, puis un étirement. Une demande du joueur reprend la main avec un relevé si nécessaire. */
   private async seanceSport(token: number) {
     const ordre = ['sport_jacks', 'sport_squat', 'sport_pompes', 'sport_abdos', 'sport_gainage', 'sport_burpee'];
     const exos = [...ordre.filter(n => this.char.has(n)), ...this.char.variantes('sport').filter(n => !ordre.includes(n))];
@@ -1508,16 +1635,23 @@ export class Game {
       if (W.hasRoom && sp.z < FACADE_FRONT - .1) { await this.goInside(token); await this.marcherMeubles(sp.clone().setY(FL), 0); }
       else await this.walk(sp.clone().setY(FL), 0);
     }
-    this.dansant = true; this.char.busy = true;                        // la séance ne se coupe pas
+    if (token !== this.autoToken) return;
     const tapis = await BIBLIO.accessoire('tapis_sport');
     if (token !== this.autoToken) return;
+    this.dansant = true; this.char.busy = true;
     if (tapis) { tapis.position.copy(this.char.obj.position); tapis.position.y = FL + (this.char.obj.position.z < FACADE_FRONT - .1 ? W.solPiece : W.solBalcon) + .001; tapis.rotation.y = this.char.obj.rotation.y; W.scene.add(tapis); this.char.planSol = .009; }
     try {
       for (const n of exos) {
         if (token !== this.autoToken) return;
         const d = this.char.clipDuree(n); if (!d) continue;
         const fois = n === 'sport_gainage' ? 1 : d < 3 ? 3 : d < 6 ? 2 : 1;
-        for (let i = 0; i < fois; i++) { if (token !== this.autoToken) return; await this.char.once(n, d); }
+        const entree = n === 'sport_gainage' ? 'plank_start' : n === 'sport_pompes' ? 'pushup_start' : n === 'sport_abdos' ? 'situp_start' : n === 'sport_jacks' ? 'jacks_start' : null;
+        const sortie = n === 'sport_gainage' ? 'plank_end' : n === 'sport_pompes' ? 'pushup_end' : n === 'sport_abdos' ? 'situp_end' : n === 'sport_jacks' ? 'jacks_end' : null;
+        if (entree && this.char.has(entree)) await this.char.once(entree, this.char.clipDuree(entree), false);
+        if (token !== this.autoToken) return;
+        await this.char.repeter(n, fois);
+        if (token !== this.autoToken) return;
+        if (sortie && this.char.has(sortie)) await this.char.once(sortie, this.char.clipDuree(sortie), false);
         if (token !== this.autoToken) return;
         this.char.play('idle', .4); await wait(700);
       }
@@ -1540,8 +1674,7 @@ export class Game {
     this.dansant = true; this.char.busy = true;
     const danses = this.char.variantes('dance').filter(n => this.state.character === 'lea' || !['dance', 'dance_14', 'dance_15'].includes(n)), laquelle = danses[Math.floor(Math.random() * danses.length)] ?? 'dance';
     const clip = this.char.clipDuree(laquelle);
-    this.char.play(laquelle, .3);
-    await wait(Math.max(3000, Math.min(12000, clip * 1000)));         // la danse entière (entre 3 et 12 s)
+    await this.char.once(laquelle, clip, false);         // la danse entière (entre 3 et 12 s)
     if (token !== this.autoToken) return;
     this.char.play('idle', .4); await wait(400);
     if (token !== this.autoToken) return;
@@ -1576,6 +1709,8 @@ export class Game {
   /** Offrir le plat à un voisin : l'assiette s'envole vers lui, les points arrivent, et parfois une graine rare. */
   private async offrir(jardinId: string) {
     const e = this.state.eco, tt = t();
+    const personnage = this.char, monde = this.world, token = this.autoToken;
+    const valide = () => this.running && personnage === this.char && monde === this.world && token === this.autoToken;
     const plat = e.platEnCours; if (!plat) return;
     const a = e.immeuble.jardins.find(x => x.id === jardinId); if (!a) return;
     this.ui.togglePhone(false);
@@ -1584,16 +1719,21 @@ export class Game {
     const res = E.offrir(e.immeuble, plat, e.jardin, a, ECO, this.ecoNow(), this.ecoRng);
     e.carnet.push(plat);
     const posee = this.assiettePosee; this.assiettePosee = null; clearTimeout(this.poseTimer);
-    setTimeout(() => { if (!this.char.busy && this.running) { this.char.busy = true; this.gesteBras('applaudir', 1600).then(() => { this.char.busy = false; }); } }, 900);   // content !
+    setTimeout(() => { if (valide() && !personnage.busy) { personnage.busy = true; this.gesteBras('applaudir', 1600).then(() => { if (valide()) personnage.busy = false; }); } }, 900);   // content !
     const assiette = this.porte ?? posee ?? this.fabriquerAssiette(this.couleursRecette());
     if (posee) posee.parent?.remove(posee);
     const occupe = this.char.busy; this.char.busy = true;
-    this.char.play('carry', .2); this.porte = this.devantSoi(assiette, 0, 1.0, .3);
+    this.char.play('idle', .2); this.porte = this.devantSoi(assiette, 0, 1.0, .3);
     this.char.mains = { paumes: true, droite: () => assiette.localToWorld(new THREE.Vector3(-.115, .018, 0)), gauche: () => assiette.localToWorld(new THREE.Vector3(.115, .018, 0)) }; this.char.ikBut = 1;
     await wait(650);
-    const depart = this.lacher() ?? this.char.obj.position.clone();
-    this.char.play('idle', .2); this.char.busy = occupe;
-    this.world.flyAway(depart, assiette);                                // c'est la vraie assiette, garnie, qui s'envole
+    const depart = assiette.getWorldPosition(new THREE.Vector3());
+    if (valide()) {
+      this.lacher(); personnage.play('idle', .2); personnage.busy = occupe;
+      monde.flyAway(depart, assiette);
+    } else {
+      assiette.parent?.remove(assiette);
+      if (this.porte === assiette) this.porte = null;
+    }                                // c'est la vraie assiette, garnie, qui s'envole
     this.ui.toast(tt.platOffert(lang() === 'en' ? re.nom_en : re.nom_fr, a.nom, plat.valeur), 3000);
     const ecran = this.world.toScreen(depart);
     const avant = e.jardin.points - plat.valeur;
@@ -1604,7 +1744,7 @@ export class Game {
       if (e.jardin.points >= prix) this.ui.notifier(`${tt.gainPieces(plat.valeur)}. ${tt.peutAcheter}`, 'boutique');
       else this.ui.notifier(`${tt.gainPieces(plat.valeur)}. ${tt.encorePieces(prix - e.jardin.points)}`, 'boutique');
     }), 700);
-    if (!this.char.busy) { this.char.play('dance'); setTimeout(() => { if (this.char.currentName === 'dance') this.char.play('idle'); }, 4000); }
+    if (valide() && !personnage.busy) { personnage.play('dance'); setTimeout(() => { if (valide() && personnage.currentName === 'dance') personnage.play('idle'); }, 4000); }
     setTimeout(() => this.ecoEvenements(), 800);
     void res;
     this.ui.refresh(); this.persist();
@@ -1634,8 +1774,9 @@ export class Game {
         this.char.busy = true;
         this.tenirArrosoir(SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .25, 0)));
         this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('water'); const done = g.fin; this.verser(g.effet); await wait(g.effet * 1000);
+        if (token !== this.autoToken) return;
         if (p.plant) { P.water(p.plant); this.refreshSlot(p); this.state.log.wateredByChar++; }
-        await done; this.char.regard = null; this.char.busy = false; this.release(); this.lacherArrosoir();
+        await done; if (token !== this.autoToken) return; this.char.regard = null; this.char.busy = false; this.release(); this.lacherArrosoir();
       } else if (night && !this.onRoof) {
         await this.goToBed(token);
       } else {
@@ -1700,6 +1841,7 @@ export class Game {
       }
       if (token !== this.autoToken) return;
       const t0 = performance.now(), me = this.char.obj.position.clone();
+      if (W.hasRoom && !this.onRoof) W.ciel?.passageFenetre(9000);
       const geste = Math.random() < .6 ? this.gesteBras('dos', 9000) : null;                                // les mains dans le dos (le café est retiré : la tasse flottait)
       await vivre(9000, () => {                                     // il balaie la vue par la fenêtre, de gauche à droite, au loin
         const t = (performance.now() - t0) / 1000, a = face + Math.sin(t * .45) * .6;
@@ -1809,12 +1951,13 @@ export class Game {
     this.char.play('sleep', .4);
     this.sleeping = true;
     while (this.sleeping && token === this.autoToken && this.world.targetNight > .3) await wait(500);
-    if (this.sleeping) this.wakeUp();
+    if (token === this.autoToken && this.sleeping) this.wakeUp();
   }
   private wakeUp() {
     if (!this.sleeping) return;
     this.sleeping = false;
-    this.char.play('idle', .3);
+    this.char.solAssis = null;
+    this.char.play('idle', .85);
     this.char.teleport(this.world.bedSide.clone(), 0);
     const tk = ++this.autoToken;
     this.goOutside(tk).then(() => { if (tk === this.autoToken) this.scheduleAutonomy(); });
@@ -1833,35 +1976,42 @@ export class Game {
     await this.goOutside(token);
   }
   /** S'asseoir sur un vrai siège de la maison (mesuré dans Blender) : on arrive devant, on se tourne, le bassin sur l'assise. */
+  /** Arrivée debout, descente et relevé : la racine se déplace pendant la transition. */
+  private async asseoir(token: number, siege: THREE.Vector3, face: number, hauteur: number, anim = 'sit') {
+    const ch = this.char, W = this.world, dir = new THREE.Vector3(Math.sin(face), 0, Math.cos(face));
+    const h = ch.osDansLeGeste(anim, .3, 'Hips') ?? new THREE.Vector3();
+    const fin = siege.clone().sub(h.clone().setY(0).applyAxisAngle(new THREE.Vector3(0, 1, 0), face));
+    fin.y = hauteur - ch.surfacePose(anim, .3, 'assise');
+    const approche = fin.clone().addScaledVector(dir, .46); approche.y = W.solAuPoint(approche);
+    await this.marcherMeubles(approche, face); if (token !== this.autoToken) return null;
+    ch.regard = null; ch.tourner(face); await wait(350); if (token !== this.autoToken) return null;
+    this.approcheAssise = { pos: approche.clone(), face };
+    ch.solAssis = W.solAuPoint(approche);
+    const descente = ch.has('sit_down') ? 'sit_down' : anim, d = ch.has('sit_down') ? ch.clipDuree(descente) : .8;
+    ch.deplacerOrigine(fin, d, descente);
+    await ch.once(descente, d, false); if (token !== this.autoToken) return null;
+    ch.play(anim, .4);
+    return approche;
+  }
+  private async relever(token: number, approche: THREE.Vector3, face: number) {
+    if (token !== this.autoToken) return;
+    const ch = this.char; ch.regard = null;
+    const d = ch.has('stand_up') ? ch.clipDuree('stand_up') : .9;
+    ch.deplacerOrigine(approche, d, ch.has('stand_up') ? 'stand_up' : undefined);
+    await ch.once(ch.has('stand_up') ? 'stand_up' : 'idle', d, false);
+    if (token !== this.autoToken) return;
+    this.approcheAssise = null;
+    ch.solAssis = null; ch.play('idle', .4); ch.tourner(face);
+  }
   private async goSiege(token: number) {
-    const W = this.world;
-    const canapes = W.sieges.filter(q => q.genre === 'canape');
-    const choix = canapes.length && Math.random() < .6 ? canapes : W.sieges;   // le canapé a la préférence
-    if (!choix.length) return;
-    const q = choix[Math.floor(Math.random() * choix.length)];
-    const rentrer = q.dedans && W.hasRoom;
+    const W = this.world, choix = W.sieges; if (!choix.length) return;
+    const q = choix[Math.floor(Math.random() * choix.length)], rentrer = q.dedans && W.hasRoom;
     if (rentrer) { await this.goInside(token); if (token !== this.autoToken) return; }
-    const dir = new THREE.Vector3(Math.sin(q.face), 0, Math.cos(q.face));
-    await this.marcherMeubles(q.pos.clone().addScaledVector(dir, .5).setY(FL), q.face); if (token !== this.autoToken) return;
-    this.char.obj.rotation.y = q.face;
-    { const ss = this.char.variantes('sit').filter(n => /^sit(?:_\d+)?$/.test(n)); this.char.play(ss[Math.floor(Math.random() * ss.length)] ?? 'sit', .3); }
-    const cfg = this.char.sitCfg;
-    await wait(cfg ? Math.min(4000, cfg.installe_a * 1000 + 450) : 600);
-    if (token !== this.autoToken) return;
-    const hips = this.char.bone('Hips');
-    if (hips) {
-      const hp = new THREE.Vector3(); hips.getWorldPosition(hp);
-      const cible = q.pos.clone().addScaledVector(dir, .06);                // le bassin un peu en avant du centre de l'assise
-      this.char.obj.position.x += cible.x - hp.x; this.char.obj.position.z += cible.z - hp.z;
-      if (cfg) this.char.obj.position.y = FL + q.h + .06 - cfg.cuisses_z;   // les cuisses posées sur l'assise mesurée
-      this.char.obj.position.y = FL + q.h - this.char.surfacePose(this.char.currentName, .3, 'assise');
-      this.char.solAssis = FL + (q.dedans ? W.solPiece : W.solBalcon);
-    }
-    const t0 = Date.now(); while (Date.now() - t0 < 12000 + Math.random() * 8000) { await wait(400); if (token !== this.autoToken) break; }
-    if (token !== this.autoToken) return;
-    this.char.play('idle', .3);
-    if (token !== this.autoToken) return;
-    this.char.teleport(q.pos.clone().addScaledVector(dir, .5).setY(FL), q.face);
+    const variantes = this.char.variantes('sit').filter(n => /^sit(?:_\d+)?$/.test(n));
+    const anim = variantes[Math.floor(Math.random() * variantes.length)] ?? 'sit';
+    const approche = await this.asseoir(token, q.pos, q.face, FL + q.h, anim); if (!approche) return;
+    await wait(12000); if (token !== this.autoToken) return;
+    await this.relever(token, approche, q.face); if (token !== this.autoToken) return;
     if (rentrer) await this.goOutside(token);
   }
   /** Assis : si un pied passe sous le sol (siège plus bas que l'assise de l'animation), on remonte le personnage d'autant. */
@@ -1876,27 +2026,13 @@ export class Game {
   }
   /** S'installer dans le canapé : on arrive devant, on s'assoit, le bassin calé sur l'assise. */
   private async goCanape(token: number) {
-    const W = this.world;
-    const sp = this.world.canapeSpot; if (!sp) return;
+    const W = this.world, sp = W.canapeSpot; if (!sp) return;
     await this.goInside(token); if (token !== this.autoToken) return;
-    const dir = sp.look.clone().sub(sp.pos).setY(0).normalize();
-    const face = Math.atan2(dir.x, dir.z);
-    await this.marcherMeubles(sp.pos.clone().addScaledVector(dir, .5).setY(FL), face); if (token !== this.autoToken) return;
-    this.char.obj.rotation.y = face;
-    this.char.play('sit', .3);
-    const cfg = this.char.sitCfg;
-    await wait(cfg ? Math.min(4000, cfg.installe_a * 1000 + 450) : 500);
-    if (token !== this.autoToken) return;
-    const hips = this.char.bone('Hips');
-    if (hips) { const hp = new THREE.Vector3(); hips.getWorldPosition(hp); const d = sp.pos.clone().addScaledVector(dir, .08).sub(hp); d.y = cfg ? (FL + .42 + .08 - cfg.cuisses_z) - this.char.obj.position.y : 0; this.char.obj.position.add(d); }
+    const dir = sp.look.clone().sub(sp.pos).setY(0).normalize(), face = Math.atan2(dir.x, dir.z);
     const meuble = W.sieges.filter(q => q.genre === 'canape').sort((a, b) => a.pos.distanceTo(sp.pos) - b.pos.distanceTo(sp.pos))[0];
-    this.char.obj.position.y = FL + (meuble?.h ?? .42) - this.char.surfacePose('sit', .3, 'assise');
-    this.char.solAssis = FL + W.solPiece;
-    const t0 = Date.now(); while (Date.now() - t0 < 12000 + Math.random() * 6000) { await wait(400); if (token !== this.autoToken) break; }
-    if (token !== this.autoToken) return;
-    this.char.play('idle', .3);
-    if (token !== this.autoToken) return;
-    this.char.teleport(sp.pos.clone().addScaledVector(dir, .5).setY(FL), face);
+    const approche = await this.asseoir(token, meuble?.pos ?? sp.pos, face, FL + (meuble?.h ?? .42)); if (!approche) return;
+    await wait(12000); if (token !== this.autoToken) return;
+    await this.relever(token, approche, face); if (token !== this.autoToken) return;
     await this.goOutside(token);
   }
   /** Une petite sieste sur le lit, en pleine journée. */
@@ -1910,6 +2046,7 @@ export class Game {
     if (token !== this.autoToken) return;
     this.char.play('idle', .4);
     if (token !== this.autoToken) return;
+    this.char.solAssis = null;
     this.char.teleport(W.bedSide.clone(), Math.PI);
     await this.goOutside(token);
   }
@@ -1935,74 +2072,22 @@ export class Game {
     console.info(`[lit] ${this.state.character}: origine ${pos.toArray()}, yaw ${yaw.toFixed(5)}, surface torse ${ch.surfacePose('sleep', .3, 'dos').toFixed(4)}`);
   }
   private async goArmchair(token: number) {
-    const spot = this.world.armchairSpot; if (!spot) return;
+    const W = this.world, sp = W.armchairSpot; if (!sp) return;
     await this.goInside(token); if (token !== this.autoToken) return;
-    const fwd = new THREE.Vector3(Math.sin(spot.face), 0, Math.cos(spot.face));
-    await this.marcherMeubles(spot.pos.clone().add(fwd.clone().multiplyScalar(.45)), spot.face); if (token !== this.autoToken) return;
-    this.char.play('sit');
-    await wait(500);
-    if (token !== this.autoToken) return;
-    const hips = this.char.bone('Hips');
-    if (hips) { const hp = new THREE.Vector3(); hips.getWorldPosition(hp); const d = spot.pos.clone().setY(FL + .5).sub(hp); d.y = Math.max(-.25, Math.min(.25, d.y + .06)); this.char.obj.position.add(d); }
-    const meuble = this.world.sieges.filter(q => q.genre !== 'canape').sort((a, b) => a.pos.distanceTo(spot.pos) - b.pos.distanceTo(spot.pos))[0];
-    this.char.obj.position.y = FL + (meuble?.h ?? .32) - this.char.surfacePose('sit', .3, 'assise');
-    this.char.solAssis = FL + this.world.solPiece;
-    const t0 = Date.now(); while (Date.now() - t0 < 12000) { await wait(400); if (token !== this.autoToken) break; }
-    if (token !== this.autoToken) return;
-    this.char.play('idle');
-    if (token !== this.autoToken) return;
-    this.char.teleport(spot.pos.clone().add(fwd.clone().multiplyScalar(.45)).setY(FL), spot.face);
+    const meuble = W.sieges.filter(q => q.genre !== 'canape').sort((a, b) => a.pos.distanceTo(sp.pos) - b.pos.distanceTo(sp.pos))[0];
+    const approche = await this.asseoir(token, meuble?.pos ?? sp.pos, sp.face, FL + (meuble?.h ?? .32)); if (!approche) return;
+    await wait(12000); if (token !== this.autoToken) return;
+    await this.relever(token, approche, sp.face); if (token !== this.autoToken) return;
     await this.goOutside(token);
   }
   private async goSit(token: number, anim: 'sit' | 'sit_2' | 'sleep', then?: string) {
-    const fwd = new THREE.Vector3(Math.sin(CHAIR_SPOT.face), 0, Math.cos(CHAIR_SPOT.face));
-    // d'où arriver sur la chaise : devant elle si c'est libre, sinon par le côté qui donne sur le balcon, sinon par derrière.
-    // Un point n'est gardé que s'il est vraiment libre (ni mur, ni rambarde, ni meuble) et qu'on peut y aller sans rien traverser.
-    const centre = new THREE.Vector3(0, FL, LAYOUT.corridorZ);
-    const cote = new THREE.Vector3(-fwd.z, 0, fwd.x); if (cote.dot(centre.clone().sub(CHAIR_SPOT.pos)) < 0) cote.negate();
-    const essais = [fwd, cote, fwd.clone().add(cote).normalize(), fwd.clone().negate()].map(d => CHAIR_SPOT.pos.clone().addScaledVector(d, .5).setY(FL));
-    const libre = essais.map(c => ({ c, f: freePoint(c.clone()) })).find(x => x.f.distanceTo(x.c) < .06 && !segmentBlocked(x.f, centre));
-    const approach = libre ? libre.f : freePoint(essais[1].clone());
-    await this.walk(approach, CHAIR_SPOT.face); if (token !== this.autoToken) return;       // la chaise reste un obstacle : on ne la traverse pas
-    this.char.tourner(CHAIR_SPOT.face); await wait(350);
-    this.char.play(anim);
-    // on attend que l'animation soit installée (moment mesuré), puis on cale : le bassin au-dessus du centre de l'assise
-    // en plan, et les cuisses (hauteur mesurée) posées sur l'assise en hauteur
-    const cfg = this.char.sitCfg;
-    await wait(cfg ? Math.min(4000, cfg.installe_a * 1000 + 450) : 500); if (token !== this.autoToken) return;   // après le fondu : la pose est la vraie
-    const hips = this.char.bone('Hips');
-    if (this.chaisePliante && /^(sit|sit_2)$/.test(anim)) {
-      const r = Game.CHAISE[this.state.character] ?? Game.CHAISE.lea;
-      const h = this.char.osDansLeGeste(anim, .3, 'Hips') ?? new THREE.Vector3();
-      const assise = this.char.surfacePose(anim, .3, 'assise');
-      const delta = h.clone().setY(0).applyAxisAngle(new THREE.Vector3(0, 1, 0), r.yaw);
-      const end = CHAIR_SPOT.pos.clone().sub(delta);
-      end.y = FL + .45 * this.chaisePliante.scale.y - assise;
-      const start = this.char.obj.position.clone();
-      for (let k = 0; k <= 1.001; k += .1) { if (token !== this.autoToken) return; this.char.obj.position.lerpVectors(start, end, Math.min(1, k)); await wait(30); }
-      this.char.obj.rotation.y = r.yaw;
-      this.char.solAssis = FL + this.world.solBalcon;
-    } else if (hips) {
-      const seat = this.world.seatPoint();
-      const hp = new THREE.Vector3(); hips.getWorldPosition(hp);
-      const delta = seat.clone().sub(hp);
-      if (cfg) delta.y = (seat.y + .08 - cfg.cuisses_z) - this.char.obj.position.y;       // cuisses à 8 cm au-dessus de l'assise
-      else delta.y = Math.max(-.25, Math.min(.25, delta.y + .06));
-      delta.add(fwd.clone().multiplyScalar(TUNE.sitForward)); delta.y += TUNE.sitDown;
-      const start = this.char.obj.position.clone(), end = start.clone().add(delta);
-      for (let k = 0; k <= 1.001; k += .1) { if (token !== this.autoToken) return; this.char.obj.position.lerpVectors(start, end, Math.min(1, k)); await wait(30); }
-    }
-    if (then === 'phone' && this.char.has('phone')) { await wait(1500); if (token === this.autoToken) { this.tenirTel(); this.char.play('phone', .4); } }
-    const stay = anim === 'sleep' ? 40000 : 9000 + Math.random() * 6000;
-    const t0 = Date.now();
-    while (Date.now() - t0 < stay) { await wait(400); if (token !== this.autoToken) break; }
-    if (token !== this.autoToken) return;
-    this.release();
-    this.char.play('idle');
-    // on se relève devant la chaise, au sol
-    this.char.teleport(new THREE.Vector3(approach.x, FL, approach.z), CHAIR_SPOT.face);
+    const r = Game.CHAISE[this.state.character] ?? Game.CHAISE.lea;
+    const hauteur = this.chaisePliante ? FL + .45 * this.chaisePliante.scale.y : this.world.seatPoint().y;
+    const approche = await this.asseoir(token, CHAIR_SPOT.pos, r.yaw, hauteur, anim); if (!approche) return;
+    if (then === 'phone') { await wait(1500); if (token === this.autoToken) this.tenirTel(); }
+    await wait(anim === 'sleep' ? 40000 : 10000); if (token !== this.autoToken) return;
+    this.release(); this.lacherTel(); await this.relever(token, approche, r.yaw);
   }
-
   // ---------- jour et nuit
   private applyNightMode(mode: 'auto' | 'day' | 'night') {
     const q = new URLSearchParams(location.search);
@@ -2037,7 +2122,7 @@ export class Game {
     this.ui.parties = this.save.liste();
     if (derniere && afficher) {
       const g = await this.save.loadFor(derniere.perso);
-      if (g) { this.state = g; this.ui.showStart(true, tx(charDef(g.character).name)); }
+      if (g) { this.state = g; this.ui.showStart(true, tx(charDef(g.character).name), g.character); }
       await this.teinterAccueil();
     }
   }
@@ -2060,13 +2145,13 @@ export class Game {
     if (this.char && this.running) this.world.suivreX = this.char.obj.position.x; else this.world.suivreX = null;
     this.world.update(dt);
     if (this.running) {
-      if (!this.auditEnCours && !this.pauseRevue) this.char.update(dt);
+      if (!this.auditEnCours && !this.pauseRevue) { this.avancerArrosoir(dt); this.char.update(dt); }
       const W = this.world, y = this.char.obj.position.y, dedans = this.char.obj.position.z < FACADE_FRONT - .1;
       const sol = W.solAuPoint(this.char.obj.position);
       if (this.char.solAssis === null && !/^(sit|sleep)(?:_|$)/.test(this.char.currentName) && (Math.abs(y - FL) < .03 || Math.abs(y - sol) < .03)) this.char.obj.position.y = sol;
       if (this.tel) this.placerTel();                                   // après l'animation : les mains sont à leur vraie place
       { const t = this.char.bone('Head'), p = new THREE.Vector3(); if (t) t.getWorldPosition(p); else p.copy(this.char.obj.position).setY(this.char.obj.position.y + 1.4); this.world.voirLaTete(p); }
-      if (this.arrosoir) this.placerArrosoir(dt);
+      if (this.arrosoir) this.placerArrosoir(0);
       if (this.sceneRevue) {
         const el = document.getElementById('sceneAuditEtat'), erreurs: string[] = [];
         if (this.char.mains?.paumes) for (const [cote, fn] of [['Right', this.char.mains.droite], ['Left', this.char.mains.gauche]] as const) {

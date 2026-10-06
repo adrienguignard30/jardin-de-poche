@@ -1,10 +1,10 @@
-// Toutes les phrases de l'interface. Aucun texte en dur ailleurs dans le code.
+﻿// Toutes les phrases de l'interface. Aucun texte en dur ailleurs dans le code.
 export type Lang = 'fr' | 'en';
 
 const STRINGS = {
   fr: {
     title: 'Potager de Poche',
-    tagline: 'Cultivez Paris, un balcon à la fois.',
+    tagline: "Un potager de balcon pour ceux qui n'en ont pas.",
     personnaliser: 'Personnaliser', plus: 'Plus (âge, métier)', retour: 'Retour', demoJury: '⏩ Démo accélérée', jouerAvec: (n: string) => `Jouer avec ${n}`,
     points: 'points',
     tabRecette: 'Ma recette', tabMarche: 'Le marché', tabBoutique: 'Boutique', tabCarnet: 'Carnet',
@@ -85,7 +85,7 @@ const STRINGS = {
     creerBtn: 'Créer mon compte', connecterBtn: 'Me connecter', deconnecterBtn: 'Me déconnecter', connecteComme: (p: string) => `Connecté : ${p}`, inviteEnCours: 'Tu joues en invité.',
     errCompte: { court: 'Mot de passe trop court : 8 caractères minimum.', courant: 'Ce mot de passe est trop courant, choisis-en un autre.', pseudo_pris: 'Ce pseudo est déjà pris.', pseudo_invalide: 'Pseudo : 3 à 20 lettres ou chiffres.', identifiants: 'Pseudo ou mot de passe incorrect.', robot: 'Vérification anti-robot impossible : réessaie dans un instant.', hors_ligne: 'Le jeu n\u2019est pas encore relié en ligne.' } as Record<string, string>,
     compteOk: 'Compte créé : ta partie te suit sur tous tes appareils.', connexionOk: 'Connecté : on récupère ta partie.',
-    classementT: 'Classement', catTrocs: 'Troqueurs', catRecoltes: 'Jardiniers', catOfferts: 'Cuisiniers', catRecus: 'Gâtés', classementVide: 'Personne encore : offre ton premier plat pour y entrer !', classementHorsLigne: 'Le classement arrive avec la mise en ligne.', toi: 'toi',
+    classementT: 'Classement', catTrocs: 'Troqueurs', catRecoltes: 'Jardiniers', catOfferts: 'Cuisiniers', catRecus: 'Gâtés', classementVide: 'Personne encore : sois le premier jardinier du classement !', classementInvite: 'Crée un compte (gratuit) pour entrer au classement.', taPlace: 'Ta place : {r}e sur {n} ({s})', horsClassement: 'Offre ton premier plat pour entrer au classement.', classementHorsLigne: 'Le classement arrive avec la mise en ligne.', toi: 'toi',
     musiqueT: 'Musique', volumeT: 'Volume', playlists: 'Playlists', plAuto: 'Celle de mon personnage', plLea: 'Léa · Café parisien', plMarcel: 'Marcel · Musette', plJimy: 'Jimy · Reggae du toit', morceau: (i: number, n: number) => `Morceau ${i} sur ${n}`, touchePourSon: 'Touche l\u2019écran pour lancer la musique.', offrirLePlat: 'Offrir le plat', ilManqueN: (n: number) => `Il manque ${n} ingrédient${n > 1 ? 's' : ''} · voir`,
     semerBtn: 'Semer', potsPleins: 'Tous tes pots sont occupés : récolte d\u2019abord, ou achète un pot dans la Boutique.',
     echangerBtn: 'Échanger', acheterGraineBtn: (p: number) => `Acheter · ${p} pts`, toutAccepter: (n: number) => `Accepter les ${n} échanges pour ta recette`, maxBtn: 'Max',
@@ -196,8 +196,8 @@ const STRINGS = {
     sellHint: (n: number) => `${n} récolte(s) à vendre`,
   },
   en: {
-    title: 'Pocket Garden',
-    tagline: 'Grow Paris, one balcony at a time.',
+    title: 'Potager de Poche',
+    tagline: 'A balcony vegetable garden for those who have none.',
     personnaliser: 'Customise', plus: 'More (age, job)', retour: 'Back', demoJury: '⏩ Fast demo', jouerAvec: (n: string) => `Play as ${n}`,
     points: 'points',
     tabRecette: 'My recipe', tabMarche: 'Market', tabBoutique: 'Shop', tabCarnet: 'Notebook',
@@ -278,7 +278,7 @@ const STRINGS = {
     creerBtn: 'Create my account', connecterBtn: 'Log in', deconnecterBtn: 'Log out', connecteComme: (p: string) => `Logged in: ${p}`, inviteEnCours: 'You are playing as a guest.',
     errCompte: { court: 'Password too short: at least 8 characters.', courant: 'This password is too common, pick another one.', pseudo_pris: 'This username is taken.', pseudo_invalide: 'Username: 3 to 20 letters or digits.', identifiants: 'Wrong username or password.', robot: 'Anti-bot check failed: try again in a moment.', hors_ligne: 'The game is not online yet.' } as Record<string, string>,
     compteOk: 'Account created: your game follows you on all your devices.', connexionOk: 'Logged in: fetching your game.',
-    classementT: 'Leaderboard', catTrocs: 'Traders', catRecoltes: 'Gardeners', catOfferts: 'Cooks', catRecus: 'Spoiled', classementVide: 'Nobody yet: give your first dish to get in!', classementHorsLigne: 'The leaderboard comes with the online version.', toi: 'you',
+    classementT: 'Leaderboard', catTrocs: 'Traders', catRecoltes: 'Gardeners', catOfferts: 'Cooks', catRecus: 'Spoiled', classementVide: 'Nobody yet: be the first gardener on the board!', classementInvite: 'Create a free account to join the leaderboard.', taPlace: 'Your rank: #{r} of {n} ({s})', horsClassement: 'Give your first dish to join the leaderboard.', classementHorsLigne: 'The leaderboard comes with the online version.', toi: 'you',
     musiqueT: 'Music', volumeT: 'Volume', playlists: 'Playlists', plAuto: 'My character\u2019s', plLea: 'Léa · Paris café', plMarcel: 'Marcel · Musette', plJimy: 'Jimy · Rooftop reggae', morceau: (i: number, n: number) => `Track ${i} of ${n}`, touchePourSon: 'Tap the screen to start the music.', offrirLePlat: 'Give the dish', ilManqueN: (n: number) => `${n} ingredient${n > 1 ? 's' : ''} missing · see`,
     semerBtn: 'Sow', potsPleins: 'All your pots are busy: harvest first, or buy a pot in the Shop.',
     echangerBtn: 'Trade', acheterGraineBtn: (p: number) => `Buy · ${p} pts`, toutAccepter: (n: number) => `Accept the ${n} trades for your recipe`, maxBtn: 'Max',
@@ -396,10 +396,11 @@ let current: Lang = detect();
 
 function detect(): Lang {
   try {
+    const q = new URLSearchParams(location.search).get('lang'); if (q === 'fr' || q === 'en') return q;   // ?lang=fr ou ?lang=en dans l'adresse
     const saved = localStorage.getItem('jdp.lang');
     if (saved === 'fr' || saved === 'en') return saved;
   } catch { /* stockage indisponible */ }
-  return (navigator.language || 'en').toLowerCase().startsWith('fr') ? 'fr' : 'en';
+  return 'en';   // anglais par defaut (jury international)
 }
 
 export function lang(): Lang { return current; }
