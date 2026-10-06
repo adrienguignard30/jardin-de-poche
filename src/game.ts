@@ -1475,9 +1475,14 @@ export class Game {
   /** Cuisiner : elle rentre, cuisine dos à nous par la porte-fenêtre, ressort avec l'assiette. */
   private async cuisiner() {
     const e = this.state.eco, tt = t();
-    if (this.char.busy || this.sceneEnCours > 0 || e.platEnCours) return;   // jamais deux cuisines en même temps (pas de double consommation)
+    if (e.platEnCours) return;                                         // un plat attend déjà : pas de deuxième cuisine
     if (!E.peutCuisiner(e.jardin, ECO)) { this.ui.toast(tt.cuisinerPasEncore); return; }
     this.ui.togglePhone(false);
+    // comme planter, arroser, récolter : refus poli pendant une vraie tâche, sinon sortie PROPRE de la scène de vie
+    // (chaise, sport, téléphone, sieste), puis on revérifie tout avant de commencer
+    this.lastPlayerAction = Date.now();
+    if (!await this.preparerActionJoueur()) return;
+    if (e.platEnCours || this.sceneEnCours > 0 || !E.peutCuisiner(e.jardin, ECO)) return;   // jamais deux cuisines (pas de double consommation)
     if (this.sleeping) {                                               // la nuit aussi on peut cuisiner : il sort d'abord du lit, proprement
       this.sleeping = false; this.char.solAssis = null;
       this.char.teleport(this.world.bedSide.clone(), 0); this.char.play('idle', .4);
@@ -1537,8 +1542,8 @@ export class Game {
       const ou = W.kitchenSpot ? pan.clone().setY(W.kitchenTop + .005) : this.char.obj.position.clone().add(fwd.clone().multiplyScalar(.5)).setY(FL + .02);
       a.position.copy(ou); W.scene.add(a); this.assiettePosee = a;
       this.ui.refresh(); this.persist();
-      this.montrerPlat();                                              // le plat est prêt : on le montre tout de suite
-      await this.danser(token);                                        // et c'est la fête, au milieu du salon, jusqu'au bout
+      await this.danser(token);                                        // la fête d'abord, au milieu du salon, jusqu'au bout…
+      if (e.platEnCours && this.running && personnage === this.char) this.montrerPlat();   // …puis la carte « offrir » (jamais pendant la danse)
     }
     if (!valide()) return;
     this.char.busy = false;
@@ -1738,11 +1743,14 @@ export class Game {
     const assiette = this.porte ?? posee ?? this.fabriquerAssiette(this.couleursRecette());
     if (posee) posee.parent?.remove(posee);
     const occupe = this.char.busy; this.char.busy = true;
+    this.sceneEnCours++;                                               // la remise de l'assiette ne s'interrompt pas
+    try {
     this.char.play('idle', .2); this.porte = this.devantSoi(assiette, 0, 1.0, .3);
     this.char.mains = { paumes: true, droite: () => assiette.localToWorld(new THREE.Vector3(-.115, .018, 0)), gauche: () => assiette.localToWorld(new THREE.Vector3(.115, .018, 0)) }; this.char.ikBut = 1;
     const mainsOffre = this.char.mains;
     await wait(650);
     if (personnage.mains === mainsOffre) { personnage.mains = null; personnage.ikBut = 0; }   // l'assiette part : les mains ne la suivent pas
+    } finally { this.sceneEnCours = Math.max(0, this.sceneEnCours - 1); }
     const depart = assiette.getWorldPosition(new THREE.Vector3());
     if (valide()) {
       this.lacher(); personnage.play('idle', .2); personnage.busy = occupe;
