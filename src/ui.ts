@@ -391,9 +391,20 @@ export class UI {
       + (c.likes ? `<div class="fl likes"><span>${s.fLikes}</span><p>${tx(c.likes)}</p></div>` : ''));
     sh.prepend(this.carrousel(id));                                  // sur mobile : ‹ ● ○ ○ › en haut de la fiche
     (sh.querySelector('.x') as HTMLButtonElement).onclick = () => { sh.classList.add('hidden'); $('#startBody').classList.remove('hidden'); this.h.onSheet(false); };
-    sh.classList.remove('hidden');
+    sh.classList.remove('hidden'); this.activerGlisserFiche();
     if (window.innerWidth < 640 || window.innerHeight > window.innerWidth) $('#startBody').classList.add('hidden');
     this.h.onSheet(true);
+  }
+  private glisserFiche = false;
+  /** Sur téléphone : tirer la fiche d'un personnage vers le bas la ferme, comme un tiroir (pas en personnalisation). */
+  private activerGlisserFiche() {
+    if (this.glisserFiche) return; this.glisserFiche = true;
+    const sh = $('#sheet'); let d0: { x: number; y: number; t: number } | null = null;
+    sh.addEventListener('touchstart', e => { if (sh.classList.contains('perso') || (e.target as HTMLElement).closest('button, input') || sh.scrollTop > 0) { d0 = null; return; } d0 = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: performance.now() }; }, { passive: true });
+    sh.addEventListener('touchend', e => {
+      if (!d0) return; const tt = e.changedTouches[0], dx = tt.clientX - d0.x, dy = tt.clientY - d0.y, dt = performance.now() - d0.t; d0 = null;
+      if (dt < 700 && dy > 80 && dy > 1.5 * Math.abs(dx) && !sh.classList.contains('hidden') && !sh.classList.contains('perso')) { sh.classList.add('hidden'); $('#startBody').classList.remove('hidden'); this.h.onSheet(false); }
+    }, { passive: true });
   }
   /** Le bouton du bas suit le choix courant, même quand une autre partie existe. */
   private majChoixAccueil(id: string) {

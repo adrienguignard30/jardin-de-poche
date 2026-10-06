@@ -29,6 +29,9 @@
   .bouton:active { transform: translateY(1px); }
   .bouton.anim { background: #fff; color: var(--encre); box-shadow: 0 4px 14px rgba(36,49,58,.12); border: 1px solid rgba(36,49,58,.12); margin-top: -6px; }
   model-viewer::part(default-ar-button) { display: none; }
+  .retour { position: sticky; top: calc(8px + var(--sat)); z-index: 5; border: 0; border-radius: 999px; padding: 9px 14px; background: #fff; color: var(--encre); font-weight: 800; font-size: 14px; box-shadow: 0 4px 14px rgba(36,49,58,.15); cursor: pointer; }
+  .scene { position: relative; } .scene .astuce { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); background: rgba(36,49,58,.72); color: #fff; font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 999px; pointer-events: none; white-space: nowrap; transition: opacity .3s; }
+  .scene.actif .astuce { opacity: 0; } .scene.actif model-viewer { outline: 3px solid #2f8f4e; outline-offset: -3px; border-radius: 22px 22px 0 0; }
   footer { text-align: center; margin-top: 28px; font-size: 14px; color: #5b6b75; }
   footer a { color: var(--vert); font-weight: 800; text-decoration: none; }
   .fr { display: none; } html[lang="fr"] .fr { display: initial; } html[lang="fr"] .en { display: none; }
@@ -36,26 +39,27 @@
 </style>
 </head>
 <body>
+<button class="retour" id="retour">‹ <span class="en">Back to the game</span><span class="fr">Retour au jeu</span></button>
 <div class="langs"><button onclick="document.documentElement.lang='en'">English</button><button onclick="document.documentElement.lang='fr'">Français</button></div>
 <header>
-  <h1>Potager de Poche <small><span class="en">Meet the characters in augmented reality</span><span class="fr">Les personnages en réalité augmentée</span></small></h1>
-  <p class="aide"><span class="en">On a phone, tap <b>View in your space</b>: Léa, Jimy or Marcel appears on your table, life-size or small. On a computer, turn them with the mouse.</span><span class="fr">Sur un téléphone, touche <b>Voir chez toi</b> : Léa, Jimy ou Marcel apparaît sur ta table, grandeur nature ou en petit. Sur ordinateur, fais-les tourner à la souris.</span></p>
+  <h1><span class="en">Pocket Kitchen Garden</span><span class="fr">Potager de Poche</span> <small><span class="en">Meet the characters in augmented reality</span><span class="fr">Les personnages en réalité augmentée</span></small></h1>
+  <p class="aide"><span class="en">On a phone, tap <b>View in your space</b>: Léa, Jimy or Marcel appears on your table, life-size or small. Tap a character to turn it.</span><span class="fr">Sur un téléphone, touche <b>Voir chez toi</b> : Léa, Jimy ou Marcel apparaît sur ta table, grandeur nature ou en petit. Touche un personnage pour le faire tourner.</span></p>
 </header>
 <div class="perso">
   <div class="carte">
-    <model-viewer id="lea" src="lea.glb" ios-src="lea.usdz" alt="Léa" ar ar-modes="scene-viewer quick-look webxr" ar-scale="auto" autoplay camera-controls auto-rotate shadow-intensity="1" exposure="1.05" camera-orbit="0deg 84deg 4.9m" camera-target="0m 0.95m 0m" loading="eager"></model-viewer>
+    <div class="scene"><model-viewer id="lea" src="lea.glb" ios-src="lea.usdz" alt="Léa" ar ar-modes="scene-viewer quick-look webxr" ar-scale="auto" autoplay disable-zoom auto-rotate shadow-intensity="1" exposure="1.05" camera-orbit="0deg 84deg 4.9m" camera-target="0m 0.95m 0m" loading="eager"></model-viewer><span class="astuce"><span class="en">👆 Tap to turn it</span><span class="fr">👆 Touche pour le tourner</span></span></div>
     <h2>Léa</h2><p><span class="en">The balcony gardener of the 3rd floor.</span><span class="fr">La jardinière du troisième étage.</span></p>
     <button class="bouton" onclick="document.getElementById('lea').activateAR()">📱 <span class="en">View in your space</span><span class="fr">Voir chez toi</span></button>
     <button class="bouton anim" data-pour="lea" onclick="basculerAnim('lea', this)">🎬 <span class="en">Animation: ON</span><span class="fr">Animation : ON</span></button>
   </div>
   <div class="carte">
-    <model-viewer id="jimy" src="jimy.glb" ios-src="jimy.usdz" alt="Jimy" ar ar-modes="scene-viewer quick-look webxr" ar-scale="auto" autoplay camera-controls auto-rotate shadow-intensity="1" exposure="1.05" camera-orbit="0deg 84deg 4.9m" camera-target="0m 0.95m 0m"></model-viewer>
+    <div class="scene"><model-viewer id="jimy" src="jimy.glb" ios-src="jimy.usdz" alt="Jimy" ar ar-modes="scene-viewer quick-look webxr" ar-scale="auto" autoplay disable-zoom auto-rotate shadow-intensity="1" exposure="1.05" camera-orbit="0deg 84deg 4.9m" camera-target="0m 0.95m 0m"></model-viewer><span class="astuce"><span class="en">👆 Tap to turn it</span><span class="fr">👆 Touche pour le tourner</span></span></div>
     <h2>Jimy</h2><p><span class="en">Reggae and tomatoes on the rooftop.</span><span class="fr">Reggae et tomates sur le toit.</span></p>
     <button class="bouton" onclick="document.getElementById('jimy').activateAR()">📱 <span class="en">View in your space</span><span class="fr">Voir chez toi</span></button>
     <button class="bouton anim" data-pour="jimy" onclick="basculerAnim('jimy', this)">🎬 <span class="en">Animation: ON</span><span class="fr">Animation : ON</span></button>
   </div>
   <div class="carte">
-    <model-viewer id="marcel" src="marcel.glb" ios-src="marcel.usdz" alt="Marcel" ar ar-modes="scene-viewer quick-look webxr" ar-scale="auto" autoplay camera-controls auto-rotate shadow-intensity="1" exposure="1.05" camera-orbit="0deg 84deg 4.9m" camera-target="0m 0.95m 0m"></model-viewer>
+    <div class="scene"><model-viewer id="marcel" src="marcel.glb" ios-src="marcel.usdz" alt="Marcel" ar ar-modes="scene-viewer quick-look webxr" ar-scale="auto" autoplay disable-zoom auto-rotate shadow-intensity="1" exposure="1.05" camera-orbit="0deg 84deg 4.9m" camera-target="0m 0.95m 0m"></model-viewer><span class="astuce"><span class="en">👆 Tap to turn it</span><span class="fr">👆 Touche pour le tourner</span></span></div>
     <h2>Marcel</h2><p><span class="en">The retired neighbour who cooks for everyone.</span><span class="fr">Le voisin retraité qui cuisine pour tout le monde.</span></p>
     <button class="bouton" onclick="document.getElementById('marcel').activateAR()">📱 <span class="en">View in your space</span><span class="fr">Voir chez toi</span></button>
     <button class="bouton anim" data-pour="marcel" onclick="basculerAnim('marcel', this)">🎬 <span class="en">Animation: ON</span><span class="fr">Animation : ON</span></button>
@@ -71,15 +75,28 @@
   window.basculerAnim = async (who, b) => {
     const mv = document.getElementById(who); animOn[who] = !animOn[who];
     b.querySelector('.en').textContent = 'Animation: ' + (animOn[who] ? 'ON' : 'OFF'); b.querySelector('.fr').textContent = 'Animation : ' + (animOn[who] ? 'ON' : 'OFF');
-    if (animOn[who]) { mv.src = who + '.glb'; mv.setAttribute('ios-src', who + '.usdz'); mv.autoplay = true; mv.play && mv.play(); }
+    if (animOn[who]) { mv.src = who + '.glb'; mv.setAttribute('ios-src', who + '.usdz'); mv.autoplay = true; mv.play && mv.play(); mv.autoRotate = true; }
     else {
+      mv.autoRotate = false;                                   // OFF : il ne tourne plus du tout (ni l'animation, ni la vue)
       const g = (await existe(who + '-fixe.glb')) ? who + '-fixe.glb' : null, u = (await existe(who + '-fixe.usdz')) ? who + '-fixe.usdz' : null;
       if (g) mv.src = g; else { mv.autoplay = false; mv.pause && mv.pause(); }
       mv.setAttribute('ios-src', u || who + '.usdz');
     }
   };
+  // toucher un personnage : on peut le tourner (et seulement lui) ; toucher ailleurs : la page défile normalement
+  const scenes = [...document.querySelectorAll('.scene')];
+  const activer = sc => scenes.forEach(x => { const on = x === sc; x.classList.toggle('actif', on); x.querySelector('model-viewer').cameraControls = on; });
+  scenes.forEach(sc => sc.addEventListener('click', e => { if (!sc.classList.contains('actif')) { e.preventDefault(); activer(sc); } }));
+  document.addEventListener('click', e => { if (!e.target.closest('.scene')) activer(null); });
+  // revenir au jeu : le bouton, ou un geste sur téléphone (glisser vers la droite, ou tirer vers le bas tout en haut de la page)
+  const versLeJeu = () => { try { if (document.referrer && new URL(document.referrer).origin === location.origin) { history.back(); return; } } catch (e) {} location.href = '/'; };
+  document.getElementById('retour').onclick = versLeJeu;
+  let d0 = null;
+  addEventListener('touchstart', e => { const sc = e.target.closest('.scene'); d0 = (sc && sc.classList.contains('actif')) ? null : { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now(), haut: scrollY <= 0 }; }, { passive: true });
+  addEventListener('touchend', e => { if (!d0) return; const t = e.changedTouches[0], dx = t.clientX - d0.x, dy = t.clientY - d0.y, vite = Date.now() - d0.t < 700; const h = d0.haut; d0 = null; if (!vite) return;
+    if (dx > 90 && Math.abs(dx) > 1.6 * Math.abs(dy)) versLeJeu(); else if (h && dy > 130 && Math.abs(dy) > 1.6 * Math.abs(dx)) versLeJeu(); }, { passive: true });
   // sans caméra AR (ordinateur), le bouton explique quoi faire
-  document.querySelectorAll('model-viewer').forEach(mv => mv.addEventListener('load', () => { if (!mv.canActivateAR) mv.parentElement.querySelector('.bouton').style.display = 'none'; }));   // pas de bouton sur ordinateur
+  document.querySelectorAll('model-viewer').forEach(mv => mv.addEventListener('load', () => { if (!mv.canActivateAR) mv.closest('.carte').querySelector('.bouton').style.display = 'none'; }));   // pas de bouton sur ordinateur
 </script>
 </body>
 </html>
