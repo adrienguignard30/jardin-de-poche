@@ -1127,7 +1127,10 @@ export class Game {
   private approcheAssise: { pos: THREE.Vector3; face: number } | null = null;
   /** Le joueur reprend la main ; une séance autonome ne conserve ni ses drapeaux ni ses contacts. */
   private async preparerActionJoueur(): Promise<boolean> {
-    if (this.jardinageJoueur) return false;
+    if (this.jardinageJoueur || this.sceneEnCours > 0) {           // cuisine, arrosage, plantation, récolte : on ne les interrompt pas
+      this.ui.toast(lang() === 'en' ? 'One moment, almost done!' : 'Un instant, je termine !', 1800);
+      return false;
+    }
     const personnage = this.char;
     if (!this.preparationJoueur) {
       const token = ++this.autoToken, ch = this.char;
@@ -1472,20 +1475,28 @@ export class Game {
   /** Cuisiner : elle rentre, cuisine dos à nous par la porte-fenêtre, ressort avec l'assiette. */
   private async cuisiner() {
     const e = this.state.eco, tt = t();
-    if (this.char.busy || e.platEnCours) return;
+    if (this.char.busy || this.sceneEnCours > 0 || e.platEnCours) return;   // jamais deux cuisines en même temps (pas de double consommation)
     if (!E.peutCuisiner(e.jardin, ECO)) { this.ui.toast(tt.cuisinerPasEncore); return; }
     this.ui.togglePhone(false);
+    if (this.sleeping) {                                               // la nuit aussi on peut cuisiner : il sort d'abord du lit, proprement
+      this.sleeping = false; this.char.solAssis = null;
+      this.char.teleport(this.world.bedSide.clone(), 0); this.char.play('idle', .4);
+    }
     this.autoToken++; const token = this.autoToken, personnage = this.char;
     const valide = () => token === this.autoToken && personnage === this.char;
     let poele: THREE.Object3D | null = null;
+    let mainsDeCuisine: unknown = null;
+    this.sceneEnCours++;
     try {
     this.char.busy = true;
     await this.goInside(token); if (!valide()) return;
+    this.char.busy = true;                                             // la marche vient de remettre busy à false : la scène continue
     const W = this.world;
     if (W.kitchenSpot) {                                             // à la cuisinière de ta maison (sur la terrasse pour Jimy)
       const f = Math.atan2(W.kitchenLook.x - W.kitchenSpot.x, W.kitchenLook.z - W.kitchenSpot.z);
       if (!W.hasRoom) { await this.char.goTo(new THREE.Vector3(this.char.obj.position.x, FL, LAYOUT.corridorZ)); if (!valide()) return; }
       await this.marcherMeubles(W.kitchenSpot.clone(), f); if (!valide()) return;
+      this.char.busy = true;
     } else { this.char.tourner(Math.PI); await wait(1000); if (!valide()) return; }                       // sinon dos à nous
     const c = charDef(this.state.character);
     const re = ECO.recette(e.jardin.recette!.recette);
@@ -1504,7 +1515,7 @@ export class Game {
     this.char.play('idle', .3);
     const t0 = performance.now();
     let saupoudre = false;
-    this.mainsCuisine(pan, t0, () => saupoudre);
+    this.mainsCuisine(pan, t0, () => saupoudre); mainsDeCuisine = this.char.mains;
     W.coeurs(() => pan.clone().add(new THREE.Vector3(0, .12, 0)), 3000, 420);   // quelques cœurs montent avec la vapeur
     await wait(3200); if (!valide()) return;
     const amour = lang() === 'en' ? re.amour_en : re.amour_fr;              // l'ingrédient le plus important
@@ -1534,8 +1545,12 @@ export class Game {
     this.persist();
     this.scheduleAutonomy();
     } finally {
+      this.sceneEnCours = Math.max(0, this.sceneEnCours - 1);
       poele?.parent?.remove(poele);
       if (this.poeleEnCours === poele) this.poeleEnCours = null;
+      // les mains guidées vers la poêle sont TOUJOURS relâchées (même si la scène a été interrompue), sans toucher
+      // à celles d'une action qui aurait déjà pris la suite
+      if (mainsDeCuisine && personnage.mains === mainsDeCuisine) { personnage.mains = null; personnage.ikBut = 0; }
       if (valide()) { personnage.ikBut = 0; personnage.busy = false; }
     }
   }
@@ -1604,7 +1619,7 @@ export class Game {
   }
   /** Un dessin passe dans le ciel : s'il est libre, le personnage le suit des yeux et le montre du doigt. */
   private montrerLeCiel(sp: THREE.Sprite) {
-    if (!this.running || this.char.busy || this.sleeping || this.phoneOpen || this.sceneRevue) return;
+    if (!this.running || this.char.busy || this.sceneEnCours > 0 || this.sleeping || this.phoneOpen || this.sceneRevue) return;
     const personnage = this.char, token = this.autoToken;
     const valide = () => this.running && personnage === this.char && token === this.autoToken;
     // nous fait-il face ? (son regard est tourné vers la caméra, à 60° près)
@@ -1725,7 +1740,9 @@ export class Game {
     const occupe = this.char.busy; this.char.busy = true;
     this.char.play('idle', .2); this.porte = this.devantSoi(assiette, 0, 1.0, .3);
     this.char.mains = { paumes: true, droite: () => assiette.localToWorld(new THREE.Vector3(-.115, .018, 0)), gauche: () => assiette.localToWorld(new THREE.Vector3(.115, .018, 0)) }; this.char.ikBut = 1;
+    const mainsOffre = this.char.mains;
     await wait(650);
+    if (personnage.mains === mainsOffre) { personnage.mains = null; personnage.ikBut = 0; }   // l'assiette part : les mains ne la suivent pas
     const depart = assiette.getWorldPosition(new THREE.Vector3());
     if (valide()) {
       this.lacher(); personnage.play('idle', .2); personnage.busy = occupe;
@@ -1764,19 +1781,24 @@ export class Game {
     const idleFor = (Date.now() - this.lastPlayerAction) / 1000;
     let token = this.autoToken;
     try {
-      if (this.char.busy || idleFor < 4 || this.phoneOpen || this.porte || this.dansant) return;   // occupé : on ne touche à rien
+      // endormi : on le laisse dormir tant qu'il fait sombre (avant, ce passage cassait le sommeil) ; au jour, on le réveille proprement
+      if (this.sleeping) { if (this.world.targetNight > .3) return; this.wakeUp(); return; }
+      if (this.char.busy || this.sceneEnCours > 0 || idleFor < 4 || this.phoneOpen || this.porte || this.dansant) return;   // occupé : on ne touche à rien
+      if (!this.tel && !this.arrosoir) { this.char.mains = null; this.char.ikBut = 0; }   // une nouvelle action démarre : plus de mains guidées qui traînent
       token = ++this.autoToken;                                       // on ne prend la main que si on démarre vraiment
-      const night = this.world.targetNight > .5;
+      const hNuit = this.gameHour(), night = this.world.targetNight > .5 && (hNuit >= 20 || hNuit < 5);   // pas de coucher à l'aube
       const thirsty = this.state.pots.filter(p => p.plant && !P.isWet(p.plant) && !P.isReady(p.plant) && SLOTS[p.id].roof === this.onRoof);
       if (thirsty.length && idleFor > 45 && (this.state.eco.jardin.etape ?? 0) >= 2) {   // au tout début, c'est au joueur d'arroser
         const p = thirsty[Math.floor(Math.random() * thirsty.length)];
         { const st = this.standFor(SLOTS[p.id], 'water'); await this.walk(st.pos, st.face, `pot${p.id}`); } if (token !== this.autoToken) return;
-        this.char.busy = true;
+        this.char.busy = true; this.sceneEnCours++;
+        try {
         this.tenirArrosoir(SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .25, 0)));
         this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('water'); const done = g.fin; this.verser(g.effet); await wait(g.effet * 1000);
         if (token !== this.autoToken) return;
         if (p.plant) { P.water(p.plant); this.refreshSlot(p); this.state.log.wateredByChar++; }
         await done; if (token !== this.autoToken) return; this.char.regard = null; this.char.busy = false; this.release(); this.lacherArrosoir();
+        } finally { this.sceneEnCours = Math.max(0, this.sceneEnCours - 1); }
       } else if (night && !this.onRoof) {
         await this.goToBed(token);
       } else {
@@ -1790,6 +1812,9 @@ export class Game {
    *  le matin la vue et les plantes, l'après-midi le canapé et la sieste, le soir la rambarde au coucher du soleil et la danse.
    *  Jamais deux fois de suite la même chose ; le regard suit toujours ce qu'il fait. */
   private dernierMoment = '';
+  /** Une scène en cours (cuisine) : l'autonomie et les petits gestes ne prennent pas la main, même si la marche
+   *  vient de remettre char.busy à false en arrivant (correctif du 5 octobre : la cuisine était abandonnée). */
+  private sceneEnCours = 0;
   private async unMoment(token: number) {
     const W = this.world, h = this.gameHour();
     const matin = h >= 6 && h < 11, midi = h >= 11 && h < 14, aprem = h >= 14 && h < 18, soir = h >= 18 && h < 23;
