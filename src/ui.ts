@@ -277,10 +277,13 @@ export class UI {
     d.className = 'demoBtn' + (demo ? ' active' : ''); d.textContent = demo ? s.demoOn : s.demoJury; d.title = s.demoOff;
     d.onclick = () => { const u = new URL(location.href); if (demo) u.searchParams.delete('demo'); else u.searchParams.set('demo', '1'); location.href = u.toString(); };
     const boutonClassement = () => { const c = el('button', 'btnClassementAccueil', `🏆 ${s.classementT}`); c.onclick = () => this.ouvrirClassement(); return c; };
+    // les personnages en réalité augmentée : la page /ar/ (même style que le bouton du classement)
+    const boutonAR = () => { const a = el('button', 'btnClassementAccueil btnArAccueil', lang() === 'en' ? '📱 Meet the characters in AR' : '📱 Les personnages chez toi'); a.onclick = () => { location.href = '/ar/index.html'; }; return a; };
     if (hasSave) {                                                      // la règle des jeux : « Continuer » toujours en premier
       const b = el('button', 'primary vert', `▶ ${s.continueWith(this.savedCharName || s.continue_)}`); agir(b, () => this.h.onContinue()); body.appendChild(b);
       body.appendChild(el('p', 'hint', s.ouAutrePerso));
       body.appendChild(boutonClassement());
+      body.appendChild(boutonAR());
       this.majChoixAccueil(this.chosen);
       return;
     }
@@ -293,6 +296,7 @@ export class UI {
     row.append(nameInput, go);
     body.appendChild(row);
     body.appendChild(boutonClassement());
+    body.appendChild(boutonAR());
     if (this.sheetId) this.majChoixAccueil(this.chosen);
   }
   /** Fiche d'un personnage, ouverte quand on le touche sur l'accueil. */
@@ -396,11 +400,11 @@ export class UI {
     const c = CATALOG.characters.find(x => x.id === id); if (!c) return;
     const s = t(), nom = this.perso[id]?.prenom || tx(c.name), reprise = !!this.parties[id];
     const body = $('#startBody');
-    const classement = body.querySelector('.btnClassementAccueil');
+    const gardes = Array.from(body.querySelectorAll('.btnClassementAccueil'));   // le classement et le bouton AR restent
     const bouton = el('button', 'primary vert', reprise ? `▶ ${s.continueWith(nom)}` : `🌱 ${s.jouerAvec(nom)}`);
     agir(bouton, () => reprise ? this.h.onContinue(id) : this.lancer(id));
     body.replaceChildren(bouton, el('p', 'hint', s.ouAutrePerso));
-    if (classement) body.appendChild(classement);
+    for (const g of gardes) body.appendChild(g);
   }
   private lancer(id: string) {
     const s = t(), c = CATALOG.characters.find(x => x.id === id)!;
