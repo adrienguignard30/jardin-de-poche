@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --cream: #efe6d3; --zinc: #8e9aa6; --terra: #c9714b; --sage: #5fa35a; --sky: #cfe3ee;
   --ink: #24313a; --muted: #5a6a74; --panel: rgba(255, 255, 255, .78); --line: rgba(36, 49, 58, .14);
   --night: #1f2c48; --warm: #ffc66a;
@@ -745,3 +745,5 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
   #phone.phone.skin-marcel:not(.hidden) .notch, #phone.phone.skin-marcel:not(.hidden) .home { display: none !important; }
 }
 
+/* heure-mobile-2e-ligne : sur telephone, l'heure ne tient pas au centre de la 1re ligne (le son, la maison et les reglages passaient par-dessus) : 2e ligne, a droite */
+@media (max-width: 700px) { .pill.clock { top: calc(62px + var(--sat)); left: auto; right: 14px; transform: none; font-size: 14px; padding: 7px 12px; } }

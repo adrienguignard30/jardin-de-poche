@@ -4,6 +4,9 @@
 //  Le volume et la coupure sont gardés sur l'appareil. Les navigateurs n'autorisent le son qu'après un premier geste :
 //  la musique démarre au premier toucher / clic / touche.
 // =============================================================================================
+const DIAG_SON = typeof location !== 'undefined' && new URLSearchParams(location.search).has('son');
+const JOURNAL_SON: string[] = [];
+function noterSon(t: string) { if (!DIAG_SON) return; JOURNAL_SON.push(new Date().toTimeString().slice(0, 8) + ' ' + t); if (JOURNAL_SON.length > 14) JOURNAL_SON.shift(); }
 const CLE = 'jdp.son';
 const FONDU = 3.0;                                  // secondes de fondu enchaîné à la boucle
 const CHANGEMENT = 1.6;                             // secondes de fondu quand on change de morceau
@@ -39,8 +42,15 @@ class Musique {
   R = reglagesSon();
 
   constructor() {
-    const debloquer = () => { this.demarrerContexte(); window.removeEventListener('pointerdown', debloquer); window.removeEventListener('keydown', debloquer); };
-    window.addEventListener('pointerdown', debloquer); window.addEventListener('keydown', debloquer);
+    // Le son démarre au premier geste, et il est relancé à CHAQUE geste s'il a été suspendu. Sur iPhone, seuls « touchend »
+    // et « click » comptent comme de vrais gestes pour le son (pas toujours « pointerdown »), d'où la liste complète.
+    const gestes = ['pointerdown', 'touchend', 'click', 'keydown'];
+    const debloquer = (e: Event) => {
+      this.demarrerContexte();
+      if (this.ac && this.ac.state !== 'running' && !this.enPause) this.ac.resume().then(() => noterSon('relance OK sur ' + e.type)).catch(() => noterSon('relance refusee sur ' + e.type));
+      if (this.muet && this.muet.paused) this.muet.play().catch(() => { /* au prochain geste */ });
+    };
+    for (const g of gestes) window.addEventListener(g, debloquer, { capture: true, passive: true });
   }
   private demarrerContexte() {
     if (this.pret) return;
@@ -55,9 +65,10 @@ class Musique {
       const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       if (ios) {
         const muet = document.createElement('audio');
-        muet.src = URL.createObjectURL(silenceWav(1));                 // 1 seconde de vrai silence, fabriquée ici
+        muet.src = silenceDataUrl(1);                                    // 1 seconde de vrai silence, en data URL (une blob URL échoue en silence dans Safari)
+        muet.setAttribute('x-webkit-airplay', 'deny');
         muet.loop = true; muet.setAttribute('playsinline', ''); (muet as any).playsInline = true; muet.volume = .01;
-        muet.play().catch(() => { /* refusé : tant pis */ });
+        muet.play().then(() => noterSon('audio muet iOS : lance')).catch(e => noterSon('audio muet iOS refuse : ' + (e && e.name)));
         this.muet = muet;
       }
     } catch { /* ignore */ }
@@ -66,6 +77,7 @@ class Musique {
       this.maitre = this.ac.createGain(); this.maitre.connect(this.ac.destination);
       this.maitre.gain.value = this.R.coupe ? 0 : this.R.volume;
       this.pret = true;
+      noterSon('contexte audio cree : ' + this.ac.state); const ac0 = this.ac; ac0.onstatechange = () => noterSon('contexte -> ' + ac0.state);
       if (this.voulu) this.jouer(this.voulu);
     } catch { /* pas de son possible sur cet appareil */ }
   }
@@ -77,7 +89,7 @@ class Musique {
   private async adresses(id: string): Promise<string[]> {
     if (!this.listes.has(id)) this.listes.set(id, (async () => {
       const out: string[] = [];
-      const existe = async (u: string) => { try { const r = await fetch(u, { method: 'HEAD' }); return r.ok && (r.headers.get('content-type') || '').includes('audio'); } catch { return false; } };
+      const existe = async (u: string) => { try { const r = await fetch(u, { method: 'HEAD' }); noterSon('HEAD ' + u.split('/').pop() + ' -> ' + r.status + ' ' + (r.headers.get('content-type') || '?')); return r.ok && (r.headers.get('content-type') || '').includes('audio'); } catch (e) { noterSon('HEAD echoue ' + u.split('/').pop() + ' ' + (e as Error).name); return false; } };
       for (const u of [`music/music-${id}.mp3`, `music/music_${id}.mp3`, `music/musique_${id}.mp3`, `music/${id}.mp3`]) if (await existe(u)) { out.push(u); break; }
       for (let k = 2; k <= 4; k++) { const u = [`music/music-${id}-${k}.mp3`, `music/music-${id}${k}.mp3`, `music/music_${id}_${k}.mp3`]; let ok = false; for (const x of u) if (await existe(x)) { out.push(x); ok = true; break; } if (!ok) break; }
       if (!out.length) console.warn(`[musique] aucun fichier pour ${id}`);
@@ -87,7 +99,7 @@ class Musique {
   }
   private decoder(url: string): Promise<Morceau | null> {
     if (!this.decodes.has(url)) {
-      this.decodes.set(url, (async () => { try { const r = await fetch(url); return utile(await this.ac!.decodeAudioData(await r.arrayBuffer())); } catch { return null; } })());
+      this.decodes.set(url, (async () => { try { const r = await fetch(url); const b = await r.arrayBuffer(); noterSon('telecharge ' + url.split('/').pop() + ' ' + r.status + ' ' + Math.round(b.byteLength / 1024) + ' Ko'); const d = await this.ac!.decodeAudioData(b); noterSon('decode OK ' + url.split('/').pop()); return utile(d); } catch (e) { noterSon('ECHEC decodage ' + url.split('/').pop() + ' : ' + (e as Error).name + ' ' + (e as Error).message); return null; } })());
       while (this.decodes.size > 2) this.decodes.delete(this.decodes.keys().next().value!);   // on libère le plus ancien
     }
     return this.decodes.get(url)!;
@@ -117,7 +129,7 @@ class Musique {
   /** Jouer une playlist, à partir d'un morceau ; les morceaux s'enchaînent dans l'ordre, en fondu, puis on recommence.
    *  Chaque morceau n'est décodé qu'au moment d'être programmé (≈ 8 s avant), et seuls 2 restent en mémoire. */
   async jouer(id: string, depart = 0, force = false) {
-    this.voulu = id;
+    this.voulu = id; noterSon('jouer ' + id + ' (pret ' + this.pret + ')');
     if (!this.pret || !this.ac) return;
     if (this.enCours?.id === id && !force) return;
     const urls = await this.adresses(id);
@@ -176,13 +188,27 @@ class Musique {
 }
 export const MUSIQUE = new Musique();
 
+// ---------- DIAGNOSTIC DU SON (seulement avec ?son=1 dans l'adresse) : un petit panneau qui raconte ce que fait le son
+if (DIAG_SON) {
+  for (const g of ['pointerdown', 'touchend', 'click']) window.addEventListener(g, e => noterSon('geste ' + e.type), true);
+  const p = document.createElement('div');
+  p.style.cssText = 'position:fixed;left:6px;bottom:6px;z-index:9999;max-width:94vw;background:rgba(0,0,0,.82);color:#9f9;font:11px/1.35 monospace;padding:6px 8px;border-radius:8px;pointer-events:none;white-space:pre-wrap';
+  const maj = () => {
+    const m = MUSIQUE as unknown as { ac: AudioContext | null; pret: boolean; voulu: string; enCours_: unknown; R: { volume: number; coupe: boolean }; enPause: boolean };
+    p.textContent = `SON  contexte: ${m.ac ? m.ac.state : 'pas cree'} | pret: ${m.pret} | voulu: ${m.voulu || '-'} | joue: ${m.enCours_ ? JSON.stringify(m.enCours_) : 'rien'}\nvolume: ${m.R.volume} coupe: ${m.R.coupe} pause: ${m.enPause}\n${navigator.userAgent.slice(0, 90)}\n` + JOURNAL_SON.join('\n');
+    if (!p.parentNode && document.body) document.body.appendChild(p);
+  };
+  setInterval(maj, 700);
+}
+
 /** Un fichier WAV de silence de `secondes` secondes (8 kHz, 8 bits, mono), fabriqué en mémoire. */
-function silenceWav(secondes: number): Blob {
+function silenceDataUrl(secondes: number): string {
   const n = Math.round(8000 * secondes), b = new ArrayBuffer(44 + n), v = new DataView(b);
   const txt = (o: number, t: string) => { for (let i = 0; i < t.length; i++) v.setUint8(o + i, t.charCodeAt(i)); };
   txt(0, 'RIFF'); v.setUint32(4, 36 + n, true); txt(8, 'WAVE'); txt(12, 'fmt '); v.setUint32(16, 16, true);
   v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, 8000, true); v.setUint32(28, 8000, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true);
   txt(36, 'data'); v.setUint32(40, n, true);
   new Uint8Array(b, 44).fill(128);
-  return new Blob([b], { type: 'audio/wav' });
+  let s = ''; const u = new Uint8Array(b); for (let i = 0; i < u.length; i++) s += String.fromCharCode(u[i]);
+  return 'data:audio/wav;base64,' + btoa(s);
 }
