@@ -586,10 +586,11 @@ export class UI {
       const c = CATALOG.characters.find(x => x.id === l.id);
       const html = `${c ? tx(c.name) : l.id}<small>${c?.age ? s.years(c.age) : ''}</small>`; if (e.innerHTML !== html) e.innerHTML = html;
       const cls = 'nameTag' + (l.id === chosen ? ' chosen' : ''); if (e.className !== cls) e.className = cls;
-      const sousTitre = sousTitre0;
-      const y = Math.max(l.y, sousTitre + 40);                           // l'étiquette fait ~40 px de haut, tracée au-dessus du point
-      e.style.display = l.visible ? 'block' : 'none';
-      e.style.transform = `translate(${l.x}px, ${y}px) translate(-50%, -100%)`;
+      const place = Math.max(0, l.y - sousTitre0);                       // la place entre le bas du titre et la tete
+      const k = Math.min(1, place / 44);                                 // pas assez de place : le prenom retrecit, toujours entre les deux
+      e.style.display = l.visible && k > .3 ? 'block' : 'none';
+      e.style.transformOrigin = '50% 100%';
+      e.style.transform = `translate(${l.x}px, ${l.y}px) translate(-50%, -100%) scale(${k.toFixed(3)})`;
     }
   }
   hideNameTags() { for (const e of this.tags.values()) e.style.display = 'none'; }
