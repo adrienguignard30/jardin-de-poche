@@ -275,40 +275,60 @@ export class Game {
   }
   /** Couleur moyenne de la texture par zone (zones_<perso>.json, écrit par jdp_zones_perso.py). */
   private moyennes: Record<string, Record<string, string>> = {};
+  private masquesVisage: Record<string, THREE.Texture> = {};
   private async chargerMoyennes(id: string) {
+    if (['marcel', 'jimy'].includes(id) && !this.masquesVisage[id]) {
+      try { const tex = await new THREE.TextureLoader().loadAsync(`models/visage_${id}_mask.png`); tex.flipY = false; tex.colorSpace = THREE.NoColorSpace; this.masquesVisage[id] = tex; }
+      catch (e) { console.warn('[personnalisation] masque visage absent', id, e); }
+    }
     if (this.moyennes[id]) return;
     try { const r = await fetch(`models/zones_${id}.json`); if (r.ok && (r.headers.get('content-type') || '').includes('json')) this.moyennes[id] = (await r.json()).moyennes ?? {}; else this.moyennes[id] = {}; } catch { this.moyennes[id] = {}; }
   }
   /** Teinte les matières nommées d'un personnage (matières clonées : les autres personnages ne bougent pas). */
   private teinter(obj: THREE.Object3D | undefined, couleurs: Record<string, string>, id = this.state?.character ?? this.showroom?.chars[0]?.def.id ?? '') {
     if (!obj) return;
+    couleurs = { ...(obj.userData.teintesVisage ?? {}), ...couleurs };
+    obj.userData.teintesVisage = { ...couleurs };
     const moy = this.moyennes[id] ?? {};
+    const masque = this.masquesVisage[id];
+    const skinKey = Object.keys(couleurs).find(k => k.replace(/\.\d{3}$/, '') === `mat_${id}_peau`);
+    const skinHex = skinKey ? couleurs[skinKey] : '';
+    const hairKey = Object.keys(couleurs).find(k => k.replace(/\.\d{3}$/, '') === `mat_${id}_cheveux`);
+    const hairHex = hairKey ? couleurs[hairKey] : '';
+    const hairAvg = new THREE.Color(moy.cheveux ?? '#808080');
+    const hairLum = Math.max(.08, .299 * hairAvg.r + .587 * hairAvg.g + .114 * hairAvg.b);
+    const skinAvg = new THREE.Color(moy.peau ?? '#b58060');
+    const skinLum = Math.max(.08, .299 * skinAvg.r + .587 * skinAvg.g + .114 * skinAvg.b);
     obj.traverse(o => {
       const m = o as THREE.Mesh; if (!m.isMesh) return;
       const arr = Array.isArray(m.material) ? m.material : [m.material];
       const out = arr.map(mat => {
         const sm = mat as THREE.MeshStandardMaterial; if (!sm.name) return mat;
         const cle = sm.name in couleurs ? sm.name : Object.keys(couleurs).find(k => k.replace(/\.\d{3}$/, '') === sm.name.replace(/\.\d{3}$/, ''));
-        if (!cle) return mat;
-        const hex = couleurs[cle];
+        const zone = sm.name.replace(/\.\d{3}$/, '').split('_').pop()!;
+        if (!cle && !(masque && ['peau', 'cheveux'].includes(zone))) return mat;
+        const hex = cle ? couleurs[cle] : '';
         const c = (sm.userData.tinted ? sm : sm.clone()) as THREE.MeshStandardMaterial;
         // la texture reste (plis, ombres) : on garde sa luminosité relative et on remplace sa couleur par la teinte choisie
         if (!c.userData.tinted) {
           c.userData.tinted = true;
-          c.userData.u = { uTint: { value: new THREE.Color('#ffffff') }, uLum: { value: 1 }, uOn: { value: 0 }, uAvg: { value: new THREE.Color('#808080') }, uKeep: { value: 0 }, uArc: { value: 0 }, uTemps: TEMPS_ARC };
+          c.userData.u = { uTint: { value: new THREE.Color('#ffffff') }, uLum: { value: 1 }, uOn: { value: 0 }, uAvg: { value: new THREE.Color('#808080') }, uKeep: { value: 0 }, uArc: { value: 0 }, uTemps: TEMPS_ARC, uVisage: { value: masque ?? null }, uVisageOn: { value: 0 }, uHair: { value: 0 }, uSkinTint: { value: new THREE.Color() }, uSkinLum: { value: 1 }, uSkinOn: { value: 0 }, uSkinArc: { value: 0 }, uFaceOn: { value: 0 }, uFaceTint: { value: new THREE.Color() }, uFaceLum: { value: 1 }, uFaceArc: { value: 0 } };
           c.onBeforeCompile = sh => {
             Object.assign(sh.uniforms, c.userData.u);
             sh.fragmentShader = sh.fragmentShader
-              .replace('#include <common>', '#include <common>\nuniform vec3 uTint; uniform float uLum; uniform float uOn; uniform vec3 uAvg; uniform float uKeep; uniform float uArc; uniform float uTemps;\nvec3 arcEnCiel(float h) { return clamp(abs(mod(h * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0); }')
+              .replace('#include <common>', '#include <common>\nuniform vec3 uTint; uniform float uLum; uniform float uOn; uniform vec3 uAvg; uniform float uKeep; uniform float uArc; uniform float uTemps; uniform sampler2D uVisage; uniform float uVisageOn; uniform float uHair; uniform vec3 uSkinTint; uniform float uSkinLum; uniform float uSkinOn; uniform float uSkinArc; uniform float uFaceOn; uniform vec3 uFaceTint; uniform float uFaceLum; uniform float uFaceArc;\nvec3 arcEnCiel(float h) { return clamp(abs(mod(h * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0); }')
               // ce qui n'est pas de la couleur de la zone (yeux, moustache, boutons) garde sa couleur d'origine
-              .replace('#include <map_fragment>', '#include <map_fragment>\nif (uOn > 0.5) { float l = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114)); vec3 base = uTint;\n#ifdef USE_MAP\n if (uArc > 0.5) base = mix(vec3(1.0), arcEnCiel(fract(uTemps * 0.12 + vMapUv.y * 2.5 + vMapUv.x * 1.2)), 0.85);\n#else\n if (uArc > 0.5) base = mix(vec3(1.0), arcEnCiel(fract(uTemps * 0.12 + gl_FragCoord.y * 0.004)), 0.85);\n#endif\n vec3 t = base * clamp(l / max(uLum, 0.02), 0.25, 1.9); float d = distance(diffuseColor.rgb / max(l, 0.05), uAvg / max(dot(uAvg, vec3(0.299, 0.587, 0.114)), 0.05)); float k = uKeep > 0.5 ? 1.0 - smoothstep(0.35, 0.8, d) : 1.0; diffuseColor.rgb = mix(diffuseColor.rgb, t, k); }');
+              .replace('#include <map_fragment>', '#include <map_fragment>\nif (uOn > 0.5 || uSkinOn > 0.5 || uFaceOn > 0.5) { float l = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114)); vec3 base = uTint;\n#ifdef USE_MAP\n if (uArc > 0.5) base = mix(vec3(1.0), arcEnCiel(fract(uTemps * 0.12 + vMapUv.y * 2.5 + vMapUv.x * 1.2)), 0.85);\n#else\n if (uArc > 0.5) base = mix(vec3(1.0), arcEnCiel(fract(uTemps * 0.12 + gl_FragCoord.y * 0.004)), 0.85);\n#endif\n vec3 t = base * clamp(l / max(uLum, 0.02), 0.25, 1.9); float d = distance(diffuseColor.rgb / max(l, 0.05), uAvg / max(dot(uAvg, vec3(0.299, 0.587, 0.114)), 0.05)); float k = uKeep > 0.5 ? 1.0 - smoothstep(0.35, 0.8, d) : 1.0; vec3 visage = vec3(0.0);\n#ifdef USE_MAP\n if (uVisageOn > 0.5) visage = texture2D(uVisage, vMapUv).rgb;\n#endif\n float face = uHair * visage.g; vec3 original = diffuseColor.rgb; diffuseColor.rgb = mix(original, t, k * uOn * (1.0 - face) * (1.0 - visage.r)); vec3 skinBase = uSkinTint;\n#ifdef USE_MAP\n if (uSkinArc > 0.5) skinBase = mix(vec3(1.0), arcEnCiel(fract(uTemps * 0.12 + vMapUv.y * 2.5 + vMapUv.x * 1.2)), 0.85);\n#endif\n vec3 skin = skinBase * clamp(l / max(uSkinLum, 0.02), 0.25, 1.9); float protection = visage.r / max(visage.g, 0.001); diffuseColor.rgb = mix(diffuseColor.rgb, mix(original, skin, uSkinOn * (1.0 - protection)), face); vec3 poilsBase = uFaceTint;\n#ifdef USE_MAP\n if (uFaceArc > 0.5) poilsBase = mix(vec3(1.0), arcEnCiel(fract(uTemps * 0.12 + vMapUv.y * 2.5 + vMapUv.x * 1.2)), 0.85);\n#endif\n vec3 poils = poilsBase * clamp(l / max(uFaceLum, 0.02), 0.25, 1.9); diffuseColor.rgb = mix(diffuseColor.rgb, poils, visage.b * uFaceOn); }');
           };
-          c.customProgramCacheKey = () => 'teinte-zone';
+          c.customProgramCacheKey = () => 'teinte-zone-visage-v2';
           c.needsUpdate = true;
         }
         const u = c.userData.u;
+        u.uVisage.value = masque ?? null; u.uVisageOn.value = masque && ['peau', 'cheveux'].includes(zone) ? 1 : 0; u.uHair.value = zone === 'cheveux' ? 1 : 0;
+        u.uSkinOn.value = masque && skinHex ? 1 : 0; u.uSkinLum.value = skinLum; u.uSkinArc.value = skinHex === 'arc' ? 1 : 0; u.uSkinTint.value.set(skinHex && skinHex !== 'arc' ? skinHex : '#ffffff');
+        u.uFaceOn.value = id === 'marcel' && masque && hairHex && ['peau', 'cheveux'].includes(zone) ? 1 : 0;
+        u.uFaceTint.value.set(hairHex && hairHex !== 'arc' ? hairHex : '#ffffff'); u.uFaceLum.value = hairLum; u.uFaceArc.value = hairHex === 'arc' ? 1 : 0;
         if (!hex) { u.uOn.value = 0; return c; }                                // ↺ : la texture d'origine
-        const zone = sm.name.replace(/\.\d{3}$/, '').split('_').pop()!;
         const avg = moy[zone] ? new THREE.Color(moy[zone]) : null;
         const lum = avg ? (0.299 * avg.r + 0.587 * avg.g + 0.114 * avg.b) : 0.5;
         if (hex === 'arc') { u.uArc.value = 1; u.uTint.value.set('#ffffff'); } else { u.uArc.value = 0; u.uTint.value.set(hex); }   // 🌈 : les couleurs défilent
@@ -383,6 +403,7 @@ export class Game {
     // Le layout et les rayons du décor changent CHAIR_SPOT : installer ensuite.
     this.world.mesurerSol();
     this.char.solSousPied = p => this.world.solAuPoint(p);
+    this.char.piedHorsObstacle = (pied, pointe) => this.piedHorsPots(pied, pointe);
     await this.installerChaisePliante(c.id);
     await Promise.all(['arrosoir', 'arrosoir_vert', 'telephone', 'assiette', 'tasse'].map(n => BIBLIO.accessoire(n)));
     this.char.teleport(START_SPOT, 0);
@@ -518,7 +539,8 @@ export class Game {
     }
     const ch = this.char.obj;
     const versLui = ch.position.clone().sub(terre).setY(0).normalize();
-    const cible = terre.clone().addScaledVector(versLui, quoi === 'recolte' ? .02 : 0).setY(y);
+    // Semer dans la moitié proche de la terre : les chaussures restent hors du pot, sans forcer le bras au-delà de sa portée.
+    const cible = terre.clone().addScaledVector(versLui, quoi === 'recolte' ? .02 : this.state.character === 'lea' ? .08 : 0).setY(y);
     const char = this.char, token = this.autoToken;
     setTimeout(() => { if (this.char !== char || token !== this.autoToken) return; char.mains = { droite: () => cible, paumes: true, doigts: quoi === 'semis' }; char.ikBut = 1; }, Math.max(0, effet - .6) * 1000);
     setTimeout(() => { if (this.char === char && token === this.autoToken) char.ikBut = 0; }, (effet + .45) * 1000);
@@ -1018,6 +1040,12 @@ export class Game {
   private poserAssiette() {
     if (!this.porte) return;
     const W = this.world, o = this.porte;
+    // Le relâchement garde ses derniers contacts, pas ceux de l'assiette déplacée jusqu'à la cuisine.
+    const mains = this.char.mains;
+    if (mains) {
+      const droite = mains.droite?.().clone(), gauche = mains.gauche?.().clone();
+      this.char.mains = { ...mains, droite: droite ? () => droite : undefined, gauche: gauche ? () => gauche : undefined };
+    }
     this.lacher();
     const ou = W.kitchenSpot ? W.kitchenLook.clone().lerp(W.kitchenSpot, .35).setY(W.kitchenTop + .005)
       : BASKET_SPOT.clone().add(new THREE.Vector3(.35, .02, 0)).setY(FL + .02);
@@ -1137,6 +1165,7 @@ export class Game {
       clearTimeout(this.autoTimer);
       this.preparationJoueur = (async () => {
         const n = ch.currentName;
+        if (this.porte) this.poserAssiette(); // le plat attend l'offrande sur le plan de travail, jamais attaché pendant une autre tâche
         ch.annulerMarche(); ch.regard = null; ch.ikBut = 0;
         this.lacherArrosoir(); this.lacherTel(); this.release();
         this.poeleEnCours?.parent?.remove(this.poeleEnCours); this.poeleEnCours = null;
@@ -1223,7 +1252,7 @@ export class Game {
       await this.char.goTo(points[i].clone().setY(FL + this.world.solPiece), i === points.length - 1 ? face : undefined);
     }
   }
-  private standFor(slot: Slot, geste?: string): { pos: THREE.Vector3; face: number } {
+  private standForSansEmpreinte(slot: Slot, geste?: string): { pos: THREE.Vector3; face: number } {
     const g = geste ? this.char.gestures[geste] : undefined;
     if (!g || slot.roof) return { pos: slot.stand, face: slot.face };
     const dir = Math.sign(LAYOUT.corridorZ - slot.pos.z) || 1;
@@ -1231,7 +1260,7 @@ export class Game {
       // Le torse du pickup avance davantage que la main : une approche à 60°
       // conserve au moins 3 cm entre l'enveloppe du corps et la rambarde.
       const id = this.state.character;
-      const face = (id === 'lea' && geste === 'plant' ? -1 : 1) * Math.PI / 3;
+      const face = Math.PI / 3;
       const recul = id === 'marcel' ? (geste === 'plant' ? (SLOTS.indexOf(slot) === 0 ? .23 : .15) : SLOTS.indexOf(slot) === 0 ? .15 : .10) : id === 'jimy' || geste === 'harvest' ? .05 : .025;
       const main = new THREE.Vector3(-(g.cote ?? 0), 0, g.distance).applyAxisAngle(new THREE.Vector3(0, 1, 0), face);
       const pos = new THREE.Vector3(slot.pos.x - main.x, FL, slot.pos.z - main.z - recul);
@@ -1248,6 +1277,53 @@ export class Game {
     const right = new THREE.Vector3(-Math.cos(face), 0, Math.sin(face));
     const pos = new THREE.Vector3(slot.pos.x, FL, slot.pos.z).addScaledVector(u, d).addScaledVector(right, -(g.cote ?? 0));
     return { pos: freePoint(pos, `pot${SLOTS.indexOf(slot)}`), face };
+  }
+  /** Les pots restent fixes : déplacer le point de travail pour garder les deux chaussures hors des bacs. */
+  private standFor(slot: Slot, geste?: string): { pos: THREE.Vector3; face: number } {
+    const base = this.standForSansEmpreinte(slot, geste);
+    if (slot.roof) return base;
+    const pieds = this.char.empreintePieds(); if (!pieds.length) return base;
+    const axe = new THREE.Vector3(0, 1, 0), rayon = POT_SCALE * 1.06 / 2 + .025;
+    const libre = (pos: THREE.Vector3) => {
+      for (const pot of SLOTS) {
+        if (pot.roof) continue;
+        const local = pot.pos.clone().sub(pos).applyAxisAngle(axe, -base.face);
+        for (const pied of pieds) {
+          const x = THREE.MathUtils.clamp(local.x, pied.minX, pied.maxX);
+          const z = THREE.MathUtils.clamp(local.z, pied.minZ, pied.maxZ);
+          if (Math.hypot(local.x - x, local.z - z) < rayon) return false;
+        }
+      }
+      return true;
+    };
+    if (libre(base.pos)) return base;
+    let choix: THREE.Vector3 | null = null, meilleur = Infinity;
+    // Chercher le déplacement minimal autour de l'approche mesurée ; contrôler aussi les pots voisins.
+    for (let ix = -12; ix <= 12; ix++) for (let iz = -12; iz <= 12; iz++) {
+      const pos = base.pos.clone().add(new THREE.Vector3(ix * .03, 0, iz * .03));
+      const score = pos.distanceToSquared(base.pos); if (score >= meilleur) continue;
+      if (freePoint(pos, 'pot' + slot.id).distanceTo(pos) > .005 || !libre(pos)) continue;
+      choix = pos; meilleur = score;
+    }
+    return { pos: choix ?? base.pos, face: base.face };
+  }
+  /** Préserver les pots fixes pendant les pas et les virages : contrôler toute la longueur de la chaussure. */
+  private piedHorsPots(pied: THREE.Vector3, pointe: THREE.Vector3): THREE.Vector3 {
+    const cible = pied.clone(), bout = pointe.clone();
+    if (this.onRoof || this.inside) return cible;
+    const rayon = POT_SCALE * 1.06 / 2 + .065;
+    for (let i = 0; i < 4; i++) for (const pot of SLOTS) {
+      if (pot.roof) continue;
+      const dx = bout.x - cible.x, dz = bout.z - cible.z, longueur2 = dx * dx + dz * dz;
+      const k = longueur2 < 1e-8 ? 0 : THREE.MathUtils.clamp(((pot.pos.x - cible.x) * dx + (pot.pos.z - cible.z) * dz) / longueur2, 0, 1);
+      const x = cible.x + dx * k - pot.pos.x, z = cible.z + dz * k - pot.pos.z, distance = Math.hypot(x, z);
+      if (distance >= rayon) continue;
+      const direction = new THREE.Vector3(x, 0, z);
+      if (distance < 1e-5) direction.set(0, 0, LAYOUT.corridorZ >= pot.pos.z ? 1 : -1);
+      direction.normalize().multiplyScalar(rayon - distance);
+      cible.add(direction); bout.add(direction);
+    }
+    return cible;
   }
   private async gotoSlot(slot: Slot, geste?: string) {
     await this.ensureLevel(slot.roof);

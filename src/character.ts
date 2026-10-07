@@ -92,6 +92,7 @@ export class Character {
   }
   /** Un geste mesuré : on joue seulement le passage utile, à vitesse normale. Renvoie quand faire l'effet et la fin. */
   geste(name: string, fallbackMax = 3.2): { effet: number; fin: Promise<void> } {
+    this.annulerVirage();
     const g = this.gestures[name];
     const a = g ? (this.actions.get(g.anim) ?? this.resolve(name)) : null;
     if (!g || !a) {
@@ -114,6 +115,47 @@ export class Character {
     return { effet: Math.max(0, g.effet - g.debut), fin };
   }
   busy = false;                         // en train de marcher ou de faire une action
+  private virage: { debut: number; delta: number; duree: number; t: number; fin: boolean; occupeAvant: boolean } | null = null;
+  private debuterVirage(face: number): boolean {
+    const delta = Math.atan2(Math.sin(face - this.obj.rotation.y), Math.cos(face - this.obj.rotation.y));
+    if (Math.abs(delta) < .5 || this.solAssis !== null || this.mains && this.ikBut > 0) return false;
+    const nom = delta > 0 ? 'turn_left' : 'turn_right', action = this.actions.get(nom);
+    if (!action) return false;
+    this.pinInPlace(nom);
+    const duree = Math.max(action.getClip().duration, Math.abs(delta) * 1.6 / 3.2);
+    const occupeAvant = this.busy;
+    this.play(nom, .18, action.getClip().duration / duree);
+    action.setLoop(THREE.LoopOnce, 1); action.clampWhenFinished = true;
+    this.virage = { debut: this.obj.rotation.y, delta, duree, t: 0, fin: false, occupeAvant };
+    this.busy = true;
+    return true;
+  }
+  private avancerVirage(dt: number) {
+    const v = this.virage; if (!v) return;
+    v.t += dt;
+    const k = THREE.MathUtils.smoothstep(v.t, 0, v.duree);
+    this.obj.rotation.y = v.debut + v.delta * k;
+    if (v.t >= v.duree && !v.fin) { v.fin = true; this.virage = null; this.play('idle', .3); this.virage = v; }
+    if (v.t >= v.duree + .35) { this.virage = null; this.busy = v.occupeAvant; }
+  }
+  private annulerVirage() {
+    if (!this.virage) return;
+    if (!this.walking) this.busy = this.virage.occupeAvant;
+    this.virage = null;
+  }
+  /** Le clip fait les pas ; l'orientation appartient au groupe du corps, sans deuxième rotation du bassin. */
+  private neutraliserRotationDuVirage() {
+    if (!this.virage) return;
+    const bassin = this.bone('Hips'); if (!bassin?.parent) return;
+    this.obj.updateMatrixWorld(true);
+    const q = bassin.getWorldQuaternion(new THREE.Quaternion());
+    const local = this.obj.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(q);
+    const direction = new THREE.Vector3(0, 0, 1).applyQuaternion(local);
+    const angle = Math.atan2(direction.x, direction.z);
+    const monde = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -angle).multiply(q);
+    bassin.quaternion.copy(bassin.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(monde));
+    bassin.updateMatrixWorld(true);
+  }
   private walking: { target: THREE.Vector3; face?: number; arrivee?: boolean; resolve: () => void } | null = null;
   private fade = { value: 1, target: 1 };
   private meshes: THREE.Mesh[] = [];
@@ -428,6 +470,7 @@ export class Character {
   private breathT = 0;
   /** Joue une animation en boucle (idle, walk, sit, sleep, phone, dance). */
   play(name: string, fadeSec = .22, timeScale = 1) {
+    if (!name.startsWith('turn_')) this.annulerVirage();
     if (name === 'idle' && this.appuisGeste) this.appuisFin = fadeSec;
     else if (!/^(plant|harvest|pickup|water)$/.test(name)) { this.appuisGeste = null; this.appuisFin = 0; }
     this.breathing = false;
@@ -468,6 +511,7 @@ export class Character {
     return new Promise<void>(resolve => { this.finAction = { reste: duree, epoch, retourIdle, resolve }; });
   }
   once(name: string, maxSec = 4, retourIdle = true): Promise<void> {
+    this.annulerVirage();
     const a = this.resolve(name); if (!a) return Promise.resolve();
     const dur = Math.min(a.getClip().duration, maxSec);
     this.raccorderPose(.35);
@@ -486,7 +530,7 @@ export class Character {
     if (this.walking) { const w = this.walking; this.walking = null; w.resolve(); }
     const d = target.clone().sub(this.obj.position);
     d.y = 0;
-    this.faceCible = null;
+    this.faceCible = null; this.virage = null;
     if (d.length() < .05) {
       if (face === undefined) return Promise.resolve();
       this.busy = true; this.play('idle');
@@ -494,6 +538,7 @@ export class Character {
     }
     this.busy = true;
     this.play('walk');
+    this.debuterVirage(Math.atan2(d.x, d.z));
     return new Promise(res => { this.walking = { target: target.clone(), face, resolve: res }; });
   }
 
@@ -516,7 +561,8 @@ export class Character {
   }
   annulerMarche() {
     this.actionEpoch++;
-    const w = this.walking; this.walking = null;
+    this.annulerVirage();
+    const w = this.walking; this.walking = null; this.virage = null;
     if (w) { this.busy = false; w.resolve(); }
   }
   setFade(target: number) { this.fade.target = target; }
@@ -537,7 +583,7 @@ export class Character {
     this.obj.traverse(o => {
       const m = o as THREE.SkinnedMesh; if (!m.isSkinnedMesh) return;
       const mats = Array.isArray(m.material) ? m.material : [m.material];
-      if (!mats.some(a => /_haut$/.test(a.name))) return;
+      if (!mats.some(a => /_(haut|bas)$/.test(a.name))) return;
       const si = m.geometry.attributes.skinIndex, sw = m.geometry.attributes.skinWeight;
       const os = new Set(m.skeleton.bones.map((b, i) => /Hips$|Spine\d*$/.test(b.name) ? i : -1));
       const indices: number[] = []; m.skeleton.update();
@@ -568,26 +614,36 @@ export class Character {
     }
   }
   private contourTorse: THREE.Vector3[] = [];
+  private tranchesTorse = new Map<string, THREE.Box3>();
+  private bornesTorse = new THREE.Box3();
   private couRepos = new Map<string, THREE.Quaternion>();
   private mesurerVolumeTorse() {
     this.contourTorse = [];
-    if (!this.torseLarge || !/^(idle(?:_|$)|walk(?:_|$)|run(?:_|$)|plant$|harvest$|pickup$|water$|carry(?:_|$)|phone(?:_|$)|cafe(?:_|$)|sit(?:_|$)|stand_up$)/.test(this.currentName)) return;
+    this.tranchesTorse.clear(); this.bornesTorse.makeEmpty();
+    if (!this.torse.length || !/^(idle(?:_|$)|walk(?:_|$)|run(?:_|$)|plant$|harvest$|pickup$|water$|carry(?:_|$)|phone(?:_|$)|cafe(?:_|$)|sit(?:_|$)|stand_up$)/.test(this.currentName)) return;
     this.obj.updateMatrixWorld(true);
     for (const { mesh, indices } of this.torse) {
       mesh.skeleton.update();
       for (const i of indices) {
-        const p = new THREE.Vector3(); mesh.getVertexPosition(i, p); mesh.localToWorld(p); this.obj.worldToLocal(p); this.contourTorse.push(p);
+        const p = new THREE.Vector3(); mesh.getVertexPosition(i, p); mesh.localToWorld(p); this.obj.worldToLocal(p); this.contourTorse.push(p); this.bornesTorse.expandByPoint(p);
       }
     }
   }
   private mainHorsDuTorse(cote: 'Right' | 'Left', monde: THREE.Vector3, rayon = 0) {
     if (!this.contourTorse.length) return monde;
     const p = this.obj.worldToLocal(monde.clone());
-    const tranche = this.contourTorse.filter(q => Math.abs(q.y - p.y) < .04 + rayon);
-    if (!tranche.length) return monde;
-    const box = new THREE.Box3().setFromPoints(tranche).expandByScalar(rayon);
+    const centre = Math.round(p.y / .02) * .02, r = Math.ceil(rayon / .005) * .005;
+    const cle = centre.toFixed(2) + ':' + r.toFixed(3);
+    let box = this.tranchesTorse.get(cle);
+    if (!box) {
+      box = new THREE.Box3();
+      for (const q of this.contourTorse) if (Math.abs(q.y - centre) < .05 + r) box.expandByPoint(q);
+      if (!box.isEmpty()) box.expandByScalar(r);
+      this.tranchesTorse.set(cle, box);
+    }
+    if (box.isEmpty()) return monde;
     // Entrer progressivement dans la zone de dégagement évite un saut du poignet.
-    const bas = Math.min(...this.contourTorse.map(q => q.y)), haut = Math.max(...this.contourTorse.map(q => q.y));
+    const bas = this.bornesTorse.min.y, haut = this.bornesTorse.max.y;
     const poids = THREE.MathUtils.smoothstep(p.y, bas - .05, bas) * (1 - THREE.MathUtils.smoothstep(p.y, haut, haut + .05))
       * THREE.MathUtils.smoothstep(p.z, box.min.z - .10, box.min.z)
       * (1 - THREE.MathUtils.smoothstep(p.z, box.max.z, box.max.z + .10))
@@ -629,9 +685,60 @@ export class Character {
   private os(n: string) { return (this.ikOs[n] ??= this.bone(n)); }
   solAssis: number | null = null;
   solSousPied: ((p: THREE.Vector3) => number) | null = null;
+  piedHorsObstacle: ((pied: THREE.Vector3, pointe: THREE.Vector3) => THREE.Vector3) | null = null;
+  private degagerPiedsEnMouvement() {
+    if (!this.piedHorsObstacle || (!this.walking && !this.virage)) return;
+    for (const cote of ['Left', 'Right'] as const) {
+      const pied = this.os(cote + 'Foot'), pointe = this.os(cote + 'ToeBase');
+      if (!pied?.parent || !pointe) continue;
+      const q = pied.getWorldQuaternion(new THREE.Quaternion());
+      for (let i = 0; i < 3; i++) {
+        const p = pied.getWorldPosition(new THREE.Vector3());
+        const cible = this.piedHorsObstacle(p, pointe.getWorldPosition(new THREE.Vector3()));
+        if (cible.distanceToSquared(p) < 1e-8) break;
+        // Garder le pas à portée de la jambe ; un léger soulèvement vaut mieux qu'une jambe étirée.
+        const hanche = this.os(cote + 'UpLeg'), genou = this.os(cote + 'Leg');
+        if (hanche && genou) {
+          const h = hanche.getWorldPosition(new THREE.Vector3()), g = genou.getWorldPosition(new THREE.Vector3());
+          const longueur = h.distanceTo(g) + g.distanceTo(p) - .002;
+          const horizontal = Math.hypot(cible.x - h.x, cible.z - h.z);
+          if (horizontal < longueur) cible.y = Math.max(cible.y, h.y - Math.sqrt(longueur * longueur - horizontal * horizontal));
+        }
+        this.chaineIK(cote, cible, 1, true);
+        pied.quaternion.copy(pied.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(q));
+        pied.updateMatrixWorld(true);
+      }
+    }
+  }
   private appuisGeste: { cote: 'Left' | 'Right'; pos: THREE.Vector3; q: THREE.Quaternion }[] | null = null;
   private appuisFin = 0;
   private dernierGeste = '';
+  private empreinteRepos: { minX: number; maxX: number; minZ: number; maxZ: number }[] | null = null;
+  /** Enveloppe des chaussures au repos, dans le repère de placement du corps. Mesurée une seule fois. */
+  empreintePieds() {
+    if (this.empreinteRepos) return this.empreinteRepos;
+    if (!this.poseSonde('idle', 0)) return [];
+    const boxes = [new THREE.Box3(), new THREE.Box3()];
+    this.sonde.traverse(o => {
+      const mesh = o as THREE.SkinnedMesh; if (!mesh.isSkinnedMesh) return;
+      const indices = mesh.geometry.attributes.skinIndex, weights = mesh.geometry.attributes.skinWeight;
+      if (!indices || !weights) return;
+      mesh.skeleton.update();
+      for (let i = 0; i < indices.count; i++) {
+        const sides = [0, 0];
+        for (let k = 0; k < 4; k++) {
+          const name = mesh.skeleton.bones[indices.getComponent(i, k)]?.name ?? '';
+          if (/Left(Foot|Toe)/.test(name)) sides[0] += weights.getComponent(i, k);
+          if (/Right(Foot|Toe)/.test(name)) sides[1] += weights.getComponent(i, k);
+        }
+        if (Math.max(...sides) < .5) continue;
+        const point = mesh.getVertexPosition(i, new THREE.Vector3()); mesh.localToWorld(point);
+        boxes[sides[0] > sides[1] ? 0 : 1].expandByPoint(point);
+      }
+    });
+    this.empreinteRepos = boxes.filter(b => !b.isEmpty()).map(b => ({ minX: b.min.x - .04, maxX: b.max.x + .04, minZ: b.min.z - .04, maxZ: b.max.z + .04 }));
+    return this.empreinteRepos;
+  }
   private fixerAppuis() {
     const hauteur = this.surfacePose('idle', 0, 'chaussures');
     this.appuisGeste = [];
@@ -698,23 +805,24 @@ export class Character {
     const droite = new THREE.Vector3(-fw.z, 0, fw.x).multiplyScalar(cote === 'Right' ? 1 : -1);
     const large = this.contourTorse.length > 0;
     const guide = this.mains && this.ikBut > 0 && (cote === 'Right' ? this.mains.droite : this.mains.gauche);
-    const pole = jambe ? fw.clone().addScaledVector(droite, .12) : guide ? E0.clone().sub(S) : new THREE.Vector3(0, -1, 0).addScaledVector(droite, large ? 1.15 : .55).addScaledVector(fw, large ? .20 : -.35);
+    const pole = jambe ? fw.clone().addScaledVector(droite, .12) : guide && this.currentName === 'water' ? new THREE.Vector3(0, -1, 0).addScaledVector(droite, .65).addScaledVector(fw, -.20) : guide ? E0.clone().sub(S) : new THREE.Vector3(0, -1, 0).addScaledVector(droite, large ? 1.15 : .55).addScaledVector(fw, large ? .20 : -.35);
     let pp = pole.sub(dir.clone().multiplyScalar(pole.dot(dir)));
     if (pp.lengthSq() < 1e-8) { pp = new THREE.Vector3(0, -1, 0).addScaledVector(droite, .55); pp.addScaledVector(dir, -pp.dot(dir)); }
     pp.normalize();   // le pôle, dans le plan perpendiculaire à l'axe épaule → cible
     const cosA = THREE.MathUtils.clamp((a * a + d * d - b * b) / (2 * a * d), -1, 1);
     const centre = S.clone().addScaledVector(dir, a * cosA), rayon = a * Math.sqrt(1 - cosA * cosA);
     let coude = centre.clone().addScaledVector(pp, rayon);
-    if (!jambe && large) {
+    if (!jambe && (large || guide)) {
       // Même cible de main, mais choisir un coude dont l'avant-bras contourne le ventre.
       const travers = new THREE.Vector3().crossVectors(dir, pp).normalize();
       let meilleur = Infinity;
-      const precedent = guide ? this.coudesDebutFrame.get(cote) : undefined;
+      const precedent = this.coudesDebutFrame.get(cote);
       const ancien = precedent ? this.obj.localToWorld(precedent.clone()).sub(centre) : null;
       const anglePrecedent = ancien ? Math.atan2(ancien.dot(travers), ancien.dot(pp)) : 0;
       for (const angle of [anglePrecedent, 0, .4, -.4, .8, -.8, 1.2, -1.2, 1.6, -1.6, 2, -2, 2.4, -2.4, 2.8, -2.8, Math.PI]) {
         const essai = centre.clone().addScaledVector(pp, Math.cos(angle) * rayon).addScaledVector(travers, Math.sin(angle) * rayon);
         let score = precedent ? this.obj.worldToLocal(essai.clone()).distanceToSquared(precedent) * .002 : angle * angle * 1e-6;
+        if (guide && this.currentName === 'water') score += angle * angle * .002;
         for (const point of [essai, ...[.25, .5, .75].map(k => essai.clone().lerp(cible, k))]) {
           score += 100 * point.distanceToSquared(this.mainHorsDuTorse(cote, point, this.rayonAvantBras[cote]));
         }
@@ -729,7 +837,7 @@ export class Character {
         coude = centre.clone().addScaledVector(pp, Math.cos(angle) * rayon).addScaledVector(travers, Math.sin(angle) * rayon);
       }
     }
-    if (!jambe && large) this.coudePrecedent.set(cote, this.obj.worldToLocal(coude.clone()));
+    if (!jambe && (large || guide)) this.coudePrecedent.set(cote, this.obj.worldToLocal(coude.clone()));
     const tourner = (os: THREE.Object3D, de: THREE.Vector3, vers: THREE.Vector3) => {
       const q = new THREE.Quaternion().setFromUnitVectors(de.normalize(), vers.normalize());
       const bq = new THREE.Quaternion(), pq = new THREE.Quaternion();
@@ -788,7 +896,7 @@ export class Character {
     return THREE.MathUtils.clamp((valeur - debut) / (fin - debut), 0, 1);
   }
   private faceCible: number | null = null;
-  tourner(face: number) { this.faceCible = face; }
+  tourner(face: number) { this.annulerVirage(); this.faceCible = face; }
   /** Correction des bras : si le squelette venu de Mixamo tient les bras trop hauts dans toutes les animations, on abaisse
    *  les deux bras d'un angle fixe (en degrés) à chaque image, après l'animation. ?bras=35 dans l'adresse pour essayer. */
   brasOffset = 0;
@@ -806,6 +914,7 @@ export class Character {
     }
   }
   update(dt: number) {
+    this.avancerVirage(dt);
     if (this.faceCible !== null) {
       const d = ((this.faceCible - this.obj.rotation.y + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
       const pas = Math.sign(d) * Math.min(Math.abs(d), dt * 3.2);
@@ -822,7 +931,8 @@ export class Character {
     // Le déplacement et le raccord précèdent les contraintes en coordonnées mondiales.
     if (this.walking) {
       const w = this.walking;
-      if (!w.arrivee) {
+      if (!w.arrivee && !this.virage) {
+        if (this.currentName !== 'walk') this.play('walk');
         const d = w.target.clone().sub(this.obj.position); d.y = 0;
         const len = d.length(), step = this.speed * dt;
         if (len > step) {
@@ -834,16 +944,17 @@ export class Character {
           this.play('idle');
         } else this.obj.position.add(d.normalize().multiplyScalar(step));
       }
-      if (w.arrivee) {
+      if (w.arrivee && !this.virage) {
         const dy = w.face === undefined ? 0 : Math.atan2(Math.sin(w.face - this.obj.rotation.y), Math.cos(w.face - this.obj.rotation.y));
-        const pas = Math.min(Math.abs(dy), dt * 3.2);
+        const pas = this.debuterVirage(this.obj.rotation.y + dy) ? 0 : Math.min(Math.abs(dy), dt * 3.2);
         this.obj.rotation.y += Math.sign(dy) * pas;
-        if (Math.abs(dy) <= pas + 1e-6) {
+        if (!this.virage && Math.abs(dy) <= pas + 1e-6) {
           this.walking = null; this.busy = false; w.resolve();
         }
       }
     }
     this.appliquerRaccord(dt);
+    this.neutraliserRotationDuVirage();
     if (this.currentName === 'idle' && this.appuisGeste) {
       this.appuisFin = Math.max(0, this.appuisFin - dt);
       if (!this.appuisFin && !this.raccord) this.appuisGeste = null;
@@ -862,6 +973,7 @@ export class Character {
     if (!this.mouvementOrigine && this.solAssis === null) this.stabiliserSol();
     this.poserPiedsAssis();
     this.poserAppuisGeste();
+    this.degagerPiedsEnMouvement();
     this.abaisserBras();
     this.mesurerVolumeTorse();
     this.coudesDebutFrame = new Map([...this.coudePrecedent].map(([n, p]) => [n, p.clone()]));
