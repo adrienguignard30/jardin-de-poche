@@ -650,7 +650,7 @@ export class Game {
       const m = n === 'plant' ? this.char.osDansLeGeste(g.anim, g.effet, 'RightHandMiddle4') : h && mi ? h.clone().multiplyScalar(.35).addScaledVector(mi, .65) : h; if (!m) continue;
       const avant = m.z, cote = -m.x;                                  // repère du personnage : il regarde vers +z, sa droite est en -x
       if (avant > .15 && avant < 1.2) { g.distance = avant; g.cote = cote; }
-      if (n === 'water') g.distance = .42;
+      if (n === 'water') { g.distance = .42; g.cote = this.state.character === 'marcel' ? .38 : .34; }
       console.info(`[gestes] ${n} : main à ${avant.toFixed(2)} m devant, ${cote.toFixed(2)} m à droite, ${m.y.toFixed(2)} m de haut`);
     }
   }
@@ -924,7 +924,7 @@ export class Game {
     return o;
   }
   /** L'arrosoir tenu : recalé à chaque image dans la main droite, bec vers le pot ; il s'incline pour verser et l'eau coule. */
-  private arrosoir: { o: THREE.Object3D; cible: THREE.Vector3; verse: number; versement: number } | null = null;
+  private arrosoir: { o: THREE.Object3D; cible: THREE.Vector3; verse: number; versement: number; transition?: { debut: number; de: number; vers: number } } | null = null;
   private tenirArrosoir(cible: THREE.Vector3) {
     this.lacherArrosoir();
     const o = this.fabriquerArrosoir(); this.world.scene.add(o);
@@ -938,20 +938,31 @@ export class Game {
     const depart = this.paume('Right')?.clone(); if (!depart) return;
     const debut = performance.now(), g = char.gestures.water;
     const prise = char.priseDansLeGeste('water', g?.effet ?? char.clipDuree('water') * .35, 'Right');
+    const mainRepos = char.bone('RightHand');
+    const reposPrise = mainRepos ? { orientation: char.obj.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(mainRepos.getWorldQuaternion(new THREE.Quaternion())) } : null;
+    const poseStable = reposPrise ? new Map(['RightShoulder', 'RightArm', 'RightForeArm'].map(n => char.bone(n)).filter((b): b is THREE.Object3D => !!b).map(b => [b.name, b.quaternion.clone()])) : undefined;
     const reference = new THREE.Quaternion().setFromEuler(new THREE.Euler(.70, 0, 0, 'YXZ'));
-    const grip = prise ? reference.invert().multiply(prise.orientation) : new THREE.Quaternion();
+    const grip = reposPrise ? reposPrise.orientation.clone() : prise ? reference.invert().multiply(prise.orientation) : new THREE.Quaternion();
+    const poseCorps = reposPrise ? new Map(['Hips', 'Spine', 'Spine1', 'Spine2', 'Neck', 'Head', 'LeftShoulder', 'LeftArm', 'LeftForeArm', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftToeBase', 'RightUpLeg', 'RightLeg', 'RightFoot', 'RightToeBase'].map(n => char.bone(n)).filter((b): b is THREE.Object3D => !!b).map(b => [b.name, b.quaternion.clone()])) : undefined;
+    const poseBassin = reposPrise ? char.bone('Hips')?.position.clone() : undefined;
     const duree = g ? g.fin - g.debut : char.clipDuree('water');
     // Contrôler aussi les entrées/sorties : l'ancien arrêt de l'IK à effet+1,1 s
     // rendait le bras au clip brut pendant ses 2,5 dernières secondes.
-    char.mains = { paumes: true, priseDroite: prise?.doigts, orientationDroite: () => tenu.o.getWorldQuaternion(new THREE.Quaternion()).multiply(grip), droite: () => {
+    char.mains = { paumes: true, poseCorps, poseBassin, poseDroite: poseStable, priseDroite: prise?.doigts, orientationDroite: () => tenu.o.getWorldQuaternion(new THREE.Quaternion()).multiply(grip), droite: () => {
       const t = (performance.now() - debut) / 1000;
       const k = THREE.MathUtils.smoothstep(t, 0, .75) * (1 - THREE.MathUtils.smoothstep(t, Math.max(.75, duree - .75), duree));
-      const p = char.obj.position, yaw = Math.atan2(tenu.cible.x - p.x, tenu.cible.z - p.z);
+      const p = char.obj.position, yaw = char.obj.rotation.y;
       const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(tenu.verse * .70, yaw, 0, 'YXZ'));
       const bec = (tenu.o.userData.bec as THREE.Vector3).clone().applyQuaternion(q);
       const dehors = new THREE.Vector3(-Math.cos(char.obj.rotation.y), 0, Math.sin(char.obj.rotation.y));
-      const hauteur = this.state.character === 'marcel' ? .62 : .50;
+      const hauteur = this.state.character === 'marcel' ? .74 : .70;
       const cible = depart.clone().lerp(tenu.cible.clone().add(new THREE.Vector3(0, hauteur, 0)).sub(bec), k).addScaledVector(dehors, Math.sin(Math.PI * k) * .06);
+      {
+        const local = char.obj.worldToLocal(cible.clone());
+        local.x = THREE.MathUtils.clamp(local.x, this.state.character === 'marcel' ? -.40 : -.36, this.state.character === 'marcel' ? -.34 : -.30);
+        local.z = THREE.MathUtils.clamp(local.z, .10, .31);
+        char.obj.localToWorld(local); cible.copy(local);
+      }
       return cible;
     } }; char.ikBut = 1;
     setTimeout(() => { if (!tenu || this.arrosoir !== tenu || char !== this.char) return;
@@ -962,9 +973,11 @@ export class Game {
   private lacherArrosoir() { if (this.arrosoir) { this.arrosoir.o.parent?.remove(this.arrosoir.o); this.arrosoir = null; this.char.ikBut = 0; } }
   private avancerArrosoir(dt: number) {
     const a = this.arrosoir; if (!a || !this.char) return;
-    a.verse += (a.versement - a.verse) * Math.min(1, dt * 4);
+    const now = performance.now();
+    if (!a.transition || a.transition.vers !== a.versement) a.transition = { debut: now, de: a.verse, vers: a.versement };
+    a.verse = THREE.MathUtils.lerp(a.transition.de, a.transition.vers, THREE.MathUtils.smoothstep((now - a.transition.debut) / 1000, 0, .70));
     const origine = this.char.obj.position;
-    a.o.rotation.set(a.verse * .70, Math.atan2(a.cible.x - origine.x, a.cible.z - origine.z), 0, 'YXZ');
+    a.o.rotation.set(a.verse * .70, this.char.obj.rotation.y, 0, 'YXZ');
     a.o.updateMatrixWorld(true);
   }
   private placerArrosoir(dt: number) {
@@ -972,7 +985,7 @@ export class Game {
     this.avancerArrosoir(dt);
     const p = this.paume('Right'); if (!p) return;
     a.o.position.copy(p);                                               // incliné seulement pour verser (~40°)
-    if (a.versement > .5 && a.verse > .5 && Math.random() < .7) {              // l'eau : des gouttes qui partent du bec vers le pot
+    if (a.versement > .5 && a.verse > .98 && Math.random() < .7) {              // l'eau : des gouttes qui partent du bec vers le pot
       const bec = a.o.localToWorld(a.o.userData.bec.clone());
       this.world.gouttes(bec, a.cible);
     }
@@ -1387,6 +1400,7 @@ export class Game {
     await this.gotoSlot(SLOTS[p.id], 'water');
     if (token !== this.autoToken || personnage !== this.char) return;
     this.char.busy = true;
+    await wait(350); if (token !== this.autoToken || personnage !== this.char) return;
     this.tenirArrosoir(SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .25, 0)));
     this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('water'); const done = g.fin;
     this.verser(g.effet);
@@ -1877,6 +1891,7 @@ export class Game {
         { const st = this.standFor(SLOTS[p.id], 'water'); await this.walk(st.pos, st.face, `pot${p.id}`); } if (token !== this.autoToken) return;
         this.char.busy = true; this.sceneEnCours++;
         try {
+        await wait(350); if (token !== this.autoToken) return;
         this.tenirArrosoir(SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .25, 0)));
         this.char.regard = SLOTS[p.id].pos.clone().add(new THREE.Vector3(0, .3, 0)); const g = this.char.geste('water'); const done = g.fin; this.verser(g.effet); await wait(g.effet * 1000);
         if (token !== this.autoToken) return;
