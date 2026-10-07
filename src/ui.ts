@@ -641,8 +641,12 @@ export class UI {
     const r = gr.getBoundingClientRect(), w = pp.getBoundingClientRect().width || 70;
     if (!r.width || !r.height) return;                                   // pastille des graines pas encore affichée
     pp.style.position = 'fixed'; pp.style.right = 'auto'; pp.style.bottom = 'auto';
-    const placeHeure = window.innerWidth <= 700 ? 120 : 8;               // sur téléphone, l'heure est à droite sur cette ligne
-    if (r.right + 8 + w <= window.innerWidth - placeHeure) { pp.style.left = `${Math.round(r.right + 8)}px`; pp.style.top = `${Math.round(r.top)}px`; }
+    if (window.innerWidth <= 700) {                                       // telephone : sous l'heure, a droite (jamais sur les ingredients)
+      const ck = (this.root.querySelector('#clock') as HTMLElement | null)?.getBoundingClientRect();
+      pp.style.left = 'auto'; pp.style.right = '14px'; pp.style.top = `${Math.round((ck && ck.height ? ck.bottom : r.bottom) + 8)}px`;
+      return;
+    }
+    if (r.right + 8 + w <= window.innerWidth - 8) { pp.style.left = `${Math.round(r.right + 8)}px`; pp.style.top = `${Math.round(r.top)}px`; }
     else { pp.style.left = `${Math.round(r.left)}px`; pp.style.top = `${Math.round(r.bottom + 8)}px`; }
   }
   /** Ce qu'il y a dans le panier : l'image et le nom de chaque légume, avec la quantité. */
