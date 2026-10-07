@@ -746,4 +746,26 @@ button.charge::after { content: ''; display: inline-block; width: 14px; height: 
 }
 
 /* heure-mobile-2e-ligne : sur telephone, l'heure ne tient pas au centre de la 1re ligne (le son, la maison et les reglages passaient par-dessus) : 2e ligne, a droite */
-@media (max-width: 700px) { .pill.clock { top: calc(62px + var(--sat)); left: auto; right: 14px; transform: none; font-size: 14px; padding: 7px 12px; } }
+@media (max-width: 700px) { .pill.clock { top: calc(62px + var(--sat)); left: auto; right: 14px; transform: none; font-size: 14px; padding: 7px 12px; } }/* ===== responsive-accueil-mobile : petits ecrans et navigateurs avec barre (X, Instagram, Safari) ===== */
+/* la 3D couvre TOUJOURS tout l'ecran, meme quand la barre du navigateur se replie (plus de bande grise en bas) */
+#c { width: 100vw !important; height: 100vh !important; height: 100dvh !important; }
+html, body { background: #0f1a24; }
+/* l'accueil s'adapte a la hauteur : titre plus petit, boutons compacts, rien ne se chevauche */
+@media (max-height: 760px) and (pointer: coarse) {
+  .startTop { padding-top: calc(10px + var(--sat)); }
+  .overlay.start .brand h1 { font-size: clamp(22px, 6vw, 30px); }
+  .overlay.start .brand .tag { font-size: 12px; margin-top: 2px; }
+  .startBottom { gap: 6px; padding-bottom: calc(10px + var(--sab)); }
+  .startBottom .hint { font-size: 12px; margin: 0; }
+  .startBottom .primary { padding: 10px 18px; font-size: 15px; }
+  .startBottom .btnClassementAccueil { padding: 7px 12px; font-size: 13px; }
+  .nameTag { font-size: 15px; }
+}
+@media (max-height: 640px) and (pointer: coarse) {
+  .overlay.start .brand .tag, .startBottom .hint { display: none; }
+  .overlay.start .brand h1 { font-size: clamp(20px, 5.5vw, 26px); }
+  .startBottom { gap: 4px; }
+  .startBottom .primary { padding: 9px 16px; font-size: 14px; }
+  .startBottom .btnClassementAccueil { padding: 6px 10px; font-size: 12px; }
+  .nameTag { font-size: 13px; } .nameTag small { display: none; }
+}
