@@ -1,4 +1,4 @@
-﻿// Toutes les phrases de l'interface. Aucun texte en dur ailleurs dans le code.
+// Toutes les phrases de l'interface. Aucun texte en dur ailleurs dans le code.
 export type Lang = 'fr' | 'en';
 
 const STRINGS = {
@@ -196,7 +196,7 @@ const STRINGS = {
     sellHint: (n: number) => `${n} récolte(s) à vendre`,
   },
   en: {
-    title: 'Potager de Poche',
+    title: 'Pocket Kitchen Garden',
     tagline: 'A balcony vegetable garden for those who have none.',
     personnaliser: 'Customise', plus: 'More (age, job)', retour: 'Back', demoJury: '⏩ Fast demo', jouerAvec: (n: string) => `Play as ${n}`,
     points: 'points',
