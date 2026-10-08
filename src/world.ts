@@ -81,10 +81,37 @@ export function segmentBlocked(a: THREE.Vector3, b: THREE.Vector3, ignore?: stri
   }
   return false;
 }
+/** Échec attendu de navigation, distinct d'une erreur de programmation. */
+export class TrajetImpossible extends Error {}
+/** Sortie courte d'une marge d'obstacle : on s'en éloigne sans en traverser un autre.
+ * Le point retourné doit être rejoint à pied, jamais par teleport(). */
+export function degagementBalcon(a: THREE.Vector3, ignore?: string): THREE.Vector3 | null {
+  const obs = obstacles(ignore), contient = obs.filter(o => Math.hypot(a.x - o.x, a.z - o.z) < o.r - .04);
+  const bornes = (p: THREE.Vector3) => p.x >= -LAYOUT.halfW + .2 && p.x <= LAYOUT.halfW - .2 && p.z >= LAYOUT.backZ && p.z <= LAYOUT.frontZ;
+  if (!contient.length && bornes(a)) return null;
+  for (let d = .06; d <= .60; d += .02) for (let i = 0; i < 64; i++) {
+    const angle = i * Math.PI / 32, p = a.clone().add(new THREE.Vector3(Math.cos(angle) * d, 0, Math.sin(angle) * d));
+    if (!bornes(p) || obs.some(o => Math.hypot(p.x - o.x, p.z - o.z) < o.r - .005)) continue;
+    const dx = p.x - a.x, dz = p.z - a.z;
+    if (contient.some(o => (a.x - o.x) * dx + (a.z - o.z) * dz < -1e-8)) continue;
+    const traverse = obs.filter(o => !contient.includes(o)).some(o => {
+      const t = THREE.MathUtils.clamp(((o.x - a.x) * dx + (o.z - a.z) * dz) / (d * d), 0, 1);
+      return Math.hypot(a.x + dx * t - o.x, a.z + dz * t - o.z) < o.r - .04;
+    });
+    if (traverse) continue;
+    return p;
+  }
+  throw new TrajetImpossible('Aucun dégagement court sur le balcon');
+}
 /** Graphe de visibilité autour des obstacles : chaque segment est contrôlé,
  * y compris la jonction avec le couloir qui était auparavant supposée libre. */
 export function cheminBalcon(a: THREE.Vector3, cible: THREE.Vector3, ignore?: string): THREE.Vector3[] {
-  const b = freePoint(cible, ignore); if (!segmentBlocked(a, b, ignore)) return [b];
+  if (![a.x, a.z, cible.x, cible.z].every(Number.isFinite)) throw new TrajetImpossible('Position de marche invalide');
+  const sortie = degagementBalcon(a, ignore);
+  if (sortie) return [sortie, ...cheminBalcon(sortie, cible, ignore)];
+  const b = freePoint(cible, ignore);
+  if (obstacles(ignore).some(o => Math.hypot(b.x - o.x, b.z - o.z) < o.r - .04)) throw new TrajetImpossible('Arrivée occupée sur le balcon');
+  if (!segmentBlocked(a, b, ignore)) return [b];
   const points = [a.clone(), b];
   for (const o of obstacles(ignore)) for (let i = 0; i < 16; i++) {
     const t = i * Math.PI / 8, p = new THREE.Vector3(o.x + Math.cos(t) * (o.r + .055), a.y, o.z + Math.sin(t) * (o.r + .055));
@@ -93,7 +120,7 @@ export function cheminBalcon(a: THREE.Vector3, cible: THREE.Vector3, ignore?: st
   const d = points.map(() => Infinity), avant = points.map(() => -1), visite = new Set<number>(); d[0] = 0;
   for (;;) {
     let u = -1; for (let i = 0; i < points.length; i++) if (!visite.has(i) && (u < 0 || d[i] < d[u])) u = i;
-    if (u < 0 || !Number.isFinite(d[u])) throw new Error('Aucun trajet libre sur le balcon');
+    if (u < 0 || !Number.isFinite(d[u])) throw new TrajetImpossible('Aucun trajet libre sur le balcon');
     if (u === 1) break; visite.add(u);
     for (let v = 1; v < points.length; v++) {
       if (visite.has(v) || segmentBlocked(points[u], points[v], ignore)) continue;
@@ -547,6 +574,11 @@ export class World {
   private fromLayout(v: number[]): THREE.Vector3 { return new THREE.Vector3(v[0], v[2] + FL, -v[1] + FACADE_FRONT); }
   /** Trajets dans la pièce / sur le toit-terrasse, autour du mobilier chargé. */
   cheminMeubles(a: THREE.Vector3, cible: THREE.Vector3): THREE.Vector3[] {
+    if (![a.x, a.z, cible.x, cible.z].every(Number.isFinite)) throw new TrajetImpossible('Position de marche invalide');
+    if (a.z >= LAYOUT.backZ && a.z <= LAYOUT.frontZ) {
+      const sortie = degagementBalcon(a, 'chair');
+      if (sortie) return [sortie, ...this.cheminMeubles(sortie, cible)];
+    }
     this.envGroup.updateMatrixWorld(true);
     const boites: THREE.Box3[] = [], sol = new THREE.Box3();
     this.envGroup.traverse(o => { if ((o as THREE.Mesh).isMesh && /floor|wood_deck/i.test(o.name)) sol.union(new THREE.Box3().setFromObject(o)); });
@@ -558,13 +590,20 @@ export class World {
       if (b.max.y > FL + .3) boites.push(b);
     });
     const dedans = (p: THREE.Vector3, b: THREE.Box3) => p.x > b.min.x && p.x < b.max.x && p.z > b.min.z && p.z < b.max.z;
-    const libre = (p: THREE.Vector3) => !boites.some(b => dedans(p, b));
-    const b = cible.clone();
+    const pots = obstacles('chair').filter(o => o.id.startsWith('pot') || o.id === 'basket');
+    const libre = (p: THREE.Vector3) => !boites.some(b => dedans(p, b)) && !pots.some(o => Math.hypot(p.x - o.x, p.z - o.z) < o.r - .04);
+    const b = cible.z >= LAYOUT.backZ && cible.z <= LAYOUT.frontZ ? freePoint(cible, 'chair') : cible.clone();
     for (const o of boites) if (dedans(b, o)) {
       const sorties = [new THREE.Vector3(o.min.x - .01, b.y, b.z), new THREE.Vector3(o.max.x + .01, b.y, b.z), new THREE.Vector3(b.x, b.y, o.min.z - .01), new THREE.Vector3(b.x, b.y, o.max.z + .01)].filter(libre);
       sorties.sort((p, q) => p.distanceTo(b) - q.distanceTo(b)); if (sorties[0]) b.copy(sorties[0]);
     }
-    const bloque = (p: THREE.Vector3, q: THREE.Vector3) => boites.some(o => {
+    if (!libre(b)) throw new TrajetImpossible('Arrivée occupée près du mobilier');
+    const bloquePots = (p: THREE.Vector3, q: THREE.Vector3) => pots.some(o => {
+      const dx = q.x - p.x, dz = q.z - p.z, l2 = dx * dx + dz * dz;
+      const t = l2 < 1e-8 ? 0 : THREE.MathUtils.clamp(((o.x - p.x) * dx + (o.z - p.z) * dz) / l2, 0, 1);
+      return Math.hypot(p.x + dx * t - o.x, p.z + dz * t - o.z) < o.r - .04;
+    });
+    const bloque = (p: THREE.Vector3, q: THREE.Vector3) => bloquePots(p, q) || boites.some(o => {
       // Un personnage qui vient de se lever sort d'abord de son propre siège.
       if (dedans(p, o) && p.distanceTo(a) < .001) return false;
       let lo = 0, hi = 1;
@@ -577,6 +616,10 @@ export class World {
     });
     if (!bloque(a, b)) return [b];
     const points = [a.clone(), b];
+    for (const o of pots) for (let i = 0; i < 32; i++) {
+      const angle = i * Math.PI / 16, p = new THREE.Vector3(o.x + Math.cos(angle) * (o.r + .055), a.y, o.z + Math.sin(angle) * (o.r + .055));
+      if (libre(p) && p.x >= -LAYOUT.halfW + .2 && p.x <= LAYOUT.halfW - .2 && p.z >= LAYOUT.backZ && p.z <= LAYOUT.frontZ) points.push(p);
+    }
     for (const o of boites) for (const x of [o.min.x - .01, o.max.x + .01]) for (const z of [o.min.z - .01, o.max.z + .01]) {
       const p = new THREE.Vector3(x, a.y, z);
       if (libre(p) && dansLaPiece(p)) points.push(p);
@@ -584,7 +627,7 @@ export class World {
     const d = points.map(() => Infinity), avant = points.map(() => -1), vus = new Set<number>(); d[0] = 0;
     for (;;) {
       let u = -1; for (let i = 0; i < points.length; i++) if (!vus.has(i) && (u < 0 || d[i] < d[u])) u = i;
-      if (u < 0 || !Number.isFinite(d[u])) throw new Error('Aucun trajet libre autour des meubles');
+      if (u < 0 || !Number.isFinite(d[u])) throw new TrajetImpossible('Aucun trajet libre autour des meubles');
       if (u === 1) break; vus.add(u);
       for (let v = 1; v < points.length; v++) if (!vus.has(v) && !bloque(points[u], points[v])) {
         const nd = d[u] + points[u].distanceTo(points[v]); if (nd < d[v]) { d[v] = nd; avant[v] = u; }
