@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Assets } from './assets';
-import { World, SLOTS, FL, POT_SCALE, FACADE_FRONT, freePoint, segmentBlocked, cheminBalcon, degagementBalcon, TrajetImpossible, CHAIR_SPOT, LADDER_SPOT, ROOF_STAND, START_SPOT, BASKET_SPOT, LAYOUT, TUNE, HAND, mountTunePanel, type Slot, type Layout } from './world';
+import { World, SLOTS, FL, POT_SCALE, FACADE_FRONT, freePoint, segmentBlocked, cheminBalcon, CHAIR_SPOT, LADDER_SPOT, ROOF_STAND, START_SPOT, BASKET_SPOT, LAYOUT, TUNE, HAND, mountTunePanel, type Slot, type Layout } from './world';
 import { Character, type Reglages } from './character';
 import { UI, icon } from './ui';
 import { MUSIQUE } from './musique';
@@ -1221,11 +1221,7 @@ export class Game {
       })();
     }
     const attente = this.preparationJoueur;
-    try { await attente; }
-    finally {
-      if (this.preparationJoueur === attente) this.preparationJoueur = null;
-      if (personnage === this.char && this.running) this.scheduleAutonomy();
-    }
+    try { await attente; } finally { if (this.preparationJoueur === attente) this.preparationJoueur = null; }
     return personnage === this.char && !this.jardinageJoueur;
   }
   private async tapSlot(id: number, x: number, y: number) {
@@ -1271,24 +1267,6 @@ export class Game {
   /** Marche sans traverser les pots : on rejoint le couloir central, on le suit, puis on va au point. */
   /** Marche vers un point : la cible est ramenée sur le balcon hors des obstacles, et si la ligne droite traverse
    *  un pot, la chaise ou le panier, on passe par la ligne du couloir. */
-  private echecTrajetAuto = false;
-  private annulerTrajet(erreur: unknown, joueur: boolean, token: number) {
-    if (!(erreur instanceof TrajetImpossible)) throw erreur;
-    if (token !== this.autoToken) return;
-    this.char.annulerMarche(); this.char.regard = null; this.char.ikBut = 0; this.char.mains = null;
-    this.release(); this.lacherArrosoir(); this.lacherTel();
-    this.char.busy = false; this.char.play('idle', .3); this.world.openDoors(false);
-    if (joueur) this.ui.toast(lang() === 'en' ? "I can't get there. Try again." : "Je ne peux pas passer. Réessaie.", 3000);
-    else this.echecTrajetAuto = true;
-    if (this.running) this.scheduleAutonomy();
-  }
-  private async verifierArriveeBalcon(epoch: number, face?: number, ignore?: string) {
-    if (epoch !== this.autoToken) return;
-    const sortie = degagementBalcon(this.char.obj.position, ignore);
-    if (!sortie) return;
-    await this.char.goTo(sortie, face);
-    if (epoch === this.autoToken && degagementBalcon(this.char.obj.position, ignore)) throw new TrajetImpossible('Arrivée encore occupée');
-  }
   private async walk(target: THREE.Vector3, face?: number, ignore?: string) {
     const epoch = this.autoToken;
     if (this.onRoof) { await this.char.goTo(target, face); return; }
@@ -1298,7 +1276,6 @@ export class Game {
     const t = freePoint(target, ignore);
     const points = cheminBalcon(this.char.obj.position, t, ignore);
     for (let i = 0; i < points.length; i++) { if (epoch !== this.autoToken) return; await this.char.goTo(points[i], i === points.length - 1 ? face : undefined); }
-    await this.verifierArriveeBalcon(epoch, face, ignore);
   }
   private async marcherMeubles(target: THREE.Vector3, face?: number) {
     const epoch = this.autoToken;
@@ -1307,8 +1284,6 @@ export class Game {
       if (epoch !== this.autoToken) return;
       await this.char.goTo(points[i].clone().setY(FL + this.world.solPiece), i === points.length - 1 ? face : undefined);
     }
-    const p = this.char.obj.position;
-    if (p.z >= LAYOUT.backZ - .05 && p.z <= LAYOUT.frontZ + .05) await this.verifierArriveeBalcon(epoch, face, 'chair');
   }
   private standForSansEmpreinte(slot: Slot, geste?: string): { pos: THREE.Vector3; face: number } {
     const g = geste ? this.char.gestures[geste] : undefined;
@@ -1408,7 +1383,7 @@ export class Game {
     this.jardinageJoueur = true;
     try {
     this.ui.apercuRecolte(plant);                                      // ce que tu récolteras, en image
-    if (!j.poche[plant] && !j.rares[plant]) return; // vérifier sans consommer avant la marche
+    if (!j.poche[plant]) { if (!j.rares[plant]) return; j.rares[plant]--; if (!j.rares[plant]) delete j.rares[plant]; }   // une rare se sème une fois
     const slot = SLOTS[id];
     this.ui.refresh();
     await this.gotoSlot(slot, 'plant');
@@ -1419,8 +1394,6 @@ export class Game {
     this.mainVersLaPlante(p, 'semis', g.effet);
     await wait(g.effet * 1000);
     if (token !== this.autoToken || personnage !== this.char) return;
-    if (p.plant || (!j.poche[plant] && !j.rares[plant])) return;
-    if (!j.poche[plant]) { j.rares[plant]--; if (!j.rares[plant]) delete j.rares[plant]; }
     p.plant = P.sow(plant);
     p.plant.wateredAt = Date.now();          // on sème dans une terre humide
     if ((s.eco.jardin.etape ?? 0) < 5) p.plant.acc = Math.max(1, plantDef(plant).grow / 90);   // l'accueil : chaque première pousse mûrit en 90 s
@@ -1431,12 +1404,9 @@ export class Game {
     if ((s.eco.jardin.etape ?? 0) <= 1) this.etape(1);
     await done; if (token !== this.autoToken || personnage !== this.char) return; this.char.regard = null; this.char.busy = false; this.release();
     this.persist();
-    } catch (erreur) {
-      this.annulerTrajet(erreur, true, token);
     } finally {
       if (personnage === this.char) {
         this.jardinageJoueur = false;
-        if (this.running) this.scheduleAutonomy();
         if (token === this.autoToken) { personnage.busy = false; if (this.phoneOpen && this.running) void this.phoneGesture(true); }
       }
     }
@@ -1467,12 +1437,9 @@ export class Game {
     this.etape(2);
     await done; if (token !== this.autoToken || personnage !== this.char) return; this.char.regard = null; this.char.busy = false; this.release(); this.lacherArrosoir();
     this.persist();
-    } catch (erreur) {
-      this.annulerTrajet(erreur, true, token);
     } finally {
       if (personnage === this.char) {
         this.jardinageJoueur = false;
-        if (this.running) this.scheduleAutonomy();
         if (token === this.autoToken) { personnage.busy = false; if (this.phoneOpen && this.running) void this.phoneGesture(true); }
       }
     }
@@ -1504,12 +1471,9 @@ export class Game {
     if ((j.etape ?? 0) === 5) this.rappelEtape();
     await done; if (token !== this.autoToken || personnage !== this.char) return; this.char.regard = null; this.char.busy = false;
     this.persist();
-    } catch (erreur) {
-      this.annulerTrajet(erreur, true, token);
     } finally {
       if (personnage === this.char) {
         this.jardinageJoueur = false;
-        if (this.running) this.scheduleAutonomy();
         if (token === this.autoToken) { personnage.busy = false; if (this.phoneOpen && this.running) void this.phoneGesture(true); }
       }
     }
@@ -1663,7 +1627,7 @@ export class Game {
     const W = this.world;
     if (W.kitchenSpot) {                                             // à la cuisinière de ta maison (sur la terrasse pour Jimy)
       const f = Math.atan2(W.kitchenLook.x - W.kitchenSpot.x, W.kitchenLook.z - W.kitchenSpot.z);
-      if (!W.hasRoom) { await this.walk(new THREE.Vector3(this.char.obj.position.x, FL, LAYOUT.corridorZ)); if (!valide()) return; }
+      if (!W.hasRoom) { await this.char.goTo(new THREE.Vector3(this.char.obj.position.x, FL, LAYOUT.corridorZ)); if (!valide()) return; }
       await this.marcherMeubles(W.kitchenSpot.clone(), f); if (!valide()) return;
       this.char.busy = true;
     } else { await this.char.tourner(Math.PI); if (!valide()) return; }                       // sinon dos à nous
@@ -1713,8 +1677,6 @@ export class Game {
     this.char.busy = false;
     this.persist();
     this.scheduleAutonomy();
-    } catch (erreur) {
-      this.annulerTrajet(erreur, true, token);
     } finally {
       this.sceneEnCours = Math.max(0, this.sceneEnCours - 1);
       poele?.parent?.remove(poele);
@@ -1960,10 +1922,9 @@ export class Game {
       if (this.char.busy || this.sceneEnCours > 0 || idleFor < 4 || this.phoneOpen || this.porte || this.dansant) return;   // occupé : on ne touche à rien
       if (!this.tel && !this.arrosoir) { this.char.mains = null; this.char.ikBut = 0; }   // une nouvelle action démarre : plus de mains guidées qui traînent
       token = ++this.autoToken;                                       // on ne prend la main que si on démarre vraiment
-      const eviterSceneEchouee = this.echecTrajetAuto; this.echecTrajetAuto = false;
       const hNuit = this.gameHour(), night = this.world.targetNight > .5 && (hNuit >= 20 || hNuit < 5);   // pas de coucher à l'aube
       const thirsty = this.state.pots.filter(p => p.plant && !P.isWet(p.plant) && !P.isReady(p.plant) && SLOTS[p.id].roof === this.onRoof);
-      if (!eviterSceneEchouee && thirsty.length && idleFor > 45 && (this.state.eco.jardin.etape ?? 0) >= 2) {   // au tout début, c'est au joueur d'arroser
+      if (thirsty.length && idleFor > 45 && (this.state.eco.jardin.etape ?? 0) >= 2) {   // au tout début, c'est au joueur d'arroser
         const p = thirsty[Math.floor(Math.random() * thirsty.length)];
         { const st = this.standFor(SLOTS[p.id], 'water'); await this.walk(st.pos, st.face, `pot${p.id}`); } if (token !== this.autoToken) return;
         this.char.busy = true; this.sceneEnCours++;
@@ -1975,13 +1936,11 @@ export class Game {
         if (p.plant) { P.water(p.plant); this.refreshSlot(p); this.state.log.wateredByChar++; }
         await done; if (token !== this.autoToken) return; this.char.regard = null; this.char.busy = false; this.release(); this.lacherArrosoir();
         } finally { this.sceneEnCours = Math.max(0, this.sceneEnCours - 1); }
-      } else if (!eviterSceneEchouee && night && !this.onRoof) {
+      } else if (night && !this.onRoof) {
         await this.goToBed(token);
       } else {
         await this.unMoment(token);
       }
-    } catch (erreur) {
-      this.annulerTrajet(erreur, false, token);
     } finally {
       if (token === this.autoToken) this.scheduleAutonomy(); else this.scheduleAutonomy();
     }
@@ -2127,7 +2086,7 @@ export class Game {
     await this.walk(this.world.doorSpot, Math.PI); if (token !== this.autoToken) return;
     if (this.world.doors.length) { this.world.openDoors(true); await wait(500); }   // sans porte : on passe simplement l'ouverture
     if (token !== this.autoToken) return;
-    await this.marcherMeubles(this.world.insideSpot, Math.PI);
+    await this.char.goTo(this.world.insideSpot, Math.PI);
     if (token !== this.autoToken) return;
     this.inside = true;
     if (this.world.doors.length) { await wait(300); this.world.openDoors(false); }
@@ -2139,7 +2098,7 @@ export class Game {
     await this.marcherMeubles(W.insideSpot, 0); if (token !== this.autoToken && !this.sleeping) return;
     if (W.doors.length) { W.openDoors(true); await wait(500); }
     if (token !== this.autoToken && !this.sleeping) return;
-    await this.marcherMeubles(W.doorSpot, 0);
+    await this.char.goTo(W.doorSpot, 0);
     if (token !== this.autoToken && !this.sleeping) return;
     this.inside = false;
     if (W.doors.length) { await wait(300); W.openDoors(false); }
@@ -2163,7 +2122,7 @@ export class Game {
     this.char.play('idle', .85);
     this.char.teleport(this.world.bedSide.clone(), 0);
     const tk = ++this.autoToken;
-    this.goOutside(tk).catch(erreur => this.annulerTrajet(erreur, false, tk)).finally(() => { if (tk === this.autoToken) this.scheduleAutonomy(); });
+    this.goOutside(tk).then(() => { if (tk === this.autoToken) this.scheduleAutonomy(); });
   }
   /** Un moment dans le fauteuil, à l'intérieur. */
   /** Aller regarder son tableau, un moment. */
@@ -2187,7 +2146,6 @@ export class Game {
     fin.y = hauteur - ch.surfacePose(anim, .3, 'assise');
     const approche = fin.clone().addScaledVector(dir, .46); approche.y = W.solAuPoint(approche);
     await this.marcherMeubles(approche, face); if (token !== this.autoToken) return null;
-    approche.copy(ch.obj.position); // le relevé revient au point réellement atteint, hors des pots
     ch.regard = null; await ch.tourner(face); if (token !== this.autoToken) return null;
     this.approcheAssise = { pos: approche.clone(), face };
     ch.solAssis = W.solAuPoint(approche);
