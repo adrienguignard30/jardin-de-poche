@@ -404,6 +404,7 @@ export class Game {
     this.world.mesurerSol();
     this.char.solSousPied = p => this.world.solAuPoint(p);
     this.char.piedHorsObstacle = (pied, pointe) => this.piedHorsPots(pied, pointe);
+    this.char.positionDuVirage = p => this.onRoof || this.inside ? p.clone() : freePoint(p);
     await this.installerChaisePliante(c.id);
     await Promise.all(['arrosoir', 'arrosoir_vert', 'telephone', 'assiette', 'tasse'].map(n => BIBLIO.accessoire(n)));
     this.char.teleport(START_SPOT, 0);
@@ -1592,7 +1593,7 @@ export class Game {
       if (!W.hasRoom) { await this.char.goTo(new THREE.Vector3(this.char.obj.position.x, FL, LAYOUT.corridorZ)); if (!valide()) return; }
       await this.marcherMeubles(W.kitchenSpot.clone(), f); if (!valide()) return;
       this.char.busy = true;
-    } else { this.char.tourner(Math.PI); await wait(1000); if (!valide()) return; }                       // sinon dos à nous
+    } else { await this.char.tourner(Math.PI); if (!valide()) return; }                       // sinon dos à nous
     const c = charDef(this.state.character);
     const re = ECO.recette(e.jardin.recette!.recette);
     this.ui.toast(c.universe === 'woman' ? tt.enCuisine : tt.ilCuisine, 3000);
@@ -2108,7 +2109,7 @@ export class Game {
     fin.y = hauteur - ch.surfacePose(anim, .3, 'assise');
     const approche = fin.clone().addScaledVector(dir, .46); approche.y = W.solAuPoint(approche);
     await this.marcherMeubles(approche, face); if (token !== this.autoToken) return null;
-    ch.regard = null; ch.tourner(face); await wait(350); if (token !== this.autoToken) return null;
+    ch.regard = null; await ch.tourner(face); if (token !== this.autoToken) return null;
     this.approcheAssise = { pos: approche.clone(), face };
     ch.solAssis = W.solAuPoint(approche);
     const descente = ch.has('sit_down') ? 'sit_down' : anim, d = ch.has('sit_down') ? ch.clipDuree(descente) : .8;

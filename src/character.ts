@@ -120,74 +120,94 @@ export class Character {
     return { effet: Math.max(0, g.effet - g.debut), fin };
   }
   busy = false;                         // en train de marcher ou de faire une action
-  private virage: { debut: number; delta: number; duree: number; t: number; fin: boolean; occupeAvant: boolean; pas: number; phase: number; poseJambes: Map<string, THREE.Quaternion>; appuis: { cote: 'Right' | 'Left'; p: THREE.Vector3; q: THREE.Quaternion; localP: THREE.Vector3; localQ: THREE.Quaternion }[]; departP: THREE.Vector3; departQ: THREE.Quaternion; cibleP: THREE.Vector3; cibleQ: THREE.Quaternion } | null = null;
+  private virage: { debut: number; delta: number; cibleDelta: number; action: THREE.AnimationAction; duree: number; t: number; fin: boolean; apres?: number; occupeAvant: boolean; origine: THREE.Vector3; trajet: { k: number; angle: number; p: THREE.Vector3 }[]; resolves: (() => void)[] } | null = null;
+  /** Valider le petit déplacement d'un changement d'orientation selon le décor courant. */
+  positionDuVirage: ((p: THREE.Vector3) => THREE.Vector3) | null = null;
   private debuterVirage(face: number): boolean {
     const delta = Math.atan2(Math.sin(face - this.obj.rotation.y), Math.cos(face - this.obj.rotation.y));
     if (Math.abs(delta) < .25 || this.solAssis !== null || this.mains && this.ikBut > 0) return false;
-    const occupeAvant = this.busy, debut = this.obj.rotation.y;
-    this.obj.updateMatrixWorld(true);
-    const racineQ = this.obj.getWorldQuaternion(new THREE.Quaternion()).invert();
-    const appuis = (['Right', 'Left'] as const).map(cote => {
-      const pied = this.bone(cote + 'Foot'); if (!pied) return null;
-      const p = pied.getWorldPosition(new THREE.Vector3()), q = pied.getWorldQuaternion(new THREE.Quaternion());
-      return { cote, p, q, localP: this.obj.worldToLocal(p.clone()), localQ: racineQ.clone().multiply(q) };
-    }).filter((p): p is NonNullable<typeof p> => !!p);
-    if (appuis.length !== 2) return false;
-    const poseJambes = new Map<string, THREE.Quaternion>();
-    const repos = this.poseSonde('idle', 0) ? this.sonde : this.obj;
-    repos.traverse(b => { if ((b as THREE.Bone).isBone && /(?:Left|Right)(?:UpLeg|Leg|Foot|ToeBase)$/.test(b.name)) poseJambes.set(b.name, b.quaternion.clone()); });
-    if (repos === this.sonde) for (const pied of appuis) {
-      let os: THREE.Object3D | null = null; repos.traverse(b => { if ((b as THREE.Bone).isBone && b.name.endsWith(pied.cote + 'Foot')) os = b; });
-      if (os) { const p = repos.worldToLocal((os as THREE.Object3D).getWorldPosition(new THREE.Vector3())); pied.localP.x = p.x; pied.localP.z = p.z; pied.localQ.copy(repos.getWorldQuaternion(new THREE.Quaternion()).invert().multiply((os as THREE.Object3D).getWorldQuaternion(new THREE.Quaternion()))); }
+    const nom = delta > 0 ? 'turn_left' : 'turn_right', action = this.actions.get(nom);
+    if (!action) return false;
+    const clip = action.getClip(), samples: { k: number; angle: number; p: THREE.Vector3 }[] = [];
+    let angleAvant = 0, cumul = 0;
+    for (let i = 0; i <= 40; i++) {
+      this.poseSonde(nom, clip.duration * i / 40);
+      let bassin: THREE.Object3D | null = null; this.sonde.traverse(b => { if ((b as THREE.Bone).isBone && b.name.endsWith('Hips')) bassin = b; });
+      if (!bassin) return false;
+      const q = (bassin as THREE.Object3D).getWorldQuaternion(new THREE.Quaternion());
+      const dir = new THREE.Vector3(0, 0, 1).applyQuaternion(q), angle = Math.atan2(dir.x, dir.z);
+      if (i) cumul += Math.atan2(Math.sin(angle - angleAvant), Math.cos(angle - angleAvant));
+      angleAvant = angle;
+      const p = this.sonde.worldToLocal((bassin as THREE.Object3D).getWorldPosition(new THREE.Vector3()));
+      samples.push({ k: i / 40, angle: cumul, p });
     }
-    // Un appui au sol pendant que l'autre se replace ; dernier pas pour aligner les deux pieds.
-    const pas = Math.max(2, Math.ceil(Math.abs(delta) / .42) + 1), duree = pas * .30;
-    this.play('idle', .25);
-    this.currentName = delta > 0 ? 'turn_left' : 'turn_right';
-    this.virage = { debut, delta, duree, t: 0, fin: false, occupeAvant, pas, phase: -1, poseJambes, appuis, departP: new THREE.Vector3(), departQ: new THREE.Quaternion(), cibleP: new THREE.Vector3(), cibleQ: new THREE.Quaternion() };
+    const total = samples[samples.length - 1].angle, p0 = samples[0].p.clone(), net = samples[samples.length - 1].p.clone().sub(p0);
+    if (Math.abs(total) < .1) return false;
+    for (const sample of samples) { sample.angle /= total; sample.p.sub(p0).addScaledVector(net, -THREE.MathUtils.smoothstep(sample.k, 0, 1)); sample.p.y = 0; }
+    // Le mouvement du bassin provient du clip entier ; légère adaptation de trajectoire pour revenir au point utile.
+    const occupeAvant = this.busy, debut = this.obj.rotation.y, origine = this.obj.position.clone();
+    const duree = Math.max(1.1, Math.abs(delta) / 1.8);
+    this.faceCible = null; this.play(nom, .3, 0);
+    action.setLoop(THREE.LoopOnce, 1); action.clampWhenFinished = true;
+    this.virage = { debut, delta, cibleDelta: delta, action, duree, t: 0, fin: false, occupeAvant, origine, trajet: samples, resolves: [] };
     this.busy = true;
     return true;
   }
   private avancerVirage(dt: number) {
     const v = this.virage; if (!v) return;
     v.t += dt;
-    const k = THREE.MathUtils.smoothstep(v.t, 0, v.duree - .30);
-    this.obj.rotation.y = v.debut + v.delta * k;
-    if (v.t >= v.duree && !v.fin) { v.fin = true; this.currentName = 'idle'; }
-    if (v.t >= v.duree + .28) { this.virage = null; this.busy = v.occupeAvant; }
+    v.delta += (v.cibleDelta - v.delta) * (1 - Math.exp(-dt * 10));
+    const k = THREE.MathUtils.smoothstep(v.t, 0, v.duree);
+    if (!v.fin) v.action.time = v.action.getClip().duration * k;
+    const rotation = k;
+    this.obj.rotation.y = v.debut + v.delta * rotation;
+    const p = new THREE.Vector3(0, 0, .055 * Math.sin(2 * Math.PI * k)).applyAxisAngle(new THREE.Vector3(0, 1, 0), v.debut);
+    // Toujours un petit pas du corps, même si un clip a sa translation déjà figée.
+    p.add(new THREE.Vector3(-Math.cos(v.debut), 0, Math.sin(v.debut)).multiplyScalar(Math.sign(v.delta) * .16 * Math.sin(Math.PI * k) ** 2));
+    const cible = v.origine.clone().add(p), libre = this.positionDuVirage?.(cible) ?? cible;
+    // Réduire l'excursion si un meuble ou un pot gêne ; ne jamais téléporter à travers l'obstacle.
+    if (libre.distanceTo(cible) < .005) this.obj.position.copy(cible);
+    else this.obj.position.lerp(v.origine, Math.min(1, dt * 8));
+    if (v.t >= v.duree && !v.fin) {
+      this.obj.position.copy(v.origine); this.obj.rotation.y = v.debut + v.delta;
+      v.fin = true; this.virage = null;
+      if (this.walking && !this.walking.arrivee) {
+        this.play('walk', .3); this.busy = true;
+        for (const resolve of v.resolves) resolve();
+        return;
+      }
+      this.play('idle', .4); this.virage = v;
+    }
+    if (v.t >= v.duree + .4) {
+      this.virage = null; this.busy = v.occupeAvant;
+      const suites = v.resolves;
+      if (v.apres !== undefined && Math.abs(Math.atan2(Math.sin(v.apres - this.obj.rotation.y), Math.cos(v.apres - this.obj.rotation.y))) > .01)
+        void this.tourner(v.apres).then(() => { for (const resolve of suites) resolve(); });
+      else for (const resolve of suites) resolve();
+    }
   }
-  private poserPiedsDuVirage() {
+  private neutraliserRotationDuVirage() {
     const v = this.virage; if (!v || v.fin) return;
-    const phase = Math.min(v.pas - 1, Math.floor(v.t / .30));
-    // En cas de frame longue, conserver les appuis de chaque pas sauté avant de poursuivre.
-    while (v.phase < phase) {
-      if (v.phase >= 0) { const fini = v.appuis[v.phase % 2]; fini.p.copy(v.cibleP); fini.q.copy(v.cibleQ); }
-      v.phase++;
-      const pied = v.appuis[v.phase % 2]; v.departP.copy(pied.p); v.departQ.copy(pied.q);
-      const fin = Math.min(v.duree - .30, (v.phase + 1) * .30);
-      const yaw = v.debut + v.delta * THREE.MathUtils.smoothstep(fin, 0, v.duree - .30);
-      const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
-      v.cibleP.copy(pied.localP).applyQuaternion(q).add(this.obj.position);
-      v.cibleQ.copy(q).multiply(pied.localQ);
-    }
-    const t = THREE.MathUtils.clamp((v.t - phase * .30) / .30, 0, 1), k = THREE.MathUtils.smoothstep(t, 0, 1);
-    for (let i = 0; i < 2; i++) {
-      const pied = v.appuis[i], mobile = i === phase % 2;
-      const cible = mobile ? v.departP.clone().lerp(v.cibleP, k) : pied.p.clone();
-      if (mobile) cible.y += .045 * Math.sin(Math.PI * t) ** 2;
-      const q = mobile ? v.departQ.clone().slerp(v.cibleQ, k) : pied.q;
-      this.chaineIK(pied.cote, cible, 1, true);
-      const os = this.os(pied.cote + 'Foot'); if (os?.parent) { os.quaternion.copy(os.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(q)); os.updateMatrixWorld(true); }
-    }
+    const bassin = this.bone('Hips'); if (!bassin?.parent) return;
+    this.obj.updateMatrixWorld(true);
+    const q = bassin.getWorldQuaternion(new THREE.Quaternion()), local = this.obj.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(q);
+    const dir = new THREE.Vector3(0, 0, 1).applyQuaternion(local), angle = Math.atan2(dir.x, dir.z);
+    const monde = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -angle).multiply(q);
+    bassin.quaternion.copy(bassin.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(monde));
+    // La translation horizontale du clip est portée par le groupe, une seule fois.
+    const tr = this.current?.getClip().tracks.find(t => /hips\.position$/i.test(t.name));
+    if (tr) { const up = this.axeHaut(); for (let i = 0; i < 3; i++) if (i !== up) bassin.position.setComponent(i, tr.values[i]); }
+    this.obj.updateMatrixWorld(true);
   }
   private annulerVirage() {
-    if (!this.virage) return;
-    if (!this.walking) this.busy = this.virage.occupeAvant;
-    this.virage = null;
+    const v = this.virage; if (!v) return;
+    if (!this.walking) this.busy = v.occupeAvant;
+    this.virage = null; for (const resolve of v.resolves) resolve();
   }
   private walking: { target: THREE.Vector3; face?: number; arrivee?: boolean; resolve: () => void } | null = null;
   private fade = { value: 1, target: 1 };
   private meshes: THREE.Mesh[] = [];
+  private marcheLea = false;
   private sonde!: THREE.Object3D;
   private sondeMixer!: THREE.AnimationMixer;
   private correctionSol = 0;
@@ -209,6 +229,7 @@ export class Character {
     this.hanchesRepos = hauteurHanches(this.obj);                     // avant toute animation : la pose de repos
     if (this.deLaBibliotheque) for (const n of this.actions.keys()) if (/^idle/.test(n)) this.pinInPlace(n);   // Breathing Idle balance le bassin de 19 cm : fixé sur place
     this.obj.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) this.meshes.push(m); });
+    this.marcheLea = this.meshes.some(m => (Array.isArray(m.material) ? m.material : [m.material]).some(a => /^mat_lea_/.test(a.name)));
     this.sonde = skeletonClone(this.obj);
     this.sondeMixer = new THREE.AnimationMixer(this.sonde);
     if (this.poseSonde('idle', 0)) this.sonde.traverse(o => {
@@ -556,6 +577,8 @@ export class Character {
   goTo(target: THREE.Vector3, face?: number): Promise<void> {
     this.appuisGeste = null; this.mouvementOrigine = null;
     this.solAssis = null;
+    this.annulerVirage();
+    for (const resolve of this.attentesOrientation.splice(0)) resolve();
     if (this.walking) { const w = this.walking; this.walking = null; w.resolve(); }
     const d = target.clone().sub(this.obj.position);
     d.y = 0;
@@ -567,6 +590,7 @@ export class Character {
     }
     this.busy = true;
     this.play('walk');
+    // Le changement de direction utilise le mouvement du clip, puis la marche continue.
     this.debuterVirage(Math.atan2(d.x, d.z));
     return new Promise(res => { this.walking = { target: target.clone(), face, resolve: res }; });
   }
@@ -591,6 +615,7 @@ export class Character {
   annulerMarche() {
     this.actionEpoch++;
     this.annulerVirage();
+    this.faceCible = null; for (const resolve of this.attentesOrientation.splice(0)) resolve();
     const w = this.walking; this.walking = null; this.virage = null;
     if (w) { this.busy = false; w.resolve(); }
   }
@@ -737,6 +762,27 @@ export class Character {
         pied.quaternion.copy(pied.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(q));
         pied.updateMatrixWorld(true);
       }
+    }
+  }
+  /** Réduire l'abduction du pas de Léa sans modifier le pli du genou ni ses longueurs d'os. */
+  private resserrerMarcheLea() {
+    if (!this.marcheLea || this.currentName !== 'walk') return;
+    this.obj.updateMatrixWorld(true);
+    for (const cote of ['Left', 'Right'] as const) {
+      const hanche = this.os(cote + 'UpLeg'), pied = this.os(cote + 'Foot');
+      if (!hanche?.parent || !pied?.parent) continue;
+      const h = hanche.getWorldPosition(new THREE.Vector3()), p = pied.getWorldPosition(new THREE.Vector3());
+      const local = this.obj.worldToLocal(p.clone()), cible = local.clone();
+      // Chaque cheville reste dans un couloir de 22 cm ; correction limitée à 3,5 cm par jambe.
+      cible.x += THREE.MathUtils.clamp(THREE.MathUtils.clamp(local.x, -.11, .11) - local.x, -.035, .035);
+      this.obj.localToWorld(cible);
+      const qPied = pied.getWorldQuaternion(new THREE.Quaternion());
+      const q = new THREE.Quaternion().setFromUnitVectors(p.sub(h).normalize(), cible.sub(h).normalize());
+      const monde = q.multiply(hanche.getWorldQuaternion(new THREE.Quaternion()));
+      hanche.quaternion.copy(hanche.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(monde));
+      hanche.updateMatrixWorld(true);
+      pied.quaternion.copy(pied.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(qPied));
+      pied.updateMatrixWorld(true);
     }
   }
   private appuisGeste: { cote: 'Left' | 'Right'; pos: THREE.Vector3; q: THREE.Quaternion }[] | null = null;
@@ -925,7 +971,20 @@ export class Character {
     return THREE.MathUtils.clamp((valeur - debut) / (fin - debut), 0, 1);
   }
   private faceCible: number | null = null;
-  tourner(face: number) { this.annulerVirage(); this.faceCible = null; if (!this.debuterVirage(face)) this.faceCible = face; }
+  tourner(face: number): Promise<void> {
+    const v = this.virage;
+    if (v) {
+      // Un suivi visuel peut demander la même orientation à chaque frame : ne pas relancer le clip.
+      if (!v.fin) v.cibleDelta += Math.atan2(Math.sin(face - v.debut - v.cibleDelta), Math.cos(face - v.debut - v.cibleDelta));
+      else v.apres = face;
+      return new Promise(resolve => v.resolves.push(resolve));
+    }
+    this.faceCible = null;
+    if (this.debuterVirage(face)) return new Promise(resolve => this.virage!.resolves.push(resolve));
+    this.faceCible = face;
+    return new Promise(resolve => this.attentesOrientation.push(resolve));
+  }
+  private attentesOrientation: (() => void)[] = [];
   /** Correction des bras : si le squelette venu de Mixamo tient les bras trop hauts dans toutes les animations, on abaisse
    *  les deux bras d'un angle fixe (en degrés) à chaque image, après l'animation. ?bras=35 dans l'adresse pour essayer. */
   brasOffset = 0;
@@ -948,6 +1007,7 @@ export class Character {
       const d = ((this.faceCible - this.obj.rotation.y + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
       const pas = Math.sign(d) * Math.min(Math.abs(d), dt * 3.2);
       this.obj.rotation.y += pas; if (Math.abs(d) < .01) this.faceCible = null;
+      if (this.faceCible === null) { const attentes = this.attentesOrientation.splice(0); for (const resolve of attentes) resolve(); }
     }
     this.mixer.update(dt);
     if (this.mouvementOrigine) {
@@ -983,7 +1043,7 @@ export class Character {
       }
     }
     this.appliquerRaccord(dt);
-    // Les appuis du virage sont résolus après le placement au sol.
+    this.neutraliserRotationDuVirage();
     if (this.currentName === 'idle' && this.appuisGeste) {
       this.appuisFin = Math.max(0, this.appuisFin - dt);
       if (!this.appuisFin && !this.raccord) this.appuisGeste = null;
@@ -1005,13 +1065,10 @@ export class Character {
       const bassin = this.bone('Hips'); if (bassin && this.mains.poseBassin) bassin.position.lerp(this.mains.poseBassin, poids);
       this.obj.updateMatrixWorld(true);
     }
-    // Le mixer ne réécrit pas chaque frame les pistes constantes déjà évaluées.
-    // Restaurer les jambes avant l'IK pour éviter une accumulation de flexion.
-    if (this.virage) { const pose = this.virage.poseJambes; this.obj.traverse(b => { const q = pose.get(b.name); if (q) b.quaternion.copy(q); }); this.obj.updateMatrixWorld(true); }
     if (!this.mouvementOrigine && this.solAssis === null) this.stabiliserSol();
     this.poserPiedsAssis();
     this.poserAppuisGeste();
-    this.poserPiedsDuVirage();
+    this.resserrerMarcheLea();
     this.degagerPiedsEnMouvement();
     this.abaisserBras();
     this.mesurerVolumeTorse();
