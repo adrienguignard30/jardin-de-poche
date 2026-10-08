@@ -209,6 +209,16 @@ export class UI {
     maj(); clearInterval(this.motsT); this.motsT = window.setInterval(maj, 2500);
   }
   /** Le classement, depuis l'accueil (même contenu que l'appli du téléphone). */
+  /** Les regles du jeu (public/regles/) par-dessus l'accueil ; "J'ai compris" ou "Passer" les referment. */
+  ouvrirRegles() {
+    if (document.getElementById('reglesJeu')) return;
+    const f = document.createElement('iframe');
+    f.id = 'reglesJeu'; f.title = lang() === 'en' ? 'How to play' : 'Comment jouer';
+    f.src = `/regles/index.html?lang=${lang()}`;
+    const fermer = (e: MessageEvent) => { if (e.origin !== location.origin || e.data !== 'regles:fermer') return; f.remove(); window.removeEventListener('message', fermer); };
+    window.addEventListener('message', fermer);
+    document.body.appendChild(f);
+  }
   ouvrirClassement() {
     const c = el('div', 'fenClassement'); c.appendChild(el('h2', '', `🏆 ${t().classementT}`));
     const zone = el('div', ''); c.appendChild(zone); remplirClassement(zone);
@@ -279,10 +289,13 @@ export class UI {
     const boutonClassement = () => { const c = el('button', 'btnClassementAccueil', `🏆 ${s.classementT}`); c.onclick = () => this.ouvrirClassement(); return c; };
     // les personnages en réalité augmentée : la page /ar/ (même style que le bouton du classement)
     const boutonAR = () => { const a = el('button', 'btnClassementAccueil btnArAccueil', lang() === 'en' ? '📱 Meet the characters in AR' : '📱 Les personnages chez toi'); a.onclick = () => { location.href = '/ar/index.html'; }; return a; };
+    // les regles du jeu : la page /regles/, ouverte par-dessus l'accueil (le jeu reste charge derriere)
+    const boutonRegles = () => { const r = el('button', 'btnClassementAccueil btnReglesAccueil', lang() === 'en' ? '📖 How to play' : '📖 Comment jouer'); r.onclick = () => this.ouvrirRegles(); return r; };
+    const rangAccueil = () => { const r = el('div', 'rangAccueil'); r.append(boutonRegles(), boutonClassement()); return r; };
     if (hasSave) {                                                      // la règle des jeux : « Continuer » toujours en premier
       const b = el('button', 'primary vert', `▶ ${s.continueWith(this.savedCharName || s.continue_)}`); agir(b, () => this.h.onContinue()); body.appendChild(b);
       body.appendChild(el('p', 'hint', s.ouAutrePerso));
-      body.appendChild(boutonClassement());
+      body.appendChild(rangAccueil());
       body.appendChild(boutonAR());
       this.majChoixAccueil(this.chosen);
       return;
@@ -295,7 +308,7 @@ export class UI {
     go.onclick = () => { const c = CATALOG.characters.find(x => x.id === this.chosen)!; this.h.onStart(this.chosen, nameInput.value.trim(), this.perso[this.chosen] ?? { prenom: nameInput.value.trim() || tx(c.name), age: c.age, metier: tx(c.job), couleurs: {} }); };
     row.append(nameInput, go);
     body.appendChild(row);
-    body.appendChild(boutonClassement());
+    body.appendChild(rangAccueil());
     body.appendChild(boutonAR());
     if (this.sheetId) this.majChoixAccueil(this.chosen);
   }
@@ -411,7 +424,7 @@ export class UI {
     const c = CATALOG.characters.find(x => x.id === id); if (!c) return;
     const s = t(), nom = this.perso[id]?.prenom || tx(c.name), reprise = !!this.parties[id];
     const body = $('#startBody');
-    const gardes = Array.from(body.querySelectorAll('.btnClassementAccueil'));   // le classement et le bouton AR restent
+    const gardes = Array.from(body.querySelectorAll(':scope > .btnClassementAccueil, :scope > .rangAccueil'));   // le classement et le bouton AR restent
     const bouton = el('button', 'primary vert', reprise ? `▶ ${s.continueWith(nom)}` : `🌱 ${s.jouerAvec(nom)}`);
     agir(bouton, () => reprise ? this.h.onContinue(id) : this.lancer(id));
     body.replaceChildren(bouton, el('p', 'hint', s.ouAutrePerso));
