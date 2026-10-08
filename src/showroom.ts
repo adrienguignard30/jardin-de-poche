@@ -118,6 +118,22 @@ export class Showroom {
     if (this.focused) { const sel = this.chars.find(c => c.def.id === this.focused); if (sel) sel.char.obj.position.x = portrait ? 0 : -.9; this.frameBody(); }
   }
 
+  /** Le fond (la vue) couvre toujours tout l'ecran, comme une image en "cover" : sur un telephone en hauteur, la camera
+   *  voit plus bas que le bas de l'image (bande grise). On l'agrandit juste ce qu'il faut ; l'horizon (40 % du haut) reste a 3,4. */
+  private couvrirFond() {
+    const b = this.backdrop; if (!b) return;
+    const g = b.geometry as THREE.PlaneGeometry, w = g.parameters.width, h = g.parameters.height, yH = 3.4;
+    const cam = this.camera; cam.updateMatrixWorld();
+    let s = 1;
+    for (const [nx, ny] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+      const d = new THREE.Vector3(nx, ny, .5).unproject(cam).sub(cam.position);
+      if (d.z > -1e-6) continue;                                    // ce coin ne regarde pas vers le fond
+      const t = (b.position.z - cam.position.z) / d.z, X = cam.position.x + d.x * t, Y = cam.position.y + d.y * t;
+      s = Math.max(s, (Math.abs(X) + 1.6) / (w / 2), Y < yH ? (yH - Y) / (.6 * h) : (Y - yH) / (.4 * h));   // + le balancement du fond (1,5)
+    }
+    if (s > 1) s *= 1.02;
+    b.scale.set(s, s, 1); b.position.y = yH - .1 * h * s;
+  }
   /** Touche un personnage : il danse, les autres regardent. Renvoie l'id ou null. */
   pick(x: number, y: number): string | null {
     const v = new THREE.Vector2((x / window.innerWidth) * 2 - 1, -(y / window.innerHeight) * 2 + 1);
@@ -195,5 +211,6 @@ export class Showroom {
       else { const want = c.base.x < 0 ? .3 : c.base.x > 0 ? -.3 : 0; c.char.obj.rotation.y += (want - c.char.obj.rotation.y) * Math.min(1, dt * 2); }
     }
     if (this.backdrop) this.backdrop.position.x = Math.sin(this.t * .05) * 1.5;
+    this.couvrirFond();
   }
 }
