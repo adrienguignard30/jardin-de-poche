@@ -360,7 +360,6 @@ export function livrer(im: Immeuble, j: Jardin, now: number, cat?: Catalogue): A
   for (const a of im.annonces) if (a.de === j.id && a.accepte_par && !a.livree) {
     j.panier[a.cherche.graine] = (j.panier[a.cherche.graine] ?? 0) + a.cherche.quantite;
     (j.recus ??= {})[a.cherche.graine] = { de: im.jardins.find(x => x.id === a.accepte_par)?.nom ?? '?', n: a.cherche.quantite, comment: 'troc' };
-    j.points = Math.min(REGLES.POINTS_MAX, j.points + Math.round(valeur(im, a.donne) * .2));   // petite prime de troc
     j.unites_echangees += a.cherche.quantite; a.livree = true; livrees.push(a);
     const de = im.jardins.find(x => x.id === a.accepte_par)?.nom ?? '?';
     const g = cat?.graines.find(x => x.id === a.cherche.graine);
@@ -527,17 +526,29 @@ export function premierTroc(im: Immeuble, j: Jardin, cat: Catalogue, now: number
   const mq = mqs[0];
   const v = im.jardins.find(x => x.bot && (x.poche[mq.graine] || (x.panier[mq.graine] ?? 0) > 0)) ?? im.jardins.find(x => x.bot)!;
   v.poche[mq.graine] = v.poche[mq.graine] ?? 1;
-  const besoin = new Set(cat.recette(j.recette.recette).ingredients.map(i => i.graine));
-  const mien = Object.entries(j.panier).filter(([g, n]) => n > 0 && !besoin.has(g)).sort((x, y) => y[1] - x[1])[0]?.[0];
-  const prix = (m: Ingredient) => Math.max(1, Math.round(valeur(im, m) * .8));
-  const contre = (m: Ingredient): Ingredient => mien ? { graine: mien, quantite: 1 } : { graine: POINTS, quantite: Math.min(j.points || prix(m), prix(m)) };
-  const a: Annonce = { id: `a${now}_guide`, de: v.id, donne: { graine: mq.graine, quantite: mq.quantite }, cherche: contre(mq), cree_a: now, expire_a: now + 48 * H };
+  const ingredients = cat.recette(j.recette.recette).ingredients;
+  const surplus = (g: string) => Math.max(0, (j.panier[g] ?? 0) - (ingredients.find(i => i.graine === g)?.quantite ?? 0));
+  const mien = Object.keys(j.panier).filter(g => cat.graines.some(x => x.id === g) && surplus(g) > 0).sort((a, b) => surplus(b) - surplus(a))[0];
+  // Aucun surplus : demander une variété de sa poche, à semer/récolter, sans inventer de légumes.
+  const aCultiver = Object.keys(j.poche).sort((a, b) => {
+    const dansRecette = (g: string) => ingredients.some(i => i.graine === g) ? 1 : 0;
+    return dansRecette(a) - dansRecette(b) || cat.graine(a).pousse_min - cat.graine(b).pousse_min;
+  })[0];
+  const donneJoueur = mien ?? aCultiver;
+  if (!donneJoueur) return null;
+  const restants = new Map(Object.keys(j.panier).filter(g => cat.graines.some(x => x.id === g)).map(g => [g, surplus(g)]));
+  const contre = (): Ingredient => {
+    const g = [...restants].filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1])[0]?.[0] ?? aCultiver ?? donneJoueur;
+    restants.set(g, Math.max(0, (restants.get(g) ?? 0) - 1));
+    return { graine: g, quantite: 1 };
+  };
+  const a: Annonce = { id: `a${now}_guide`, de: v.id, donne: { graine: mq.graine, quantite: mq.quantite }, cherche: contre(), cree_a: now, expire_a: now + 48 * H };
   im.annonces = im.annonces.filter(x => !x.id.includes('_guide'));
   im.annonces.push(a);
   for (const m of mqs.slice(1)) {                                       // un deuxième manque : un autre voisin l'a aussi en annonce
     const w = im.jardins.find(x => x.bot && x !== v && (x.poche[m.graine] || (x.panier[m.graine] ?? 0) > 0)) ?? v;
     w.poche[m.graine] = w.poche[m.graine] ?? 1;
-    im.annonces.push({ id: `a${now}_${m.graine}_guide2`, de: w.id, donne: { graine: m.graine, quantite: m.quantite }, cherche: contre(m), cree_a: now, expire_a: now + 48 * H });
+    im.annonces.push({ id: `a${now}_${m.graine}_guide2`, de: w.id, donne: { graine: m.graine, quantite: m.quantite }, cherche: contre(), cree_a: now, expire_a: now + 48 * H });
   }
   return a;
 }

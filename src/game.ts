@@ -85,7 +85,15 @@ export class Game {
     if (e === 5 && re) {
       const mqs = E.manque(j, ECO).filter(m => !j.poche[m.graine]);
       const im = this.state.eco.immeuble;
-      const noms = [...new Set(mqs.map(m => im.annonces.find(x => x.id.includes('_guide') && x.donne.graine === m.graine)).filter(Boolean).map(a => im.jardins.find(x => x.id === a!.de)?.nom ?? ''))].filter(Boolean);
+      const annonces = mqs.map(m => im.annonces.find(a => !a.accepte_par && a.de !== j.id && a.donne.graine === m.graine && a.donne.quantite >= m.quantite && a.cherche.graine !== E.POINTS));
+      const demandes = new Map<string, number>();
+      for (const a of annonces) if (a) demandes.set(a.cherche.graine, (demandes.get(a.cherche.graine) ?? 0) + a.cherche.quantite);
+      const aRecolter = [...demandes].map(([graine, q]) => {
+        const garde = re.ingredients.find(i => i.graine === graine)?.quantite ?? 0;
+        return { graine, quantite: Math.max(0, q - Math.max(0, (j.panier[graine] ?? 0) - garde)) };
+      }).filter(i => i.quantite > 0);
+      if (aRecolter.length) return tt.guide5Cultiver(nomR, lst, liste(mqs.map(m => quantite(m.quantite, ECO.graine(m.graine)))), liste(aRecolter.map(i => quantite(i.quantite, ECO.graine(i.graine)))));
+      const noms = [...new Set(annonces.filter(Boolean).map(a => im.jardins.find(x => x.id === a!.de)?.nom ?? ''))].filter(Boolean);
       return tt.guide5(nomR, lst, liste(mqs.map(m => quantite(m.quantite, ECO.graine(m.graine)))), liste(noms), noms.length);
     }
     if (e === 7 && re) {
@@ -103,6 +111,11 @@ export class Game {
     this.ui.etape(e);
     if (e === 0 && !this.state.eco.jardin.recette) { this.etape(0); return; }
     if (e < 7) this.ui.guide(this.texteEtape(e));
+  }
+  /** Même condition après un troc et à la reprise d'une ancienne partie bloquée. */
+  private avancerEtapeTroc() {
+    const j = this.state.eco.jardin;
+    if ((j.etape ?? 0) === 5 && E.manque(j, ECO).every(m => E.cultivables(j).has(m.graine))) this.etape(6);
   }
   private ecoNow(): number { const e = this.state.eco; return e.t0 + (Date.now() - e.start) * (this.demo ? 90 : 1); }
   private ecoRng = E.rng((Date.now() / 1000) | 0);
@@ -419,6 +432,12 @@ export class Game {
     this.ui.hideStart();
     this.inside = false; this.sleeping = false;
     this.running = true;
+    this.avancerEtapeTroc();
+    if ((s.eco.jardin.etape ?? 0) === 5 && !s.eco.immeuble.annonces.some(a => a.id.includes('_guide') && !a.accepte_par && a.expire_a >= this.ecoNow())) {
+      E.premierTroc(s.eco.immeuble, s.eco.jardin, ECO, this.ecoNow());
+      this.rappelEtape();
+      this.persist();
+    }
     setTimeout(() => this.panneauAnimations(), 1500);
     setTimeout(() => { void this.auditAnimations().catch(e => console.warn('[audit]', e)); }, 2500);
     this.scheduleAutonomy();
@@ -1449,6 +1468,7 @@ export class Game {
     this.ui.refresh();
     this.ui.toast(tt.harvested(tx(d.name), r.count));
     this.etape(4);
+    if ((j.etape ?? 0) === 5) this.rappelEtape();
     await done; if (token !== this.autoToken || personnage !== this.char) return; this.char.regard = null; this.char.busy = false;
     this.persist();
     } finally {
@@ -1544,18 +1564,35 @@ export class Game {
   }
   private accepter(id: string) {
     const e = this.state.eco, tt = t();
-    const a = e.immeuble.annonces.find(x => x.id === id); if (!a) return;
-    const refus = E.refusAccepter(a, e.jardin, this.ecoNow());
-    if (refus) { const r = tt.refus[refus]; this.ui.toast(typeof r === 'function' ? r(a.cherche.quantite, a.cherche.graine === E.POINTS ? tt.points : tx(plantDef(a.cherche.graine).name).toLowerCase()) : r, 4000); return; }
-    if (E.accepterAnnonce(e.immeuble, a, e.jardin, this.ecoNow())) {
-      const nom = (g: string) => tx(plantDef(g).name).toLowerCase(), ic = (g: string) => icon(g);
+    try {
+      const a = e.immeuble.annonces.find(x => x.id === id); if (!a) return;
+      // Les annonces anciennes en points ne sont plus des échanges autorisés.
+      if (a.cherche.graine === E.POINTS || a.donne.graine === E.POINTS) return;
+      // Préparer les libellés AVANT de transférer les légumes.
+      const nom = (g: string) => tx(plantDef(g).name).toLowerCase();
+      const ic = (g: string) => icon(g);
+      const cherche = nom(a.cherche.graine);
+      const refus = E.refusAccepter(a, e.jardin, this.ecoNow());
+      if (refus) { const r = tt.refus[refus]; this.ui.toast(typeof r === 'function' ? r(a.cherche.quantite, cherche) : r, 4000); return; }
       const avec = e.immeuble.jardins.find(x => x.id === a.de)?.nom ?? '?';
-      const msg = tt.trocFait(`${a.cherche.quantite} ${ic(a.cherche.graine)} ${nom(a.cherche.graine)}`, `${a.donne.quantite} ${ic(a.donne.graine)} ${nom(a.donne.graine)}`, avec);
+      const message = (l: 'fr' | 'en', avecIcone = false) => {
+        const textes = t(l);
+        const ingredient = (i: E.Ingredient) => `${i.quantite} ${avecIcone ? `${ic(i.graine)} ` : ''}${plantDef(i.graine).name[l].toLowerCase()}`;
+        return textes.trocFait(ingredient(a.cherche), ingredient(a.donne), avec);
+      };
+      const msg = message(lang(), true), texte_fr = message('fr'), texte_en = message('en');
+      if (!E.accepterAnnonce(e.immeuble, a, e.jardin, this.ecoNow())) return;
       this.ui.toast(msg, 4500, true);
       e.immeuble.evenements.push({ a: this.ecoNow(), pour: e.jardin.id, type: 'troc_accepte', de: avec, deId: a.de, repondu: true,
-        texte_fr: t().trocFait(`${a.cherche.quantite} ${nom(a.cherche.graine)}`, `${a.donne.quantite} ${nom(a.donne.graine)}`, avec), texte_en: t().trocFait(`${a.cherche.quantite} ${nom(a.cherche.graine)}`, `${a.donne.quantite} ${nom(a.donne.graine)}`, avec) });
-      this.flyCoins(4); if ((e.jardin.etape ?? 0) === 5 && E.manque(e.jardin, ECO).every(m => E.cultivables(e.jardin).has(m.graine))) this.etape(6); }
-    this.ui.refresh(); this.persist();
+        texte_fr, texte_en });
+    } catch (erreur) {
+      // Un échange en erreur ne doit pas arrêter les suivants du bouton « tout accepter ».
+      console.warn('[troc accepter]', id, erreur);
+    } finally {
+      try { this.avancerEtapeTroc(); if ((e.jardin.etape ?? 0) === 5) this.rappelEtape(); } catch (erreur) { console.warn('[troc étape]', erreur); }
+      try { this.ui.refresh(); } catch (erreur) { console.warn('[troc affichage]', erreur); }
+      try { this.persist(); } catch (erreur) { console.warn('[troc sauvegarde]', erreur); }
+    }
   }
   private retirer(id: string) {
     const e = this.state.eco, tt = t();

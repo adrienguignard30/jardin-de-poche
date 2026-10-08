@@ -43,6 +43,7 @@ const STRINGS = {
     platPretGuide: 'Ton plat est prêt ! Offre-le à un voisin : ouvre le téléphone, c\u2019est tout en haut de Ma recette.',
     ligneInterdite2: 'Ton balcon ne peut pas en faire pousser : échange au marché.',
     ligneSansGraine: (prix: number) => `Tu n\u2019as pas cette graine : échange-la au marché, ou achète la graine à la Boutique (${prix} points).`,
+    guide5Cultiver: (nom: string, liste: string, manque: string, recolter: string) => `Pour ${nom}, garde les ingrédients de la recette et récolte ${recolter} de plus : sème ou laisse repousser, puis arrose et récolte. Échange ensuite ce surplus au marché contre ${manque}.`,
     guide6: 'Échange fait : tu as tout pour cuisiner. Désormais, le marché est ouvert. Bon jardinage !',
     ligneOk: (n: number) => `Il t\u2019en faut ${n} · tu les as`,
     ligneManque: (a: number, n: number) => `Il t\u2019en faut ${n}, tu en as ${a}.`,
@@ -236,6 +237,7 @@ const STRINGS = {
     platPretGuide: 'Your dish is ready! Give it to a neighbour: open the phone, it\u2019s at the very top of My recipe.',
     ligneInterdite2: 'Your balcony can\u2019t grow it: trade at the market.',
     ligneSansGraine: (prix: number) => `You don\u2019t have this seed: trade at the market, or buy the seed (${prix} points).`,
+    guide5Cultiver: (nom: string, liste: string, manque: string, recolter: string) => `For ${nom}, keep your recipe ingredients and grow ${recolter} extra: sow or let plants regrow, then water and harvest. Trade this surplus at the market for ${manque}.`,
     guide6: 'Trade done: you have everything to cook. The market is open from now on. Happy gardening!',
     ligneOk: (n: number) => `You need ${n} · you have them`,
     ligneManque: (a: number, n: number) => `You need ${n}, you have ${a}.`,
@@ -409,7 +411,7 @@ export function setLang(l: Lang) {
   try { localStorage.setItem('jdp.lang', l); } catch { /* ignore */ }
   document.documentElement.lang = l;
 }
-export function t(): Strings { return STRINGS[current] as Strings; }
+export function t(l: Lang = current): Strings { return STRINGS[l] as Strings; }
 /** Texte bilingue du catalogue : { fr, en } → la langue courante. */
 /** « 2 fraises », « 3 brins de basilic », « 1 gousse d'ail » (et en anglais). */
 export function quantite(n: number, g: { id: string; famille: string; nom_fr: string; nom_en: string }): string {
