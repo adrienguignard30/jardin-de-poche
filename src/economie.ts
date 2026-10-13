@@ -4,22 +4,23 @@
 //  Le temps passe par l'horloge `Horloge` : en mode démo, elle tourne 90 fois plus vite.
 // ---------------------------------------------------------------------------------------------
 
-export type Bi = { fr: string; en: string };
+import { tx, quantite, quantiteESDisponible, texteNonVide, type Bi as TexteBi, type QuantiteES } from './i18n';
+export type Bi = TexteBi;
 export type Famille = 'herbe' | 'racine' | 'fruit';
 
 export interface Graine {
   id: string; v1?: boolean; famille: Famille;
-  nom_fr: string; nom_en: string;
+  nom_fr: string; nom_en: string; nom_es?: string; quantite_es?: QuantiteES;
   pousse_min: number;            // minutes réelles pour arriver à maturité
   recoltes: number;              // nombre de récoltes par semis
   unites_par_recolte: number;
   prix_base: number;             // points, avant le cours
-  phrase_fr?: string; phrase_en?: string; interdit_fr?: string; interdit_en?: string; couleur?: string;
+  phrase_fr?: string; phrase_en?: string; phrase_es?: string; interdit_fr?: string; interdit_en?: string; interdit_es?: string; couleur?: string;
 }
 export interface Ingredient { graine: string; quantite: number }
 export interface Recette {
-  id: string; type: 'entree' | 'plat' | 'dessert'; accueil?: boolean; amour_fr?: string; amour_en?: string; etapes_fr?: string[]; etapes_en?: string[];
-  nom_fr: string; nom_en: string; ingredients: Ingredient[]; phrase_fr?: string; phrase_en?: string; difficulte?: number;
+  id: string; type: 'entree' | 'plat' | 'dessert'; accueil?: boolean; amour_fr?: string; amour_en?: string; amour_es?: string; etapes_fr?: string[]; etapes_en?: string[]; etapes_es?: string[];
+  nom_fr: string; nom_en: string; nom_es?: string; ingredients: Ingredient[]; phrase_fr?: string; phrase_en?: string; phrase_es?: string; difficulte?: number;
 }
 
 /** Une plante en pot, côté règles (le rendu lit `avancement`). */
@@ -57,7 +58,16 @@ export interface Immeuble {
   cours: Record<string, number>; cours_calcule_a: number; jour: string;
   evenements: Evenement[];
 }
-export interface Evenement { a: number; jour?: string; pour: string; type: 'troc_accepte' | 'plat_recu' | 'graine_rare' | 'bienvenue' | 'recette' | 'message'; de?: string; deId?: string; repondu?: boolean; platId?: string; texte_fr: string; texte_en: string }
+export interface Evenement { a: number; jour?: string; pour: string; type: 'troc_accepte' | 'plat_recu' | 'graine_rare' | 'bienvenue' | 'recette' | 'message'; de?: string; deId?: string; repondu?: boolean; platId?: string; texte_fr: string; texte_en: string; texte_es?: string }
+
+
+/** Ajoute ES sans changer les textes historiques FR/EN ; une lacune garde toute la phrase EN. */
+function avecEspagnol(ev: Evenement, espagnol: () => string, ...noms: (string | undefined)[]): Evenement {
+  if (noms.every(texteNonVide)) {
+    try { const value = espagnol(); if (texteNonVide(value)) return { ...ev, texte_es: value }; } catch { /* ancien catalogue */ }
+  }
+  return { ...ev, texte_es: texteNonVide(ev.texte_en) ? ev.texte_en : 'Message unavailable' };
+}
 
 /** Les premières recettes : pour chaque ingrédient qui manque, il existe toujours une annonce que le joueur peut payer
  *  tout de suite (une unité qu'il a en trop, ou des points). Plus tard, le marché est libre et demande de vrais choix. */
@@ -365,9 +375,9 @@ export function livrer(im: Immeuble, j: Jardin, now: number, cat?: Catalogue): A
     const g = cat?.graines.find(x => x.id === a.cherche.graine);
     const re = cat && j.recette ? cat.recettes.find(x => x.id === j.recette!.recette) : undefined;
     const pour = re && re.ingredients.some(i => i.graine === a.cherche.graine);
-    im.evenements.push({ a: now, pour: j.id, type: 'troc_accepte', de, deId: a.accepte_par,
+    im.evenements.push(avecEspagnol({ a: now, pour: j.id, type: 'troc_accepte', de, deId: a.accepte_par,
       texte_fr: `Troc fait avec ${de} : tu reçois ${a.cherche.quantite} ${(g?.nom_fr ?? a.cherche.graine).toLowerCase()} contre ${a.donne.quantite} ${(cat?.graines.find(x => x.id === a.donne.graine)?.nom_fr ?? a.donne.graine).toLowerCase()}${pour ? `, pour « ${re!.nom_fr} »` : ''}.`,
-      texte_en: `Trade done with ${de}: you get ${a.cherche.quantite} ${(g?.nom_en ?? a.cherche.graine).toLowerCase()} for ${a.donne.quantite} ${(cat?.graines.find(x => x.id === a.donne.graine)?.nom_en ?? a.donne.graine).toLowerCase()}${pour ? `, for “${re!.nom_en}”` : ''}.` });
+      texte_en: `Trade done with ${de}: you get ${a.cherche.quantite} ${(g?.nom_en ?? a.cherche.graine).toLowerCase()} for ${a.donne.quantite} ${(cat?.graines.find(x => x.id === a.donne.graine)?.nom_en ?? a.donne.graine).toLowerCase()}${pour ? `, for “${re!.nom_en}”` : ''}.` }, () => `Intercambio hecho con ${de}: recibes ${quantite(a.cherche.quantite, g!, 'es')} a cambio de ${quantite(a.donne.quantite, cat!.graine(a.donne.graine), 'es')}${pour ? `, para «${re!.nom_es}»` : ''}.`, quantiteESDisponible(g) ? g?.nom_es : undefined, quantiteESDisponible(cat?.graines.find(x => x.id === a.donne.graine)) ? cat?.graines.find(x => x.id === a.donne.graine)?.nom_es : undefined, ...(pour ? [re?.nom_es] : [])));
   }
   return livrees;
 }
@@ -402,8 +412,8 @@ export function offrir(im: Immeuble, plat: Plat, j: Jardin, a: Jardin, cat: Cata
     const dispo = cat.graines.filter(g => !cultivables(j).has(g.id) || j.interdites.includes(g.id));
     if (dispo.length) { rare = pick(dispo, r).id; j.rares[rare] = (j.rares[rare] ?? 0) + 1; j.rares_recues++; }
   }
-  im.evenements.push({ a: now, pour: a.id, type: 'plat_recu', de: j.nom, deId: j.id, platId: plat.id, texte_fr: `${j.nom} t'a offert un plat : ${re.nom_fr}. Il est dans ton carnet.`, texte_en: `${j.nom} gave you a dish: ${re.nom_en}. It's in your notebook.` });
-  if (rare) im.evenements.push({ a: now, pour: j.id, type: 'graine_rare', de: a.nom, texte_fr: `${a.nom} te remercie avec une graine rare : ${cat.graine(rare).nom_fr} !`, texte_en: `${a.nom} thanks you with a rare seed: ${cat.graine(rare).nom_en}!` });
+  im.evenements.push(avecEspagnol({ a: now, pour: a.id, type: 'plat_recu', de: j.nom, deId: j.id, platId: plat.id, texte_fr: `${j.nom} t'a offert un plat : ${re.nom_fr}. Il est dans ton carnet.`, texte_en: `${j.nom} gave you a dish: ${re.nom_en}. It's in your notebook.` }, () => `${j.nom} te ha regalado un plato: ${re.nom_es}. Está en tu recetario.`, re.nom_es));
+  if (rare) im.evenements.push(avecEspagnol({ a: now, pour: j.id, type: 'graine_rare', de: a.nom, texte_fr: `${a.nom} te remercie avec une graine rare : ${cat.graine(rare).nom_fr} !`, texte_en: `${a.nom} thanks you with a rare seed: ${cat.graine(rare).nom_en}!` }, () => `${a.nom} te da las gracias con una semilla rara: ¡${cat.graine(rare!).nom_es}!`, cat.graine(rare!).nom_es));
   return { rare };
 }
 
@@ -416,7 +426,7 @@ export function nouveauJour(im: Immeuble, cat: Catalogue, now: number) {
     if (!j.bot && (j.etape ?? 0) < 5) continue;                 // les premiers pas : la recette vient à son heure, pas à minuit
     if (j.recette && !j.recette.faite && j.recette.jour >= jour) continue;   // la recette de demain, déjà regardée, reste
     j.recette = tirerRecette(j, im, cat, jour, hier);
-    if (!j.bot && j.recette) im.evenements.push({ a: now, pour: j.id, type: 'recette', texte_fr: `Ta recette du jour est arrivée : ${cat.recette(j.recette.recette).nom_fr}.`, texte_en: `Today's recipe has arrived: ${cat.recette(j.recette.recette).nom_en}.` });
+    if (!j.bot && j.recette) im.evenements.push(avecEspagnol({ a: now, pour: j.id, type: 'recette', texte_fr: `Ta recette du jour est arrivée : ${cat.recette(j.recette.recette).nom_fr}.`, texte_en: `Today's recipe has arrived: ${cat.recette(j.recette.recette).nom_en}.` }, () => `Ya tienes tu receta del día: ${cat.recette(j.recette!.recette).nom_es}.`, cat.recette(j.recette!.recette).nom_es));
   }
   im.jour = jour; purgerAnnonces(im, now);
   return true;
@@ -555,24 +565,24 @@ export function premierTroc(im: Immeuble, j: Jardin, cat: Catalogue, now: number
 
 /** Un tour de simulation : à appeler souvent ; il fait le nécessaire selon l'heure (cours, bots, jour). */
 /** Les messages préécrits (comme dans les jeux entre voisins : pas de chat libre, que de la gentillesse). */
-export const REPONSES: Record<string, { fr: string; en: string }[]> = {
-  plat_recu: [{ fr: 'Merci, c\u2019était délicieux !', en: 'Thank you, it was delicious!' }, { fr: 'Merci voisin, tu m\u2019as fait plaisir !', en: 'Thanks neighbour, you made my day!' },
-    { fr: 'Tu as des talents de chef !', en: 'You\u2019re a real chef!' }, { fr: 'Je te rends la pareille très vite !', en: 'I\u2019ll return the favour soon!' }],
-  troc_accepte: [{ fr: 'Merci pour l\u2019échange !', en: 'Thanks for the trade!' }, { fr: 'Parfait, merci voisin !', en: 'Perfect, thanks neighbour!' },
-    { fr: 'Au plaisir de troquer à nouveau !', en: 'Happy to trade again!' }, { fr: 'Tes récoltes sont superbes !', en: 'Your harvest looks great!' }],
-  message: [{ fr: 'Avec plaisir !', en: 'My pleasure!' }, { fr: 'Bonne journée, voisin !', en: 'Have a nice day, neighbour!' }],
+export const REPONSES: Record<string, Bi[]> = {
+  plat_recu: [{ fr: 'Merci, c\u2019était délicieux !', en: 'Thank you, it was delicious!', es: "¡Gracias, estaba delicioso!" }, { fr: 'Merci voisin, tu m\u2019as fait plaisir !', en: 'Thanks neighbour, you made my day!', es: "¡Gracias, vecino, me has alegrado el día!" },
+    { fr: 'Tu as des talents de chef !', en: 'You\u2019re a real chef!', es: "¡Tienes talento para la cocina!" }, { fr: 'Je te rends la pareille très vite !', en: 'I\u2019ll return the favour soon!', es: "¡Pronto te devolveré el favor!" }],
+  troc_accepte: [{ fr: 'Merci pour l\u2019échange !', en: 'Thanks for the trade!', es: "¡Gracias por el intercambio!" }, { fr: 'Parfait, merci voisin !', en: 'Perfect, thanks neighbour!', es: "¡Perfecto, gracias, vecino!" },
+    { fr: 'Au plaisir de troquer à nouveau !', en: 'Happy to trade again!', es: "¡Será un placer volver a intercambiar contigo!" }, { fr: 'Tes récoltes sont superbes !', en: 'Your harvest looks great!', es: "¡Tu cosecha tiene una pinta estupenda!" }],
+  message: [{ fr: 'Avec plaisir !', en: 'My pleasure!', es: "¡Con mucho gusto!" }, { fr: 'Bonne journée, voisin !', en: 'Have a nice day, neighbour!', es: "¡Que tengas un buen día, vecino!" }],
 };
-const REPONSES_VOISINS = [{ fr: 'Avec plaisir !', en: 'My pleasure!' }, { fr: 'De rien, bon appétit !', en: 'You\u2019re welcome, enjoy!' },
-  { fr: 'À charge de revanche !', en: 'Next one\u2019s on me!' }, { fr: 'Ça me fait plaisir !', en: 'Glad to help!' }, { fr: 'Merci à toi, voisin !', en: 'Thank you, neighbour!' }];
-export function envoyerMessage(im: Immeuble, de: Jardin, a: Jardin, texte: { fr: string; en: string }, now: number) {
-  im.evenements.push({ a: now, pour: a.id, type: 'message', de: de.nom, deId: de.id, texte_fr: texte.fr, texte_en: texte.en });
+const REPONSES_VOISINS = [{ fr: 'Avec plaisir !', en: 'My pleasure!', es: "¡Con mucho gusto!" }, { fr: 'De rien, bon appétit !', en: 'You\u2019re welcome, enjoy!', es: "¡De nada, que aproveche!" },
+  { fr: 'À charge de revanche !', en: 'Next one\u2019s on me!', es: "¡La próxima vez me toca a mí!" }, { fr: 'Ça me fait plaisir !', en: 'Glad to help!', es: "¡Me alegra ayudarte!" }, { fr: 'Merci à toi, voisin !', en: 'Thank you, neighbour!', es: "¡Gracias a ti, vecino!" }];
+export function envoyerMessage(im: Immeuble, de: Jardin, a: Jardin, texte: Bi, now: number) {
+  im.evenements.push(avecEspagnol({ a: now, pour: a.id, type: 'message', de: de.nom, deId: de.id, texte_fr: texte.fr, texte_en: texte.en }, () => tx(texte, 'es', 'Message unavailable'), texte.es));
   if (a.bot) (im.reponses ??= []).push({ de: a.id, pour: de.id, a: now + (3 + Math.random() * 12) * MIN });   // il répond un peu plus tard
 }
 export function tickImmeuble(im: Immeuble, cat: Catalogue, now: number, r: () => number, echelle = 1) {
   for (const rep of (im.reponses ?? []).filter(x => x.a <= now)) {
     const b = im.jardins.find(x => x.id === rep.de); if (!b) continue;
     const t = REPONSES_VOISINS[Math.floor(r() * REPONSES_VOISINS.length)];
-    im.evenements.push({ a: now, pour: rep.pour, type: 'message', de: b.nom, deId: b.id, texte_fr: `${b.nom} : « ${t.fr} »`, texte_en: `${b.nom}: “${t.en}”` });
+    im.evenements.push(avecEspagnol({ a: now, pour: rep.pour, type: 'message', de: b.nom, deId: b.id, texte_fr: `${b.nom} : « ${t.fr} »`, texte_en: `${b.nom}: “${t.en}”` }, () => `${b.nom}: «${tx(t, 'es', 'Message unavailable')}»`, t.es));
   }
   if (im.reponses) im.reponses = im.reponses.filter(x => x.a > now);
   const p_cours = REGLES.COURS_PERIODE_MIN * MIN, p_bot = REGLES.BOT_PERIODE_MIN * MIN;

@@ -8,11 +8,13 @@
    "file": "models/char_lea_v2.glb",
    "name": {
     "fr": "Léa",
-    "en": "Léa"
+    "en": "Léa",
+    "es": "Léa"
    },
    "tagline": {
     "fr": "Balcon haussmannien, vue sur la tour Eiffel",
-    "en": "Haussmann balcony, Eiffel Tower view"
+    "en": "Haussmann balcony, Eiffel Tower view",
+    "es": "Balcón haussmanniano con vistas a la tour Eiffel"
    },
    "view": "tour",
    "universe": "woman",
@@ -24,19 +26,23 @@
    "age": 28,
    "job": {
     "fr": "Graphiste",
-    "en": "Graphic designer"
+    "en": "Graphic designer",
+    "es": "Diseñadora gráfica"
    },
    "story": {
     "fr": "Son 22 m² sous les toits n'a pas de jardin. Alors elle en fait un sur le balcon.",
-    "en": "Her 22 m² under the roofs has no garden. So she makes one on the balcony."
+    "en": "Her 22 m² under the roofs has no garden. So she makes one on the balcony.",
+    "es": "Su piso de 22 m² bajo el tejado no tiene jardín. Así que ha creado uno en el balcón."
    },
    "address": {
     "fr": "Rue Oberkampf, Paris 11e, 5e étage sans ascenseur",
-    "en": "Rue Oberkampf, Paris 11th, 5th floor, no lift"
+    "en": "Rue Oberkampf, Paris 11th, 5th floor, no lift",
+    "es": "Rue Oberkampf, Paris, distrito 11, quinta planta sin ascensor"
    },
    "likes": {
     "fr": "Le basilic frais sur tout, les vinyles jazz, les cafés en terrasse, dessiner les toits depuis son balcon.",
-    "en": "Fresh basil on everything, jazz records, café terraces, drawing the roofs from her balcony."
+    "en": "Fresh basil on everything, jazz records, café terraces, drawing the roofs from her balcony.",
+    "es": "La albahaca fresca en todo, los vinilos de jazz, los cafés en las terrazas y dibujar los tejados desde su balcón."
    },
    "theme": {
     "plaster": "#ece2cc",
@@ -59,11 +65,13 @@
    "file": "models/char_marcel_v2.glb",
    "name": {
     "fr": "Marcel",
-    "en": "Marcel"
+    "en": "Marcel",
+    "es": "Marcel"
    },
    "tagline": {
     "fr": "Cour d'immeuble, vue sur le pont Alexandre III",
-    "en": "Courtyard, Pont Alexandre III view"
+    "en": "Courtyard, Pont Alexandre III view",
+    "es": "Patio del edificio con vistas al pont Alexandre III"
    },
    "view": "pont",
    "universe": "papi",
@@ -75,19 +83,23 @@
    "age": 74,
    "job": {
     "fr": "Ancien cheminot",
-    "en": "Retired railwayman"
+    "en": "Retired railwayman",
+    "es": "Ferroviario jubilado"
    },
    "story": {
     "fr": "Il a toujours eu un potager. Aujourd'hui c'est une cour, et il s'en contente très bien.",
-    "en": "He always had a vegetable garden. Now it's a courtyard, and that suits him fine."
+    "en": "He always had a vegetable garden. Now it's a courtyard, and that suits him fine.",
+    "es": "Siempre ha tenido un huerto. Ahora es un patio, y está muy a gusto con él."
    },
    "address": {
     "fr": "Rue de Belleville, Paris 20e, rez-de-cour",
-    "en": "Rue de Belleville, Paris 20th, courtyard level"
+    "en": "Rue de Belleville, Paris 20th, courtyard level",
+    "es": "Rue de Belleville, Paris, distrito 20, planta baja junto al patio"
    },
    "likes": {
     "fr": "Les tomates qui ont du goût, la radio le matin, les parties de belote, raconter la gare de l'Est.",
-    "en": "Tomatoes that taste like tomatoes, the morning radio, card games, stories from the old station."
+    "en": "Tomatoes that taste like tomatoes, the morning radio, card games, stories from the old station.",
+    "es": "Los tomates que saben a tomate, la radio por las mañanas, las partidas de belote y contar historias de la gare de l'Est."
    },
    "theme": {
     "plaster": "#e3cfa6",
@@ -110,11 +122,13 @@
    "file": "models/char_jimy_v2.glb",
    "name": {
     "fr": "Jimy",
-    "en": "Jimy"
+    "en": "Jimy",
+    "es": "Jimy"
    },
    "tagline": {
     "fr": "Toit-terrasse, vue sur l'Arc de Triomphe",
-    "en": "Rooftop terrace, Arc de Triomphe view"
+    "en": "Rooftop terrace, Arc de Triomphe view",
+    "es": "Azotea con vistas al Arc de Triomphe"
    },
    "view": "arc",
    "universe": "reggae",
@@ -126,19 +140,23 @@
    "age": 35,
    "job": {
     "fr": "DJ, sound system",
-    "en": "DJ, sound system"
+    "en": "DJ, sound system",
+    "es": "DJ, sound system"
    },
    "story": {
     "fr": "Un toit-terrasse, des enceintes, et des plantes qui poussent au rythme du dub.",
-    "en": "A rooftop terrace, speakers, and plants growing to the rhythm of dub."
+    "en": "A rooftop terrace, speakers, and plants growing to the rhythm of dub.",
+    "es": "Una azotea, unos altavoces y plantas que crecen al ritmo del dub."
    },
    "address": {
     "fr": "Rue Myrha, Paris 18e, sur le toit",
-    "en": "Rue Myrha, Paris 18th, on the roof"
+    "en": "Rue Myrha, Paris 18th, on the roof",
+    "es": "Rue Myrha, Paris, distrito 18, en la azotea"
    },
    "likes": {
     "fr": "Le dub qui fait vibrer les pots, le piment dans tout, les couchers de soleil sur les toits, les soirées sur sa terrasse.",
-    "en": "Dub that makes the pots vibrate, chili in everything, sunsets over the roofs, evenings on his terrace."
+    "en": "Dub that makes the pots vibrate, chili in everything, sunsets over the roofs, evenings on his terrace.",
+    "es": "El dub que hace vibrar las macetas, la guindilla en todo, las puestas de sol sobre los tejados y las noches en su terraza."
    },
    "theme": {
     "plaster": "#f2efe6",
@@ -184,7 +202,8 @@
    "id": "basilic",
    "name": {
     "fr": "Basilic",
-    "en": "Basil"
+    "en": "Basil",
+    "es": "Albahaca"
    },
    "seed": 5,
    "harvest": 12,
@@ -199,7 +218,8 @@
    "id": "menthe",
    "name": {
     "fr": "Menthe",
-    "en": "Mint"
+    "en": "Mint",
+    "es": "Menta"
    },
    "seed": 8,
    "harvest": 20,
@@ -214,7 +234,8 @@
    "id": "fraise",
    "name": {
     "fr": "Fraise",
-    "en": "Strawberry"
+    "en": "Strawberry",
+    "es": "Fresa"
    },
    "seed": 15,
    "harvest": 40,
@@ -229,7 +250,8 @@
    "id": "piment",
    "name": {
     "fr": "Piment",
-    "en": "Chili"
+    "en": "Chili",
+    "es": "Guindilla"
    },
    "seed": 30,
    "harvest": 80,
@@ -244,7 +266,8 @@
    "id": "tomate",
    "name": {
     "fr": "Tomate cerise",
-    "en": "Cherry tomato"
+    "en": "Cherry tomato",
+    "es": "Tomate cherry"
    },
    "seed": 50,
    "harvest": 140,
@@ -265,7 +288,8 @@
     "id": "terracotta",
     "name": {
      "fr": "Terre cuite",
-     "en": "Terracotta"
+     "en": "Terracotta",
+    "es": "Terracota"
     },
     "extra": 0
    },
@@ -273,7 +297,8 @@
     "id": "wood",
     "name": {
      "fr": "Bac en bois",
-     "en": "Wooden planter"
+     "en": "Wooden planter",
+    "es": "Jardinera de madera"
     },
     "extra": 15
    },
@@ -281,7 +306,8 @@
     "id": "painted",
     "name": {
      "fr": "Pot peint",
-     "en": "Painted pot"
+     "en": "Painted pot",
+    "es": "Maceta pintada"
     },
     "extra": 20
    },
@@ -289,7 +315,8 @@
     "id": "metal",
     "name": {
      "fr": "Pot métal",
-     "en": "Metal pot"
+     "en": "Metal pot",
+    "es": "Maceta de metal"
     },
     "extra": 40
    }
@@ -303,11 +330,13 @@
    "price": 50,
    "name": {
     "fr": "Lanterne",
-    "en": "Lantern"
+    "en": "Lantern",
+    "es": "Farol"
    },
    "desc": {
     "fr": "S'allume la nuit.",
-    "en": "Lights up at night."
+    "en": "Lights up at night.",
+    "es": "Se enciende por la noche."
    }
   },
   {
@@ -317,11 +346,13 @@
    "price": 70,
    "name": {
     "fr": "Guirlande",
-    "en": "String lights"
+    "en": "String lights",
+    "es": "Guirnalda"
    },
    "desc": {
     "fr": "Onze ampoules chaudes.",
-    "en": "Eleven warm bulbs."
+    "en": "Eleven warm bulbs.",
+    "es": "Once bombillas de luz cálida."
    }
   },
   {
@@ -331,11 +362,13 @@
    "price": 90,
    "name": {
     "fr": "Table bistrot",
-    "en": "Bistro table"
+    "en": "Bistro table",
+    "es": "Mesa de café"
    },
    "desc": {
     "fr": "La lanterne se pose dessus.",
-    "en": "The lantern sits on it."
+    "en": "The lantern sits on it.",
+    "es": "Puedes poner el farol encima."
    }
   },
   {
@@ -345,11 +378,13 @@
    "price": 120,
    "name": {
     "fr": "Store banne",
-    "en": "Awning"
+    "en": "Awning",
+    "es": "Toldo"
    },
    "desc": {
     "fr": "Rayé rouge et crème.",
-    "en": "Red and cream stripes."
+    "en": "Red and cream stripes.",
+    "es": "Con rayas rojas y de color crema."
    }
   },
   {
@@ -359,11 +394,13 @@
    "price": 80,
    "name": {
     "fr": "Arrosoir vert",
-    "en": "Green watering can"
+    "en": "Green watering can",
+    "es": "Regadera verde"
    },
    "desc": {
     "fr": "Arrose deux pots d'un coup.",
-    "en": "Waters two pots at once."
+    "en": "Waters two pots at once.",
+    "es": "Riega dos macetas a la vez."
    },
    "effect": "water2"
   },
@@ -374,11 +411,13 @@
    "price": 400,
    "name": {
     "fr": "Le toit",
-    "en": "The roof"
+    "en": "The roof",
+    "es": "La azotea"
    },
    "desc": {
     "fr": "Six plantes de plus, là-haut. Balcon plein requis.",
-    "en": "Six more plants, up there. Full balcony required."
+    "en": "Six more plants, up there. Full balcony required.",
+    "es": "Seis plantas más allí arriba. Necesitas tener el balcón lleno."
    }
   }
  ],

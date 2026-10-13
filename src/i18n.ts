@@ -1,5 +1,10 @@
 // Toutes les phrases de l'interface. Aucun texte en dur ailleurs dans le code.
-export type Lang = 'fr' | 'en';
+export const LANGUES = [
+  { id: 'fr', nom: 'Français' },
+  { id: 'en', nom: 'English' },
+  { id: 'es', nom: 'Español' },
+] as const;
+export type Lang = typeof LANGUES[number]['id'];
 
 const STRINGS = {
   fr: {
@@ -392,31 +397,265 @@ const STRINGS = {
   },
 } as const;
 
-export type Strings = typeof STRINGS.fr;
+type TexteFonction = (...args: any[]) => string;
+type Elargir<T> = T extends TexteFonction ? (...args: Parameters<T>) => string
+  : T extends string ? string
+  : T extends readonly unknown[] ? { [K in keyof T]: Elargir<T[K]> }
+  : T extends object ? { [K in keyof T]: Elargir<T[K]> } : T;
+export type DictionnairePartiel<T> = T extends TexteFonction ? T
+  : T extends readonly unknown[] ? { [K in keyof T]?: DictionnairePartiel<T[K]> }
+  : T extends object ? { [K in keyof T]?: DictionnairePartiel<T[K]> } : T;
 
-let current: Lang = detect();
+const EXTRA_EN = {
+  unite: 'unit', patienter: 'One moment, almost done!', commentJouer: 'How to play',
+  personnagesAR: '📱 Meet the characters in AR', boutonRegles: '📖 How to play', afficherMdp: 'show password',
+  pseudoPrefixe: 'Gardener ', typesRecette: { entree: 'starter', plat: 'main', dessert: 'dessert' },
+  typesRecetteArticle: { entree: 'a starter', plat: 'a main course', dessert: 'a dessert' }, recoltes: 'harvests',
+} as const;
+const EXTRA_FR = {
+  unite: 'unité', patienter: 'Un instant, je termine !', commentJouer: 'Comment jouer',
+  personnagesAR: '📱 Les personnages chez toi', boutonRegles: '📖 Comment jouer', afficherMdp: 'afficher le mot de passe',
+  pseudoPrefixe: 'Jardinier ', typesRecette: { entree: 'entrée', plat: 'plat', dessert: 'dessert' },
+  typesRecetteArticle: { entree: 'une entrée', plat: 'un plat', dessert: 'un dessert' }, recoltes: 'récoltes',
+} as const;
+export type Strings = Elargir<typeof STRINGS.en & typeof EXTRA_EN>;
 
-function detect(): Lang {
-  try {
-    const q = new URLSearchParams(location.search).get('lang'); if (q === 'fr' || q === 'en') return q;   // ?lang=fr ou ?lang=en dans l'adresse
-    const saved = localStorage.getItem('jdp.lang');
-    if (saved === 'fr' || saved === 'en') return saved;
-  } catch { /* stockage indisponible */ }
-  return 'en';   // anglais par defaut (jury international)
+/** Ne considère jamais une chaîne vide ou composée d'espaces comme une traduction. */
+export function texteNonVide(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
 }
 
+/** Complète les objets et tableaux, et protège aussi les retours des fonctions traduites. */
+export function completer<T>(anglais: T, traduction: unknown): T {
+  if (typeof anglais === 'string') {
+    return (texteNonVide(traduction) ? traduction : texteNonVide(anglais) ? anglais : 'Information unavailable') as T;
+  }
+  if (typeof anglais === 'function') {
+    const base = anglais as (...args: unknown[]) => unknown;
+    const candidate = typeof traduction === 'function' ? traduction as typeof base : undefined;
+    return ((...args: unknown[]) => {
+      if (candidate) {
+        try { const value = candidate(...args); if (texteNonVide(value)) return value; } catch { /* retour à la phrase anglaise */ }
+      }
+      try { const value = base(...args); if (texteNonVide(value)) return value; } catch { /* base mal formée */ }
+      return 'Information unavailable';
+    }) as T;
+  }
+  if (Array.isArray(anglais)) {
+    const candidate = Array.isArray(traduction) ? traduction : [];
+    return anglais.map((value, i) => completer(value, candidate[i])) as T;
+  }
+  if (anglais && typeof anglais === 'object') {
+    const candidate = traduction && typeof traduction === 'object' && !Array.isArray(traduction)
+      ? traduction as Record<string, unknown> : {};
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(anglais)) result[key] = completer(value, candidate[key]);
+    return result as T;
+  }
+  return anglais;
+}
+
+export function estLang(value: unknown): value is Lang {
+  return LANGUES.some(l => l.id === value);
+}
+export function detect(): Lang {
+  try { const q = new URLSearchParams(location.search).get('lang'); if (estLang(q)) return q; } catch { /* hors navigateur */ }
+  try { const saved = localStorage.getItem('jdp.lang'); if (estLang(saved)) return saved; } catch { /* stockage indisponible */ }
+  return 'en';
+}
+let current: Lang = detect();
+if (typeof document !== 'undefined') document.documentElement.lang = current;
 export function lang(): Lang { return current; }
 export function setLang(l: Lang) {
-  current = l;
-  try { localStorage.setItem('jdp.lang', l); } catch { /* ignore */ }
-  document.documentElement.lang = l;
+  current = estLang(l) ? l : 'en';
+  try { localStorage.setItem('jdp.lang', current); } catch { /* stockage indisponible */ }
+  if (typeof document !== 'undefined') document.documentElement.lang = current;
 }
-export function t(l: Lang = current): Strings { return STRINGS[l] as Strings; }
-/** Texte bilingue du catalogue : { fr, en } → la langue courante. */
-/** « 2 fraises », « 3 brins de basilic », « 1 gousse d'ail » (et en anglais). */
-export function quantite(n: number, g: { id: string; famille: string; nom_fr: string; nom_en: string }): string {
-  if (lang() === 'en') {
-    const nom = g.nom_en.toLowerCase();
+
+/** Un contenu localisé ; es est facultatif pour les anciennes données et sauvegardes. */
+export type Bi = { fr: string; en: string; es?: string };
+export function tx(o: Bi | undefined | null, l: Lang = current, secours = 'Information unavailable'): string {
+  const langue = estLang(l) ? l : 'en';
+  const value = o?.[langue];
+  return texteNonVide(value) ? value : texteNonVide(o?.en) ? o.en : texteNonVide(secours) ? secours : 'Information unavailable';
+}
+
+export type ChampTexte = 'nom' | 'phrase' | 'interdit' | 'amour' | 'texte';
+export type ChampsLocalises<C extends ChampTexte> = Partial<Record<`${C}_${Lang}`, string>>;
+export function texteChamp<C extends ChampTexte>(o: ChampsLocalises<C> | undefined | null, champ: C, l: Lang = current, secours = 'Information unavailable'): string {
+  const langue = estLang(l) ? l : 'en';
+  const value = o?.[`${champ}_${langue}`];
+  const anglais = o?.[`${champ}_en`];
+  return texteNonVide(value) ? value : texteNonVide(anglais) ? anglais : texteNonVide(secours) ? secours : 'Information unavailable';
+}
+
+/** Si une étape ES manque, conserver toute la procédure anglaise plutôt que la raccourcir. */
+export function etapesRecette(o: { etapes_fr?: string[]; etapes_en?: string[]; etapes_es?: string[] } | undefined | null, l: Lang = current): string[] {
+  const anglais = o?.etapes_en;
+  const candidate = o?.[`etapes_${estLang(l) ? l : 'en'}`];
+  const valide = (v: unknown): v is string[] => Array.isArray(v) && v.length > 0 && Array.from(v).every(texteNonVide);
+  if (valide(candidate) && (!Array.isArray(anglais) || candidate.length === anglais.length)) return [...candidate];
+  if (Array.isArray(anglais) && anglais.length > 0) return Array.from(anglais, v => texteNonVide(v) ? v : 'Step unavailable');
+  return ['Recipe instructions unavailable'];
+}
+export function locale(l: Lang = current): 'fr-FR' | 'en-GB' | 'es-ES' {
+  return l === 'fr' ? 'fr-FR' : l === 'es' ? 'es-ES' : 'en-GB';
+}
+export function typeRecette(type: string, l: Lang = current, article = false): string {
+  const table = article ? t(l).typesRecetteArticle : t(l).typesRecette;
+  return Object.prototype.hasOwnProperty.call(table, type) ? table[type as keyof typeof table] : 'dish';
+}
+
+export interface QuantiteES { singulier: string; pluriel: string; unite?: 'ramita' | 'diente' | 'puñado' }
+export interface GraineQuantite { id: string; famille: string; nom_fr: string; nom_en: string; nom_es?: string; quantite_es?: QuantiteES }
+
+
+const ESPAGNOL = {
+  title: 'Huerto de Bolsillo',
+  tagline: 'Un huerto de balcón para quienes no tienen uno.',
+  personnaliser: 'Personalizar', plus: 'Más (edad, profesión)', retour: 'Volver', demoJury: '⏩ Demo acelerada', jouerAvec: (n: string) => `Jugar con ${n}`,
+  points: 'puntos',
+  tabRecette: 'Mi receta', tabMarche: 'El mercado', tabBoutique: 'Tienda', tabCarnet: 'Recetario',
+  recetteDuJour: 'Receta del día', pasDeRecette: 'Hoy no hay receta: mañana llegará una nueva.',
+  jai: 'Tengo', ilManque: 'Falta', caPousse: 'Está creciendo', enPoche: 'En mi bolsillo',
+  coutTotal: (n: number) => `Lo que me falta vale ${n} puntos al precio de hoy`,
+  cuisiner: 'Cocinar', cuisinerPasEncore: 'Te faltan ingredientes para cocinar.',
+  platPret: (nom: string) => `¡${nom} ya está listo! ¿A quién se lo regalas?`, offrirA: 'Regalar a',
+  platOffert: (nom: string, a: string, pts: number) => `${nom}, regalado a ${a}: +${pts} puntos`,
+  recetteFaite: 'Ya has preparado la receta del día. Mañana habrá otra.',
+  cours: 'Precios', annonces: 'Ofertas de tus vecinos', pasDAnnonce: 'Todavía no hay ofertas.',
+  donne: 'da', contre: 'a cambio de', accepter: 'Aceptar', accepte: 'Aceptada', monAnnonce: 'mi oferta',
+  proposerTroc: 'Proponer un intercambio', jeDonne: 'Doy', jeCherche: 'Busco', publier: 'Publicar',
+  trocRefus: { trop_d_annonces: 'Puedes tener un máximo de 3 ofertas abiertas.', pas_assez: 'No tienes suficiente en la cesta.', ecart_trop_grand: 'El intercambio no es justo (la diferencia máxima es del 25 %).' },
+  trocPublie: 'Oferta publicada: un vecino puede aceptarla en cualquier momento.',
+  trocAccepteToast: 'Intercambio aceptado: ya está en tu cesta.',
+  varietes: 'Variedades de semillas', prochainPot: (n: number) => `Una maceta más: ${n} puntos`, potsComplets: 'El balcón está lleno.',
+  acheterPot: 'Comprar una maceta', potAchete: '¡Una maceta más en el balcón!',
+  varieteAchetee: (n: string) => `${n}: ya puedes sembrarla.`, varietesMax: 'Puedes llevar un máximo de 5 variedades en el bolsillo.',
+  interdite: 'No crece en este balcón', rare: 'semilla rara',
+  carnetVide: 'Todavía no hay platos. ¡Prepara tu receta del día!', platsOfferts: 'platos regalados', raresRecues: 'semillas raras', echanges: 'unidades intercambiadas',
+  manqueUnites: (n: number, g: string) => `${n} ${g}`,
+  panierPlein: 'La cesta está llena para esta semilla (20).',
+  modeDemo: 'Modo demo: el tiempo pasa 90 veces más rápido.',
+  demoOn: '⏹ Salir de la demo acelerada', demoOff: 'Modo demo: todo va 90 veces más rápido',
+  guide0: (nom: string, liste: string, g: string) => `Tu primera receta: ${nom}. Necesitas ${liste}. Toca una maceta vacía y siembra: ${g}.`,
+  guideAussi: (g: string) => `Ahora siembra también ${g} en otra maceta. Lo necesitas para tu receta.`,
+  pasDansRecette: (g: string, r: string, reste: string) => `${g} crecerá, pero no forma parte de tu receta. Para ${r}, siembra: ${reste}.`,
+  guide1: 'Ya está todo sembrado. Cuando aparezca una gota debajo de una maceta, tócala para regarla.',
+  guide2: '¡Gracias! Ahora crecerá sin ayuda.',
+  guide3: 'Ya está listo. Toca la maceta para cosechar.',
+  guide4: '¡Buena cosecha! Cuando lo tengas todo, abre el teléfono: Mi receta y luego Cocinar.',
+  guide5: (nom: string, liste: string, manque: string, voisins: string, n: number) => `Nueva receta: ${nom}. Necesitas ${liste}. Te falta ${manque} y no tienes las semillas. ${voisins} ${n > 1 ? 'tienen' : 'tiene'} lo que necesitas: abre el mercado y acepta ${n > 1 ? 'sus intercambios' : 'su intercambio'}.`,
+  guide7: (nom: string, liste: string, g: string, prix: number, pts: number) => `¡Bien hecho! Tu próxima receta: ${nom}. Necesitarás ${liste}. No tienes semillas de ${g}: cómpralas en la Tienda (${prix} puntos, tienes ${pts}${pts < prix ? ': regala un plato más y podrás comprarlas' : ''}) o consíguelas en el mercado.`,
+  guide7tout: (nom: string, liste: string) => `¡Bien hecho! Tu próxima receta: ${nom}. Necesitarás ${liste}. Ya tienes todas las semillas: siémbralas ahora.`,
+  platPretGuide: '¡Tu plato está listo! Regálaselo a un vecino: abre el teléfono, lo tienes arriba del todo en Mi receta.',
+  ligneInterdite2: 'No crece en tu balcón: consíguelo en el mercado.',
+  ligneSansGraine: (prix: number) => `No tienes estas semillas: consíguelas en el mercado o cómpralas en la Tienda (${prix} puntos).`,
+  guide5Cultiver: (nom: string, liste: string, manque: string, recolter: string) => `Para ${nom}, guarda ${liste} y cosecha además ${recolter}: siembra o deja que vuelva a crecer, riega y cosecha. Después intercambia lo que te sobre en el mercado por ${manque}.`,
+  guide6: 'Intercambio hecho: ya tienes todo para cocinar. A partir de ahora, el mercado está abierto. ¡Disfruta de tu huerto!',
+  ligneOk: (n: number) => `Necesitas ${n} · ya lo tienes`,
+  ligneManque: (a: number, n: number) => `Necesitas ${n}, tienes ${a}.`,
+  ligneSemer: 'Siembra, aquí crece.', lignePousse: (k: number) => `${k} maceta${k === 1 ? '' : 's'} con plantas creciendo.`,
+  ligneVoisin: 'No crece en tu balcón: un vecino lo tiene.', ligneInterdite: 'No crece en tu balcón: un vecino lo tiene.',
+  recuDe: (n: number, g: string, de: string, c: string) => c === 'cadeau' ? `${de} te ha traído ${n} ${g}` : `${n} ${g}, intercambiados con ${de}`,
+  ligneRecu: (de: string, c: string) => c === 'cadeau' ? `regalo de ${de}` : `intercambiado con ${de}`,
+  trocJeDonne: 'Doy', trocContre: 'a cambio de', trocEquitable: 'Intercambio justo', trocDesequilibre: (a: number, b: number) => `No es justo: das ${a} puntos y pides ${b}`,
+  trocMax: (n: number) => `(tienes ${n})`, retirer: 'Retirar', annonceRetiree: 'Oferta retirada: vuelve a estar en tu cesta.',
+  refus: { deja: 'Otro vecino ya la ha aceptado.', mienne: 'Es tu propia oferta.', expiree: 'Esta oferta ha caducado.', pas_assez: (n: number, g: string) => `Necesitas ${n} ${g} en tu cesta para aceptar.` },
+  echangerAuMarche: 'Buscar en el mercado', recetteFaiteBarre: 'Receta preparada', voirDemain: 'Ver la receta de mañana', demainTitre: 'Receta de mañana',
+  pourTaRecette: 'Para tu receta', ontCeQuilManque: 'Estos vecinos tienen lo que te falta:', personnePoste: (g: string) => `Todavía nadie ofrece ${g}. Propón un intercambio: un vecino que lo cultive podrá aceptarlo.`,
+  autresAnnonces: 'Las otras ofertas', valeurTitre: 'Lo que vale cada cosecha hoy',
+  valeurExplique: 'Cuanto más escasa y buscada sea una cosecha en el edificio, más puntos vale. Intercambia tus cosechas más valiosas por lo que te falta.',
+  rareM: 'escasa', courante: 'abundante', recherchee: 'buscada', tuEnAs: (n: number) => `tienes ${n}`, ilTeManqueB: 'te falta',
+  voir: 'Ver', aideRecette: '¿Te falta un ingrediente? Toca «Buscar en el mercado».',
+  apps: { panier: 'Cesta', classement: 'Clasificación', jeu: 'Juego', musique: 'Música', recette: 'Receta del día', bourse: 'Cotizaciones', marche: 'Mercado', boutique: 'Tienda', carnet: 'Mis recetas', recus: 'Platos recibidos', voisins: 'Vecinos', notifs: 'Mensajes', reglages: 'Ajustes' },
+  jeDonneQ: 'doy', trocJeCherche: 'Busco', trocContreDonne: 'Doy', mesAnnonces: 'Mis ofertas', rienADonner: 'Todavía no te sobra nada para intercambiar: cosecha un poco más de lo que pide tu receta (una maceta extra de la hierba que crezca más rápido) o espera una oferta de un vecino para ti.',
+  bourseAuj: 'Lo más buscado hoy', bourseSemaine: 'Lo más buscado esta semana', bourseExplique: 'Una cosecha vale más cuando las recetas del edificio la necesitan y pocos vecinos la cultivan. Toca una cosecha para ver su semana y la previsión de mañana.',
+  demande: 'buscada', cultivateurs: (n: number) => `${n} vecino${n === 1 ? '' : 's'} la cultiva${n === 1 ? '' : 'n'}`, dansRecettes: (n: number) => `Se usa en ${n} receta${n === 1 ? '' : 's'} de 66`,
+  demain: 'Mañana', prevHausse: 'probablemente más cara', prevBaisse: 'probablemente más barata', prevStable: 'más o menos igual',
+  leg: { cours: 'Valor (puntos)', demande: 'Demanda', cultiv: 'Vecinos que la cultivan' },
+  repondreA: (n: string) => `Responder a ${n}`, envoye: (n: string) => `Enviado a ${n}`, dejaRepondu: 'Ya has respondido.',
+  resumeAbsence: (p: number, t_: number, m: number) => 'Mientras no estabas: ' + [p ? `${p} plato${p === 1 ? '' : 's'} recibido${p === 1 ? '' : 's'}` : '', t_ ? `${t_} intercambio${t_ === 1 ? '' : 's'} aceptado${t_ === 1 ? '' : 's'}` : '', m ? `${m} mensaje${m === 1 ? '' : 's'}` : ''].filter(Boolean).join(', ') + '.',
+  verdict: { avantageux: 'Ventajoso para ti', equitable: 'Justo', desavantageux: 'Desventajoso para ti' },
+  valeurs: (r: number, d: number) => `recibes ≈ ${r} ptos · das ≈ ${d} ptos`,
+  chanceAccept: { avantageux: 'Ventajoso para ti: los vecinos tardarán más en aceptar.', equitable: 'Justo: un vecino que lo tenga aceptará pronto.', desavantageux: 'Generoso por tu parte: lo aceptarán enseguida.' },
+  tropLoin: 'Demasiado desigual (más de 3 veces): ajusta las cantidades.',
+  gainPlat: (n: number, type: string, m: number, rare: boolean) => `Este plato te dará ≈ ${n} monedas: el valor de sus ingredientes en el mercado, ×${m} porque es ${type}${rare ? ', y ×3 gracias a un ingrediente que no crece en tu balcón' : ''}.`,
+  trocFait: (donne: string, recoit: string, avec: string) => `Has intercambiado ${donne} por ${recoit} con ${avec}.`,
+  jeuT: 'Juego del mes', jeuBientot: 'Próximamente: un pequeño juego, uno nuevo cada mes.', jeuQuitter: 'Salir del juego', jeuCharge: 'El juego se está cargando…',
+  recommencer: 'Sí, empezar de nuevo', annuler: 'Cancelar', boutiqueBtn: (p: number) => `Tienda · ${p} ptos`,
+  chantierMots: ['Estamos levantando las paredes…', 'Estamos montando el balcón…', 'Estamos llenando las macetas de tierra…', 'Estamos colgando el cuadro…', 'Estamos ordenando las semillas…', 'Estamos abriendo las contraventanas…', 'Un momento más…'],
+  tuRecolteras: 'Cosecharás', monPanier: 'Mi cesta', panierVide: 'Tu cesta está vacía: cosecha tus plantas maduras para llenarla.', affichageBloque: 'La pantalla se ha quedado bloqueada: tu partida está guardada, recarga la página (F5).',
+  reprendreMaPartie: 'Continuar mi partida', ouAutrePerso: 'o toca otro personaje para jugar con él',
+  changerPerso: 'Cambiar de personaje', valider: 'Guardar', persoEnregistre: 'Ya está guardado.',
+  compteT: 'Cuenta', jouerTout: 'Jugar ahora', jouerToutAide: 'No tienes que escribir nada: tu partida se guarda en este teléfono y en línea. Puedes crear una cuenta más adelante sin perder nada.',
+  creerCompteT: 'Crear una cuenta', dejaCompte: 'Ya tengo una cuenta', pseudoT: 'Nombre de usuario', mdpT: 'Contraseña',
+  pseudoAide: 'De 3 a 20 letras o números', pseudoLibre: '✓ disponible', pseudoPris: '✗ ya está en uso', mdpAide: 'Contraseña: al menos 8 caracteres.',
+  creerBtn: 'Crear mi cuenta', connecterBtn: 'Iniciar sesión', deconnecterBtn: 'Cerrar sesión', connecteComme: (p: string) => `Sesión iniciada: ${p}`, inviteEnCours: 'Estás jugando como invitado.',
+  errCompte: { court: 'La contraseña es demasiado corta: al menos 8 caracteres.', courant: 'Esta contraseña es demasiado común, elige otra.', pseudo_pris: 'Este nombre de usuario ya está en uso.', pseudo_invalide: 'Nombre de usuario: de 3 a 20 letras o números.', identifiants: 'Nombre de usuario o contraseña incorrectos.', robot: 'No se ha podido comprobar que no eres un robot: vuelve a intentarlo en un momento.', hors_ligne: 'El juego todavía no está conectado en línea.' },
+  compteOk: 'Cuenta creada: puedes seguir tu partida en todos tus dispositivos.', connexionOk: 'Sesión iniciada: estamos recuperando tu partida.',
+  classementT: 'Clasificación', catTrocs: 'Intercambios', catRecoltes: 'Huerto', catOfferts: 'Cocina', catRecus: 'Regalos recibidos', classementVide: 'Todavía no hay nadie: ¡sé la primera persona en la clasificación!', classementInvite: 'Crea una cuenta gratuita para entrar en la clasificación.', taPlace: 'Tu puesto: {r}.º de {n} ({s})', horsClassement: 'Regala tu primer plato para entrar en la clasificación.', classementHorsLigne: 'La clasificación llegará con la versión en línea.', toi: 'tú',
+  musiqueT: 'Música', volumeT: 'Volumen', playlists: 'Listas de reproducción', plAuto: 'La de mi personaje', plLea: 'Léa · Café parisino', plMarcel: 'Marcel · Musette', plJimy: 'Jimy · Reggae en la azotea', morceau: (i: number, n: number) => `Tema ${i} de ${n}`, touchePourSon: 'Toca la pantalla para iniciar la música.', offrirLePlat: 'Regalar el plato', ilManqueN: (n: number) => `Falta${n === 1 ? '' : 'n'} ${n} ingrediente${n === 1 ? '' : 's'} · ver`,
+  semerBtn: 'Sembrar', potsPleins: 'Todas tus macetas están ocupadas: cosecha primero o compra una maceta en la Tienda.',
+  echangerBtn: 'Intercambiar', acheterGraineBtn: (p: number) => `Comprar · ${p} ptos`, toutAccepter: (n: number) => `Aceptar los ${n} intercambios para tu receta`, maxBtn: 'Máx.',
+  pourDemain: 'para mañana', pourAujourdhui: 'para hoy',
+  tuPeuxRepondre: 'Puedes responder.', gainPieces: (n: number) => `+${n} monedas`, peutAcheter: 'Puedes comprar nuevas semillas en la Tienda.', encorePieces: (n: number) => `Con ${n} monedas más podrás comprar nuevas semillas.`,
+  pauseSoif: 'En pausa: tiene sed. Riégala para que siga creciendo.', ilReste: (t_: string) => `Quedan ${t_}`, repondre: 'Responder', fermerTel: 'Cerrar',
+  accueilTel: 'Inicio', fondEcran: 'Fondo de pantalla', vibreur: 'Vibración', sonNotif: 'Sonido de las notificaciones', sonAucun: 'Silencio', sonBip: 'Pitido', sonCloche: 'Campanita', sonGoutte: 'Gota',
+  fonds: { aube: 'Amanecer', menthe: 'Menta', lavande: 'Lavanda', nuit: 'Noche', terracotta: 'Terracota', paris: 'Cielo de Paris' },
+  aucunMessage: 'Todavía no hay mensajes.', essai: 'Probar', maintenant: 'ahora',
+  collection: (n: number, t: number) => `Mis recetas: ${n} preparada${n === 1 ? '' : 's'} de ${t}`,
+  tuAsCuisine: 'Has cocinado', aQuiOffrir: '¿A quién quieres regalárselo?', ingredients: 'Ingredientes', laRecette: 'La receta', fermer: 'Cerrar', plusTard: 'Más tarde',
+  platsOffertsT: 'Platos regalados', platsRecusT: 'Platos recibidos', aucunRecu: 'Todavía no has recibido ningún plato: tus vecinos también cocinan.', offertA: (n: string) => `regalado a ${n}`, recuDeQui: (n: string) => `de ${n}`,
+  amourToujours: 'Siempre tienes', impossibleIci: 'Aquí no crece', pourRecette: 'para tu receta', recetteHud: 'Receta', recetteHudFaite: 'Receta preparada · ver la de mañana', aToi: 'ya lo tienes',
+  poche: (n: number, max: number, pts: number) => `Tu bolsillo: ${n} variedad${n === 1 ? '' : 'es'} de ${max} · tienes ${pts} puntos`,
+  manquePoints: (prix: number, pts: number) => `Necesitas ${prix} puntos, tienes ${pts}. Regala un plato para ganar más.`,
+  dejaATOI: 'Ya lo tienes en tu bolsillo.', premiereRecette: 'Tu primera receta', touteTa: 'Lo tienes todo: ya puedes cocinar.',
+  persoTitre: 'Este eres tú', zPeau: 'Piel', zCheveux: 'Pelo', zHaut: 'Parte de arriba', zBas: 'Parte de abajo', zChaussures: 'Calzado', zAutre: 'Otro color', zReset: 'Original', persoPrenom: 'Tu nombre', persoAge: 'Tu edad', persoMetier: 'Tu profesión', persoCouleurs: 'Tus colores', persoPhoto: '📸 Hacerme una foto', persoPhotoOk: '¡Foto hecha!', persoCouleurNom: (i: number) => `Color ${i}`,
+  enCuisine: 'Está cocinando…', ilCuisine: 'Está cocinando…',
+  voisin: 'vecino', cultive: 'cultiva', cherche: 'busca',
+  loading: 'Cargando el balcón…', tapToStart: 'Toca para empezar', chooseCharacter: '¿Quién cuida el huerto?', yourName: 'Tu nombre de usuario',
+  play: 'Jugar', continue_: 'Continuar', newGame: 'Nueva partida', coins: 'monedas', basket: 'Cesta', phone: 'Teléfono', sell: 'Vender', buy: 'Comprar', rank: 'Clasificación', sellAll: 'Vender todo',
+  basketEmpty: 'La cesta está vacía.', basketFull: 'La cesta está llena: ve a vender.', seeds: 'Semillas', pots: 'Macetas', decos: 'Decoración', upgrades: 'Mejoras', roof: 'Azotea', owned: 'Comprado', locked: 'Bloqueado',
+  unlockEarned: (n: number) => `Se desbloquea al ganar ${n} €`, unlockRoof: 'Se desbloquea con la azotea', needFullBalcony: 'Necesitas 8 macetas en el balcón.', notEnough: 'No tienes suficientes monedas.',
+  bought: (name: string) => `¡${name}, comprado!`, sold: (n: number) => `Vendido por ${n} €`, chooseSeed: '¿Qué quieres sembrar aquí?', noSeeds: 'No quedan semillas: cómpralas en el teléfono.',
+  planted: (name: string) => `${name}, sembrado`, watered: 'Regado', harvested: (name: string, n: number) => `${name}, cosechado (+${n})`, potEmpty: 'La maceta está vacía, puedes volver a sembrar.', thirsty: '¡Tiene sed!', ready: 'Listo para cosechar', growing: (s: string) => `Creciendo… ${s}`,
+  stageNames: ['Sembrada', 'Brotando', 'Joven', 'En flor', 'Lista'], roofUnlocked: '¡La azotea está abierta!', settings: 'Ajustes', language: 'Idioma', sound: 'Sonido', forceNight: 'Forzar la noche', auto: 'Auto', day: 'Día', night: 'Noche', reset: 'Borrar la partida', resetConfirm: '¿Quieres borrar la partida y empezar de nuevo?', close: 'Cerrar',
+  price: (n: number) => `${n} €`, score: 'Puntuación', balconyValue: 'Valor del balcón', earned: 'Ganado en total', rankSoon: 'La clasificación en línea llegará con las partidas compartidas.',
+  welcomeBack: 'Mientras no estabas:', nothingHappened: 'Nada nuevo, todo sigue creciendo.', readyCount: (n: number) => `${n} cosecha${n === 1 ? '' : 's'} lista${n === 1 ? '' : 's'}`, wateredByChar: (name: string, n: number) => `${name} ha regado ${n} maceta${n === 1 ? '' : 's'}`, seedsLeft: (n: number) => `${n} semilla${n === 1 ? '' : 's'}`, potsCount: (a: number, b: number) => `${a} / ${b} macetas`, nextPot: (n: number) => `Siguiente maceta: ${n} €`, potMax: 'El balcón está lleno.', speed: 'Velocidad de la demo', toRoof: 'A la azotea', home: 'Inicio',
+  years: (n: number) => `${n} años`, chooseSub: 'Cada personaje tiene su balcón, sus vistas de Paris y sus semillas iniciales. La tienda es la misma para todos.', yourNick: '¿Cómo te llamamos?', chooseTouch: '¿Qué personaje eliges? Tócalo.', continueWith: (name: string) => `Continuar la partida con ${name}`, newGameHint: 'Nueva partida: elige un personaje', fFirstName: 'Nombre', fAge: 'Edad', fJob: 'Profesión', fAddress: 'Dirección', fLikes: 'Le gusta', fView: 'Vistas', playWith: (name: string) => `Jugar con ${name}`,
+  goSell: '¡La cesta está llena: ve a vender en el teléfono!', harvestsDone: (a: number, b: number) => `Cosechas: ${a}/${b}`, soilWet: 'La tierra está húmeda', soilDry: 'La tierra está seca: riégala', wilted: 'Se está marchitando: riega enseguida', readyNow: '¡Ya puedes cosechar!', basketTitle: 'La cesta', basketTotal: (n: number) => `Valor: ${n} €`, openPhone: 'Abrir el teléfono', sellHint: (n: number) => `${n} cosecha${n === 1 ? '' : 's'} para vender`,
+  unite: 'unidad', patienter: '¡Un momento, ya casi está!', commentJouer: 'Cómo jugar', personnagesAR: '📱 Los personajes en tu casa', boutonRegles: '📖 Cómo jugar', afficherMdp: 'mostrar la contraseña',
+  pseudoPrefixe: 'Jardinero ', typesRecette: { entree: 'entrante', plat: 'plato principal', dessert: 'postre' }, typesRecetteArticle: { entree: 'un entrante', plat: 'un plato principal', dessert: 'un postre' }, recoltes: 'cosechas',
+} satisfies DictionnairePartiel<Strings>;
+
+const ANGLAIS: Strings = { ...STRINGS.en, ...EXTRA_EN };
+const DICTIONNAIRES: Record<Lang, Strings> = {
+  fr: completer(ANGLAIS, { ...STRINGS.fr, ...EXTRA_FR }),
+  en: completer(ANGLAIS, ANGLAIS),
+  es: completer(ANGLAIS, ESPAGNOL),
+};
+export function t(l: Lang = current): Strings { return DICTIONNAIRES[estLang(l) ? l : 'en']; }
+
+/** Une quantité ES incomplète doit faire retomber toute la phrase sur l'anglais. */
+export function quantiteESDisponible(g: GraineQuantite | undefined | null): boolean {
+  const forme = g?.quantite_es;
+  return !!g && texteNonVide(g.nom_es) && !!forme && texteNonVide(forme.singulier) && texteNonVide(forme.pluriel)
+    && (forme.unite === undefined || forme.unite === 'ramita' || forme.unite === 'diente' || forme.unite === 'puñado');
+}
+
+export function quantite(n: number, g: GraineQuantite, l: Lang = current): string {
+  if (l === 'es') {
+    const forme = g.quantite_es;
+    if (quantiteESDisponible(g) && forme) {
+      const unite = forme.unite;
+      if (unite === 'ramita' || unite === 'diente' || unite === 'puñado') return `${n} ${unite}${n === 1 ? '' : 's'} de ${forme.singulier}`;
+      if (unite === undefined) return `${n} ${n === 1 ? forme.singulier : forme.pluriel}`;
+    }
+    l = 'en';
+  }
+  if (l !== 'fr') {
+    const nom = texteNonVide(g.nom_en) ? g.nom_en.toLowerCase() : 'unknown plant';
     if (g.famille === 'herbe') return `${n} sprig${n > 1 ? 's' : ''} of ${nom}`;
     if (g.id === 'ail') return `${n} clove${n > 1 ? 's' : ''} of garlic`;
     if (g.id === 'epinard' || g.id === 'salade') return `${n} handful${n > 1 ? 's' : ''} of ${nom}`;
@@ -425,7 +664,7 @@ export function quantite(n: number, g: { id: string; famille: string; nom_fr: st
     const pl = /[^aeiou]y$/.test(last) ? last.slice(0, -1) + 'ies' : /(s|x|ch|sh|o)$/.test(last) ? last + 'es' : last + 's';
     return `${n} ${[...w, pl].join(' ')}`;
   }
-  const nom = g.nom_fr.toLowerCase();
+  const nom = texteNonVide(g.nom_fr) ? g.nom_fr.toLowerCase() : texteChamp(g, 'nom', 'en', 'unknown plant').toLowerCase();
   const de = (x: string) => (/^[aeiouyéèêàh]/.test(x) ? 'd\u2019' : 'de ') + x;
   if (g.famille === 'herbe') return `${n} brin${n > 1 ? 's' : ''} ${de(nom)}`;
   if (g.id === 'ail') return `${n} gousse${n > 1 ? 's' : ''} d\u2019ail`;
@@ -433,14 +672,12 @@ export function quantite(n: number, g: { id: string; famille: string; nom_fr: st
   if (n <= 1) return `1 ${nom}`;
   return `${n} ` + nom.split(' ').map(x => /[sxz]$/.test(x) ? x : /eau$/.test(x) ? x + 'x' : x + 's').join(' ');
 }
-/** « 2 fraises et 1 brin de basilic » */
-export function liste(items: string[]): string {
+/** Conjonction adaptée à la langue ; aucune modification des libellés FR/EN. */
+export function liste(items: string[], l: Lang = current): string {
   if (items.length <= 1) return items.join('');
-  return items.slice(0, -1).join(', ') + (lang() === 'en' ? ' and ' : ' et ') + items[items.length - 1];
-}
-export function tx(o: { fr: string; en: string } | undefined): string {
-  if (!o) return '';
-  return o[current] ?? o.fr;
+  const dernier = items[items.length - 1];
+  const lien = l === 'es' ? (/^(?:i|hi(?![ea]))/i.test(dernier.trim()) ? ' e ' : ' y ') : l === 'fr' ? ' et ' : ' and ';
+  return items.slice(0, -1).join(', ') + lien + dernier;
 }
 export function fmtTime(sec: number): string {
   sec = Math.max(0, Math.ceil(sec));

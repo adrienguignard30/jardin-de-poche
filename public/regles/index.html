@@ -217,6 +217,7 @@ button:focus-visible { outline: 3px solid var(--sage-deep); outline-offset: 3px;
     <div class="langs" role="group" aria-label="Langue">
       <button type="button" id="lang-fr" data-lang="fr">FR</button>
       <button type="button" id="lang-en" data-lang="en">EN</button>
+      <button type="button" id="lang-es" data-lang="es">ES</button>
     </div>
     <button type="button" class="skip" id="passer" data-t="passer">Passer</button>
   </header>
@@ -468,6 +469,64 @@ button:focus-visible { outline: 3px solid var(--sage-deep); outline-offset: 3px;
       persoAlt: 'Léa, Marcel and Jimy on their balcony', moins: 'Less', plus: 'More', langue: 'Language', titrePage: 'How to play the Garden'
     }
   };
+const REGLES_ES = {
+  titre: 'Cómo jugar', passer: 'Saltar', suivant: 'Siguiente', jouer: '¡Entendido, a jugar!',
+  k1: 'El objetivo del juego', s1: '¡Cultiva, cocina y regala tus platos a tus vecinos!',
+  etapes: [
+    ['Siembra', 'Toca una maceta vacía y elige una semilla.'],
+    ['Riega', '¿Aparece una gota? Toca la maceta.'],
+    ['Cosecha', '¿Ya está maduro? Toca la maceta. ¡Algunas plantas vuelven a crecer!'],
+    ['Cocina', 'Cada día, una receta. Teléfono → Receta del día → Cocinar.'],
+    ['Regala', 'Regala tu plato a un vecino.'],
+    ['Gana puntos', 'Cada plato que regalas te da puntos. ¡Tienes decenas de recetas para cocinar: las encontrarás en Mis recetas!'],
+  ],
+  k2: 'El Mercado', s2: '¿Te falta una verdura?', s2p: 'Consíguela en el Mercado: intercambia una de tus verduras por la de un vecino.',
+  donnes: 'Das', demandes: 'Pides', uneTomate: '1 tomate', basilic: n => `${n} ramita${n === 1 ? '' : 's'} de albahaca`, combien: '¿Cuánta albahaca?',
+  aide: 'Cambia la cantidad: el juego te dice si es justo.',
+  verdict: { avantageux: 'Ventajoso para ti', equitable: 'Justo', desavantageux: 'Desventajoso para ti' },
+  bourseCourt: 'La app <b>Cotizaciones</b> te muestra lo que buscan tus vecinos: ¡cultívalo para intercambiar mejor!',
+  k3: 'Cotizaciones', s3: '¡Cultiva lo que buscan tus vecinos!', s3p: 'La app Cotizaciones te muestra las verduras más buscadas: son las que mejor se intercambian.',
+  bourseAuj: 'Lo más buscado hoy', tomate: 'Tomate', fraise: 'Fresa', basilicNom: 'Albahaca', exemple: 'Ejemplo',
+  k4: 'Tus puntos', s4: 'Solo ganas puntos al regalar un plato.', plusPoints: '+ puntos',
+  entree: 'Entrante', plat: 'Plato principal', dessert: 'Postre', dessertPlus: '¡Un postre da más puntos!',
+  boutiqueCourt: 'En la <b>Tienda</b>, tus puntos te permiten comprar:',
+  k5: 'La Tienda', s5: 'Usa tus puntos para ampliar el huerto.', s5p: 'En la Tienda, compra nuevas semillas y macetas para cosechar más.',
+  graines: 'Nuevas semillas', pots: 'Más macetas',
+  k6: 'Tu teléfono', s6: 'Lo tienes todo dentro.',
+  apps: ['Receta del día', 'Mis recetas', 'Mercado', 'Cotizaciones', 'Tienda', 'Juego', 'Clasificación', 'Ajustes'],
+  classement: 'La <b>Clasificación</b> de quienes cuidan su huerto. Crea una cuenta para entrar.',
+  cats: ['🔄 Intercambios', '🥕 Cosechas', '🍲 Platos regalados', '🎁 Platos recibidos'],
+  persoCourt: 'Tu personaje tiene su propia vida: descansa, hace deporte y duerme por la noche. Toca una maceta: viene a ayudarte.',
+  k7: 'Tu personaje', s7: 'Tiene su propia vida.', s7p: 'Descansa, hace deporte y duerme por la noche. Toca una maceta: viene a ayudarte.',
+  persoAlt: 'Léa, Marcel y Jimy en su balcón', moins: 'Menos', plus: 'Más', langue: 'Idioma', titrePage: 'Cómo jugar a Huerto de Bolsillo',
+};
+
+  T.es = REGLES_ES;
+// Les pages public restent autonomes : même contrat de repli profond que i18n.ts.
+const nonVide = v => typeof v === 'string' && v.trim().length > 0;
+const completer = (anglais, traduction) => {
+  if (typeof anglais === 'string') return nonVide(traduction) ? traduction : nonVide(anglais) ? anglais : 'Information unavailable';
+  if (typeof anglais === 'function') return (...args) => {
+    if (typeof traduction === 'function') { try { const v = traduction(...args); if (nonVide(v)) return v; } catch (e) {} }
+    try { const v = anglais(...args); if (nonVide(v)) return v; } catch (e) {}
+    return 'Information unavailable';
+  };
+  if (Array.isArray(anglais)) return Array.from(anglais, (v, i) => completer(v, Array.isArray(traduction) ? traduction[i] : undefined));
+  if (anglais && typeof anglais === 'object') {
+    const candidate = traduction && typeof traduction === 'object' && !Array.isArray(traduction) ? traduction : {};
+    return Object.fromEntries(Object.entries(anglais).map(([k, v]) => [k, completer(v, candidate[k])]));
+  }
+  return anglais;
+};
+const langues = ['fr', 'en', 'es'];
+const langueValide = l => langues.includes(l);
+const detecterLangue = () => {
+  try { const q = new URLSearchParams(location.search).get('lang'); if (langueValide(q)) return q; } catch (e) {}
+  try { const s = localStorage.getItem('jdp.lang'); if (langueValide(s)) return s; } catch (e) {}
+  const n = (navigator.language || '').toLowerCase();
+  return n.startsWith('fr') ? 'fr' : n.startsWith('es') ? 'es' : 'en';
+};
+
   // typographie française : espace fine insécable avant ? ! : ;
   const fine = v => typeof v === 'string' ? v.replace(/ ([?!:;])/g, ' $1') : Array.isArray(v) ? v.map(fine) : v;
   for (const k of Object.keys(T.fr)) T.fr[k] = fine(T.fr[k]);
@@ -503,9 +562,8 @@ button:focus-visible { outline: 3px solid var(--sage-deep); outline-offset: 3px;
   const dansLeJeu = (() => { try { return window.parent !== window && window.parent.location.origin === location.origin; } catch (e) { return false; } })();
 
   // ---------- langue : demandée par le jeu (?lang=), sinon celle déjà choisie, sinon celle du navigateur
-  let L = 'fr';
-  try { const q = new URLSearchParams(location.search).get('lang'); if (q === 'fr' || q === 'en') L = q; else {
-    const s = localStorage.getItem('jdp.lang'); L = s === 'fr' || s === 'en' ? s : ((navigator.language || '').toLowerCase().startsWith('fr') ? 'fr' : 'en'); } } catch (e) {}
+  let L = detecterLangue();
+  let S = completer(T.en, T[L]);
 
   // ---------- téléphone : 7 écrans courts ; ordinateur / tablette : 4 écrans
   function mode() {
@@ -557,9 +615,9 @@ button:focus-visible { outline: 3px solid var(--sage-deep); outline-offset: 3px;
   const scenes = [...document.querySelectorAll('.scene')];
   function choisir(i) {
     etape = (i + 6) % 6;
-    nodes.forEach((b, k) => { b.classList.toggle('on', k === etape); b.setAttribute('aria-pressed', k === etape ? 'true' : 'false'); b.setAttribute('aria-label', T[L].etapes[k][0]); });
+    nodes.forEach((b, k) => { b.classList.toggle('on', k === etape); b.setAttribute('aria-pressed', k === etape ? 'true' : 'false'); b.setAttribute('aria-label', S.etapes[k][0]); });
     scenes.forEach((s, k) => { s.classList.remove('on'); if (k === etape) { void s.offsetWidth; s.classList.add('on'); } });
-    const [t, p] = T[L].etapes[etape];
+    const [t, p] = S.etapes[etape];
     $('#cap-n').textContent = `${etape + 1} / 6`; $('#cap-t').textContent = t; $('#cap-p').textContent = p;
     placer();
   }
@@ -571,8 +629,8 @@ button:focus-visible { outline: 3px solid var(--sage-deep); outline-offset: 3px;
   let nb = 2;
   function troc(anim) {
     const ratio = (3 * nb) / 6, v = ratio >= 1.15 ? 'avantageux' : ratio >= .87 ? 'equitable' : 'desavantageux';
-    const el = $('#verdict'); el.className = 'verdict ' + v; el.textContent = T[L].verdict[v];
-    $('#nb-basilic').textContent = T[L].basilic(nb);
+    const el = $('#verdict'); el.className = 'verdict ' + v; el.textContent = S.verdict[v];
+    $('#nb-basilic').textContent = S.basilic(nb);
     $('#moins').disabled = nb <= 1; $('#plus').disabled = nb >= 4;
     const zone = $('#basilics'); zone.innerHTML = '';
     for (let i = 0; i < nb; i++) { const im = document.createElement('img'); im.src = 'img/basilic.webp'; im.alt = ''; if (anim && i === nb - 1) im.className = 'pop'; zone.appendChild(im); }
@@ -585,25 +643,27 @@ button:focus-visible { outline: 3px solid var(--sage-deep); outline-offset: 3px;
     const ph = $('#phone'); ph.innerHTML = '';
     APPS.forEach(([c, d], i) => {
       const a = document.createElement('div'); a.className = 'app-i'; a.style.animationDelay = (i * 60) + 'ms';
-      a.innerHTML = `<span class="appico" style="background:${c}">${ICO(d)}</span><span>${T[L].apps[i]}</span>`;
+      a.innerHTML = `<span class="appico" style="background:${c}">${ICO(d)}</span><span>${S.apps[i]}</span>`;
       ph.appendChild(a);
     });
-    $('#cats').innerHTML = T[L].cats.map(c => `<span>${c}</span>`).join('');
+    $('#cats').innerHTML = S.cats.map(c => `<span>${c}</span>`).join('');
   }
 
   // ---------- textes
   function textes() {
+    L = langueValide(L) ? L : 'en';
+    S = completer(T.en, T[L]);
     document.documentElement.lang = L;
-    document.querySelectorAll('[data-t]').forEach(e => { const v = T[L][e.dataset.t]; if (typeof v === 'string') e.innerHTML = v; });
-    document.title = T[L].titrePage;
-    $('#lang-fr').setAttribute('aria-pressed', L === 'fr'); $('#lang-en').setAttribute('aria-pressed', L === 'en');
-    document.querySelector('.langs').setAttribute('aria-label', T[L].langue);
-    $('#moins').setAttribute('aria-label', T[L].moins); $('#plus').setAttribute('aria-label', T[L].plus);
-    document.querySelectorAll('.persos').forEach(im => { im.alt = T[L].persoAlt; });
+    document.querySelectorAll('[data-t]').forEach(e => { const v = S[e.dataset.t]; if (typeof v === 'string') e.innerHTML = v; });
+    document.title = S.titrePage;
+    document.querySelectorAll('.langs [data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === L));
+    document.querySelector('.langs').setAttribute('aria-label', S.langue);
+    $('#moins').setAttribute('aria-label', S.moins); $('#plus').setAttribute('aria-label', S.plus);
+    document.querySelectorAll('.persos').forEach(im => { im.alt = S.persoAlt; });
     choisir(etape); troc(false); telephone(); bas(); ajuster();
   }
   document.querySelectorAll('.langs button').forEach(b => b.onclick = () => {
-    L = b.dataset.lang; if (!dansLeJeu) { try { localStorage.setItem('jdp.lang', L); } catch (e) {} } textes();
+    L = langueValide(b.dataset.lang) ? b.dataset.lang : 'en'; if (!dansLeJeu) { try { localStorage.setItem('jdp.lang', L); } catch (e) {} } textes();
   });
 
   // ---------- navigation
@@ -611,7 +671,7 @@ button:focus-visible { outline: 3px solid var(--sage-deep); outline-offset: 3px;
   function bas() {
     [...dots.children].forEach((d, k) => d.setAttribute('aria-current', k === ecran ? 'true' : 'false'));
     const fin = ecran === N - 1;
-    suivant.textContent = fin ? T[L].jouer : T[L].suivant; suivant.classList.toggle('fin', fin);
+    suivant.textContent = fin ? S.jouer : S.suivant; suivant.classList.toggle('fin', fin);
     $('#passer').style.visibility = fin ? 'hidden' : 'visible';
   }
   // petites animations à l'arrivée sur un écran

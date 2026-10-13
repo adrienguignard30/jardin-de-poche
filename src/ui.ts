@@ -1,4 +1,4 @@
-﻿import { t, tx, lang, setLang, fmtTime, type Lang } from './i18n';
+﻿import { t, tx, lang, setLang, fmtTime, LANGUES, type Lang } from './i18n';
 import { remplirClassement, STYLE_CLASSEMENT } from './classement';
 import { CATALOG, ECO, type GameState, type CharacterDef, type Perso } from './state';
 import * as E from './economie';
@@ -50,6 +50,23 @@ function agir(b: HTMLElement, fn: () => unknown) {
   };
   b.addEventListener('pointerdown', go); b.addEventListener('click', go);
 }
+const drapeauSVG = (formes: string) => `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="20" viewBox="0 0 28 20" aria-hidden="true" focusable="false">${formes}</svg>`;
+const DRAPEAUX: Record<Lang, string> = {
+  fr: drapeauSVG('<path fill="#fff" d="M0 0h28v20H0z"/><path fill="#002395" d="M0 0h9.333v20H0z"/><path fill="#ed2939" d="M18.667 0H28v20h-9.333z"/>'),
+  en: drapeauSVG('<path fill="#012169" d="M0 0h28v20H0z"/><path stroke="#fff" stroke-width="5" d="m0 0 28 20M28 0 0 20"/><path stroke="#c8102e" stroke-width="2" d="m0 0 28 20M28 0 0 20"/><path stroke="#fff" stroke-width="7" d="M14 0v20M0 10h28"/><path stroke="#c8102e" stroke-width="4" d="M14 0v20M0 10h28"/>'),
+  es: drapeauSVG('<path fill="#aa151b" d="M0 0h28v20H0z"/><path fill="#f1bf00" d="M0 5h28v10H0z"/>'),
+};
+// Textes locaux provisoires, avec le même repli anglais que les données du jeu.
+const texteAccueil = (fr: string, en: string, es: string) => tx({ fr, en, es });
+function initialiserLangueAccueil() {
+  const param = new URLSearchParams(location.search).get('lang');
+  // i18n.ts a déjà appliqué le paramètre ou la préférence : ne pas la réécrire.
+  if (LANGUES.some(l => l.id === param)) { document.documentElement.lang = lang(); return; }
+  let premiereVisite = false;
+  try { premiereVisite = localStorage.getItem('jdp.lang') === null; } catch { /* ne pas supposer que la préférence est absente */ }
+  if (premiereVisite) setLang(navigator.language.toLowerCase().startsWith('fr') ? 'fr' : 'en');
+  document.documentElement.lang = lang();
+}
 const LISIBLE = 'color:#24313a;background:rgba(36,49,58,.08);border:1px solid rgba(36,49,58,.2);font-weight:600;';
 const el = <T extends HTMLElement = HTMLElement>(tag: string, cls = '', html = '') => { const e = document.createElement(tag) as T; if (cls) e.className = cls; if (html) e.innerHTML = html; return e; };
 
@@ -97,6 +114,7 @@ export class UI {
   nightMode: 'auto' | 'day' | 'night' = 'auto';
 
   constructor(private h: UIHandlers) {
+    initialiserLangueAccueil();
     this.root.innerHTML = `
       <div id="loading" class="overlay">
         <div class="brand"><div class="logo">🪴</div><h1 data-t="title"></h1><p class="tag" data-t="tagline"></p></div>
@@ -113,7 +131,8 @@ export class UI {
         <div class="bar"><div class="fill"></div></div><p class="small" id="loadLabel"></p><p class="small chantierMot" id="loadMot"></p>
       </div>
       <div id="start" class="overlay start hidden">
-        <div class="langs"><button data-lang="fr">Français</button><button data-lang="en">English</button></div>
+        <button id="menuAccueilBtn" class="menuAccueilBtn" type="button" aria-haspopup="dialog">⚙️</button>
+        <div class="langs languesAccueil"><div class="boutonsLangues" role="group" aria-label="Langue / Language / Idioma"></div></div>
         <div class="startTop"><div class="brand"><h1 data-t="title"></h1><p class="tag" data-t="tagline"></p></div></div>
         <div class="sheet hidden" id="sheet"></div>
         <div class="startBottom" id="startBody"></div>
@@ -143,7 +162,12 @@ export class UI {
       <div id="settings" class="modal hidden"><div class="card" id="settingsCard"></div></div>
       <div id="toast" class="toast hidden"></div>
       <div id="notifBanner" class="notifBanner hidden"></div>`;
-    this.root.querySelectorAll<HTMLButtonElement>('[data-lang]').forEach(b => b.onclick = () => { setLang(b.dataset.lang as Lang); this.h.onLang(lang()); this.retranslate(); });
+    this.afficherLanguesAccueil();
+    this.afficherBadgeDemo();
+    $('#menuAccueilBtn').onclick = () => this.ouvrirMenuAccueil();
+    window.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !$('#modal').classList.contains('hidden') && $('#modal .accueilMenu')) { this.fermerModal(); $('#menuAccueilBtn').focus(); }
+    });
     $('#btnPhone').onclick = () => this.togglePhone();
     $('#phoneClose').onclick = () => this.togglePhone(false);
     $('#appBack').onclick = () => this.ouvrir('home', undefined, 'versGauche');     // « ‹ Accueil » ramène TOUJOURS à l'accueil ; glisser revient d'un cran
@@ -186,7 +210,10 @@ export class UI {
   retranslate() {
     const s = t();
     this.root.querySelectorAll<HTMLElement>('[data-t]').forEach(e => { const k = e.dataset.t as keyof typeof s; const v = s[k]; if (typeof v === 'string') e.textContent = v; });
-    this.root.querySelectorAll<HTMLButtonElement>('[data-lang]').forEach(b => b.classList.toggle('active', b.dataset.lang === lang()));
+    this.afficherLanguesAccueil();
+    this.afficherBadgeDemo();
+    $('#menuAccueilBtn').setAttribute('aria-label', texteAccueil('Menu', 'Menu', 'Menú'));
+    if (!$('#modal').classList.contains('hidden') && $('#modal .accueilMenu')) this.ouvrirMenuAccueil();
     $('#appBack').textContent = '‹ ' + s.accueilTel;
     $('#phoneClose').innerHTML = `<span>${s.fermerTel}</span>`;
     $('#btnSettings').title = s.settings; $('#btnHome').title = s.home; $('#seedsPill').title = s.seeds;
@@ -213,7 +240,7 @@ export class UI {
   ouvrirRegles() {
     if (document.getElementById('reglesJeu')) return;
     const f = document.createElement('iframe');
-    f.id = 'reglesJeu'; f.title = lang() === 'en' ? 'How to play' : 'Comment jouer';
+    f.id = 'reglesJeu'; f.title = texteAccueil('Comment jouer', 'How to play', 'Cómo jugar');
     f.src = `/regles/index.html?lang=${lang()}`;
     const fermer = (e: MessageEvent) => { if (e.origin !== location.origin || e.data !== 'regles:fermer') return; f.remove(); window.removeEventListener('message', fermer); };
     window.addEventListener('message', fermer);
@@ -234,8 +261,9 @@ export class UI {
   }
   private hasSave = false;
   private savedCharName = '';
+  private savedCharId = '';
   showStart(hasSave: boolean, savedCharName = '', savedCharId = '') {
-    this.hasSave = hasSave; this.savedCharName = savedCharName;
+    this.hasSave = hasSave; this.savedCharName = savedCharName; this.savedCharId = savedCharId;
     if (savedCharId) this.chosen = savedCharId;
     $('#loading').classList.add('hidden');
     $('#start').classList.remove('hidden');
@@ -275,42 +303,73 @@ export class UI {
       }).join('');
     }
   }
-  private renderStart(hasSave: boolean) {
-    this.activerGlisserAccueil(); this.majCompte(); this.chargerPersos(); requestAnimationFrame(() => this.titrePousse());
-    const s = t();
-    const body = $('#startBody');
-    body.innerHTML = '';
-    // le mode démo (tout 90 fois plus vite), en haut à côté des langues, visible dès l'accueil
-    const demo = new URLSearchParams(location.search).get('demo') === '1';
-    let d = document.getElementById('demoBtn') as HTMLButtonElement | null;
-    if (!d) { d = el<HTMLButtonElement>('button', 'demoBtn'); d.id = 'demoBtn'; $('#start').appendChild(d); }
-    d.className = 'demoBtn' + (demo ? ' active' : ''); d.textContent = demo ? s.demoOn : s.demoJury; d.title = s.demoOff;
-    d.onclick = () => { const u = new URL(location.href); if (demo) u.searchParams.delete('demo'); else u.searchParams.set('demo', '1'); location.href = u.toString(); };
-    const boutonClassement = () => { const c = el('button', 'btnClassementAccueil', `🏆 ${s.classementT}`); c.onclick = () => this.ouvrirClassement(); return c; };
-    // les personnages en réalité augmentée : la page /ar/ (même style que le bouton du classement)
-    const boutonAR = () => { const a = el('button', 'btnClassementAccueil btnArAccueil', lang() === 'en' ? '📱 Meet the characters in AR' : '📱 Les personnages chez toi'); a.onclick = () => { location.href = '/ar/index.html'; }; return a; };
-    // les regles du jeu : la page /regles/, ouverte par-dessus l'accueil (le jeu reste charge derriere)
-    const boutonRegles = () => { const r = el('button', 'btnClassementAccueil btnReglesAccueil', lang() === 'en' ? '📖 How to play' : '📖 Comment jouer'); r.onclick = () => this.ouvrirRegles(); return r; };
-    const rangAccueil = () => { const r = el('div', 'rangAccueil'); r.append(boutonRegles(), boutonClassement()); return r; };
-    if (hasSave) {                                                      // la règle des jeux : « Continuer » toujours en premier
-      const b = el('button', 'primary vert', `▶ ${s.continueWith(this.savedCharName || s.continue_)}`); agir(b, () => this.h.onContinue()); body.appendChild(b);
-      body.appendChild(el('p', 'hint', s.ouAutrePerso));
-      body.appendChild(rangAccueil());
-      body.appendChild(boutonAR());
-      this.majChoixAccueil(this.chosen);
-      return;
+  private afficherLanguesAccueil() {
+    const zone = $('#start .boutonsLangues'); if (!zone) return;
+    zone.replaceChildren();
+    for (const l of LANGUES) {
+      const b = el<HTMLButtonElement>('button', 'drapeauLangue', DRAPEAUX[l.id]);
+      b.type = 'button'; b.dataset.lang = l.id; b.title = l.nom; b.setAttribute('aria-label', l.nom);
+      b.classList.toggle('active', l.id === lang());
+      b.setAttribute('aria-pressed', String(l.id === lang()));
+      b.onclick = () => {
+        setLang(l.id); this.h.onLang(lang()); this.retranslate();
+      };
+      zone.appendChild(b);
     }
-    body.appendChild(el('p', 'hint', s.chooseTouch));
-    const row = el('div', 'startRow');
-    const nameInput = el<HTMLInputElement>('input', 'nick');
-    nameInput.placeholder = s.yourNick; nameInput.maxLength = 18;
-    const go = el('button', 'primary big', s.play);
-    go.onclick = () => { const c = CATALOG.characters.find(x => x.id === this.chosen)!; this.h.onStart(this.chosen, nameInput.value.trim(), this.perso[this.chosen] ?? { prenom: nameInput.value.trim() || tx(c.name), age: c.age, metier: tx(c.job), couleurs: {} }); };
-    row.append(nameInput, go);
-    body.appendChild(row);
-    body.appendChild(rangAccueil());
-    body.appendChild(boutonAR());
-    if (this.sheetId) this.majChoixAccueil(this.chosen);
+  }
+  private ouvrirMenuAccueil() {
+    const c = el('div', 'fenClassement accueilMenu');
+    c.setAttribute('role', 'dialog'); c.setAttribute('aria-modal', 'true'); c.setAttribute('aria-label', texteAccueil('Menu', 'Menu', 'Menú'));
+    c.appendChild(el('h2', '', texteAccueil('Menu', 'Menu', 'Menú')));
+    const items = el('div', 'accueilMenuItems'); c.appendChild(items);
+    const ajouter = (texte: string, action: () => void) => {
+      const b = el<HTMLButtonElement>('button', 'menuAccueilItem', texte); b.type = 'button';
+      b.onclick = () => { this.fermerModal(); action(); }; items.appendChild(b);
+    };
+    ajouter(texteAccueil('📖 Comment jouer', '📖 How to play', '📖 Cómo jugar'), () => this.ouvrirRegles());
+    ajouter(texteAccueil('🏆 Classement', '🏆 Leaderboard', '🏆 Clasificación'), () => this.ouvrirClassement());
+    ajouter(texteAccueil('📱 Les personnages chez toi', '📱 Meet the characters in AR', '📱 Los personajes en tu casa'), () => { location.href = '/ar/index.html'; });
+    const compte = el<HTMLButtonElement>('button', 'menuAccueilItem compteBtn'); compte.id = 'compteBtn'; compte.type = 'button';
+    compte.disabled = !EL.EN_LIGNE;
+    compte.onclick = () => { this.fermerModal(); this.compte(); }; items.appendChild(compte);
+    if (!EL.EN_LIGNE) compte.textContent = texteAccueil('👤 Compte', '👤 Account', '👤 Cuenta');
+    const demo = el('div', 'demoMenu');
+    demo.appendChild(el('div', 'demoMenuTitre', texteAccueil('⏩ Démo accélérée', '⏩ Accelerated demo', '⏩ Demo acelerada')));
+    const choix = el('div', 'demoChoix'); choix.setAttribute('role', 'group'); choix.setAttribute('aria-label', texteAccueil('Vitesse de la démo', 'Demo speed', 'Velocidad de la demo'));
+    for (const vitesse of [1, 50, 90] as const) {
+      const b = el<HTMLButtonElement>('button', '', vitesse === 1 ? 'Normal' : `×${vitesse}`); b.type = 'button';
+      b.setAttribute('aria-pressed', String(this.vitesseDemo() === vitesse));
+      b.onclick = () => this.choisirDemo(vitesse); choix.appendChild(b);
+    }
+    demo.appendChild(choix); items.appendChild(demo);
+    this.modal(c, true);
+    this.majCompte();
+    const fermer = $('#modal .x'); fermer?.setAttribute('aria-label', texteAccueil('Fermer', 'Close', 'Cerrar'));
+    items.querySelector<HTMLButtonElement>('button')?.focus();
+  }
+  private vitesseDemo(): 1 | 50 | 90 {
+    const valeur = new URLSearchParams(location.search).get('demo');
+    return valeur === '50' ? 50 : valeur === '1' || valeur === '90' ? 90 : 1;
+  }
+  private choisirDemo(vitesse: 1 | 50 | 90) {
+    const u = new URL(location.href);
+    if (vitesse === 1) u.searchParams.delete('demo'); else u.searchParams.set('demo', String(vitesse));
+    if (u.href === location.href) location.reload(); else location.assign(u.href);
+  }
+  private afficherBadgeDemo() {
+    const vitesse = this.vitesseDemo();
+    let badge = document.getElementById('demoBtn') as HTMLButtonElement | null;
+    if (vitesse === 1) { badge?.remove(); return; }
+    if (!badge) { badge = el<HTMLButtonElement>('button', 'demoBadge'); badge.id = 'demoBtn'; badge.type = 'button'; this.root.appendChild(badge); }
+    badge.textContent = `⏩ ×${vitesse}`;
+    badge.title = texteAccueil('Arrêter la démo', 'Stop demo', 'Detener la demo'); badge.setAttribute('aria-label', `${badge.textContent} — ${badge.title}`);
+    badge.onclick = () => this.choisirDemo(1);
+  }
+  private prenomsAccueil: Record<string, string> = {};
+  private renderStart(hasSave: boolean) {
+    this.activerGlisserAccueil(); this.chargerPersos(); this.majCompte(); requestAnimationFrame(() => this.titrePousse());
+    this.hasSave = hasSave;
+    this.majChoixAccueil(this.chosen);
   }
   /** Fiche d'un personnage, ouverte quand on le touche sur l'accueil. */
   private sheetId = '';
@@ -366,7 +425,7 @@ export class UI {
   majCompte() {
     if (!EL.EN_LIGNE) return;
     let b = document.getElementById('compteBtn') as HTMLButtonElement | null;
-    if (!b) { b = el<HTMLButtonElement>('button', 'compteBtn'); b.id = 'compteBtn'; $('#start').appendChild(b); b.onclick = () => this.compte(); }
+    if (!b) return; // le compte existe seulement dans le panneau, jamais dans un coin de l'accueil
     const e = EL.etatCompte();
     b.textContent = `👤 ${e.connecte && !e.invite ? e.pseudo : t().compteT}`;
   }
@@ -405,7 +464,7 @@ export class UI {
     sh.prepend(this.carrousel(id));                                  // sur mobile : ‹ ● ○ ○ › en haut de la fiche
     (sh.querySelector('.x') as HTMLButtonElement).onclick = () => { sh.classList.add('hidden'); $('#startBody').classList.remove('hidden'); this.h.onSheet(false); };
     sh.classList.remove('hidden'); this.activerGlisserFiche();
-    if (window.innerWidth < 640 || window.innerHeight > window.innerWidth) $('#startBody').classList.add('hidden');
+    $('#startBody').classList.add('hidden'); // une seule action principale visible, même sur ordinateur
     this.h.onSheet(true);
   }
   private glisserFiche = false;
@@ -422,13 +481,28 @@ export class UI {
   /** Le bouton du bas suit le choix courant, même quand une autre partie existe. */
   private majChoixAccueil(id: string) {
     const c = CATALOG.characters.find(x => x.id === id); if (!c) return;
-    const s = t(), nom = this.perso[id]?.prenom || tx(c.name), reprise = !!this.parties[id];
-    const body = $('#startBody');
-    const gardes = Array.from(body.querySelectorAll(':scope > .btnClassementAccueil, :scope > .rangAccueil'));   // le classement et le bouton AR restent
-    const bouton = el('button', 'primary vert', reprise ? `▶ ${s.continueWith(nom)}` : `🌱 ${s.jouerAvec(nom)}`);
-    agir(bouton, () => reprise ? this.h.onContinue(id) : this.lancer(id));
-    body.replaceChildren(bouton, el('p', 'hint', s.ouAutrePerso));
-    for (const g of gardes) body.appendChild(g);
+    const s = t(), nom = this.perso[id]?.prenom || (id === this.savedCharId ? this.savedCharName : '') || tx(c.name);
+    const reprise = !!this.parties[id] || (this.hasSave && id === this.savedCharId);
+    const body = $('#startBody'); body.replaceChildren();
+    body.appendChild(el('p', 'hint', texteAccueil('Touche un jardinier', 'Tap a gardener', 'Toca un jardinero')));
+    if (reprise) {
+      const bouton = el('button', 'primary vert', `▶ ${s.continueWith(nom)}`);
+      agir(bouton, () => this.h.onContinue(id)); body.appendChild(bouton);
+      const autre = el<HTMLButtonElement>('button', 'autreJardinier', texteAccueil('Jouer avec un autre jardinier', 'Play with another gardener', 'Jugar con otro jardinero'));
+      autre.type = 'button'; autre.onclick = () => { this.h.onPick(id); this.showSheet(id); };
+      body.appendChild(autre); return;
+    }
+    const nameInput = el<HTMLInputElement>('input', 'nick'); nameInput.placeholder = s.yourNick; nameInput.maxLength = 18;
+    nameInput.setAttribute('aria-label', texteAccueil('Prénom', 'First name', 'Nombre')); nameInput.autocomplete = 'given-name';
+    nameInput.value = this.prenomsAccueil[id] ?? this.perso[id]?.prenom ?? '';
+    nameInput.oninput = () => { this.prenomsAccueil[id] = nameInput.value; };
+    const go = el('button', 'primary big vert', s.play);
+    agir(go, () => {
+      const prenom = nameInput.value.trim();
+      const perso = { ...(this.perso[id] ?? { age: c.age, metier: tx(c.job), couleurs: {} }), prenom: prenom || this.perso[id]?.prenom || tx(c.name) };
+      this.h.onStart(id, prenom, perso);
+    });
+    body.append(nameInput, go);
   }
   private lancer(id: string) {
     const s = t(), c = CATALOG.characters.find(x => x.id === id)!;
@@ -518,7 +592,7 @@ export class UI {
     const rh = $('#recetteHud');
     if (j.recette) {
       const re = ECO.recette(j.recette.recette);
-      const nomR = lang() === 'en' ? re.nom_en : re.nom_fr;
+      const nomR = tx({ fr: re.nom_fr, en: re.nom_en, es: re.nom_es });
       rh.innerHTML = (j.recette.faite ? `<em>${t().recetteHudFaite}</em>`
         : `<em>${t().recetteHud}</em><b>${nomR}</b>` + re.ingredients.map(i => { const n = Math.min(i.quantite, j.panier[i.graine] ?? 0); return `<span class="${n >= i.quantite ? 'ok' : ''}">${icon(i.graine)} ${n}/${i.quantite}</span>`; }).join('')) + '<i class="chev">›</i>';
       rh.classList.remove('hidden');
@@ -711,6 +785,7 @@ export class UI {
     box.innerHTML = ''; box.appendChild(contenu);
     if (fermable) { const x = el('button', 'x', '×'); x.onclick = () => this.fermerModal(); box.prepend(x); m.onclick = (e) => { if (e.target === m) this.fermerModal(); }; }
     else m.onclick = null;
+    m.classList.toggle('depuisAccueil', !$('#start').classList.contains('hidden'));
     m.classList.remove('hidden');
   }
   fermerModal() { $('#modal').classList.add('hidden'); }
@@ -721,7 +796,7 @@ export class UI {
     const s = t(), re = ECO.recette(recetteId);
     const c = el('div', 'platPret');
     c.appendChild(el('small', '', s.tuAsCuisine));
-    c.appendChild(el('h3', '', lang() === 'en' ? re.nom_en : re.nom_fr));
+    c.appendChild(el('h3', '', tx({ fr: re.nom_fr, en: re.nom_en, es: re.nom_es })));
     const im = imagePlat(re, 'ficheImg'); im.onclick = () => this.fiche(re.id); c.appendChild(im);
     c.appendChild(el('p', 'q', s.aQuiOffrir));
     for (const v of voisins) { const b = el('button', 'seed', `<span>${s.offrirA} ${v.nom}</span><small>${v.icons}</small>`); b.onclick = () => { this.fermerModal(); offrir(v.id); }; c.appendChild(b); }
@@ -956,8 +1031,12 @@ export class UI {
   openSettings() {
     const s = t();
     const card = $('#settingsCard'); card.innerHTML = `<h3>${s.settings}</h3>`;
-    const langRow = el('div', 'setrow', `<span>${s.language}</span>`);
-    for (const l of ['fr', 'en'] as Lang[]) { const b = el('button', l === lang() ? 'active' : '', l.toUpperCase()); b.onclick = () => { setLang(l); this.h.onLang(l); this.retranslate(); this.openSettings(); }; langRow.appendChild(b); }
+    const langRow = el('div', 'setrow languesReglages'); langRow.setAttribute('role', 'group'); langRow.setAttribute('aria-label', 'Langue / Language / Idioma');
+    for (const l of LANGUES) {
+      const b = el<HTMLButtonElement>('button', 'drapeauLangue' + (l.id === lang() ? ' active' : ''), DRAPEAUX[l.id]);
+      b.type = 'button'; b.title = l.nom; b.setAttribute('aria-label', l.nom); b.setAttribute('aria-pressed', String(l.id === lang()));
+      b.onclick = () => { setLang(l.id); this.h.onLang(l.id); this.retranslate(); this.openSettings(); }; langRow.appendChild(b);
+    }
     card.appendChild(langRow);
     const nightRow = el('div', 'setrow', `<span>${s.forceNight}</span>`);
     for (const m of ['auto', 'day', 'night'] as const) { const b = el('button', m === this.nightMode ? 'active' : '', m === 'auto' ? s.auto : m === 'day' ? s.day : s.night); b.onclick = () => { this.nightMode = m; this.h.onNight(m); this.openSettings(); }; nightRow.appendChild(b); }

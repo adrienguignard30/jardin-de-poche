@@ -5,6 +5,12 @@
   "famille": "herbe",
   "nom_fr": "Basilic",
   "nom_en": "Basil",
+  "nom_es": "Albahaca",
+  "quantite_es": {
+   "singulier": "albahaca",
+   "pluriel": "albahaca",
+   "unite": "ramita"
+  },
   "pousse_min": 8,
   "recoltes": 3,
   "unites_par_recolte": 2,
@@ -12,8 +18,10 @@
   "couleur": "#4f9d3a",
   "phrase_fr": "Il adore la chaleur et qu'on le pince souvent.",
   "phrase_en": "It loves warmth and being pinched often.",
+  "phrase_es": "Le encanta el calor y que le despuntes los tallos a menudo.",
   "interdit_fr": "Trop de vent ici : le basilic n'y tiendrait pas.",
-  "interdit_en": "Too windy here: basil wouldn't last."
+  "interdit_en": "Too windy here: basil wouldn't last.",
+  "interdit_es": "Aquí hace demasiado viento: la albahaca no aguantaría."
  },
  {
   "id": "menthe",
@@ -21,6 +29,12 @@
   "famille": "herbe",
   "nom_fr": "Menthe",
   "nom_en": "Mint",
+  "nom_es": "Menta",
+  "quantite_es": {
+   "singulier": "menta",
+   "pluriel": "menta",
+   "unite": "ramita"
+  },
   "pousse_min": 15,
   "recoltes": 3,
   "unites_par_recolte": 2,
@@ -28,8 +42,10 @@
   "couleur": "#3fbf8a",
   "phrase_fr": "Elle pousse partout, surtout là où on ne l'attend pas.",
   "phrase_en": "It grows everywhere, especially where you least expect it.",
+  "phrase_es": "Crece por todas partes, sobre todo donde menos te lo esperas.",
   "interdit_fr": "Pas assez d'eau sur ce balcon pour une menthe gourmande.",
-  "interdit_en": "Not enough water on this balcony for thirsty mint."
+  "interdit_en": "Not enough water on this balcony for thirsty mint.",
+  "interdit_es": "No hay suficiente agua en este balcón para una menta tan sedienta."
  },
  {
   "id": "thym",
@@ -37,6 +53,12 @@
   "famille": "herbe",
   "nom_fr": "Thym",
   "nom_en": "Thyme",
+  "nom_es": "Tomillo",
+  "quantite_es": {
+   "singulier": "tomillo",
+   "pluriel": "tomillo",
+   "unite": "ramita"
+  },
   "pousse_min": 18,
   "recoltes": 3,
   "unites_par_recolte": 2,
@@ -44,8 +66,10 @@
   "couleur": "#7a8f5a",
   "phrase_fr": "Un peu de soleil, très peu d'eau, beaucoup de parfum.",
   "phrase_en": "A little sun, very little water, lots of scent.",
+  "phrase_es": "Un poco de sol, muy poca agua y mucho aroma.",
   "interdit_fr": "Trop d'humidité ici : le thym y pourrirait.",
-  "interdit_en": "Too damp here: thyme would rot."
+  "interdit_en": "Too damp here: thyme would rot.",
+  "interdit_es": "Aquí hay demasiada humedad: el tomillo se pudriría."
  },
  {
   "id": "ciboulette",
@@ -53,6 +77,12 @@
   "famille": "herbe",
   "nom_fr": "Ciboulette",
   "nom_en": "Chives",
+  "nom_es": "Cebollino",
+  "quantite_es": {
+   "singulier": "cebollino",
+   "pluriel": "cebollino",
+   "unite": "ramita"
+  },
   "pousse_min": 10,
   "recoltes": 3,
   "unites_par_recolte": 2,
@@ -60,8 +90,10 @@
   "couleur": "#5aa84a",
   "phrase_fr": "On la coupe, elle repousse, et elle recommence.",
   "phrase_en": "You cut it, it grows back, again and again.",
+  "phrase_es": "Lo cortas, vuelve a crecer y empieza de nuevo.",
   "interdit_fr": "Trop d'ombre ici pour une ciboulette bien droite.",
-  "interdit_en": "Too shady here for upright chives."
+  "interdit_en": "Too shady here for upright chives.",
+  "interdit_es": "Aquí hay demasiada sombra para que el cebollino crezca erguido."
  },
  {
   "id": "coriandre",
@@ -69,6 +101,12 @@
   "famille": "herbe",
   "nom_fr": "Coriandre",
   "nom_en": "Coriander",
+  "nom_es": "Cilantro",
+  "quantite_es": {
+   "singulier": "cilantro",
+   "pluriel": "cilantro",
+   "unite": "ramita"
+  },
   "pousse_min": 12,
   "recoltes": 3,
   "unites_par_recolte": 2,
@@ -76,8 +114,10 @@
   "couleur": "#6cb85a",
   "phrase_fr": "On l'aime ou on la déteste, elle s'en moque.",
   "phrase_en": "You love it or hate it, it doesn't care.",
+  "phrase_es": "Lo adoras o lo detestas, a él le da igual.",
   "interdit_fr": "Trop chaud ici : la coriandre monterait en graines.",
-  "interdit_en": "Too hot here: coriander would bolt."
+  "interdit_en": "Too hot here: coriander would bolt.",
+  "interdit_es": "Aquí hace demasiado calor: el cilantro se espigaría."
  },
  {
   "id": "persil",
@@ -85,6 +125,12 @@
   "famille": "herbe",
   "nom_fr": "Persil plat",
   "nom_en": "Flat parsley",
+  "nom_es": "Perejil de hoja plana",
+  "quantite_es": {
+   "singulier": "perejil de hoja plana",
+   "pluriel": "perejil de hoja plana",
+   "unite": "ramita"
+  },
   "pousse_min": 14,
   "recoltes": 3,
   "unites_par_recolte": 2,
@@ -92,8 +138,10 @@
   "couleur": "#3f8a3a",
   "phrase_fr": "Patient au début, généreux ensuite.",
   "phrase_en": "Slow at first, generous after.",
+  "phrase_es": "Paciente al principio, generoso después.",
   "interdit_fr": "Le pot est trop petit pour ses longues racines.",
-  "interdit_en": "The pot is too small for its long roots."
+  "interdit_en": "The pot is too small for its long roots.",
+  "interdit_es": "La maceta es demasiado pequeña para sus largas raíces."
  },
  {
   "id": "radis",
@@ -101,6 +149,11 @@
   "famille": "légume",
   "nom_fr": "Radis",
   "nom_en": "Radish",
+  "nom_es": "Rábano",
+  "quantite_es": {
+   "singulier": "rábano",
+   "pluriel": "rábanos"
+  },
   "pousse_min": 40,
   "recoltes": 1,
   "unites_par_recolte": 4,
@@ -108,8 +161,10 @@
   "couleur": "#d94a6a",
   "phrase_fr": "Le plus pressé du balcon.",
   "phrase_en": "The most impatient one on the balcony.",
+  "phrase_es": "El que más prisa tiene de todo el balcón.",
   "interdit_fr": "Trop de pigeons ici : ils déterrent les radis.",
-  "interdit_en": "Too many pigeons here: they dig up radishes."
+  "interdit_en": "Too many pigeons here: they dig up radishes.",
+  "interdit_es": "Aquí hay demasiadas palomas: desenterrarían los rábanos."
  },
  {
   "id": "salade",
@@ -117,6 +172,12 @@
   "famille": "légume",
   "nom_fr": "Laitue",
   "nom_en": "Lettuce",
+  "nom_es": "Lechuga",
+  "quantite_es": {
+   "singulier": "lechuga",
+   "pluriel": "lechuga",
+   "unite": "puñado"
+  },
   "pousse_min": 50,
   "recoltes": 1,
   "unites_par_recolte": 3,
@@ -124,8 +185,10 @@
   "couleur": "#8ccf5a",
   "phrase_fr": "Fraîche, croquante, et un peu frileuse.",
   "phrase_en": "Fresh, crunchy and a little chilly.",
+  "phrase_es": "Fresca, crujiente y un poco friolera.",
   "interdit_fr": "Trop de soleil l'après-midi : la laitue y brûlerait.",
-  "interdit_en": "Too much afternoon sun: lettuce would scorch."
+  "interdit_en": "Too much afternoon sun: lettuce would scorch.",
+  "interdit_es": "Hay demasiado sol por la tarde: la lechuga se quemaría."
  },
  {
   "id": "epinard",
@@ -133,6 +196,12 @@
   "famille": "légume",
   "nom_fr": "Épinard",
   "nom_en": "Spinach",
+  "nom_es": "Espinaca",
+  "quantite_es": {
+   "singulier": "espinacas",
+   "pluriel": "espinacas",
+   "unite": "puñado"
+  },
   "pousse_min": 55,
   "recoltes": 1,
   "unites_par_recolte": 3,
@@ -140,8 +209,10 @@
   "couleur": "#2f7a3a",
   "phrase_fr": "Il aime la fraîcheur et les matins gris.",
   "phrase_en": "It loves cool air and grey mornings.",
+  "phrase_es": "Le gusta el frescor y las mañanas grises.",
   "interdit_fr": "Trop chaud sur ce balcon pour des épinards tendres.",
-  "interdit_en": "Too warm on this balcony for tender spinach."
+  "interdit_en": "Too warm on this balcony for tender spinach.",
+  "interdit_es": "En este balcón hace demasiado calor para unas espinacas tiernas."
  },
  {
   "id": "oignon",
@@ -149,6 +220,11 @@
   "famille": "légume",
   "nom_fr": "Oignon nouveau",
   "nom_en": "Spring onion",
+  "nom_es": "Cebolleta",
+  "quantite_es": {
+   "singulier": "cebolleta",
+   "pluriel": "cebolletas"
+  },
   "pousse_min": 60,
   "recoltes": 1,
   "unites_par_recolte": 3,
@@ -156,8 +232,10 @@
   "couleur": "#c9b8e8",
   "phrase_fr": "Discret dans le pot, indispensable dans l'assiette.",
   "phrase_en": "Quiet in the pot, essential on the plate.",
+  "phrase_es": "Discreta en la maceta, imprescindible en el plato.",
   "interdit_fr": "Pas assez de profondeur ici pour des oignons.",
-  "interdit_en": "Not deep enough here for onions."
+  "interdit_en": "Not deep enough here for onions.",
+  "interdit_es": "Aquí no hay suficiente profundidad para las cebollas."
  },
  {
   "id": "carotte",
@@ -165,6 +243,11 @@
   "famille": "légume",
   "nom_fr": "Carotte",
   "nom_en": "Carrot",
+  "nom_es": "Zanahoria",
+  "quantite_es": {
+   "singulier": "zanahoria",
+   "pluriel": "zanahorias"
+  },
   "pousse_min": 90,
   "recoltes": 1,
   "unites_par_recolte": 4,
@@ -172,8 +255,10 @@
   "couleur": "#f08a24",
   "phrase_fr": "Tout se passe sous la terre, en secret.",
   "phrase_en": "It all happens underground, in secret.",
+  "phrase_es": "Todo ocurre bajo tierra, en secreto.",
   "interdit_fr": "Le pot est trop peu profond pour des carottes.",
-  "interdit_en": "The pot is too shallow for carrots."
+  "interdit_en": "The pot is too shallow for carrots.",
+  "interdit_es": "La maceta es demasiado poco profunda para las zanahorias."
  },
  {
   "id": "haricot",
@@ -181,6 +266,11 @@
   "famille": "légume",
   "nom_fr": "Haricot vert",
   "nom_en": "Green bean",
+  "nom_es": "Judía verde",
+  "quantite_es": {
+   "singulier": "judía verde",
+   "pluriel": "judías verdes"
+  },
   "pousse_min": 100,
   "recoltes": 2,
   "unites_par_recolte": 4,
@@ -188,8 +278,10 @@
   "couleur": "#4f9d3a",
   "phrase_fr": "Il grimpe dès qu'on lui tend la main.",
   "phrase_en": "It climbs as soon as you lend a hand.",
+  "phrase_es": "Trepa en cuanto le echas una mano.",
   "interdit_fr": "Pas de place pour un tuteur ici : les haricots s'effondreraient.",
-  "interdit_en": "No room for a stake here: beans would topple."
+  "interdit_en": "No room for a stake here: beans would topple.",
+  "interdit_es": "Aquí no hay sitio para un tutor: las judías se caerían."
  },
  {
   "id": "courgette",
@@ -197,6 +289,11 @@
   "famille": "légume",
   "nom_fr": "Courgette",
   "nom_en": "Zucchini",
+  "nom_es": "Calabacín",
+  "quantite_es": {
+   "singulier": "calabacín",
+   "pluriel": "calabacines"
+  },
   "pousse_min": 110,
   "recoltes": 2,
   "unites_par_recolte": 3,
@@ -204,8 +301,10 @@
   "couleur": "#3f7a2f",
   "phrase_fr": "Elle prend toute la place, et elle a raison.",
   "phrase_en": "It takes all the room, and it's right to.",
+  "phrase_es": "Ocupa todo el espacio, y hace bien.",
   "interdit_fr": "Trop à l'étroit ici pour une courgette.",
-  "interdit_en": "Too cramped here for a zucchini."
+  "interdit_en": "Too cramped here for a zucchini.",
+  "interdit_es": "Aquí no hay suficiente espacio para un calabacín."
  },
  {
   "id": "concombre",
@@ -213,6 +312,11 @@
   "famille": "légume",
   "nom_fr": "Concombre",
   "nom_en": "Cucumber",
+  "nom_es": "Pepino",
+  "quantite_es": {
+   "singulier": "pepino",
+   "pluriel": "pepinos"
+  },
   "pousse_min": 120,
   "recoltes": 1,
   "unites_par_recolte": 3,
@@ -220,8 +324,10 @@
   "couleur": "#5a9a3a",
   "phrase_fr": "De l'eau, du soleil, et de la patience.",
   "phrase_en": "Water, sun and patience.",
+  "phrase_es": "Agua, sol y paciencia.",
   "interdit_fr": "Trop de vent ici : le concombre s'y dessécherait.",
-  "interdit_en": "Too windy here: cucumber would dry out."
+  "interdit_en": "Too windy here: cucumber would dry out.",
+  "interdit_es": "Aquí hace demasiado viento: el pepino se secaría."
  },
  {
   "id": "tomate",
@@ -229,6 +335,11 @@
   "famille": "légume",
   "nom_fr": "Tomate cerise",
   "nom_en": "Cherry tomato",
+  "nom_es": "Tomate cherry",
+  "quantite_es": {
+   "singulier": "tomate cherry",
+   "pluriel": "tomates cherry"
+  },
   "pousse_min": 300,
   "recoltes": 3,
   "unites_par_recolte": 4,
@@ -236,8 +347,10 @@
   "couleur": "#e04a3a",
   "phrase_fr": "Elle aime le soleil du matin et un peu de patience.",
   "phrase_en": "It loves morning sun and a little patience.",
+  "phrase_es": "Le gusta el sol de la mañana y un poco de paciencia.",
   "interdit_fr": "Trop d'ombre sur ce balcon : les tomates n'y mûriraient jamais.",
-  "interdit_en": "Too much shade on this balcony: tomatoes would never ripen."
+  "interdit_en": "Too much shade on this balcony: tomatoes would never ripen.",
+  "interdit_es": "Hay demasiada sombra en este balcón: los tomates nunca madurarían."
  },
  {
   "id": "poivron",
@@ -245,6 +358,11 @@
   "famille": "légume",
   "nom_fr": "Poivron",
   "nom_en": "Bell pepper",
+  "nom_es": "Pimiento",
+  "quantite_es": {
+   "singulier": "pimiento",
+   "pluriel": "pimientos"
+  },
   "pousse_min": 240,
   "recoltes": 2,
   "unites_par_recolte": 3,
@@ -252,8 +370,10 @@
   "couleur": "#d9432b",
   "phrase_fr": "Il rougit doucement, au soleil.",
   "phrase_en": "It blushes slowly in the sun.",
+  "phrase_es": "Se va poniendo rojo poco a poco, al sol.",
   "interdit_fr": "Pas assez chaud ici pour des poivrons.",
-  "interdit_en": "Not warm enough here for peppers."
+  "interdit_en": "Not warm enough here for peppers.",
+  "interdit_es": "Aquí no hace suficiente calor para los pimientos."
  },
  {
   "id": "ail",
@@ -261,6 +381,12 @@
   "famille": "légume",
   "nom_fr": "Ail",
   "nom_en": "Garlic",
+  "nom_es": "Ajo",
+  "quantite_es": {
+   "singulier": "ajo",
+   "pluriel": "ajo",
+   "unite": "diente"
+  },
   "pousse_min": 180,
   "recoltes": 1,
   "unites_par_recolte": 3,
@@ -268,8 +394,10 @@
   "couleur": "#e8e0d0",
   "phrase_fr": "Il dort longtemps, puis il parfume tout.",
   "phrase_en": "It sleeps a long time, then scents everything.",
+  "phrase_es": "Duerme mucho tiempo y luego lo llena todo de aroma.",
   "interdit_fr": "Trop humide ici : l'ail y pourrirait.",
-  "interdit_en": "Too damp here: garlic would rot."
+  "interdit_en": "Too damp here: garlic would rot.",
+  "interdit_es": "Aquí hay demasiada humedad: el ajo se pudriría."
  },
  {
   "id": "fraise",
@@ -277,6 +405,11 @@
   "famille": "fruit",
   "nom_fr": "Fraise",
   "nom_en": "Strawberry",
+  "nom_es": "Fresa",
+  "quantite_es": {
+   "singulier": "fresa",
+   "pluriel": "fresas"
+  },
   "pousse_min": 180,
   "recoltes": 2,
   "unites_par_recolte": 4,
@@ -284,8 +417,10 @@
   "couleur": "#e03a3a",
   "phrase_fr": "Chaque fraise est une petite fête.",
   "phrase_en": "Every strawberry is a little party.",
+  "phrase_es": "Cada fresa es una pequeña fiesta.",
   "interdit_fr": "Les merles du quartier mangeraient toutes les fraises.",
-  "interdit_en": "The neighbourhood blackbirds would eat every strawberry."
+  "interdit_en": "The neighbourhood blackbirds would eat every strawberry.",
+  "interdit_es": "Los mirlos del barrio se comerían todas las fresas."
  },
  {
   "id": "framboise",
@@ -293,6 +428,11 @@
   "famille": "fruit",
   "nom_fr": "Framboise",
   "nom_en": "Raspberry",
+  "nom_es": "Frambuesa",
+  "quantite_es": {
+   "singulier": "frambuesa",
+   "pluriel": "frambuesas"
+  },
   "pousse_min": 180,
   "recoltes": 2,
   "unites_par_recolte": 4,
@@ -300,8 +440,10 @@
   "couleur": "#c9304a",
   "phrase_fr": "Un buisson de douceur, épines comprises.",
   "phrase_en": "A bush of sweetness, thorns included.",
+  "phrase_es": "Un arbusto lleno de dulzura, espinas incluidas.",
   "interdit_fr": "Trop de soleil brûlant ici pour les framboises.",
-  "interdit_en": "Too much scorching sun here for raspberries."
+  "interdit_en": "Too much scorching sun here for raspberries.",
+  "interdit_es": "Aquí el sol es demasiado fuerte para las frambuesas."
  },
  {
   "id": "citron",
@@ -309,6 +451,11 @@
   "famille": "fruit",
   "nom_fr": "Citron",
   "nom_en": "Lemon",
+  "nom_es": "Limón",
+  "quantite_es": {
+   "singulier": "limón",
+   "pluriel": "limones"
+  },
   "pousse_min": 330,
   "recoltes": 2,
   "unites_par_recolte": 3,
@@ -316,8 +463,10 @@
   "couleur": "#f2d23a",
   "phrase_fr": "Un petit arbre qui sent les vacances.",
   "phrase_en": "A little tree that smells like holidays.",
+  "phrase_es": "Un arbolito que huele a vacaciones.",
   "interdit_fr": "Trop froid l'hiver ici : le citronnier gèlerait.",
-  "interdit_en": "Too cold in winter here: the lemon tree would freeze."
+  "interdit_en": "Too cold in winter here: the lemon tree would freeze.",
+  "interdit_es": "Aquí hace demasiado frío en invierno: el limonero se helaría."
  },
  {
   "id": "peche",
@@ -325,6 +474,11 @@
   "famille": "fruit",
   "nom_fr": "Pêche",
   "nom_en": "Peach",
+  "nom_es": "Melocotón",
+  "quantite_es": {
+   "singulier": "melocotón",
+   "pluriel": "melocotones"
+  },
   "pousse_min": 340,
   "recoltes": 1,
   "unites_par_recolte": 3,
@@ -332,8 +486,10 @@
   "couleur": "#f4a07a",
   "phrase_fr": "Un arbre nain, des fruits de géant.",
   "phrase_en": "A dwarf tree, giant fruit.",
+  "phrase_es": "Un árbol enano con frutos de gigante.",
   "interdit_fr": "Pas assez de place ici pour un pêcher.",
-  "interdit_en": "Not enough room here for a peach tree."
+  "interdit_en": "Not enough room here for a peach tree.",
+  "interdit_es": "Aquí no hay suficiente sitio para un melocotonero."
  },
  {
   "id": "melon",
@@ -341,6 +497,11 @@
   "famille": "fruit",
   "nom_fr": "Melon",
   "nom_en": "Melon",
+  "nom_es": "Melón",
+  "quantite_es": {
+   "singulier": "melón",
+   "pluriel": "melones"
+  },
   "pousse_min": 360,
   "recoltes": 1,
   "unites_par_recolte": 3,
@@ -348,8 +509,10 @@
   "couleur": "#e8b85a",
   "phrase_fr": "Il aime la chaleur et qu'on ne le presse pas.",
   "phrase_en": "It loves heat and not being rushed.",
+  "phrase_es": "Le gusta el calor y que no le metan prisa.",
   "interdit_fr": "Trop à l'ombre ici : le melon n'y sucrerait pas.",
-  "interdit_en": "Too shady here: melon wouldn't sweeten."
+  "interdit_en": "Too shady here: melon wouldn't sweeten.",
+  "interdit_es": "Aquí hay demasiada sombra: el melón no se pondría dulce."
  },
  {
   "id": "papaye",
@@ -357,6 +520,11 @@
   "famille": "fruit",
   "nom_fr": "Papaye",
   "nom_en": "Papaya",
+  "nom_es": "Papaya",
+  "quantite_es": {
+   "singulier": "papaya",
+   "pluriel": "papayas"
+  },
   "pousse_min": 420,
   "recoltes": 1,
   "unites_par_recolte": 3,
@@ -364,8 +532,10 @@
   "couleur": "#f28a3a",
   "phrase_fr": "Un morceau de tropique sur le toit.",
   "phrase_en": "A piece of the tropics on the roof.",
+  "phrase_es": "Un trocito del trópico en la azotea.",
   "interdit_fr": "Trop froid ici : la papaye a besoin d'un toit plein sud.",
-  "interdit_en": "Too cold here: papaya needs a south-facing roof."
+  "interdit_en": "Too cold here: papaya needs a south-facing roof.",
+  "interdit_es": "Aquí hace demasiado frío: la papaya necesita una azotea orientada al sur."
  },
  {
   "id": "mangue",
@@ -373,6 +543,11 @@
   "famille": "fruit",
   "nom_fr": "Mangue",
   "nom_en": "Mango",
+  "nom_es": "Mango",
+  "quantite_es": {
+   "singulier": "mango",
+   "pluriel": "mangos"
+  },
   "pousse_min": 460,
   "recoltes": 1,
   "unites_par_recolte": 3,
@@ -380,8 +555,10 @@
   "couleur": "#f2b23a",
   "phrase_fr": "Elle prend son temps, et ça vaut la peine.",
   "phrase_en": "It takes its time, and it's worth it.",
+  "phrase_es": "Se toma su tiempo, y merece la pena.",
   "interdit_fr": "Trop frais ici : la mangue ne mûrirait pas.",
-  "interdit_en": "Too cool here: mango wouldn't ripen."
+  "interdit_en": "Too cool here: mango wouldn't ripen.",
+  "interdit_es": "Aquí hace demasiado fresco: el mango no maduraría."
  },
  {
   "id": "ananas",
@@ -389,6 +566,11 @@
   "famille": "fruit",
   "nom_fr": "Ananas",
   "nom_en": "Pineapple",
+  "nom_es": "Piña",
+  "quantite_es": {
+   "singulier": "piña",
+   "pluriel": "piñas"
+  },
   "pousse_min": 480,
   "recoltes": 1,
   "unites_par_recolte": 2,
@@ -396,7 +578,9 @@
   "couleur": "#e8c83a",
   "phrase_fr": "Une couronne de feuilles et beaucoup de patience.",
   "phrase_en": "A crown of leaves and lots of patience.",
+  "phrase_es": "Una corona de hojas y mucha paciencia.",
   "interdit_fr": "Trop froid ici pour un ananas.",
-  "interdit_en": "Too cold here for a pineapple."
+  "interdit_en": "Too cold here for a pineapple.",
+  "interdit_es": "Aquí hace demasiado frío para una piña."
  }
 ]

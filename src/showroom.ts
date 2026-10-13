@@ -1,3 +1,4 @@
+import { tx } from './i18n';
 import * as THREE from 'three';
 import { Assets } from './assets';
 import { Character } from './character';
@@ -91,7 +92,7 @@ export class Showroom {
     const n = CATALOG.characters.length;
     for (let i = 0; i < n; i++) {
       const def = CATALOG.characters[i];
-      onProgress(def.name.fr);
+      onProgress(tx(def.name));
       try {
         const asset = await this.assets.loadCharacter(def.id, def.file);
         const c = new Character(this.assets, asset);

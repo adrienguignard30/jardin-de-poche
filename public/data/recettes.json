@@ -6,6 +6,7 @@
   "difficulte": 0,
   "nom_fr": "Fraises au basilic",
   "nom_en": "Strawberries with basil",
+  "nom_es": "Fresas con albahaca",
   "ingredients": [
    {
     "graine": "fraise",
@@ -18,8 +19,10 @@
   ],
   "phrase_fr": "Un dessert frais, fruité et lumineux avec une touche de miel.",
   "phrase_en": "A fresh, fruity and bright dessert with a touch of honey.",
+  "phrase_es": "Un postre fresco, afrutado y lleno de color, con un toque de miel.",
   "amour_fr": "une pincée d'amour",
   "amour_en": "a pinch of love",
+  "amour_es": "una pizca de amor",
   "etapes_fr": [
    "Prépare et coupe fraises, basilic.",
    "Mélange délicatement avec un peu de miel ou de sucre.",
@@ -29,6 +32,11 @@
    "Prepare and cut the strawberries, basil.",
    "Toss gently with a little honey or sugar.",
    "Rest for a few minutes, then serve chilled."
+  ],
+  "etapes_es": [
+   "Prepara y corta fresas y albahaca.",
+   "Mezcla con cuidado con un poco de miel o azúcar.",
+   "Deja reposar unos minutos y sirve fresco."
   ]
  },
  {
@@ -38,6 +46,7 @@
   "difficulte": 0,
   "nom_fr": "Fraises à la menthe",
   "nom_en": "Minted strawberries",
+  "nom_es": "Fresas con menta",
   "ingredients": [
    {
     "graine": "fraise",
@@ -50,8 +59,10 @@
   ],
   "phrase_fr": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
   "phrase_en": "Just a few minutes make this naturally delicious dessert.",
+  "phrase_es": "Solo necesitas unos minutos para este postre delicioso y natural.",
   "amour_fr": "un soupçon d'amour",
   "amour_en": "a hint of love",
+  "amour_es": "un poquito de amor",
   "etapes_fr": [
    "Prépare et coupe fraises, menthe.",
    "Mélange délicatement avec un peu de miel ou de sucre.",
@@ -61,6 +72,11 @@
    "Prepare and cut the strawberries, mint.",
    "Toss gently with a little honey or sugar.",
    "Rest for a few minutes, then serve chilled."
+  ],
+  "etapes_es": [
+   "Prepara y corta fresas y menta.",
+   "Mezcla con cuidado con un poco de miel o azúcar.",
+   "Deja reposar unos minutos y sirve fresco."
   ]
  },
  {
@@ -70,6 +86,7 @@
   "difficulte": 0,
   "nom_fr": "Tomates au basilic",
   "nom_en": "Basil cherry tomatoes",
+  "nom_es": "Tomates con albahaca",
   "ingredients": [
    {
     "graine": "tomate",
@@ -82,8 +99,10 @@
   ],
   "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
   "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "phrase_es": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
   "amour_fr": "fait avec beaucoup d'amour",
   "amour_en": "made with lots of love",
+  "amour_es": "hecho con mucho amor",
   "etapes_fr": [
    "Lave puis prépare tomates cerises, basilic.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -93,6 +112,11 @@
    "Wash and prepare the cherry tomatoes, basil.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara tomates cherry y albahaca.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -102,6 +126,7 @@
   "difficulte": 0,
   "nom_fr": "Radis à la ciboulette",
   "nom_en": "Radishes with chives",
+  "nom_es": "Rábanos con cebollino",
   "ingredients": [
    {
     "graine": "radis",
@@ -114,8 +139,10 @@
   ],
   "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
   "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "phrase_es": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
   "amour_fr": "une larme d'amour",
   "amour_en": "a drop of love",
+  "amour_es": "una lágrima de amor",
   "etapes_fr": [
    "Lave puis prépare radis, ciboulette.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -125,6 +152,11 @@
    "Wash and prepare the radish, chives.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara rábanos y cebollino.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -134,6 +166,7 @@
   "difficulte": 0,
   "nom_fr": "Carottes à la coriandre",
   "nom_en": "Carrots with coriander",
+  "nom_es": "Zanahorias con cilantro",
   "ingredients": [
    {
     "graine": "carotte",
@@ -146,8 +179,10 @@
   ],
   "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
   "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "phrase_es": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
   "amour_fr": "un nuage d'amour",
   "amour_en": "a cloud of love",
+  "amour_es": "una nube de amor",
   "etapes_fr": [
    "Lave puis prépare carotte, coriandre.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -157,6 +192,11 @@
    "Wash and prepare the carrot, coriander.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara zanahoria y cilantro.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -166,6 +206,7 @@
   "difficulte": 0,
   "nom_fr": "Concombre à la menthe",
   "nom_en": "Minted cucumber",
+  "nom_es": "Pepino con menta",
   "ingredients": [
    {
     "graine": "concombre",
@@ -178,8 +219,10 @@
   ],
   "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
   "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "phrase_es": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
   "amour_fr": "une poignée de tendresse",
   "amour_en": "a handful of tenderness",
+  "amour_es": "un puñado de ternura",
   "etapes_fr": [
    "Lave puis prépare concombre, menthe.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -189,6 +232,11 @@
    "Wash and prepare the cucumber, mint.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara pepino y menta.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -198,6 +246,7 @@
   "difficulte": 1,
   "nom_fr": "Salade croquante du balcon",
   "nom_en": "Crunchy balcony salad",
+  "nom_es": "Ensalada crujiente del balcón",
   "ingredients": [
    {
     "graine": "salade",
@@ -214,8 +263,10 @@
   ],
   "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
   "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "phrase_es": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
   "amour_fr": "un zeste de tendresse",
   "amour_en": "a zest of tenderness",
+  "amour_es": "un toque de ternura",
   "etapes_fr": [
    "Lave puis prépare laitue, radis, concombre.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -225,6 +276,11 @@
    "Wash and prepare the lettuce, radish, cucumber.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara lechuga, rábanos y pepino.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -234,6 +290,7 @@
   "difficulte": 1,
   "nom_fr": "Tomates fraîches au persil",
   "nom_en": "Fresh parsley tomatoes",
+  "nom_es": "Tomates frescos con perejil",
   "ingredients": [
    {
     "graine": "tomate",
@@ -250,8 +307,10 @@
   ],
   "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
   "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "phrase_es": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
   "amour_fr": "un filet d'amour",
   "amour_en": "a drizzle of love",
+  "amour_es": "un chorrito de amor",
   "etapes_fr": [
    "Lave puis prépare tomates cerises, persil plat, oignon nouveau.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -261,6 +320,11 @@
    "Wash and prepare the cherry tomatoes, flat parsley, spring onion.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara tomates cherry, perejil de hoja plana y cebolleta.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -270,6 +334,7 @@
   "difficulte": 1,
   "nom_fr": "Rubans de courgette citronnés",
   "nom_en": "Lemony zucchini ribbons",
+  "nom_es": "Cintas de calabacín al limón",
   "ingredients": [
    {
     "graine": "courgette",
@@ -286,8 +351,10 @@
   ],
   "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
   "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "phrase_es": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
   "amour_fr": "une cuillère de câlins",
   "amour_en": "a spoonful of hugs",
+  "amour_es": "una cucharada de abrazos",
   "etapes_fr": [
    "Lave puis prépare courgette, citron, basilic.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -297,6 +364,11 @@
    "Wash and prepare the zucchini, lemon, basil.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara calabacín, limón y albahaca.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -306,6 +378,7 @@
   "difficulte": 1,
   "nom_fr": "Poivron vif à la coriandre",
   "nom_en": "Bright coriander pepper",
+  "nom_es": "Pimiento lleno de sabor con cilantro",
   "ingredients": [
    {
     "graine": "poivron",
@@ -322,8 +395,10 @@
   ],
   "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
   "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "phrase_es": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
   "amour_fr": "un brin de douceur",
   "amour_en": "a sprig of sweetness",
+  "amour_es": "un poquito de dulzura",
   "etapes_fr": [
    "Lave puis prépare poivron, coriandre, citron.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -333,6 +408,11 @@
    "Wash and prepare the bell pepper, coriander, lemon.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara pimiento, cilantro y limón.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -342,6 +422,7 @@
   "difficulte": 1,
   "nom_fr": "Épinards aux radis",
   "nom_en": "Spinach and radish salad",
+  "nom_es": "Espinacas con rábanos",
   "ingredients": [
    {
     "graine": "epinard",
@@ -358,8 +439,10 @@
   ],
   "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
   "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "phrase_es": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
   "amour_fr": "un grain de folie douce",
   "amour_en": "a grain of sweet madness",
+  "amour_es": "una pizca de dulce locura",
   "etapes_fr": [
    "Lave puis prépare épinards, radis, ciboulette.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -369,6 +452,11 @@
    "Wash and prepare the spinach, radish, chives.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara espinacas, rábanos y cebollino.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -378,6 +466,7 @@
   "difficulte": 1,
   "nom_fr": "Haricots aux tomates",
   "nom_en": "Green beans with tomatoes",
+  "nom_es": "Judías verdes con tomates",
   "ingredients": [
    {
     "graine": "haricot",
@@ -394,8 +483,10 @@
   ],
   "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
   "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "phrase_es": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
   "amour_fr": "une caresse de soleil",
   "amour_en": "a caress of sunshine",
+  "amour_es": "una caricia de sol",
   "etapes_fr": [
    "Lave puis prépare haricots verts, tomates cerises, persil plat.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -405,6 +496,11 @@
    "Wash and prepare the green beans, cherry tomatoes, flat parsley.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara judías verdes, tomates cherry y perejil de hoja plana.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -414,6 +510,7 @@
   "difficulte": 1,
   "nom_fr": "Carottes fraîches à la menthe",
   "nom_en": "Fresh minted carrots",
+  "nom_es": "Zanahorias frescas con menta",
   "ingredients": [
    {
     "graine": "carotte",
@@ -430,8 +527,10 @@
   ],
   "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
   "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "phrase_es": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
   "amour_fr": "un sourire en plus",
   "amour_en": "one more smile",
+  "amour_es": "una sonrisa más",
   "etapes_fr": [
    "Lave puis prépare carotte, menthe, citron.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -441,6 +540,11 @@
    "Wash and prepare the carrot, mint, lemon.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara zanahoria, menta y limón.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -450,6 +554,7 @@
   "difficulte": 1,
   "nom_fr": "Concombre à la coriandre",
   "nom_en": "Coriander cucumber",
+  "nom_es": "Pepino con cilantro",
   "ingredients": [
    {
     "graine": "concombre",
@@ -466,8 +571,10 @@
   ],
   "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
   "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "phrase_es": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
   "amour_fr": "une bonne dose d'amour",
   "amour_en": "a good dose of love",
+  "amour_es": "una buena dosis de amor",
   "etapes_fr": [
    "Lave puis prépare concombre, oignon nouveau, coriandre.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -477,6 +584,11 @@
    "Wash and prepare the cucumber, spring onion, coriander.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara pepino, cebolleta y cilantro.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -486,6 +598,7 @@
   "difficulte": 1,
   "nom_fr": "Laitue pêche basilic",
   "nom_en": "Peach basil lettuce",
+  "nom_es": "Lechuga, melocotón y albahaca",
   "ingredients": [
    {
     "graine": "salade",
@@ -502,8 +615,10 @@
   ],
   "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
   "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "phrase_es": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
   "amour_fr": "un clin d'œil d'amour",
   "amour_en": "a wink of love",
+  "amour_es": "un guiño de amor",
   "etapes_fr": [
    "Lave puis prépare laitue, pêche, basilic.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -513,6 +628,11 @@
    "Wash and prepare the lettuce, peach, basil.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara lechuga, melocotón y albahaca.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -522,6 +642,7 @@
   "difficulte": 1,
   "nom_fr": "Radis citron persil",
   "nom_en": "Lemony parsley radishes",
+  "nom_es": "Rábanos, limón y perejil",
   "ingredients": [
    {
     "graine": "radis",
@@ -538,8 +659,10 @@
   ],
   "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
   "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "phrase_es": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
   "amour_fr": "un peu de cœur",
   "amour_en": "a little heart",
+  "amour_es": "un poquito de corazón",
   "etapes_fr": [
    "Lave puis prépare radis, persil plat, citron.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -549,6 +672,11 @@
    "Wash and prepare the radish, flat parsley, lemon.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara rábanos, perejil de hoja plana y limón.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -558,6 +686,7 @@
   "difficulte": 1,
   "nom_fr": "Tomates au poivron croquant",
   "nom_en": "Tomatoes with crisp pepper",
+  "nom_es": "Tomates con pimiento crujiente",
   "ingredients": [
    {
     "graine": "tomate",
@@ -574,8 +703,10 @@
   ],
   "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
   "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "phrase_es": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
   "amour_fr": "tout son cœur",
   "amour_en": "all your heart",
+  "amour_es": "todo el corazón",
   "etapes_fr": [
    "Lave puis prépare tomates cerises, poivron, ciboulette.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -585,6 +716,11 @@
    "Wash and prepare the cherry tomatoes, bell pepper, chives.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara tomates cherry, pimiento y cebollino.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -594,6 +730,7 @@
   "difficulte": 1,
   "nom_fr": "Courgette fraîche à la menthe",
   "nom_en": "Fresh minted zucchini",
+  "nom_es": "Calabacín fresco con menta",
   "ingredients": [
    {
     "graine": "courgette",
@@ -610,8 +747,10 @@
   ],
   "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
   "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "phrase_es": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
   "amour_fr": "un bisou du chef",
   "amour_en": "a chef's kiss",
+  "amour_es": "un beso de quien cocina",
   "etapes_fr": [
    "Lave puis prépare courgette, menthe, oignon nouveau.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -621,6 +760,11 @@
    "Wash and prepare the zucchini, mint, spring onion.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara calabacín, menta y cebolleta.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -630,6 +774,7 @@
   "difficulte": 1,
   "nom_fr": "Courgette dorée au thym",
   "nom_en": "Golden thyme zucchini",
+  "nom_es": "Calabacín dorado con tomillo",
   "ingredients": [
    {
     "graine": "courgette",
@@ -646,8 +791,10 @@
   ],
   "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
   "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "phrase_es": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
   "amour_fr": "une touche de tendresse",
   "amour_en": "a touch of tenderness",
+  "amour_es": "un toque de ternura",
   "etapes_fr": [
    "Prépare et coupe courgette, ail, thym.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -657,6 +804,11 @@
    "Prepare and cut the zucchini, garlic, thyme.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta calabacín, ajo y tomillo.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -666,6 +818,7 @@
   "difficulte": 1,
   "nom_fr": "Haricots persillés à l'ail",
   "nom_en": "Garlic parsley beans",
+  "nom_es": "Judías verdes con perejil y ajo",
   "ingredients": [
    {
     "graine": "haricot",
@@ -682,8 +835,10 @@
   ],
   "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
   "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "phrase_es": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
   "amour_fr": "une pluie d'amour",
   "amour_en": "a shower of love",
+  "amour_es": "una lluvia de amor",
   "etapes_fr": [
    "Prépare et coupe haricots verts, ail, persil plat.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -693,6 +848,11 @@
    "Prepare and cut the green beans, garlic, flat parsley.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta judías verdes, ajo y perejil de hoja plana.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -702,6 +862,7 @@
   "difficulte": 1,
   "nom_fr": "Poivron fondant aux tomates",
   "nom_en": "Tender pepper and tomatoes",
+  "nom_es": "Pimiento tierno con tomates",
   "ingredients": [
    {
     "graine": "poivron",
@@ -718,8 +879,10 @@
   ],
   "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
   "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "phrase_es": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
   "amour_fr": "un murmure d'amour",
   "amour_en": "a whisper of love",
+  "amour_es": "un susurro de amor",
   "etapes_fr": [
    "Prépare et coupe poivron, tomates cerises, oignon nouveau.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -729,6 +892,11 @@
    "Prepare and cut the bell pepper, cherry tomatoes, spring onion.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta pimiento, tomates cherry y cebolleta.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -738,6 +906,7 @@
   "difficulte": 1,
   "nom_fr": "Épinards ail citron",
   "nom_en": "Lemony garlic spinach",
+  "nom_es": "Espinacas, ajo y limón",
   "ingredients": [
    {
     "graine": "epinard",
@@ -754,8 +923,10 @@
   ],
   "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
   "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "phrase_es": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
   "amour_fr": "une étincelle d'amour",
   "amour_en": "a spark of love",
+  "amour_es": "una chispa de amor",
   "etapes_fr": [
    "Prépare et coupe épinards, ail, citron.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -765,6 +936,11 @@
    "Prepare and cut the spinach, garlic, lemon.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta espinacas, ajo y limón.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -774,6 +950,7 @@
   "difficulte": 1,
   "nom_fr": "Carottes rôties au thym",
   "nom_en": "Thyme-roasted carrots",
+  "nom_es": "Zanahorias asadas con tomillo",
   "ingredients": [
    {
     "graine": "carotte",
@@ -790,8 +967,10 @@
   ],
   "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
   "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "phrase_es": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
   "amour_fr": "un voile de douceur",
   "amour_en": "a veil of sweetness",
+  "amour_es": "un velo de dulzura",
   "etapes_fr": [
    "Prépare et coupe carotte, thym, oignon nouveau.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -801,6 +980,11 @@
    "Prepare and cut the carrot, thyme, spring onion.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta zanahoria, tomillo y cebolleta.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -810,6 +994,7 @@
   "difficulte": 1,
   "nom_fr": "Courgette tomate basilic",
   "nom_en": "Zucchini tomato basil",
+  "nom_es": "Calabacín, tomate y albahaca",
   "ingredients": [
    {
     "graine": "courgette",
@@ -826,8 +1011,10 @@
   ],
   "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
   "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "phrase_es": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
   "amour_fr": "une bouffée de bonheur",
   "amour_en": "a breath of happiness",
+  "amour_es": "un soplo de felicidad",
   "etapes_fr": [
    "Prépare et coupe courgette, tomates cerises, basilic.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -837,6 +1024,11 @@
    "Prepare and cut the zucchini, cherry tomatoes, basil.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta calabacín, tomates cherry y albahaca.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -846,6 +1038,7 @@
   "difficulte": 1,
   "nom_fr": "Haricots au poivron",
   "nom_en": "Green beans and pepper",
+  "nom_es": "Judías verdes con pimiento",
   "ingredients": [
    {
     "graine": "haricot",
@@ -862,8 +1055,10 @@
   ],
   "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
   "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "phrase_es": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
   "amour_fr": "une louche d'amour",
   "amour_en": "a ladle of love",
+  "amour_es": "un cucharón de amor",
   "etapes_fr": [
    "Prépare et coupe haricots verts, poivron, coriandre.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -873,6 +1068,11 @@
    "Prepare and cut the green beans, bell pepper, coriander.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta judías verdes, pimiento y cilantro.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -882,6 +1082,7 @@
   "difficulte": 1,
   "nom_fr": "Épinards aux oignons nouveaux",
   "nom_en": "Spinach with spring onions",
+  "nom_es": "Espinacas con cebolletas",
   "ingredients": [
    {
     "graine": "epinard",
@@ -898,8 +1099,10 @@
   ],
   "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
   "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "phrase_es": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
   "amour_fr": "un rayon de tendresse",
   "amour_en": "a ray of tenderness",
+  "amour_es": "un rayo de ternura",
   "etapes_fr": [
    "Prépare et coupe épinards, oignon nouveau, ciboulette.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -909,6 +1112,11 @@
    "Prepare and cut the spinach, spring onion, chives.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta espinacas, cebolleta y cebollino.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -918,6 +1126,7 @@
   "difficulte": 1,
   "nom_fr": "Poêlée carotte courgette",
   "nom_en": "Carrot zucchini skillet",
+  "nom_es": "Salteado de zanahoria y calabacín",
   "ingredients": [
    {
     "graine": "carotte",
@@ -934,8 +1143,10 @@
   ],
   "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
   "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "phrase_es": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
   "amour_fr": "un cœur tout entier",
   "amour_en": "a whole heart",
+  "amour_es": "un corazón entero",
   "etapes_fr": [
    "Prépare et coupe carotte, courgette, persil plat.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -945,6 +1156,11 @@
    "Prepare and cut the carrot, zucchini, flat parsley.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta zanahoria, calabacín y perejil de hoja plana.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -954,6 +1170,7 @@
   "difficulte": 1,
   "nom_fr": "Tomates confites minute",
   "nom_en": "Quick thyme tomatoes",
+  "nom_es": "Tomates confitados rápidos",
   "ingredients": [
    {
     "graine": "tomate",
@@ -970,8 +1187,10 @@
   ],
   "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
   "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "phrase_es": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
   "amour_fr": "une miette de magie",
   "amour_en": "a crumb of magic",
+  "amour_es": "una miguita de magia",
   "etapes_fr": [
    "Prépare et coupe tomates cerises, ail, thym.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -981,6 +1200,11 @@
    "Prepare and cut the cherry tomatoes, garlic, thyme.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta tomates cherry, ajo y tomillo.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -990,6 +1214,7 @@
   "difficulte": 1,
   "nom_fr": "Poêlée du soleil",
   "nom_en": "Sunny vegetable skillet",
+  "nom_es": "Salteado soleado",
   "ingredients": [
    {
     "graine": "poivron",
@@ -1006,8 +1231,10 @@
   ],
   "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
   "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "phrase_es": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
   "amour_fr": "un souffle d'amour",
   "amour_en": "a breath of love",
+  "amour_es": "un soplo de amor",
   "etapes_fr": [
    "Prépare et coupe poivron, courgette, basilic.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1017,6 +1244,11 @@
    "Prepare and cut the bell pepper, zucchini, basil.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta pimiento, calabacín y albahaca.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -1026,6 +1258,7 @@
   "difficulte": 1,
   "nom_fr": "Haricots carottes au thym",
   "nom_en": "Thyme beans and carrots",
+  "nom_es": "Judías verdes y zanahorias con tomillo",
   "ingredients": [
    {
     "graine": "haricot",
@@ -1042,8 +1275,10 @@
   ],
   "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
   "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "phrase_es": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
   "amour_fr": "une goutte de bonheur",
   "amour_en": "a drop of happiness",
+  "amour_es": "una gota de felicidad",
   "etapes_fr": [
    "Prépare et coupe haricots verts, carotte, thym.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1053,6 +1288,11 @@
    "Prepare and cut the green beans, carrot, thyme.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta judías verdes, zanahoria y tomillo.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -1062,6 +1302,7 @@
   "difficulte": 1,
   "nom_fr": "Melon fraise menthe",
   "nom_en": "Melon strawberry mint",
+  "nom_es": "Melón, fresa y menta",
   "ingredients": [
    {
     "graine": "melon",
@@ -1078,8 +1319,10 @@
   ],
   "phrase_fr": "Un dessert frais, fruité et lumineux avec une touche de miel.",
   "phrase_en": "A fresh, fruity and bright dessert with a touch of honey.",
+  "phrase_es": "Un postre fresco, afrutado y lleno de color, con un toque de miel.",
   "amour_fr": "un éclat de rire",
   "amour_en": "a burst of laughter",
+  "amour_es": "una carcajada",
   "etapes_fr": [
    "Prépare et coupe melon, fraises, menthe.",
    "Mélange délicatement avec un peu de miel ou de sucre.",
@@ -1089,6 +1332,11 @@
    "Prepare and cut the melon, strawberries, mint.",
    "Toss gently with a little honey or sugar.",
    "Rest for a few minutes, then serve chilled."
+  ],
+  "etapes_es": [
+   "Prepara y corta melón, fresas y menta.",
+   "Mezcla con cuidado con un poco de miel o azúcar.",
+   "Deja reposar unos minutos y sirve fresco."
   ]
  },
  {
@@ -1098,6 +1346,7 @@
   "difficulte": 1,
   "nom_fr": "Pêche framboise basilic",
   "nom_en": "Peach raspberry basil",
+  "nom_es": "Melocotón, frambuesa y albahaca",
   "ingredients": [
    {
     "graine": "peche",
@@ -1114,8 +1363,10 @@
   ],
   "phrase_fr": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
   "phrase_en": "Just a few minutes make this naturally delicious dessert.",
+  "phrase_es": "Solo necesitas unos minutos para este postre delicioso y natural.",
   "amour_fr": "une caresse d'amour",
   "amour_en": "a caress of love",
+  "amour_es": "una caricia de amor",
   "etapes_fr": [
    "Prépare et coupe pêche, framboises, basilic.",
    "Mélange délicatement avec un peu de miel ou de sucre.",
@@ -1125,6 +1376,11 @@
    "Prepare and cut the peach, raspberries, basil.",
    "Toss gently with a little honey or sugar.",
    "Rest for a few minutes, then serve chilled."
+  ],
+  "etapes_es": [
+   "Prepara y corta melocotón, frambuesas y albahaca.",
+   "Mezcla con cuidado con un poco de miel o azúcar.",
+   "Deja reposar unos minutos y sirve fresco."
   ]
  },
  {
@@ -1134,6 +1390,7 @@
   "difficulte": 1,
   "nom_fr": "Mangue citron menthe",
   "nom_en": "Mango lemon mint",
+  "nom_es": "Mango, limón y menta",
   "ingredients": [
    {
     "graine": "mangue",
@@ -1150,8 +1407,10 @@
   ],
   "phrase_fr": "Un dessert frais, fruité et lumineux avec une touche de miel.",
   "phrase_en": "A fresh, fruity and bright dessert with a touch of honey.",
+  "phrase_es": "Un postre fresco, afrutado y lleno de color, con un toque de miel.",
   "amour_fr": "une tasse de tendresse",
   "amour_en": "a cup of tenderness",
+  "amour_es": "una taza de ternura",
   "etapes_fr": [
    "Prépare et coupe mangue, citron, menthe.",
    "Mélange délicatement avec un peu de miel ou de sucre.",
@@ -1161,6 +1420,11 @@
    "Prepare and cut the mango, lemon, mint.",
    "Toss gently with a little honey or sugar.",
    "Rest for a few minutes, then serve chilled."
+  ],
+  "etapes_es": [
+   "Prepara y corta mango, limón y menta.",
+   "Mezcla con cuidado con un poco de miel o azúcar.",
+   "Deja reposar unos minutos y sirve fresco."
   ]
  },
  {
@@ -1170,6 +1434,7 @@
   "difficulte": 1,
   "nom_fr": "Ananas basilic citron",
   "nom_en": "Pineapple basil lemon",
+  "nom_es": "Piña, albahaca y limón",
   "ingredients": [
    {
     "graine": "ananas",
@@ -1186,8 +1451,10 @@
   ],
   "phrase_fr": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
   "phrase_en": "Just a few minutes make this naturally delicious dessert.",
+  "phrase_es": "Solo necesitas unos minutos para este postre delicioso y natural.",
   "amour_fr": "un bouquet d'amour",
   "amour_en": "a bouquet of love",
+  "amour_es": "un ramo de amor",
   "etapes_fr": [
    "Prépare et coupe ananas, basilic, citron.",
    "Mélange délicatement avec un peu de miel ou de sucre.",
@@ -1197,6 +1464,11 @@
    "Prepare and cut the pineapple, basil, lemon.",
    "Toss gently with a little honey or sugar.",
    "Rest for a few minutes, then serve chilled."
+  ],
+  "etapes_es": [
+   "Prepara y corta piña, albahaca y limón.",
+   "Mezcla con cuidado con un poco de miel o azúcar.",
+   "Deja reposar unos minutos y sirve fresco."
   ]
  },
  {
@@ -1206,6 +1478,7 @@
   "difficulte": 1,
   "nom_fr": "Papaye framboise menthe",
   "nom_en": "Papaya raspberry mint",
+  "nom_es": "Papaya, frambuesa y menta",
   "ingredients": [
    {
     "graine": "papaye",
@@ -1222,8 +1495,10 @@
   ],
   "phrase_fr": "Un dessert frais, fruité et lumineux avec une touche de miel.",
   "phrase_en": "A fresh, fruity and bright dessert with a touch of honey.",
+  "phrase_es": "Un postre fresco, afrutado y lleno de color, con un toque de miel.",
   "amour_fr": "un fond de douceur",
   "amour_en": "a hint of gentleness",
+  "amour_es": "un fondo de dulzura",
   "etapes_fr": [
    "Prépare et coupe papaye, framboises, menthe.",
    "Mélange délicatement avec un peu de miel ou de sucre.",
@@ -1233,6 +1508,11 @@
    "Prepare and cut the papaya, raspberries, mint.",
    "Toss gently with a little honey or sugar.",
    "Rest for a few minutes, then serve chilled."
+  ],
+  "etapes_es": [
+   "Prepara y corta papaya, frambuesas y menta.",
+   "Mezcla con cuidado con un poco de miel o azúcar.",
+   "Deja reposar unos minutos y sirve fresco."
   ]
  },
  {
@@ -1242,6 +1522,7 @@
   "difficulte": 1,
   "nom_fr": "Fraise pêche citron",
   "nom_en": "Strawberry peach lemon",
+  "nom_es": "Fresa, melocotón y limón",
   "ingredients": [
    {
     "graine": "fraise",
@@ -1258,8 +1539,10 @@
   ],
   "phrase_fr": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
   "phrase_en": "Just a few minutes make this naturally delicious dessert.",
+  "phrase_es": "Solo necesitas unos minutos para este postre delicioso y natural.",
   "amour_fr": "une vague d'amour",
   "amour_en": "a wave of love",
+  "amour_es": "una ola de amor",
   "etapes_fr": [
    "Prépare et coupe fraises, pêche, citron.",
    "Mélange délicatement avec un peu de miel ou de sucre.",
@@ -1269,6 +1552,11 @@
    "Prepare and cut the strawberries, peach, lemon.",
    "Toss gently with a little honey or sugar.",
    "Rest for a few minutes, then serve chilled."
+  ],
+  "etapes_es": [
+   "Prepara y corta fresas, melocotón y limón.",
+   "Mezcla con cuidado con un poco de miel o azúcar.",
+   "Deja reposar unos minutos y sirve fresco."
   ]
  },
  {
@@ -1278,6 +1566,7 @@
   "difficulte": 2,
   "nom_fr": "Salade du jardin citronnée",
   "nom_en": "Lemony garden salad",
+  "nom_es": "Ensalada del huerto al limón",
   "ingredients": [
    {
     "graine": "salade",
@@ -1298,8 +1587,10 @@
   ],
   "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
   "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "phrase_es": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
   "amour_fr": "un grain d'amour",
   "amour_en": "a grain of love",
+  "amour_es": "un granito de amor",
   "etapes_fr": [
    "Lave puis prépare laitue, concombre, radis, citron.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1309,6 +1600,11 @@
    "Wash and prepare the lettuce, cucumber, radish, lemon.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara lechuga, pepino, rábanos y limón.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -1318,6 +1614,7 @@
   "difficulte": 2,
   "nom_fr": "Tomates fraîches aux herbes",
   "nom_en": "Herby cherry tomatoes",
+  "nom_es": "Tomates frescos con hierbas",
   "ingredients": [
    {
     "graine": "tomate",
@@ -1338,8 +1635,10 @@
   ],
   "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
   "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "phrase_es": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
   "amour_fr": "une pointe de tendresse",
   "amour_en": "a dash of tenderness",
+  "amour_es": "una pizca de ternura",
   "etapes_fr": [
    "Lave puis prépare tomates cerises, basilic, persil plat, ciboulette.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1349,6 +1648,11 @@
    "Wash and prepare the cherry tomatoes, basil, flat parsley, chives.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara tomates cherry, albahaca, perejil de hoja plana y cebollino.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -1358,6 +1662,7 @@
   "difficulte": 2,
   "nom_fr": "Carottes poivron coriandre",
   "nom_en": "Carrot pepper coriander",
+  "nom_es": "Zanahorias, pimiento y cilantro",
   "ingredients": [
    {
     "graine": "carotte",
@@ -1378,8 +1683,10 @@
   ],
   "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
   "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "phrase_es": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
   "amour_fr": "un doigt de bonheur",
   "amour_en": "a finger of happiness",
+  "amour_es": "un poquito de felicidad",
   "etapes_fr": [
    "Lave puis prépare carotte, poivron, coriandre, citron.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1389,6 +1696,11 @@
    "Wash and prepare the carrot, bell pepper, coriander, lemon.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara zanahoria, pimiento, cilantro y limón.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -1398,6 +1710,7 @@
   "difficulte": 2,
   "nom_fr": "Haricots croquants aux radis",
   "nom_en": "Crunchy bean radish salad",
+  "nom_es": "Judías verdes, rábanos y perejil",
   "ingredients": [
    {
     "graine": "haricot",
@@ -1418,8 +1731,10 @@
   ],
   "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
   "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "phrase_es": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
   "amour_fr": "une montagne d'amour",
   "amour_en": "a mountain of love",
+  "amour_es": "una montaña de amor",
   "etapes_fr": [
    "Lave puis prépare haricots verts, radis, persil plat, oignon nouveau.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1429,6 +1744,11 @@
    "Wash and prepare the green beans, radish, flat parsley, spring onion.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara judías verdes, rábanos, perejil de hoja plana y cebolleta.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -1438,6 +1758,7 @@
   "difficulte": 2,
   "nom_fr": "Duo vert à la menthe",
   "nom_en": "Minted green duo",
+  "nom_es": "Calabacín, pepino y menta",
   "ingredients": [
    {
     "graine": "courgette",
@@ -1458,8 +1779,10 @@
   ],
   "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
   "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "phrase_es": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
   "amour_fr": "un pétale de tendresse",
   "amour_en": "a petal of tenderness",
+  "amour_es": "un pétalo de ternura",
   "etapes_fr": [
    "Lave puis prépare courgette, concombre, menthe, citron.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1469,6 +1792,11 @@
    "Wash and prepare the zucchini, cucumber, mint, lemon.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara calabacín, pepino, menta y limón.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -1478,6 +1806,7 @@
   "difficulte": 2,
   "nom_fr": "Épinards fraise basilic",
   "nom_en": "Strawberry basil spinach",
+  "nom_es": "Espinacas, fresa y albahaca",
   "ingredients": [
    {
     "graine": "epinard",
@@ -1498,8 +1827,10 @@
   ],
   "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
   "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "phrase_es": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
   "amour_fr": "une mesure d'amour",
   "amour_en": "a measure of love",
+  "amour_es": "una medida de amor",
   "etapes_fr": [
    "Lave puis prépare épinards, fraises, basilic, oignon nouveau.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1509,6 +1840,11 @@
    "Wash and prepare the spinach, strawberries, basil, spring onion.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara espinacas, fresas, albahaca y cebolleta.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -1518,6 +1854,7 @@
   "difficulte": 2,
   "nom_fr": "Salade pêche radis",
   "nom_en": "Peach radish salad",
+  "nom_es": "Ensalada de melocotón y rábanos",
   "ingredients": [
    {
     "graine": "salade",
@@ -1538,8 +1875,10 @@
   ],
   "phrase_fr": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
   "phrase_en": "A fresh, crunchy starter full of balcony-grown flavor.",
+  "phrase_es": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
   "amour_fr": "un chant d'amour",
   "amour_en": "a love song",
+  "amour_es": "un canto de amor",
   "etapes_fr": [
    "Lave puis prépare laitue, pêche, radis, ciboulette.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1549,6 +1888,11 @@
    "Wash and prepare the lettuce, peach, radish, chives.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara lechuga, melocotón, rábanos y cebollino.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -1558,6 +1902,7 @@
   "difficulte": 2,
   "nom_fr": "Fraîcheur tomate concombre",
   "nom_en": "Tomato cucumber freshness",
+  "nom_es": "Tomate y pepino frescos",
   "ingredients": [
    {
     "graine": "tomate",
@@ -1578,8 +1923,10 @@
   ],
   "phrase_fr": "Simple, colorée et vive avec un filet d'huile d'olive.",
   "phrase_en": "Simple, colorful and bright with a drizzle of olive oil.",
+  "phrase_es": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
   "amour_fr": "une chanson douce",
   "amour_en": "a soft song",
+  "amour_es": "una canción suave",
   "etapes_fr": [
    "Lave puis prépare tomates cerises, concombre, coriandre, oignon nouveau.",
    "Mélange avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1589,6 +1936,11 @@
    "Wash and prepare the cherry tomatoes, cucumber, coriander, spring onion.",
    "Toss with a drizzle of olive oil, salt and pepper.",
    "Serve at once to keep everything crisp."
+  ],
+  "etapes_es": [
+   "Lava y prepara tomates cherry, pepino, cilantro y cebolleta.",
+   "Mezcla con un chorrito de aceite de oliva, sal y pimienta.",
+   "Sirve enseguida para que siga bien crujiente."
   ]
  },
  {
@@ -1598,6 +1950,7 @@
   "difficulte": 2,
   "nom_fr": "Ratatouille du balcon",
   "nom_en": "Balcony ratatouille",
+  "nom_es": "Ratatouille del balcón",
   "ingredients": [
    {
     "graine": "tomate",
@@ -1618,8 +1971,10 @@
   ],
   "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
   "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "phrase_es": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
   "amour_fr": "un trait d'amour",
   "amour_en": "a stroke of love",
+  "amour_es": "un toque de amor",
   "etapes_fr": [
    "Prépare et coupe tomates cerises, courgette, poivron, ail.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1629,6 +1984,11 @@
    "Prepare and cut the cherry tomatoes, zucchini, bell pepper, garlic.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta tomates cherry, calabacín, pimiento y ajo.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -1638,6 +1998,7 @@
   "difficulte": 2,
   "nom_fr": "Haricots carottes persillés",
   "nom_en": "Parsley beans and carrots",
+  "nom_es": "Judías verdes y zanahorias con perejil",
   "ingredients": [
    {
     "graine": "haricot",
@@ -1658,8 +2019,10 @@
   ],
   "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
   "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "phrase_es": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
   "amour_fr": "une ribambelle de bisous",
   "amour_en": "a string of kisses",
+  "amour_es": "un montón de besos",
   "etapes_fr": [
    "Prépare et coupe haricots verts, carotte, persil plat, ail.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1669,6 +2032,11 @@
    "Prepare and cut the green beans, carrot, flat parsley, garlic.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta judías verdes, zanahoria, perejil de hoja plana y ajo.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -1678,6 +2046,7 @@
   "difficulte": 2,
   "nom_fr": "Épinards courgette thym",
   "nom_en": "Spinach zucchini thyme",
+  "nom_es": "Espinacas, calabacín y tomillo",
   "ingredients": [
    {
     "graine": "epinard",
@@ -1698,8 +2067,10 @@
   ],
   "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
   "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "phrase_es": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
   "amour_fr": "un parfum d'amour",
   "amour_en": "a scent of love",
+  "amour_es": "un aroma de amor",
   "etapes_fr": [
    "Prépare et coupe épinards, courgette, thym, ail.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1709,6 +2080,11 @@
    "Prepare and cut the spinach, zucchini, thyme, garlic.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta espinacas, calabacín, tomillo y ajo.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -1718,6 +2094,7 @@
   "difficulte": 2,
   "nom_fr": "Poivrons fondants coriandre",
   "nom_en": "Tender coriander peppers",
+  "nom_es": "Pimientos tiernos con cilantro",
   "ingredients": [
    {
     "graine": "poivron",
@@ -1738,8 +2115,10 @@
   ],
   "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
   "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "phrase_es": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
   "amour_fr": "une étreinte",
   "amour_en": "a hug",
+  "amour_es": "un abrazo",
   "etapes_fr": [
    "Prépare et coupe poivron, tomates cerises, coriandre, oignon nouveau.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1749,6 +2128,11 @@
    "Prepare and cut the bell pepper, cherry tomatoes, coriander, spring onion.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta pimiento, tomates cherry, cilantro y cebolleta.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -1758,6 +2142,7 @@
   "difficulte": 2,
   "nom_fr": "Carottes courgettes au thym",
   "nom_en": "Thyme carrots and zucchini",
+  "nom_es": "Zanahorias y calabacines con tomillo",
   "ingredients": [
    {
     "graine": "carotte",
@@ -1778,8 +2163,10 @@
   ],
   "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
   "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "phrase_es": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
   "amour_fr": "un peu de patience et d'amour",
   "amour_en": "a little patience and love",
+  "amour_es": "un poco de paciencia y amor",
   "etapes_fr": [
    "Prépare et coupe carotte, courgette, thym, oignon nouveau.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1789,6 +2176,11 @@
    "Prepare and cut the carrot, zucchini, thyme, spring onion.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta zanahoria, calabacín, tomillo y cebolleta.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -1798,6 +2190,7 @@
   "difficulte": 2,
   "nom_fr": "Haricots tomate basilic",
   "nom_en": "Tomato basil beans",
+  "nom_es": "Judías verdes, tomate y albahaca",
   "ingredients": [
    {
     "graine": "haricot",
@@ -1818,8 +2211,10 @@
   ],
   "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
   "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "phrase_es": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
   "amour_fr": "une pincée de bonne humeur",
   "amour_en": "a pinch of good mood",
+  "amour_es": "una pizca de buen humor",
   "etapes_fr": [
    "Prépare et coupe haricots verts, tomates cerises, basilic, ail.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1829,6 +2224,11 @@
    "Prepare and cut the green beans, cherry tomatoes, basil, garlic.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta judías verdes, tomates cherry, albahaca y ajo.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -1838,6 +2238,7 @@
   "difficulte": 2,
   "nom_fr": "Épinards poivron ciboulette",
   "nom_en": "Spinach pepper chives",
+  "nom_es": "Espinacas, pimiento y cebollino",
   "ingredients": [
    {
     "graine": "epinard",
@@ -1858,8 +2259,10 @@
   ],
   "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
   "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "phrase_es": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
   "amour_fr": "un souvenir d'enfance",
   "amour_en": "a childhood memory",
+  "amour_es": "un recuerdo de la infancia",
   "etapes_fr": [
    "Prépare et coupe épinards, poivron, ciboulette, ail.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1869,6 +2272,11 @@
    "Prepare and cut the spinach, bell pepper, chives, garlic.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta espinacas, pimiento, cebollino y ajo.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -1878,6 +2286,7 @@
   "difficulte": 2,
   "nom_fr": "Courgette persillée citron",
   "nom_en": "Lemony parsley zucchini",
+  "nom_es": "Calabacín con perejil y limón",
   "ingredients": [
    {
     "graine": "courgette",
@@ -1898,8 +2307,10 @@
   ],
   "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
   "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "phrase_es": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
   "amour_fr": "un cœur léger",
   "amour_en": "a light heart",
+  "amour_es": "un corazón alegre",
   "etapes_fr": [
    "Prépare et coupe courgette, oignon nouveau, persil plat, citron.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1909,6 +2320,11 @@
    "Prepare and cut the zucchini, spring onion, flat parsley, lemon.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta calabacín, cebolleta, perejil de hoja plana y limón.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -1918,6 +2334,7 @@
   "difficulte": 2,
   "nom_fr": "Carotte épinard coriandre",
   "nom_en": "Carrot spinach coriander",
+  "nom_es": "Zanahoria, espinacas y cilantro",
   "ingredients": [
    {
     "graine": "carotte",
@@ -1938,8 +2355,10 @@
   ],
   "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
   "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "phrase_es": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
   "amour_fr": "une note de tendresse",
   "amour_en": "a note of tenderness",
+  "amour_es": "una nota de ternura",
   "etapes_fr": [
    "Prépare et coupe carotte, épinards, coriandre, ail.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1949,6 +2368,11 @@
    "Prepare and cut the carrot, spinach, coriander, garlic.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta zanahoria, espinacas, cilantro y ajo.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -1958,6 +2382,7 @@
   "difficulte": 2,
   "nom_fr": "Haricot courgette thym",
   "nom_en": "Green bean zucchini thyme",
+  "nom_es": "Judías verdes, calabacín y tomillo",
   "ingredients": [
    {
     "graine": "haricot",
@@ -1978,8 +2403,10 @@
   ],
   "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
   "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "phrase_es": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
   "amour_fr": "un morceau de soleil",
   "amour_en": "a piece of sunshine",
+  "amour_es": "un trocito de sol",
   "etapes_fr": [
    "Prépare et coupe haricots verts, courgette, thym, oignon nouveau.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -1989,6 +2416,11 @@
    "Prepare and cut the green beans, zucchini, thyme, spring onion.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta judías verdes, calabacín, tomillo y cebolleta.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -1998,6 +2430,7 @@
   "difficulte": 2,
   "nom_fr": "Poivron carotte persil",
   "nom_en": "Pepper carrot parsley",
+  "nom_es": "Pimiento, zanahoria y perejil",
   "ingredients": [
    {
     "graine": "poivron",
@@ -2018,8 +2451,10 @@
   ],
   "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
   "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "phrase_es": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
   "amour_fr": "une brassée d'amour",
   "amour_en": "an armful of love",
+  "amour_es": "un abrazo lleno de amor",
   "etapes_fr": [
    "Prépare et coupe poivron, carotte, persil plat, ail.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -2029,6 +2464,11 @@
    "Prepare and cut the bell pepper, carrot, flat parsley, garlic.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta pimiento, zanahoria, perejil de hoja plana y ajo.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -2038,6 +2478,7 @@
   "difficulte": 2,
   "nom_fr": "Tomate épinard ciboulette",
   "nom_en": "Tomato spinach chives",
+  "nom_es": "Tomate, espinacas y cebollino",
   "ingredients": [
    {
     "graine": "tomate",
@@ -2058,8 +2499,10 @@
   ],
   "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
   "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "phrase_es": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
   "amour_fr": "un sourire de voisin",
   "amour_en": "a neighbour's smile",
+  "amour_es": "una sonrisa de tu vecino",
   "etapes_fr": [
    "Prépare et coupe tomates cerises, épinards, ciboulette, oignon nouveau.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -2069,6 +2512,11 @@
    "Prepare and cut the cherry tomatoes, spinach, chives, spring onion.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta tomates cherry, espinacas, cebollino y cebolleta.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -2078,6 +2526,7 @@
   "difficulte": 2,
   "nom_fr": "Courgette poivron thym",
   "nom_en": "Zucchini pepper thyme",
+  "nom_es": "Calabacín, pimiento y tomillo",
   "ingredients": [
    {
     "graine": "courgette",
@@ -2098,8 +2547,10 @@
   ],
   "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
   "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "phrase_es": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
   "amour_fr": "une pensée pour l'autre",
   "amour_en": "a thought for the other",
+  "amour_es": "un pensamiento para la otra persona",
   "etapes_fr": [
    "Prépare et coupe courgette, poivron, thym, ail.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -2109,6 +2560,11 @@
    "Prepare and cut the zucchini, bell pepper, thyme, garlic.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta calabacín, pimiento, tomillo y ajo.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -2118,6 +2574,7 @@
   "difficulte": 2,
   "nom_fr": "Haricots épinards citron",
   "nom_en": "Lemon beans and spinach",
+  "nom_es": "Judías verdes, espinacas y limón",
   "ingredients": [
    {
     "graine": "haricot",
@@ -2138,8 +2595,10 @@
   ],
   "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
   "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "phrase_es": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
   "amour_fr": "le temps qu'il faut, et de l'amour",
   "amour_en": "the time it takes, and love",
+  "amour_es": "el tiempo que haga falta, y amor",
   "etapes_fr": [
    "Prépare et coupe haricots verts, épinards, citron, persil plat.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -2149,6 +2608,11 @@
    "Prepare and cut the green beans, spinach, lemon, flat parsley.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta judías verdes, espinacas, limón y perejil de hoja plana.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -2158,6 +2622,7 @@
   "difficulte": 2,
   "nom_fr": "Carottes tomates ciboulette",
   "nom_en": "Carrot tomato chives",
+  "nom_es": "Zanahorias, tomates y cebollino",
   "ingredients": [
    {
     "graine": "carotte",
@@ -2178,8 +2643,10 @@
   ],
   "phrase_fr": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
   "phrase_en": "A quick, fragrant and generous dish, perfect for tonight.",
+  "phrase_es": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
   "amour_fr": "une cuillerée de joie",
   "amour_en": "a spoonful of joy",
+  "amour_es": "una cucharada de alegría",
   "etapes_fr": [
    "Prépare et coupe carotte, tomates cerises, ciboulette, ail.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -2189,6 +2656,11 @@
    "Prepare and cut the carrot, cherry tomatoes, chives, garlic.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta zanahoria, tomates cherry, cebollino y ajo.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -2198,6 +2670,7 @@
   "difficulte": 2,
   "nom_fr": "Poêlée quatre du jardin",
   "nom_en": "Four-garden skillet",
+  "nom_es": "Salteado de cuatro verduras del huerto",
   "ingredients": [
    {
     "graine": "courgette",
@@ -2218,8 +2691,10 @@
   ],
   "phrase_fr": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
   "phrase_en": "Tender, flavorful vegetables with a drizzle of olive oil.",
+  "phrase_es": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
   "amour_fr": "un ciel bleu dans l'assiette",
   "amour_en": "a blue sky on the plate",
+  "amour_es": "un cielo azul en el plato",
   "etapes_fr": [
    "Prépare et coupe courgette, haricots verts, poivron, oignon nouveau.",
    "Fais cuire doucement avec un filet d'huile d'olive, du sel et du poivre.",
@@ -2229,6 +2704,11 @@
    "Prepare and cut the zucchini, green beans, bell pepper, spring onion.",
    "Cook gently with a drizzle of olive oil, salt and pepper.",
    "Stir until the vegetables are tender."
+  ],
+  "etapes_es": [
+   "Prepara y corta calabacín, judías verdes, pimiento y cebolleta.",
+   "Cocina a fuego lento con un chorrito de aceite de oliva, sal y pimienta.",
+   "Remueve hasta que las verduras estén tiernas."
   ]
  },
  {
@@ -2238,6 +2718,7 @@
   "difficulte": 2,
   "nom_fr": "Salade tropicale menthée",
   "nom_en": "Minted tropical salad",
+  "nom_es": "Ensalada tropical con menta",
   "ingredients": [
    {
     "graine": "mangue",
@@ -2258,8 +2739,10 @@
   ],
   "phrase_fr": "Un dessert frais, fruité et lumineux avec une touche de miel.",
   "phrase_en": "A fresh, fruity and bright dessert with a touch of honey.",
+  "phrase_es": "Un postre fresco, afrutado y lleno de color, con un toque de miel.",
   "amour_fr": "une rafale de tendresse",
   "amour_en": "a gust of tenderness",
+  "amour_es": "una ráfaga de ternura",
   "etapes_fr": [
    "Prépare et coupe mangue, ananas, papaye, menthe.",
    "Mélange délicatement avec un peu de miel ou de sucre.",
@@ -2269,6 +2752,11 @@
    "Prepare and cut the mango, pineapple, papaya, mint.",
    "Toss gently with a little honey or sugar.",
    "Rest for a few minutes, then serve chilled."
+  ],
+  "etapes_es": [
+   "Prepara y corta mango, piña, papaya y menta.",
+   "Mezcla con cuidado con un poco de miel o azúcar.",
+   "Deja reposar unos minutos y sirve fresco."
   ]
  },
  {
@@ -2278,6 +2766,7 @@
   "difficulte": 2,
   "nom_fr": "Papaye mangue citron",
   "nom_en": "Papaya mango lemon",
+  "nom_es": "Papaya, mango y limón",
   "ingredients": [
    {
     "graine": "papaye",
@@ -2298,8 +2787,10 @@
   ],
   "phrase_fr": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
   "phrase_en": "Just a few minutes make this naturally delicious dessert.",
+  "phrase_es": "Solo necesitas unos minutos para este postre delicioso y natural.",
   "amour_fr": "un coin de paradis",
   "amour_en": "a corner of paradise",
+  "amour_es": "un rincón del paraíso",
   "etapes_fr": [
    "Prépare et coupe papaye, mangue, citron, basilic.",
    "Mélange délicatement avec un peu de miel ou de sucre.",
@@ -2309,6 +2800,11 @@
    "Prepare and cut the papaya, mango, lemon, basil.",
    "Toss gently with a little honey or sugar.",
    "Rest for a few minutes, then serve chilled."
+  ],
+  "etapes_es": [
+   "Prepara y corta papaya, mango, limón y albahaca.",
+   "Mezcla con cuidado con un poco de miel o azúcar.",
+   "Deja reposar unos minutos y sirve fresco."
   ]
  },
  {
@@ -2318,6 +2814,7 @@
   "difficulte": 2,
   "nom_fr": "Ananas fraise menthe",
   "nom_en": "Pineapple strawberry mint",
+  "nom_es": "Piña, fresa y menta",
   "ingredients": [
    {
     "graine": "ananas",
@@ -2338,8 +2835,10 @@
   ],
   "phrase_fr": "Un dessert frais, fruité et lumineux avec une touche de miel.",
   "phrase_en": "A fresh, fruity and bright dessert with a touch of honey.",
+  "phrase_es": "Un postre fresco, afrutado y lleno de color, con un toque de miel.",
   "amour_fr": "un nuage de bonheur",
   "amour_en": "a cloud of happiness",
+  "amour_es": "una nube de felicidad",
   "etapes_fr": [
    "Prépare et coupe ananas, fraises, menthe, citron.",
    "Mélange délicatement avec un peu de miel ou de sucre.",
@@ -2349,6 +2848,11 @@
    "Prepare and cut the pineapple, strawberries, mint, lemon.",
    "Toss gently with a little honey or sugar.",
    "Rest for a few minutes, then serve chilled."
+  ],
+  "etapes_es": [
+   "Prepara y corta piña, fresas, menta y limón.",
+   "Mezcla con cuidado con un poco de miel o azúcar.",
+   "Deja reposar unos minutos y sirve fresco."
   ]
  },
  {
@@ -2358,6 +2862,7 @@
   "difficulte": 2,
   "nom_fr": "Papaye pêche framboise",
   "nom_en": "Papaya peach raspberry",
+  "nom_es": "Papaya, melocotón y frambuesa",
   "ingredients": [
    {
     "graine": "papaye",
@@ -2378,8 +2883,10 @@
   ],
   "phrase_fr": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
   "phrase_en": "Just a few minutes make this naturally delicious dessert.",
+  "phrase_es": "Solo necesitas unos minutos para este postre delicioso y natural.",
   "amour_fr": "une douceur de dimanche",
   "amour_en": "a Sunday sweetness",
+  "amour_es": "una dulzura de domingo",
   "etapes_fr": [
    "Prépare et coupe papaye, pêche, framboises, menthe.",
    "Mélange délicatement avec un peu de miel ou de sucre.",
@@ -2389,6 +2896,11 @@
    "Prepare and cut the papaya, peach, raspberries, mint.",
    "Toss gently with a little honey or sugar.",
    "Rest for a few minutes, then serve chilled."
+  ],
+  "etapes_es": [
+   "Prepara y corta papaya, melocotón, frambuesas y menta.",
+   "Mezcla con cuidado con un poco de miel o azúcar.",
+   "Deja reposar unos minutos y sirve fresco."
   ]
  },
  {
@@ -2398,6 +2910,7 @@
   "difficulte": 2,
   "nom_fr": "Ananas fraise basilic",
   "nom_en": "Pineapple strawberry basil",
+  "nom_es": "Piña, fresa y albahaca",
   "ingredients": [
    {
     "graine": "ananas",
@@ -2418,8 +2931,10 @@
   ],
   "phrase_fr": "Un dessert frais, fruité et lumineux avec une touche de miel.",
   "phrase_en": "A fresh, fruity and bright dessert with a touch of honey.",
+  "phrase_es": "Un postre fresco, afrutado y lleno de color, con un toque de miel.",
   "amour_fr": "tout l'amour du balcon",
   "amour_en": "all the balcony's love",
+  "amour_es": "todo el amor del balcón",
   "etapes_fr": [
    "Prépare et coupe ananas, fraises, basilic, citron.",
    "Mélange délicatement avec un peu de miel ou de sucre.",
@@ -2429,6 +2944,11 @@
    "Prepare and cut the pineapple, strawberries, basil, lemon.",
    "Toss gently with a little honey or sugar.",
    "Rest for a few minutes, then serve chilled."
+  ],
+  "etapes_es": [
+   "Prepara y corta piña, fresas, albahaca y limón.",
+   "Mezcla con cuidado con un poco de miel o azúcar.",
+   "Deja reposar unos minutos y sirve fresco."
   ]
  },
  {
@@ -2438,6 +2958,7 @@
   "difficulte": 2,
   "nom_fr": "Melon mangue framboise",
   "nom_en": "Melon mango raspberry",
+  "nom_es": "Melón, mango y frambuesa",
   "ingredients": [
    {
     "graine": "melon",
@@ -2458,8 +2979,10 @@
   ],
   "phrase_fr": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
   "phrase_en": "Just a few minutes make this naturally delicious dessert.",
+  "phrase_es": "Solo necesitas unos minutos para este postre delicioso y natural.",
   "amour_fr": "un merci glissé dedans",
   "amour_en": "a thank-you tucked inside",
+  "amour_es": "un gracias escondido dentro",
   "etapes_fr": [
    "Prépare et coupe melon, mangue, framboises, menthe.",
    "Mélange délicatement avec un peu de miel ou de sucre.",
@@ -2469,6 +2992,11 @@
    "Prepare and cut the melon, mango, raspberries, mint.",
    "Toss gently with a little honey or sugar.",
    "Rest for a few minutes, then serve chilled."
+  ],
+  "etapes_es": [
+   "Prepara y corta melón, mango, frambuesas y menta.",
+   "Mezcla con cuidado con un poco de miel o azúcar.",
+   "Deja reposar unos minutos y sirve fresco."
   ]
  }
 ]

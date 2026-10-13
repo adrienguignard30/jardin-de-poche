@@ -1,7 +1,7 @@
 // Les écrans du téléphone : Ma recette · Le marché · Boutique · Carnet. Rendu DOM pur, l'état vient du jeu.
 import { CATALOG, ECO, prixProchainPot, type GameState } from './state';
 import * as E from './economie';
-import { t, tx, lang, quantite } from './i18n';
+import { t, tx, lang, quantite, texteChamp, texteNonVide, etapesRecette, locale, typeRecette, type Bi } from './i18n';
 import { MUSIQUE } from './musique';
 import * as EL from './enligne';
 import { remplirClassement } from './classement';
@@ -14,12 +14,23 @@ export interface TelHandlers {
   onBuySeed(id: string): void; onBuyPot(): void;
   onDemain(): void; onChercher(graine: string): void; onFiche(recetteId: string): void; onSemer(graine: string): void; onMontrerPlat(): void; onCompte(): void;
   onApp(app: Onglet, detail?: string): void; onReglage(k: 'fond' | 'vibre' | 'son', v: string | boolean): void;
-  onRepondre(evId: string, texte: { fr: string; en: string }): void;
+  onRepondre(evId: string, texte: Bi): void;
 }
 const el = <T extends HTMLElement = HTMLElement>(tag: string, cls = '', html = '') => { const e = document.createElement(tag) as T; if (cls) e.className = cls; if (html) e.innerHTML = html; return e; };
-const nomG = (id: string) => { const g = ECO.graines.find(x => x.id === id); return g ? (lang() === 'en' ? g.nom_en : g.nom_fr) : id; };
-const nomR = (r: E.Recette) => lang() === 'en' ? r.nom_en : r.nom_fr;
-const typeR = (r: E.Recette) => ({ entree: lang() === 'en' ? 'starter' : 'entrée', plat: lang() === 'en' ? 'main' : 'plat', dessert: 'dessert' })[r.type];
+const nomG = (id: string) => { const g = ECO.graines.find(x => x.id === id); return g ? texteChamp(g, 'nom') : id; };
+const nomR = (r: E.Recette) => texteChamp(r, 'nom');
+const typeR = (r: E.Recette) => typeRecette(r.type);
+/** Les champs facultatifs restent absents lorsqu'aucun texte n'est prévu. */
+const texteRecette = (re: E.Recette, champ: 'phrase' | 'amour') => {
+  const l = lang();
+  if (l !== 'es') return re[`${champ}_${l}`];
+  return texteNonVide(re[`${champ}_es`]) || texteNonVide(re[`${champ}_en`]) ? texteChamp(re, champ, l) : undefined;
+};
+const etapes = (re: E.Recette) => {
+  const l = lang();
+  if (l !== 'es') return re[`etapes_${l}`];
+  return re.etapes_es?.length || re.etapes_en?.length ? etapesRecette(re, l) : undefined;
+};
 
 /** L'image d'un plat, ou ses ingrédients tant qu'elle n'existe pas. */
 export function imagePlat(re: E.Recette, cls = 'platImg'): HTMLElement {
@@ -32,12 +43,12 @@ export function ficheRecette(re: E.Recette): HTMLElement {
   const s = t(), f = el('div', 'fiche');
   f.appendChild(imagePlat(re, 'ficheImg'));
   f.appendChild(el('h3', '', nomR(re)));
-  const ph = lang() === 'en' ? re.phrase_en : re.phrase_fr; if (ph) f.appendChild(el('p', 'phrase', ph));
+  const ph = texteRecette(re, 'phrase'); if (ph) f.appendChild(el('p', 'phrase', ph));
   f.appendChild(el('div', 'ttl', s.ingredients));
   const ul = el('ul', 'ingr'); for (const i of re.ingredients) ul.appendChild(el('li', '', `${icon(i.graine)} ${quantite(i.quantite, ECO.graine(i.graine))}`));
-  const am = lang() === 'en' ? re.amour_en : re.amour_fr; if (am) ul.appendChild(el('li', 'amour', am));
+  const am = texteRecette(re, 'amour'); if (am) ul.appendChild(el('li', 'amour', am));
   f.appendChild(ul);
-  const et = lang() === 'en' ? re.etapes_en : re.etapes_fr;
+  const et = etapes(re);
   if (et?.length) { f.appendChild(el('div', 'ttl', s.laRecette)); const ol = el('ol', 'etapes'); for (const e of et) ol.appendChild(el('li', '', e)); f.appendChild(ol); }
   return f;
 }
@@ -133,13 +144,13 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
   if (onglet === 'notifs' && cherche) {                                      // un message ouvert : répondre au voisin
     const ev = im.evenements.find(e => evId(e) === cherche);
     if (ev) {
-      c.appendChild(el('div', 'bulleMsg', `<small>${ev.de ?? ''}</small>${lang() === 'en' ? ev.texte_en : ev.texte_fr}`));
+      c.appendChild(el('div', 'bulleMsg', `<small>${ev.de ?? ''}</small>${texteChamp(ev, 'texte')}`));
       const reps = E.REPONSES[ev.type];
       if (reps && ev.deId) {
         if (ev.repondu) c.appendChild(el('p', 'small ok', s.dejaRepondu));
         else {
           c.appendChild(el('div', 'ttl', s.repondreA(ev.de ?? '')));
-          for (const r of reps) { const b = el('button', 'seed', `<span>${lang() === 'en' ? r.en : r.fr}</span>`); b.onclick = () => h.onRepondre(cherche, r); c.appendChild(b); }
+          for (const r of reps) { const b = el('button', 'seed', `<span>${tx(r)}</span>`); b.onclick = () => h.onRepondre(cherche, r); c.appendChild(b); }
         }
       }
     }
@@ -177,7 +188,7 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
     if (!ev.length) { c.appendChild(el('p', 'empty', s.aucunMessage)); return; }
     for (const e of ev.slice(0, 40)) {
       const app: Onglet = e.type === 'plat_recu' ? 'recus' : e.type === 'troc_accepte' ? 'marche' : 'recette';
-      const row = el('div', 'row msg', `${iconeApp(app, 30)}<span>${lang() === 'en' ? e.texte_en : e.texte_fr}<small>${e.jour ?? new Date(e.a).toLocaleString(lang() === 'en' ? 'en-GB' : 'fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</small></span>`);
+      const row = el('div', 'row msg', `${iconeApp(app, 30)}<span>${texteChamp(e, 'texte')}<small>${e.jour ?? new Date(e.a).toLocaleString(locale(), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</small></span>`);
       row.onclick = () => E.REPONSES[e.type] && e.deId ? h.onApp('notifs', evId(e)) : h.onApp(app); c.appendChild(row);
     }
     return;
@@ -284,7 +295,8 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
     const tete = el('div', 'recetteTete'); tete.appendChild(imagePlat(re, 'recetteImg')); tete.onclick = () => h.onFiche(re.id); c.appendChild(tete);
     const demain = rj.jour > E.jourDe(Date.now());
     const titre = (re.accueil ? s.premiereRecette : demain ? s.demainTitre : s.recetteDuJour) + ` · ${demain ? s.pourDemain : s.pourAujourdhui}`;
-    c.appendChild(el('div', 'recette', `<small>${titre} — ${typeR(re)}</small><b>${nomR(re)}</b>${re.phrase_fr ? `<em>${lang() === 'en' ? re.phrase_en ?? '' : re.phrase_fr}</em>` : ''}`));
+    const phrase = texteRecette(re, 'phrase');
+    c.appendChild(el('div', 'recette', `<small>${titre} — ${typeR(re)}</small><b>${nomR(re)}</b>${phrase ? `<em>${phrase}</em>` : ''}`));
     const manque = E.manque(j, ECO);
     let cout = 0;
     for (const ing of re.ingredients) {
@@ -313,15 +325,15 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
       }
       c.appendChild(row);
     }
-    const amour = lang() === 'en' ? re.amour_en : re.amour_fr;
+    const amour = texteRecette(re, 'amour');
     if (amour) c.appendChild(el('div', 'row ingr amour', `<span><b>${amour}</b><br><span class="ok">${s.amourToujours}</span></span>`));
-    const et = lang() === 'en' ? re.etapes_en : re.etapes_fr;
+    const et = etapes(re);
     if (et?.length) { c.appendChild(el('div', 'ttl', s.laRecette)); const ol = el('ol', 'etapes'); for (const e of et) ol.appendChild(el('li', '', e)); c.appendChild(ol); }
     {                                                               // ce que ce plat rapporte : valeur des ingrédients × type (× 3 avec un ingrédient rare)
       const v0 = re.ingredients.reduce((t_, i) => t_ + E.valeur(im, i), 0);
       const rare = re.ingredients.some(i => j.interdites.includes(i.graine));
       const mult = E.REGLES.MULT_TYPE[re.type] ?? 1;
-      const nomType = ({ entree: lang() === 'en' ? 'a starter' : 'une entrée', plat: lang() === 'en' ? 'a main course' : 'un plat', dessert: lang() === 'en' ? 'a dessert' : 'un dessert' } as Record<string, string>)[re.type] ?? '';
+      const nomType = typeRecette(re.type, lang(), true);
       c.appendChild(el('p', 'small gain', s.gainPlat(Math.round(v0 * mult * (rare ? 3 : 1)), nomType, mult, rare)));
     }
     if (rj.faite) { c.querySelector('.recette')?.classList.add('faite'); c.appendChild(el('p', 'small ok', s.recetteFaiteBarre)); }
@@ -448,8 +460,8 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
     const tri = [...ECO.v1()].sort((a, b) => (+!!j.poche[b.id] - +!!j.poche[a.id]) || (+j.interdites.includes(a.id) - +j.interdites.includes(b.id)) || a.pousse_min - b.pousse_min);
     for (const g of tri) {
       const owned = !!j.poche[g.id], interdite = j.interdites.includes(g.id);
-      const detail = interdite ? ((lang() === 'en' ? g.interdit_en : g.interdit_fr) || s.interdite)
-        : `${g.pousse_min >= 60 ? Math.round(g.pousse_min / 60) + ' h' : g.pousse_min + ' min'} · ${g.recoltes} ${lang() === 'en' ? 'harvests' : 'récoltes'}`;
+      const detail = interdite ? texteChamp(g, 'interdit', lang(), lang() === 'es' ? t('en').interdite : s.interdite)
+        : `${g.pousse_min >= 60 ? Math.round(g.pousse_min / 60) + ' h' : g.pousse_min + ' min'} · ${g.recoltes} ${s.recoltes}`;
       const row = el('div', 'row' + (owned ? ' owned' : '') + (interdite ? ' locked' : '') + (cherche === g.id ? ' cible' : ''), `<span>${icon(g.id)} ${nomG(g.id)}<small>${detail}</small></span>`);
       if (cherche === g.id) setTimeout(() => row.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60);
       if (owned) row.appendChild(el('span', 'tag ok', s.aToi));

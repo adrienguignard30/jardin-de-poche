@@ -1,8 +1,8 @@
 import * as E from './economie';
-import { tx } from './i18n';
+import { tx, t, type Lang, type Bi as TexteBi } from './i18n';
 
 // ---------- catalogue (public/data/catalog.json)
-export type Bi = { fr: string; en: string };
+export type Bi = TexteBi;
 export interface PlantDef { id: string; name: Bi; seed: number; harvest: number; grow: number; yield: number; harvests: number; unlock: { earned?: number; roof?: boolean } }
 export interface PotStyle { id: string; name: Bi; extra: number }
 export interface ItemDef { id: string; kind: 'deco' | 'upgrade' | 'roof'; object: string | null; price: number; name: Bi; desc: Bi; effect?: string }
@@ -29,7 +29,7 @@ export async function loadCatalog(): Promise<Catalog> {
   ECO = new E.Catalogue(gr, re);
   for (const g of ECO.v1()) {                                // chaque graine devient aussi une plante affichable
     const exist = CATALOG.plants.find(p => p.id === g.id);
-    const def: PlantDef = { id: g.id, name: { fr: g.nom_fr, en: g.nom_en }, seed: 0, harvest: g.prix_base, grow: g.pousse_min * 60, yield: g.unites_par_recolte, harvests: g.recoltes, unlock: {} };
+    const def: PlantDef = { id: g.id, name: { fr: g.nom_fr, en: g.nom_en, es: g.nom_es }, seed: 0, harvest: g.prix_base, grow: g.pousse_min * 60, yield: g.unites_par_recolte, harvests: g.recoltes, unlock: {} };
     if (exist) Object.assign(exist, def); else CATALOG.plants.push(def);
   }
   CATALOG.plants = CATALOG.plants.filter(p => ECO.graines.some(g => g.id === p.id));
@@ -97,7 +97,7 @@ export function newGame(characterId: string, nickname: string, perso?: Perso): G
   const prenom = perso?.prenom?.trim() || nickname || tx(c.name);
   const jardin = E.creerJardin('moi', prenom, false, ECO, r, poche, interdites);
   jardin.pots = Array(8).fill(null);
-  const demo = new URLSearchParams(location.search).get('demo') === '1';
+  const demo = ['1', '50', '90'].includes(new URLSearchParams(location.search).get('demo') ?? '');
   const voisins = ['Léa', 'Marcel', 'Jimy', 'Nour', 'Théo', 'Inès'].filter(n => n.toLowerCase() !== prenom.toLowerCase()).slice(0, 5);
   const immeuble = E.creerImmeuble('imm_' + now.toString(36), jardin, ECO, now, voisins);
   return {
@@ -140,9 +140,9 @@ export function nextPotPrice(s: GameState): number | null {
   if (balcony >= CATALOG.pots.max) return null;
   return CATALOG.pots.basePrice + CATALOG.pots.stepPrice * (balcony - CATALOG.start.pots);
 }
-export function generateNickname(lang: 'fr' | 'en'): string {
+export function generateNickname(lang: Lang): string {
   const n = 1000 + Math.floor(Math.random() * 9000);
-  return (lang === 'fr' ? 'Jardinier ' : 'Gardener ') + n;
+  return t(lang).pseudoPrefixe + n;
 }
 
 // ---------- couche de sauvegarde : le jeu ne parle qu'à ça

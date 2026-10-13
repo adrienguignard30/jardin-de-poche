@@ -4,7 +4,7 @@
 //  Podium pour les 3 premiers, liste ensuite, et « ta place » toujours visible, même hors du top 20.
 // =============================================================================================
 import * as EL from './enligne';
-import { t } from './i18n';
+import { t, lang } from './i18n';
 
 const esc = (x: string) => x.replace(/[<>&"]/g, '');
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls = '', html = ''): HTMLElementTagNameMap[K] {
@@ -21,7 +21,8 @@ async function monRang(cat: EL.Categorie): Promise<{ rang: number; total: number
 let catCourante: EL.Categorie = 'trocs';
 /** Remplit « c » avec le classement complet (onglets, podium, liste, ta place). */
 export function remplirClassement(hote: HTMLElement) {
-  const s = t() as any;
+  const langueRendu = lang();
+  const s = t();
   let c = hote.querySelector(':scope > .classementPro') as HTMLElement | null;   // une enveloppe à lui : le conteneur du téléphone sert à toutes les applis
   if (!c) { c = el('div', 'classementPro'); hote.appendChild(c); }
   c.innerHTML = '';
@@ -35,6 +36,7 @@ export function remplirClassement(hote: HTMLElement) {
   const cat = catCourante;
   Promise.all([EL.classement(cat), monRang(cat)]).then(([rangs, moi]) => {
     if (cat !== catCourante) return;
+    if (lang() !== langueRendu) { remplirClassement(racine); return; }
     zone.innerHTML = '';
     if (!rangs.length) zone.appendChild(el('div', 'videClassement', `<div class="grand">🏆</div><p>${s.classementVide}</p>`));
     else {

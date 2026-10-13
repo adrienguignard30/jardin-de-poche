@@ -772,3 +772,57 @@ html, body { background: #0f1a24; }
 /* --- regles du jeu (bouton a l'accueil + page par-dessus) --- */
 .rangAccueil { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 #reglesJeu { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; z-index: 1000; background: #cfe3ee; }
+
+
+/* Accueil rangé : une action principale, menu discret et langues accessibles. */
+#start .menuAccueilBtn { position: absolute; top: calc(12px + var(--sat)); left: 12px; z-index: 8; width: 44px; min-height: 44px; border-radius: 14px; border: 1px solid rgba(36,49,58,.2); background: rgba(255,255,255,.94); color: var(--ink); font-size: 22px; box-shadow: 0 3px 12px rgba(0,0,0,.12); }
+#start .languesAccueil { top: calc(12px + var(--sat)); right: 12px; z-index: 8; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+#start .boutonsLangues { display: flex; gap: 8px; }
+#start .languesAccueil .drapeauLangue { width: 44px; min-height: 44px; padding: 0; display: grid; place-items: center; border-radius: 12px; background: rgba(255,255,255,.94); border: 1px solid rgba(36,49,58,.2); color: var(--ink); font-size: 24px; line-height: 1; }
+#start .languesAccueil .drapeauLangue.active { background: #fff; color: var(--ink); outline: 2px solid var(--ink); outline-offset: 1px; }
+#start .startTop { width: 100%; padding: calc(34px + var(--sat)) 180px 0; }
+#start .brand .tag { display: block; }
+#start #startBody { width: min(520px, 100%); padding: 0 16px calc(16px + var(--sab)); gap: 8px; flex-shrink: 0; }
+#start #startBody .hint { display: block; margin: 0; }
+#start #startBody .nick, #start #startBody > .primary { width: min(320px, 100%); min-height: 48px; }
+#start .autreJardinier { min-height: 44px; padding: 8px 12px; border-radius: 10px; background: transparent; color: #fff; text-decoration: underline; text-underline-offset: 4px; font-size: 13px; max-width: 100%; }
+#start .sheet button:not(.sw), #modal.depuisAccueil button { min-width: 44px; min-height: 44px; }
+#start .sheet .actionsFiche, #start .sheet .startRow, #start .sheet .carrousel, #modal.depuisAccueil .accueilMenuItems { gap: 8px; }
+#modal.depuisAccueil .modalBox { max-width: 100%; }
+#modal.depuisAccueil .modalBox > .x { width: 44px; height: 44px; }
+#modal.depuisAccueil .accueilMenu { padding-top: 8px; }
+#modal.depuisAccueil .accueilMenu h2 { margin: 0 48px 18px 0; font-size: 22px; }
+#modal.depuisAccueil .accueilMenuItems { display: flex; flex-direction: column; }
+#modal.depuisAccueil .menuAccueilItem { position: static; width: 100%; min-height: 48px; border-radius: 12px; padding: 10px 14px; border: 1px solid var(--line); background: rgba(36,49,58,.05); color: var(--ink); text-align: left; box-shadow: none; font-size: 15px; overflow-wrap: anywhere; }
+#modal.depuisAccueil .menuAccueilItem:disabled { opacity: .5; }
+#ui:has(#modal.depuisAccueil:not(.hidden)) #startBody > .primary, #ui:has(#modal.depuisAccueil:not(.hidden)) #start .sheet .primary { visibility: hidden; }
+#modal.depuisAccueil .fenCompte > .primary:not(:last-child) { background: rgba(36,49,58,.05); color: var(--ink); border: 1px solid var(--line); box-shadow: none; }
+#start button:focus-visible, #modal.depuisAccueil button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+@media (max-width: 700px) {
+  #start .startTop { padding: calc(100px + var(--sat)) 16px 0; }
+  #start .brand h1 { font-size: clamp(24px, 6vw, 36px); }
+  #start .brand .tag { font-size: 13px; }
+  #start .startBottom .hint { font-size: 13px; }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  #start .startTop { padding: calc(80px + var(--sat)) 170px 0; }
+  #start .brand h1 { font-size: 24px; }
+  #start .brand .tag { font-size: 12px; }
+  #start #startBody { gap: 8px; padding-bottom: calc(8px + var(--sab)); }
+}
+
+#settings .setrow:has(button.active) { flex-wrap: wrap; gap: 8px; }
+#settings .setrow button { min-width: 44px; min-height: 44px; }
+
+/* Même cible tactile pour les drapeaux de l’accueil et des réglages. */
+#start .languesAccueil .drapeauLangue, #settings .languesReglages .drapeauLangue { width: 44px; height: 44px; min-width: 44px; min-height: 44px; flex: 0 0 44px; padding: 0; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 26px; line-height: 1; }
+#settings .languesReglages { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.drapeauLangue svg { display: block; width: 28px; height: 20px; flex: none; margin: auto; border-radius: 3px; overflow: hidden; box-shadow: 0 0 0 1px rgba(36,49,58,.18); }
+
+#ui > .demoBadge { position: fixed; bottom: calc(8px + var(--sab)); left: 8px; z-index: 25; min-width: 68px; min-height: 44px; padding: 0 9px; border-radius: 12px; border: 1px solid rgba(36,49,58,.2); background: rgba(255,255,255,.88); color: var(--ink); font-size: 12px; pointer-events: auto; }
+.demoMenu { border-top: 1px solid var(--line); padding-top: 12px; }
+.demoMenuTitre { font-size: 14px; margin-bottom: 8px; }
+.demoChoix { display: flex; gap: 8px; }
+.demoChoix button { flex: 1; min-width: 44px; min-height: 44px; border-radius: 10px; background: rgba(36,49,58,.05); color: var(--ink); border: 1px solid var(--line); }
+.demoChoix button[aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: -2px; font-weight: 700; }

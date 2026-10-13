@@ -6,7 +6,7 @@ import { UI, icon } from './ui';
 import { MUSIQUE } from './musique';
 import * as EL from './enligne';
 import { BIBLIO } from './bibliotheque';
-import { t, tx, lang, quantite, liste } from './i18n';
+import { t, tx, lang, quantite, liste, texteChamp, texteNonVide, type Lang, type Bi } from './i18n';
 import { CATALOG, ECO, loadCatalog, plantDef, itemDef, charDef, newGame, prixProchainPot, LocalSave, generateNickname, type GameState, type PotState, type SaveProvider, type Perso } from './state';
 import * as E from './economie';
 import * as P from './plants';
@@ -70,9 +70,9 @@ export class Game {
   private texteEtape(e: number): string {
     const tt = t(), j = this.state.eco.jardin;
     const re = j.recette ? ECO.recette(j.recette.recette) : null;
-    const nomR = re ? (lang() === 'en' ? re.nom_en : re.nom_fr) : '';
+    const nomR = re ? texteChamp(re, 'nom') : '';
     const lst = re ? liste(re.ingredients.map(i => quantite(i.quantite, ECO.graine(i.graine)))) : '';
-    const nomG = (g: string) => { const x = ECO.graine(g); return (lang() === 'en' ? x.nom_en : x.nom_fr).toLowerCase(); };
+    const nomG = (g: string) => { const x = ECO.graine(g); return texteChamp(x, 'nom').toLowerCase(); };
     const seme = new Set(this.state.pots.filter(p => p.plant).map(p => p.plant!.plant));
     const aSemer = re ? re.ingredients.filter(i => j.poche[i.graine] && !seme.has(i.graine) && (j.panier[i.graine] ?? 0) < i.quantite) : [];
     if (e === 0 && re) return tt.guide0(nomR, lst, nomG(aSemer[0]?.graine ?? re.ingredients[0].graine));
@@ -117,7 +117,7 @@ export class Game {
     const j = this.state.eco.jardin;
     if ((j.etape ?? 0) === 5 && E.manque(j, ECO).every(m => E.cultivables(j).has(m.graine))) this.etape(6);
   }
-  private ecoNow(): number { const e = this.state.eco; return e.t0 + (Date.now() - e.start) * (this.demo ? 90 : 1); }
+  private ecoNow(): number { const e = this.state.eco; return e.t0 + (Date.now() - e.start) * (this.demo ? (new URLSearchParams(location.search).get('demo') === '50' ? 50 : 90) : 1); }
   private ecoRng = E.rng((Date.now() / 1000) | 0);
   private ecoTimer = 0;
   /** Le jardin des règles reflète les pots du balcon (pour le cours et la recette). */
@@ -154,7 +154,7 @@ export class Game {
     const idEv = (x: E.Evenement) => `${x.a}_${x.type}_${x.deId ?? ''}`;
     if (nouveaux.length <= 2) {
       for (const ev of nouveaux) {
-        const txt = lang() === 'en' ? ev.texte_en : ev.texte_fr;
+        const txt = texteChamp(ev, 'texte');
         if (ev.type === 'plat_recu' && ev.deId) this.ui.notifier(`${txt} ${t().tuPeuxRepondre}`, 'notifs', idEv(ev));
         else this.ui.notifier(txt, ou[ev.type]);
       }
@@ -217,7 +217,7 @@ export class Game {
     if ((CATALOG as any).bibliotheque) { this.ui.setProgress(0, 1, 'animations'); await BIBLIO.charger((CATALOG as any).bibliotheque); if ((CATALOG as any).bibliotheque_extra) BIBLIO.chargerExtra((CATALOG as any).bibliotheque_extra); }
     const q = new URLSearchParams(location.search);
     if (q.get('fast')) P.setSpeed(parseFloat(q.get('fast')!) || 5);
-    if (q.get('demo') === '1') { P.setSpeed(90); this.demo = true; }        // mode démo : tout 90 fois plus vite
+    if (['1', '50', '90'].includes(q.get('demo') ?? '')) { P.setSpeed(q.get('demo') === '50' ? 50 : 90); this.demo = true; } // 1 reste l’alias historique de ×90
     await this.assets.loadCollections();
     await this.assets.loadOptional(['environments', 'interiors', 'env_decor', 'plantes']);   // plantes.glb : tes plantes, 7 stades par variété
     this.world.buildBalcony();
@@ -1195,7 +1195,7 @@ export class Game {
       : !wet ? `<div class="st">${tt.stageNames[stage]}</div>${barre}<div class="warn">${tt.pauseSoif}</div>`
       : `<div class="st">${tt.stageNames[stage]} · <b>${tt.ilReste(UI.timeLeft(P.remainingSec(pl)))}</b></div>${barre}`;
     const cours = this.state.eco.immeuble.cours[pl.plant] ?? d.harvest;
-    return `<b>${icon(pl.plant)} ${tx(d.name)}</b>${time}${water}<div class="st">${tt.harvestsDone(pl.harvests, d.harvests)} · ${cours} ${tt.points} / ${lang() === 'fr' ? 'unité' : 'unit'}</div>`;
+    return `<b>${icon(pl.plant)} ${tx(d.name)}</b>${time}${water}<div class="st">${tt.harvestsDone(pl.harvests, d.harvests)} · ${cours} ${tt.points} / ${tt.unite}</div>`;
   }
   private jardinageJoueur = false;
   private preparationJoueur: Promise<void> | null = null;
@@ -1203,7 +1203,7 @@ export class Game {
   /** Le joueur reprend la main ; une séance autonome ne conserve ni ses drapeaux ni ses contacts. */
   private async preparerActionJoueur(): Promise<boolean> {
     if (this.jardinageJoueur || this.sceneEnCours > 0) {           // cuisine, arrosage, plantation, récolte : on ne les interrompt pas
-      this.ui.toast(lang() === 'en' ? 'One moment, almost done!' : 'Un instant, je termine !', 1800);
+      this.ui.toast(t().patienter, 1800);
       return false;
     }
     const personnage = this.char;
@@ -1550,7 +1550,7 @@ export class Game {
     const n = Object.keys(j.poche).length;
     const prix = E.REGLES.BOUTIQUE[n - 3] ?? E.REGLES.BOUTIQUE[E.REGLES.BOUTIQUE.length - 1];
     if (j.poche[id]) { this.ui.toast(tt.dejaATOI, 3000); return; }
-    if (j.interdites.includes(id)) { const g = ECO.graine(id); this.ui.toast((lang() === 'en' ? g.interdit_en : g.interdit_fr) || tt.interdite, 4000); return; }
+    if (j.interdites.includes(id)) { const g = ECO.graine(id); this.ui.toast(texteChamp(g, 'interdit', lang(), lang() === 'es' ? t('en').interdite : tt.interdite), 4000); return; }
     if (n >= E.REGLES.POCHE_MAX) { this.ui.toast(tt.varietesMax, 3500); return; }
     if (j.points < prix) { this.ui.toast(tt.manquePoints(prix, j.points), 4500); return; }
     const ok = E.acheterGraine(j, id);
@@ -1589,16 +1589,17 @@ export class Game {
       const refus = E.refusAccepter(a, e.jardin, this.ecoNow());
       if (refus) { const r = tt.refus[refus]; this.ui.toast(typeof r === 'function' ? r(a.cherche.quantite, cherche) : r, 4000); return; }
       const avec = e.immeuble.jardins.find(x => x.id === a.de)?.nom ?? '?';
-      const message = (l: 'fr' | 'en', avecIcone = false) => {
-        const textes = t(l);
-        const ingredient = (i: E.Ingredient) => `${i.quantite} ${avecIcone ? `${ic(i.graine)} ` : ''}${plantDef(i.graine).name[l].toLowerCase()}`;
+      const message = (l: Lang, avecIcone = false) => {
+        const lecture = l === 'es' && ![a.cherche, a.donne].every(i => texteNonVide(plantDef(i.graine).name.es)) ? 'en' : l;
+        const textes = t(lecture);
+        const ingredient = (i: E.Ingredient) => `${i.quantite} ${avecIcone ? `${ic(i.graine)} ` : ''}${tx(plantDef(i.graine).name, lecture).toLowerCase()}`;
         return textes.trocFait(ingredient(a.cherche), ingredient(a.donne), avec);
       };
-      const msg = message(lang(), true), texte_fr = message('fr'), texte_en = message('en');
+      const msg = message(lang(), true), texte_fr = message('fr'), texte_en = message('en'), texte_es = message('es');
       if (!E.accepterAnnonce(e.immeuble, a, e.jardin, this.ecoNow())) return;
       this.ui.toast(msg, 4500, true);
       e.immeuble.evenements.push({ a: this.ecoNow(), pour: e.jardin.id, type: 'troc_accepte', de: avec, deId: a.de, repondu: true,
-        texte_fr, texte_en });
+        texte_fr, texte_en, texte_es });
     } catch (erreur) {
       // Un échange en erreur ne doit pas arrêter les suivants du bouton « tout accepter ».
       console.warn('[troc accepter]', id, erreur);
@@ -1665,7 +1666,9 @@ export class Game {
     this.mainsCuisine(pan, t0, () => saupoudre); mainsDeCuisine = this.char.mains;
     W.coeurs(() => pan.clone().add(new THREE.Vector3(0, .12, 0)), 3000, 420);   // quelques cœurs montent avec la vapeur
     await wait(3200); if (!valide()) return;
-    const amour = lang() === 'en' ? re.amour_en : re.amour_fr;              // l'ingrédient le plus important
+    const amour = lang() === 'es'
+      ? (texteNonVide(re.amour_es) || texteNonVide(re.amour_en) ? texteChamp(re, 'amour') : undefined)
+      : lang() === 'en' ? re.amour_en : re.amour_fr;              // l'ingrédient le plus important
     if (amour) {
       saupoudre = true; this.ui.toast(amour.charAt(0).toUpperCase() + amour.slice(1), 2600);
       const main = this.char.bone('RightHand');
@@ -1850,7 +1853,7 @@ export class Game {
     this.sow(libre.id, g);
   }
   /** Répondre à un voisin avec une phrase préécrite ; il répondra un peu plus tard. */
-  private repondre(id: string, texte: { fr: string; en: string }) {
+  private repondre(id: string, texte: Bi) {
     const e = this.state.eco;
     const ev = e.immeuble.evenements.find(x => `${x.a}_${x.type}_${x.deId ?? ''}` === id);
     const v = ev ? e.immeuble.jardins.find(x => x.id === ev.deId) : undefined;
@@ -1901,7 +1904,7 @@ export class Game {
       assiette.parent?.remove(assiette);
       if (this.porte === assiette) this.porte = null;
     }                                // c'est la vraie assiette, garnie, qui s'envole
-    this.ui.toast(tt.platOffert(lang() === 'en' ? re.nom_en : re.nom_fr, a.nom, plat.valeur), 3000);
+    this.ui.toast(tt.platOffert(texteChamp(re, 'nom'), a.nom, plat.valeur), 3000);
     const ecran = this.world.toScreen(depart);
     const avant = e.jardin.points - plat.valeur;
     setTimeout(() => this.ui.piecesVolent(ecran.x, ecran.y, avant, e.jardin.points, () => {
