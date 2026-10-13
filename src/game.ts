@@ -257,7 +257,19 @@ export class Game {
     await this.teinterAccueil();
     this.showroom.resize(window.innerWidth / window.innerHeight);
     window.addEventListener('resize', () => this.showroom?.resize(window.innerWidth / window.innerHeight));
-    this.ui.showStart(!!saved, saved ? tx(charDef(saved.character).name) : '', saved?.character ?? '');
+    // La reprise remplace seulement l'accueil : chargement et récupération du nuage sont terminés.
+    let reprise: GameState | null = null;
+    try {
+      const perso = sessionStorage.getItem('jdp.enPartie');
+      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+      if (navigation?.type === 'reload' && perso && CATALOG.characters.some(c => c.id === perso)) {
+        const partie = await this.save.loadFor(perso);
+        if (partie?.character === perso && partie.eco?.jardin && partie.eco?.immeuble && Array.isArray(partie.pots)) reprise = partie;
+      }
+      if (!reprise) sessionStorage.removeItem('jdp.enPartie');
+    } catch { /* stockage indisponible : accueil habituel */ }
+    if (reprise) { this.state = reprise; await this.continueGame(reprise.character); }
+    else this.ui.showStart(!!saved, saved ? tx(charDef(saved.character).name) : '', saved?.character ?? '');
     this.loop();
   }
   /** Sur l'accueil : toucher un personnage le fait danser et ouvre sa fiche. */
@@ -450,6 +462,7 @@ export class Game {
         sit: () => { this.autoToken++; const tk = this.autoToken; this.goSit(tk, 'sit'); },
       });
     }
+    try { sessionStorage.setItem('jdp.enPartie', s.character); } catch { /* stockage indisponible */ }
   }
   private async reset() {
     await this.save.clear(this.state?.character);
@@ -470,6 +483,7 @@ export class Game {
     sur(() => this.ui.rangerTelephone()); sur(() => this.ui.fermerModal()); sur(() => this.ui.hideCard()); sur(() => this.ui.guideHide());
   }
   private goHome() {
+    try { sessionStorage.removeItem('jdp.enPartie'); } catch { /* stockage indisponible */ }
     this.persist();
     this.running = false;
     this.autoToken++;
