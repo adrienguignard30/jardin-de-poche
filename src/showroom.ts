@@ -29,6 +29,11 @@ export class Showroom {
     // le halo au sol sous le personnage choisi : on voit qu'il est sélectionné sans un mot
     this.halo = new THREE.Mesh(new THREE.RingGeometry(.42, .55, 48), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .0, depthWrite: false }));
     this.halo.rotation.x = -Math.PI / 2; this.halo.position.y = .01; this.scene.add(this.halo);
+    // Le jeu cesse d'actualiser le showroom après hideStart : annuler aussi hors update().
+    const accueil = document.getElementById('start');
+    if (accueil) new MutationObserver(() => {
+      if (accueil.classList.contains('hidden')) this.arreterAccueil();
+    }).observe(accueil, { attributes: true, attributeFilter: ['class'] });
   }
   halo: THREE.Mesh;
   focused = '';
@@ -98,6 +103,14 @@ export class Showroom {
         const c = new Character(this.assets, asset);
         const x = (i - (n - 1) / 2) * 1.55;
         c.teleport(new THREE.Vector3(x, 0, 0), 0);
+        if (def.id === 'marcel' || def.id === 'jimy') {
+          c.play('idle', 0); c.update(0);
+          const os: { bone: THREE.Object3D; repos: THREE.Quaternion }[] = [];
+          for (const cote of ['Left', 'Right']) for (const nom of ['Arm', 'ForeArm', 'Hand']) {
+            const bone = c.bone(cote + nom); if (bone) os.push({ bone, repos: bone.quaternion.clone() });
+          }
+          this.brasDanse.set(c, { os, poids: 0, amplitude: def.id === 'marcel' ? .75 : .25 });
+        }
         c.obj.traverse(o => { if ((o as THREE.Mesh).isMesh) (o as THREE.Mesh).castShadow = true; });
         this.scene.add(c.obj);
         this.chars.push({ def, char: c, base: new THREE.Vector3(x, 0, 0) });
@@ -162,25 +175,75 @@ export class Showroom {
     this.selected = ''; this.dancing = '';
     this.demande = ''; clearTimeout(this.danseTimer); void this.trajets();
   }
-  private async trajets() {
+  private mouvements = new Map<Character, { cible: THREE.Vector3; vitesse: THREE.Vector3; epoch: number }>();
+  private danseRestante = 0;
+  private brasDanse = new Map<Character, { os: { bone: THREE.Object3D; repos: THREE.Quaternion }[]; poids: number; amplitude: number }>();
+  private adoucirBrasDanse(char: Character, active: boolean, dt: number) {
+    const r = this.brasDanse.get(char); if (!r) return;
+    // L'entrée du clip est déjà fondue depuis idle ; limiter les bras dès la première image.
+    r.poids = active ? 1 : Math.max(0, r.poids - dt / .85);
+    if (!r.poids) return;
+    for (const { bone, repos } of r.os) bone.quaternion.slerp(repos, r.amplitude * r.poids);
+    char.obj.updateMatrixWorld(true);
+  }
+  private arreterAccueil() {
+    this.routeEpoch++; this.mouvements.clear(); this.enRoute = false;
+    this.demande = null; this.dancing = ''; this.danseRestante = 0;
+    clearTimeout(this.danseTimer);
+    for (const c of this.chars) { c.char.annulerMarche(); c.char.play('idle', .85); }
+  }
+  private trajets() {
     if (this.focused) return;
     const epoch = ++this.routeEpoch, id = this.demande;
-    this.demande = null; this.route = []; this.enRoute = true;
-    // Chaque personnage garde sa colonne : changement immédiat, sans permutation.
-    for (const c of this.chars) c.char.annulerMarche();
-    try {
-      await Promise.all(this.chars.map(c => c.char.goTo(
-        new THREE.Vector3(c.base.x, 0, c.def.id === id ? .4 : 0), 0)));
-      if (epoch !== this.routeEpoch) return;
-      for (const c of this.chars) c.char.play('idle', .4);
-    } finally { if (epoch === this.routeEpoch) this.enRoute = false; }
+    this.demande = null; this.route = []; this.danseRestante = 0;
+    // Conserver la vitesse courante si une sélection arrive pendant un déplacement.
+    for (const c of this.chars) {
+      const vitesse = this.mouvements.get(c.char)?.vitesse.clone() ?? new THREE.Vector3();
+      c.char.annulerMarche(); c.char.play('idle', .85);
+      this.mouvements.set(c.char, { cible: new THREE.Vector3(c.base.x, 0, c.def.id === id ? .4 : 0), vitesse, epoch });
+    }
+    this.enRoute = true;
   }
   sheetOpen = false;
+  private orienter(c: { char: Character }, angle: number, dt: number) {
+    const dy = Math.atan2(Math.sin(angle - c.char.obj.rotation.y), Math.cos(angle - c.char.obj.rotation.y));
+    c.char.obj.rotation.y += dy * (1 - Math.exp(-4 * dt));
+  }
   private lookAt(c: { char: Character }, target: THREE.Vector3, dt: number) {
     const d = target.clone().sub(c.char.obj.position);
-    const want = Math.atan2(d.x, d.z);
-    let dy = want - c.char.obj.rotation.y; dy = Math.atan2(Math.sin(dy), Math.cos(dy));
-    c.char.obj.rotation.y += dy * Math.min(1, dt * 3);
+    if (d.lengthSq() > 1e-8) this.orienter(c, Math.atan2(d.x, d.z), dt);
+  }
+  private avancerAccueil(dt: number) {
+    for (const [char, m] of this.mouvements) {
+      if (m.epoch !== this.routeEpoch) { this.mouvements.delete(char); continue; }
+      // Ressort amorti exact : départ/arrêt doux, sans coupure à chaque clic ni dépendance au FPS.
+      const ecart = char.obj.position.clone().sub(m.cible), omega = 9;
+      const j = m.vitesse.clone().addScaledVector(ecart, omega), e = Math.exp(-omega * dt);
+      char.obj.position.copy(m.cible).add(ecart.addScaledVector(j, dt).multiplyScalar(e));
+      m.vitesse.addScaledVector(j, -omega * dt).multiplyScalar(e);
+      const vitesse = m.vitesse.length();
+      if (char.obj.position.distanceToSquared(m.cible) < .000025 && vitesse < .04) {
+        char.obj.position.copy(m.cible); char.play('idle', .35); this.mouvements.delete(char);
+      } else {
+        const recul = m.cible.z < char.obj.position.z;
+        const clip = recul && char.has('walk_back') ? 'walk_back' : 'walk';
+        char.play(clip, .18, 1); // cadence normale : play() ne réactualise pas la vitesse d’un clip déjà lancé
+      }
+    }
+    if (this.enRoute && !this.mouvements.size) {
+      this.enRoute = false;
+      const c = this.chars.find(x => x.def.id === this.selected);
+      if (c) {
+        const danses = c.char.variantes('dance').sort();
+        const index = Math.max(0, ['lea', 'marcel', 'jimy'].indexOf(c.def.id));
+        const prefere = c.def.id === 'marcel' ? 'dance_9' : c.def.id === 'jimy' ? 'dance' : undefined;
+        const clip = prefere ? (c.char.has(prefere) ? prefere : undefined) : danses[index % Math.max(1, danses.length)];
+        if (clip) { c.char.play(clip, .25, 1); this.dancing = c.def.id; this.danseRestante = 6; }
+      }
+    }
+    if (this.dancing && (this.danseRestante -= dt) <= 0) {
+      this.chars.find(c => c.def.id === this.dancing)?.char.play('idle', .85); this.dancing = '';
+    }
   }
   /** Positions écran des têtes, pour les étiquettes HTML. */
   labels(): { id: string; x: number; y: number; visible: boolean }[] {
@@ -191,25 +254,27 @@ export class Showroom {
     });
   }
   update(dt: number) {
+    dt = Math.max(0, Math.min(dt, .05));
     this.t += dt;
     const selH = this.chars.find(c => c.def.id === this.selected);
     const hm = this.halo.material as THREE.MeshBasicMaterial;
     hm.opacity += ((selH ? .7 : 0) - hm.opacity) * Math.min(1, dt * 5);
     if (selH) { this.halo.position.x = selH.char.obj.position.x; this.halo.position.z = selH.char.obj.position.z; this.halo.scale.setScalar(1 + Math.sin(this.t * 2) * .04); }
-    if (this.focused) { for (const c of this.chars) c.char.update(dt); this.suivreCamera(dt); return; }
+    if (this.focused) { for (const r of this.brasDanse.values()) r.poids = 0; this.mouvements.clear(); this.enRoute = false; this.danseRestante = 0; for (const c of this.chars) c.char.update(dt); this.suivreCamera(dt); return; }
     const want = this.portrait ? 0 : this.pan;
     const lookY = this.portrait && this.sheetOpen ? -.45 : 1.0;       // fiche ouverte sur téléphone : le personnage monte au-dessus du panneau
     if (Math.abs(want - this.panNow) > .001 || Math.abs(lookY - this.lookYNow) > .001) {
       this.panNow += (want - this.panNow) * Math.min(1, dt * 4); this.lookYNow += (lookY - this.lookYNow) * Math.min(1, dt * 4);
       this.camera.position.x = this.panNow; this.camera.lookAt(this.panNow, this.lookYNow, 0);
     }
+    this.avancerAccueil(dt);
     const sel = this.chars.find(c => c.def.id === this.selected);
     for (const c of this.chars) {
       c.char.update(dt);
-      if (c.char.busy) continue;                     // en train de marcher : il gère lui-même son orientation
+      this.adoucirBrasDanse(c.char, this.dancing === c.def.id, dt);
       if (sel && c !== sel) this.lookAt(c, sel.char.obj.position, dt);
-      else if (c === sel) { c.char.obj.rotation.y += -c.char.obj.rotation.y * Math.min(1, dt * 3); }
-      else { const want = c.base.x < 0 ? .3 : c.base.x > 0 ? -.3 : 0; c.char.obj.rotation.y += (want - c.char.obj.rotation.y) * Math.min(1, dt * 2); }
+      else if (c === sel) this.orienter(c, 0, dt);
+      else this.orienter(c, c.base.x < 0 ? .3 : c.base.x > 0 ? -.3 : 0, dt);
     }
     if (this.backdrop) this.backdrop.position.x = Math.sin(this.t * .05) * 1.5;
     this.couvrirFond();
