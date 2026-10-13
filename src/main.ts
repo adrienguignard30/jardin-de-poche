@@ -1,6 +1,7 @@
 ﻿import './style.css';
 import { Game } from './game';
 import { signalerBug } from './bugs';
+import { demarrerSuivi } from './suivi';
 
 // ---------- toute erreur s'affiche À L'ÉCRAN, en rouge, avec un bouton pour la copier : plus besoin d'ouvrir la console
 const erreurs: string[] = [];
@@ -37,6 +38,7 @@ window.addEventListener('unhandledrejection', ev => montrerErreur(texteErreur(ev
 const canvas = document.getElementById('c') as HTMLCanvasElement;
 const game = new Game(canvas);
 (window as any).__jdp = game;
+demarrerSuivi();                                      // temps de jeu, appareil, ville : vers le tableau de bord (page /tableau/)
 game.boot().catch(err => {
   console.error(err);
   montrerErreur(texteErreur(err));
