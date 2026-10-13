@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Tableau de bord</title>
+<style>
+  /* Potager de Poche — tableau de bord. Page privée : les chiffres arrivent de /api/tableau, seulement avec le bon code. */
+  :root {
+    color-scheme: light;
+    --page: #f6f5f1; --carte: #fcfcfb; --encre: #0b0b0b; --encre-2: #52514e; --muet: #6f6d68; --trait: #e1e0d9; --survol: #f0efe9;
+    --barre: #008300; --barre-piste: #e4efe2; --bon: #0a7d0a; --bon-fond: #e6f4e6; --alerte: #c22f2f; --alerte-fond: #fbeaea;
+    --ombre: 0 1px 2px rgba(20, 20, 10, .05), 0 4px 16px rgba(20, 20, 10, .05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page: #0d0d0d; --carte: #1a1a19; --encre: #ffffff; --encre-2: #c3c2b7; --muet: #9a988f; --trait: #2c2c2a; --survol: #232322;
+      --barre: #2f9e3a; --barre-piste: #1f2b1f; --bon: #4cc24c; --bon-fond: #16261a; --alerte: #ef6b6b; --alerte-fond: #2e1a1a;
+      --ombre: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --carte: #1a1a19; --encre: #ffffff; --encre-2: #c3c2b7; --muet: #9a988f; --trait: #2c2c2a; --survol: #232322;
+    --barre: #2f9e3a; --barre-piste: #1f2b1f; --bon: #4cc24c; --bon-fond: #16261a; --alerte: #ef6b6b; --alerte-fond: #2e1a1a;
+    --ombre: none;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--page); color: var(--encre); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 1120px; margin: 0 auto; padding: 20px 16px 40px; padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+  button { font: inherit; color: inherit; }
+  [hidden] { display: none !important; }
+
+  /* en-tête */
+  header { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 18px; }
+  .titres { flex: 1; min-width: 0; }
+  .marque { color: var(--encre-2); font-size: 13px; font-weight: 600; letter-spacing: .02em; }
+  h1 { margin: 2px 0 0; font-size: 24px; line-height: 1.15; font-weight: 700; letter-spacing: -.01em; }
+  .etat { display: flex; align-items: center; gap: 8px; color: var(--muet); font-size: 13px; white-space: nowrap; }
+  .rond { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--trait); background: var(--carte); cursor: pointer; display: grid; place-items: center; font-size: 17px; }
+  .rond:hover { background: var(--survol); }
+  .rond.tourne span { animation: tourne .8s linear infinite; display: inline-block; }
+  @keyframes tourne { to { transform: rotate(360deg); } }
+
+  /* entrée du code */
+  .entree { max-width: 380px; margin: 12vh auto 0; background: var(--carte); border: 1px solid var(--trait); border-radius: 16px; padding: 24px; box-shadow: var(--ombre); }
+  .entree h2 { margin: 0 0 4px; font-size: 18px; }
+  .entree p { margin: 0 0 16px; color: var(--encre-2); font-size: 14px; }
+  .entree label.champ { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .entree input[type=password] { width: 100%; font: inherit; font-size: 16px; padding: 11px 12px; border-radius: 10px; border: 1px solid var(--trait); background: var(--page); color: var(--encre); }
+  .entree input[type=password]:focus { outline: 2px solid var(--barre); outline-offset: 1px; }
+  .souvenir { display: flex; align-items: center; gap: 8px; margin: 12px 0 16px; font-size: 14px; color: var(--encre-2); }
+  .bouton { width: 100%; padding: 12px; border: 0; border-radius: 10px; background: var(--encre); color: var(--carte); font-weight: 700; cursor: pointer; }
+  .message { margin: 12px 0 0; color: var(--alerte); font-size: 14px; min-height: 1em; }
+
+  /* chiffres clés */
+  .tuiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .tuile { background: var(--carte); border: 1px solid var(--trait); border-radius: 14px; padding: 14px 16px; box-shadow: var(--ombre); min-width: 0; }
+  .tuile .lib { font-size: 13px; color: var(--encre-2); display: flex; align-items: center; gap: 6px; }
+  .tuile .val { font-size: 32px; font-weight: 650; line-height: 1.1; margin-top: 6px; }
+  .tuile .sous { font-size: 13px; color: var(--muet); margin-top: 4px; }
+  .tuile.direct .val { font-size: 40px; }
+  .pastille { width: 8px; height: 8px; border-radius: 50%; background: var(--muet); flex: none; }
+  .pastille.vif { background: var(--bon); box-shadow: 0 0 0 0 var(--bon); animation: pouls 2s infinite; }
+  @keyframes pouls { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--bon) 50%, transparent); } 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  .tuile.ok { background: var(--bon-fond); } .tuile.ok .val { color: var(--bon); }
+  .tuile.ko { background: var(--alerte-fond); } .tuile.ko .val { color: var(--alerte); }
+
+  /* cartes */
+  .grille { display: grid; grid-template-columns: 1.25fr 1fr; grid-template-areas: "bugs joueurs" "nouveaux joueurs" "persos joueurs"; grid-template-rows: auto auto 1fr; gap: 16px; align-items: start; }
+  #cBugs { grid-area: bugs; } #cJoueurs { grid-area: joueurs; } #cNouveaux { grid-area: nouveaux; } #cPersos { grid-area: persos; }
+  .carte { background: var(--carte); border: 1px solid var(--trait); border-radius: 14px; box-shadow: var(--ombre); min-width: 0; }
+  .carte > h2 { margin: 0; padding: 14px 16px 10px; font-size: 15px; font-weight: 700; display: flex; align-items: baseline; gap: 8px; }
+  .carte > h2 .nb { color: var(--muet); font-weight: 500; font-size: 13px; }
+  .vide { padding: 4px 16px 18px; color: var(--encre-2); font-size: 14px; }
+  .vide strong { color: var(--bon); }
+  ul.liste { list-style: none; margin: 0; padding: 0 0 6px; }
+
+  /* bugs */
+  .bug { border-top: 1px solid var(--trait); }
+  .bugTete { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 10px 16px 10px 14px; cursor: pointer; border-left: 3px solid transparent; }
+  .bugTete:hover { background: var(--survol); }
+  .bug.recent .bugTete { border-left-color: var(--alerte); }
+  .bugMsg { font: 13px/1.4 ui-monospace, "SF Mono", Consolas, monospace; color: var(--encre); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+  .bugMeta { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 4px; font-size: 12.5px; color: var(--muet); }
+  .bugMeta .fois { color: var(--alerte); font-weight: 700; }
+  .bugDetail { padding: 0 16px 12px 17px; font-size: 12.5px; color: var(--encre-2); }
+  .bugDetail pre { margin: 0 0 8px; padding: 10px; background: var(--page); border: 1px solid var(--trait); border-radius: 8px; font: 12px/1.45 ui-monospace, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 220px; overflow: auto; color: var(--encre); }
+  .bugDetail div { margin-top: 2px; }
+
+  /* joueurs */
+  .joueur { display: grid; grid-template-columns: 10px 1fr auto; gap: 2px 10px; align-items: center; padding: 9px 16px; border-top: 1px solid var(--trait); }
+  .joueur .pastille { grid-row: 1 / span 2; }
+  .jNom { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .jNom small { font-weight: 400; color: var(--muet); font-size: 12.5px; margin-left: 4px; }
+  .jVu { font-size: 12.5px; color: var(--muet); text-align: right; white-space: nowrap; }
+  .jInfos { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-width: 0; }
+  .puce { font-size: 11.5px; padding: 1px 7px; border-radius: 99px; border: 1px solid var(--trait); color: var(--encre-2); }
+  .jScore { font-size: 12.5px; color: var(--encre-2); text-align: right; white-space: nowrap; }
+
+  /* graphiques */
+  .graph { padding: 4px 16px 16px; }
+  .barres { position: relative; display: flex; align-items: flex-end; gap: 2px; height: 120px; border-bottom: 1px solid var(--trait); }
+  .barres .col { flex: 1; height: 100%; display: flex; align-items: flex-end; cursor: default; border-radius: 4px 4px 0 0; outline: none; }
+  .barres .col:hover, .barres .col:focus-visible { background: var(--survol); }
+  .barres .b { width: 100%; background: var(--barre); border-radius: 4px 4px 0 0; min-height: 0; }
+  .barres .b.zero { height: 2px !important; background: var(--trait); border-radius: 1px; }
+  .maxi { position: absolute; left: 0; right: 0; border-top: 1px dashed var(--trait); pointer-events: none; }
+  .maxi span { position: absolute; right: 0; top: -17px; font-size: 11.5px; color: var(--muet); background: var(--carte); padding-left: 4px; }
+  .axeX { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muet); margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .total { font-size: 13px; color: var(--encre-2); margin-top: 10px; }
+  .hbarres { display: grid; grid-template-columns: auto 1fr auto; gap: 10px 12px; align-items: center; padding: 6px 16px 18px; }
+  .hbarres .nom { font-size: 14px; font-weight: 600; }
+  .hbarres .piste { height: 12px; background: var(--barre-piste); border-radius: 0 4px 4px 0; overflow: hidden; }
+  .hbarres .rempli { height: 100%; background: var(--barre); border-radius: 0 4px 4px 0; }
+  .hbarres .n { font-size: 13px; color: var(--encre-2); font-variant-numeric: tabular-nums; text-align: right; }
+  .masque { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  #bulle { position: fixed; z-index: 10; pointer-events: none; background: var(--encre); color: var(--carte); font-size: 12.5px; padding: 6px 9px; border-radius: 8px; white-space: nowrap; transform: translate(-50%, calc(-100% - 8px)); }
+
+  footer { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; color: var(--muet); font-size: 12.5px; }
+  .lien { background: none; border: 0; padding: 0; color: var(--encre-2); text-decoration: underline; cursor: pointer; font-size: 12.5px; }
+  .alerte { background: var(--alerte-fond); color: var(--alerte); border-radius: 10px; padding: 10px 12px; font-size: 14px; margin-bottom: 14px; }
+
+  @media (max-width: 860px) { .grille { grid-template-columns: 1fr; grid-template-areas: "bugs" "joueurs" "nouveaux" "persos"; grid-template-rows: none; } }
+  @media (max-width: 640px) {
+    main { padding-top: 14px; }
+    h1 { font-size: 21px; }
+    .etat #maj { display: none; }
+    .tuiles { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tuile { padding: 12px 14px; }
+    .tuile .val { font-size: 28px; } .tuile.direct .val { font-size: 32px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .pastille.vif, .rond.tourne span { animation: none; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="titres">
+      <div class="marque">🌱 Potager de Poche</div>
+      <h1>Tableau de bord</h1>
+    </div>
+    <div class="etat" id="etat" hidden>
+      <span id="maj" aria-live="polite"></span>
+      <button class="rond" id="actualiser" title="Actualiser" aria-label="Actualiser"><span>↻</span></button>
+    </div>
+  </header>
+
+  <form class="entree" id="entree" hidden>
+    <h2>Accès privé</h2>
+    <p>Entre ton code d'accès (celui que tu as mis dans Vercel, TABLEAU_CODE).</p>
+    <label class="champ" for="code">Code d'accès</label>
+    <input type="password" id="code" autocomplete="current-password" required>
+    <label class="souvenir"><input type="checkbox" id="souvenir" checked> Se souvenir sur cet appareil</label>
+    <button class="bouton" type="submit">Entrer</button>
+    <p class="message" id="msgEntree" role="alert"></p>
+  </form>
+
+  <div id="contenu" hidden>
+    <div class="alerte" id="alerte" role="alert" hidden></div>
+    <div class="tuiles">
+      <div class="tuile direct"><div class="lib"><span class="pastille" id="pDirect"></span>En ce moment</div><div class="val" id="tDirect">–</div><div class="sous">actifs depuis 5 min</div></div>
+      <div class="tuile"><div class="lib">Aujourd'hui</div><div class="val" id="tJour">–</div><div class="sous" id="tJourSous">&nbsp;</div></div>
+      <div class="tuile"><div class="lib">Joueurs</div><div class="val" id="tTotal">–</div><div class="sous" id="tTotalSous">&nbsp;</div></div>
+      <div class="tuile" id="tuileBugs"><div class="lib" id="tBugsLib">Bugs · 24 h</div><div class="val" id="tBugs">–</div><div class="sous" id="tBugsSous">&nbsp;</div></div>
+    </div>
+
+    <div class="grille">
+      <section class="carte" id="cBugs" aria-labelledby="hBugs">
+        <h2 id="hBugs">Bugs <span class="nb" id="nbBugs"></span></h2>
+        <ul class="liste" id="bugs"></ul>
+      </section>
+      <section class="carte" id="cJoueurs" aria-labelledby="hJoueurs">
+        <h2 id="hJoueurs">Joueurs récents <span class="nb" id="nbJoueurs"></span></h2>
+        <ul class="liste" id="joueurs"></ul>
+      </section>
+      <section class="carte" id="cNouveaux" aria-labelledby="hNouveaux">
+        <h2 id="hNouveaux">Nouveaux joueurs <span class="nb">14 derniers jours</span></h2>
+        <div class="graph" id="graphNouveaux"></div>
+      </section>
+      <section class="carte" id="cPersos" aria-labelledby="hPersos">
+        <h2 id="hPersos">Personnages joués <span class="nb">parties enregistrées</span></h2>
+        <div id="graphPersos"></div>
+      </section>
+    </div>
+
+    <footer>
+      <span>Actualisé tout seul chaque minute · heure de Paris</span>
+      <button class="lien" id="oublier" type="button">Oublier le code sur cet appareil</button>
+    </footer>
+  </div>
+</main>
+<div id="bulle" role="tooltip" hidden></div>
+
+<script>
+(() => {
+  'use strict';
+  const CLE = 'jdp.tableau.code';
+  const PERSOS = { lea: 'Léa', marcel: 'Marcel', jimy: 'Jimy' };
+  const $ = id => document.getElementById(id);
+  // Tout ce qui vient de la base (noms, messages d'erreur) est écrit en TEXTE, jamais en HTML.
+  const h = (tag, cls, texte) => { const e = document.createElement(tag); if (cls) e.className = cls; if (texte != null) e.textContent = String(texte); return e; };
+  const lire = () => { try { return localStorage.getItem(CLE) || sessionStorage.getItem(CLE) || ''; } catch { return ''; } };
+  const garder = (c, toujours) => { try { (toujours ? localStorage : sessionStorage).setItem(CLE, c); } catch { /* navigation privée */ } };
+  const oublier = () => { try { localStorage.removeItem(CLE); sessionStorage.removeItem(CLE); } catch { /* rien */ } };
+
+  let code = lire(), donnees = null, derniere = 0, enCours = false;
+
+  // ---------- les dates, en français, heure de Paris
+  const fmtJour = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'short', day: 'numeric', month: 'short' });
+  const fmtCourt = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', day: 'numeric', month: 'short' });
+  const fmtComplet = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+  function ilYa(iso) {
+    const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+    if (s < 60) return 'à l’instant';
+    if (s < 3600) return `il y a ${Math.floor(s / 60)} min`;
+    if (s < 86400) return `il y a ${Math.floor(s / 3600)} h`;
+    const j = Math.floor(s / 86400);
+    return j === 1 ? 'hier' : `il y a ${j} j`;
+  }
+  const pluriel = (n, un, plusieurs) => `${n} ${n > 1 ? plusieurs : un}`;
+  const nombre = n => new Intl.NumberFormat('fr-FR').format(n ?? 0);
+
+  // ---------- les écrans
+  function montrerEntree(msg) {
+    $('contenu').hidden = true; $('etat').hidden = true; $('entree').hidden = false;
+    $('msgEntree').textContent = msg || '';
+    setTimeout(() => $('code').focus(), 50);
+  }
+  function montrerAlerte(msg) { const a = $('alerte'); a.textContent = msg || ''; a.hidden = !msg; }
+
+  async function charger() {
+    if (!code) { montrerEntree(''); return; }
+    if (enCours) return; enCours = true;
+    $('actualiser').classList.add('tourne');
+    try {
+      const r = await fetch('/api/tableau', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }), cache: 'no-store' });
+      let j = null; try { j = await r.json(); } catch { j = null; }
+      if (r.status === 401) { oublier(); code = ''; montrerEntree('Code incorrect.'); return; }
+      if (r.status === 503) { montrerEntree('Le tableau n’est pas encore réglé : ajoute TABLEAU_CODE (12 caractères ou plus) et SUPABASE_SECRET_KEY dans Vercel, puis remets le site en ligne.'); return; }
+      if (!r.ok || !j) {
+        const detail = j && j.detail ? ` (${j.detail})` : '';
+        if (donnees) { montrerAlerte(`Actualisation impossible pour l’instant${detail}. Les chiffres affichés datent de ${ilYa(derniere)}.`); return; }
+        montrerEntree(`La base n’a pas répondu${detail}. As-tu bien lancé le fichier SQL dans Supabase ?`); return;
+      }
+      donnees = j; derniere = new Date().toISOString();
+      montrerAlerte('');
+      $('entree').hidden = true; $('contenu').hidden = false; $('etat').hidden = false;
+      dessiner(j);
+    } catch {
+      if (donnees) montrerAlerte('Pas de connexion : les chiffres affichés ne sont peut-être plus à jour.');
+      else montrerEntree('Pas de connexion. Réessaie dans un instant.');
+    } finally {
+      enCours = false; $('actualiser').classList.remove('tourne'); majHeure();
+    }
+  }
+  function majHeure() { if (derniere) $('maj').textContent = `Mis à jour ${ilYa(derniere)}`; }
+
+  // ---------- dessiner
+  function dessiner(d) {
+    const J = d.joueurs || {};
+    $('tDirect').textContent = nombre(J.en_ce_moment);
+    $('pDirect').className = 'pastille' + (J.en_ce_moment > 0 ? ' vif' : '');
+    $('tJour').textContent = nombre(J.aujourdhui);
+    $('tJourSous').textContent = J.nouveaux_jour > 0 ? `dont ${pluriel(J.nouveaux_jour, 'nouveau', 'nouveaux')}` : 'aucun nouveau joueur';
+    $('tTotal').textContent = nombre(J.total);
+    $('tTotalSous').textContent = `${pluriel(J.comptes || 0, 'compte', 'comptes')} · ${pluriel(J.invites || 0, 'invité', 'invités')}`;
+    const nb = d.bugs_24h || 0, tb = $('tuileBugs');
+    tb.className = 'tuile ' + (nb > 0 ? 'ko' : 'ok');
+    $('tBugs').textContent = nb > 0 ? `⚠ ${nombre(nb)}` : '✓ 0';
+    $('tBugsSous').textContent = nb > 0 ? (nb > 1 ? 'erreurs différentes' : 'erreur') : 'aucune erreur';
+    dessinerBugs(d.bugs || []);
+    dessinerJoueurs(d.recents || []);
+    dessinerNouveaux(d.nouveaux_par_jour || []);
+    dessinerPersos(d.persos || {});
+  }
+
+  function dessinerBugs(liste) {
+    const ul = $('bugs'); ul.replaceChildren();
+    $('nbBugs').textContent = liste.length ? `${liste.length} (30 derniers jours)` : '';
+    if (!liste.length) {
+      const p = h('li', 'vide'); p.append(h('strong', null, '✓ Aucun bug signalé. '), 'Les erreurs du jeu arriveront ici toutes seules, avec le personnage et l’appareil.');
+      ul.append(p); return;
+    }
+    const jour = Date.now() - 86400e3;
+    for (const b of liste) {
+      const li = h('li', 'bug' + (new Date(b.vu_le).getTime() > jour ? ' recent' : ''));
+      const tete = h('button', 'bugTete'); tete.type = 'button'; tete.setAttribute('aria-expanded', 'false');
+      tete.append(h('span', 'bugMsg', b.message));
+      const meta = h('span', 'bugMeta');
+      meta.append(h('span', null, ilYa(b.vu_le)));
+      if (b.fois > 1) meta.append(h('span', 'fois', `×${nombre(b.fois)}`));
+      if (b.perso) meta.append(h('span', null, PERSOS[b.perso] || b.perso));
+      if (b.appareil) meta.append(h('span', null, b.appareil));
+      meta.append(h('span', null, b.joueur_pseudo ? `@${b.joueur_pseudo}` : b.joueur_nom ? `${b.joueur_nom} (invité)` : 'joueur inconnu'));
+      tete.append(meta);
+      const det = h('div', 'bugDetail'); det.hidden = true;
+      if (b.pile) det.append(h('pre', null, b.pile));
+      det.append(h('div', null, `Première fois : ${fmtComplet.format(new Date(b.cree_le))}`));
+      det.append(h('div', null, `Dernière fois : ${fmtComplet.format(new Date(b.vu_le))}`));
+      if (b.page) det.append(h('div', null, `Page : ${b.page}`));
+      tete.onclick = () => { det.hidden = !det.hidden; tete.setAttribute('aria-expanded', String(!det.hidden)); };
+      li.append(tete, det); ul.append(li);
+    }
+  }
+
+  function dessinerJoueurs(liste) {
+    const ul = $('joueurs'); ul.replaceChildren();
+    $('nbJoueurs').textContent = liste.length ? `${liste.length} derniers` : '';
+    if (!liste.length) { ul.append(h('li', 'vide', 'Personne n’a encore joué.')); return; }
+    const cinq = Date.now() - 5 * 60e3;
+    for (const p of liste) {
+      const li = h('li', 'joueur');
+      const enLigne = new Date(p.vu_le).getTime() > cinq;
+      const pt = h('span', 'pastille' + (enLigne ? ' vif' : '')); pt.title = enLigne ? 'En train de jouer' : '';
+      const nom = h('div', 'jNom', p.pseudo ? `@${p.pseudo}` : (p.nom || 'Jardinier'));
+      nom.append(h('small', null, p.pseudo ? (p.nom && p.nom.toLowerCase() !== p.pseudo ? p.nom : '') : 'invité'));
+      const vu = h('div', 'jVu', enLigne ? 'en jeu' : ilYa(p.vu_le));
+      const infos = h('div', 'jInfos');
+      for (const pe of (p.persos || [])) infos.append(h('span', 'puce', PERSOS[pe] || pe));
+      const score = h('div', 'jScore', `${pluriel(p.plats_offerts || 0, 'plat', 'plats')} · ${pluriel(p.recoltes || 0, 'récolte', 'récoltes')}`);
+      li.append(pt, nom, vu, infos, score); ul.append(li);
+    }
+  }
+
+  function dessinerNouveaux(jours) {
+    const box = $('graphNouveaux'); box.replaceChildren();
+    const max = Math.max(1, ...jours.map(j => j.n));
+    const barres = h('div', 'barres'); barres.setAttribute('role', 'img');
+    const total = jours.reduce((a, j) => a + j.n, 0);
+    barres.setAttribute('aria-label', `Nouveaux joueurs par jour sur 14 jours, ${total} au total`);
+    if (jours.some(j => j.n > 0)) {
+      const ligne = h('div', 'maxi'); ligne.style.bottom = '100%'; ligne.append(h('span', null, `${max}`)); barres.append(ligne);
+    }
+    const table = h('table', 'masque'); const corps = h('tbody'); table.append(corps);
+    for (const j of jours) {
+      const date = new Date(j.jour + 'T12:00:00Z');
+      const col = h('div', 'col'); col.tabIndex = 0;
+      const b = h('div', 'b' + (j.n ? '' : ' zero')); b.style.height = `${(j.n / max) * 100}%`;
+      col.append(b);
+      const texte = `${fmtJour.format(date)} : ${j.n ? pluriel(j.n, 'nouveau joueur', 'nouveaux joueurs') : 'aucun nouveau joueur'}`;
+      bulle(col, texte);
+      barres.append(col);
+      const tr = h('tr'); tr.append(h('td', null, fmtJour.format(date)), h('td', null, j.n)); corps.append(tr);
+    }
+    const axe = h('div', 'axeX');
+    if (jours.length) { axe.append(h('span', null, fmtCourt.format(new Date(jours[0].jour + 'T12:00:00Z'))), h('span', null, 'aujourd’hui')); }
+    box.append(barres, axe, h('div', 'total', `${pluriel(total, 'nouveau joueur', 'nouveaux joueurs')} en 14 jours`), table);
+  }
+
+  function dessinerPersos(p) {
+    const box = $('graphPersos'); box.replaceChildren();
+    const ordre = ['lea', 'marcel', 'jimy'], max = Math.max(1, ...ordre.map(k => p[k] || 0));
+    const g = h('div', 'hbarres');
+    for (const k of ordre) {
+      const n = p[k] || 0;
+      const piste = h('div', 'piste'); const r = h('div', 'rempli'); r.style.width = `${(n / max) * 100}%`; piste.append(r);
+      piste.setAttribute('role', 'img'); piste.setAttribute('aria-label', `${PERSOS[k]} : ${n}`);
+      g.append(h('div', 'nom', PERSOS[k]), piste, h('div', 'n', nombre(n)));
+    }
+    box.append(g);
+  }
+
+  // ---------- la petite bulle (survol à la souris, appui au doigt, clavier)
+  const B = $('bulle');
+  function bulle(el, texte) {
+    const montrer = () => { const r = el.getBoundingClientRect(); B.textContent = texte; B.hidden = false;
+      const x = Math.min(window.innerWidth - B.offsetWidth / 2 - 8, Math.max(B.offsetWidth / 2 + 8, r.left + r.width / 2));
+      B.style.left = `${x}px`; B.style.top = `${r.top + Math.max(0, r.height - (el.firstChild?.offsetHeight || 0))}px`; };
+    const cacher = () => { B.hidden = true; };
+    el.addEventListener('mouseenter', montrer); el.addEventListener('mouseleave', cacher);
+    el.addEventListener('focus', montrer); el.addEventListener('blur', cacher);
+    el.addEventListener('touchstart', () => { montrer(); clearTimeout(el._t); el._t = setTimeout(cacher, 1800); }, { passive: true });
+  }
+  window.addEventListener('scroll', () => { B.hidden = true; }, { passive: true });
+
+  // ---------- les boutons
+  $('entree').addEventListener('submit', e => {
+    e.preventDefault();
+    const c = $('code').value.trim(); if (!c) return;
+    code = c; oublier(); garder(c, $('souvenir').checked); $('code').value = '';
+    $('msgEntree').textContent = 'Vérification…';
+    charger();
+  });
+  $('actualiser').onclick = () => charger();
+  $('oublier').onclick = () => { oublier(); code = ''; donnees = null; montrerEntree('Code oublié sur cet appareil.'); };
+  setInterval(() => { if (document.visibilityState === 'visible' && code && donnees) charger(); }, 60e3);
+  setInterval(majHeure, 10e3);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && code && donnees && Date.now() - new Date(derniere).getTime() > 30e3) charger(); });
+
+  charger();
+})();
+</script>
+</body>
+</html>

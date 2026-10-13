@@ -1,10 +1,12 @@
 ﻿import './style.css';
 import { Game } from './game';
+import { signalerBug } from './bugs';
 
 // ---------- toute erreur s'affiche À L'ÉCRAN, en rouge, avec un bouton pour la copier : plus besoin d'ouvrir la console
 const erreurs: string[] = [];
 const deja = new Map<string, number>();
 function montrerErreur(msg: string) {
+  signalerBug(msg);                                   // chaque erreur part aussi vers le tableau de bord (page /tableau/)
   if (!new URLSearchParams(location.search).has('debug')) { console.error(msg); return; }   // le cadre rouge seulement avec ?debug=1
   const n = (deja.get(msg) ?? 0) + 1; deja.set(msg, n);
   if (n > 1) { const i = erreurs.findIndex(e => e.startsWith(msg.slice(0, 80))); if (i >= 0) erreurs[i] = `${msg}\n(×${n})`; }
