@@ -18,7 +18,7 @@ const TRIPO_API = [
   { v: 3, base: 'https://openapi.tripo3d.com/v3' },
   { v: 2, base: 'https://api.tripo3d.ai/v2/openapi' },
 ];
-const MODELE_V3 = 'v3.1-20260211';   // Tripo H3.1 : 20 crédits avec texture standard
+const MODELE_V3 = 'v3.1-20260211';   // Tripo H3.1, texture détaillée + PBR : 30 crédits, même qualité que l'application
 const MODELE_V2 = 'v2.5-20250123';
 // Pas de filtre de mots ici : c'est la modération de Tripo qui décide (si Tripo refuse tout de suite, le code est rendu au joueur).
 
@@ -46,8 +46,8 @@ async function tripo(cleTripo, quoi, arg) {
   const essais = [];
   for (const api of TRIPO_API) {
     const [methode, chemin, corps] = quoi === 'creer'
-      ? (api.v === 3 ? ['POST', '/generation/text-to-model', { prompt: arg, model: MODELE_V3, face_limit: 30000, texture: true, pbr: false, texture_quality: 'standard' }]
-                     : ['POST', '/task', { type: 'text_to_model', prompt: arg, model_version: MODELE_V2, face_limit: 30000, texture: true, pbr: false, texture_quality: 'standard' }])
+      ? (api.v === 3 ? ['POST', '/generation/text-to-model', { prompt: arg, model: MODELE_V3, texture: true, pbr: true, texture_quality: 'detailed' }]
+                     : ['POST', '/task', { type: 'text_to_model', prompt: arg, model_version: MODELE_V2, texture: true, pbr: true, texture_quality: 'detailed' }])
       : ['GET', api.v === 3 ? `/tasks/${arg}` : `/task/${arg}`, null];
     let r;
     try { r = await fetch(`${api.base}${chemin}`, { method: methode, headers: { Authorization: `Bearer ${cleTripo}`, 'Content-Type': 'application/json' }, body: corps ? JSON.stringify(corps) : undefined }); }
@@ -61,11 +61,8 @@ async function tripo(cleTripo, quoi, arg) {
   throw new Error(`tripo refus partout — ${essais.join(' | ')}`.slice(0, 400));
 }
 
-/** Le texte envoyé à Tripo : la description du joueur, encadrée pour obtenir un bel objet de jardin, seul et posé. */
-function promptTripo(texte, langue) {
-  const cadre = 'A single cute decorative garden object for a balcony game, stylized low-poly toy look, clean simple shapes, bright friendly colors, standing on a flat base, centered, no text, no people';
-  return `${cadre}. The object: ${texte}${langue && langue !== 'en' ? ` (description written in ${langue === 'fr' ? 'French' : 'Spanish'})` : ''}.`;
-}
+/** Le texte envoyé à Tripo : exactement celui du joueur, comme dans l'application Tripo. */
+function promptTripo(texte, _langue) { return texte; }
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
