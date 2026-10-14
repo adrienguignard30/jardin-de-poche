@@ -74,7 +74,7 @@ Answer ONLY with JSON: {"langue": "<the description in ${nomLangue}, for the vis
   // Les tentatives, dans l'ordre : chaque modèle Gemini (GEMINI_MODEL, ou GEMINI_MODELS séparés par des virgules), puis OpenAI.
   // Saturation (503/429) : on réessaie une fois après 1,5 s avant de passer au suivant.
   const tentatives = [];
-  if (cleCerebras) for (const m of String(process.env.CEREBRAS_MODEL || 'llama-3.3-70b').split(',').map(x => x.trim()).filter(Boolean)) tentatives.push({ qui: 'cerebras', modele: m, base: 'https://api.cerebras.ai/v1', cle: cleCerebras });
+  if (cleCerebras) for (const m of String(process.env.CEREBRAS_MODEL || 'gpt-oss-120b,gemma-4-31b,llama-3.3-70b').split(',').map(x => x.trim()).filter(Boolean)) tentatives.push({ qui: 'cerebras', modele: m, base: 'https://api.cerebras.ai/v1', cle: cleCerebras });
   if (cleGemini) for (const m of String(process.env.GEMINI_MODELS || process.env.GEMINI_MODEL || 'gemini-3.8-flash,gemini-2.5-flash').split(',').map(x => x.trim()).filter(Boolean)) tentatives.push({ qui: 'gemini', modele: m });
   if (cleIA) tentatives.push({ qui: 'openai', modele: process.env.OPENAI_MODEL || 'gpt-4o-mini', base: 'https://api.openai.com/v1', cle: cleIA });
   const appelIA = async t => {
