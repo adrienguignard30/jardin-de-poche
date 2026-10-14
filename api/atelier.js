@@ -10,8 +10,13 @@
 //   { action: 'retrouver', code }               → l'objet fabriqué avec ce code (pour le retrouver sur un autre téléphone)
 //   { action: 'ameliorer', code, texte, langue } → l'IA propose une description structurée (dans la langue du joueur + en anglais pour Tripo)
 import { createHash, randomUUID } from 'node:crypto';
+import { NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { dedup, prune, draco, textureCompress } from '@gltf-transform/functions';
+import draco3d from 'draco3dgltf';
+import sharp from 'sharp';
 
-export const config = { maxDuration: 60 };   // copier un modèle de 10 à 30 Mo peut dépasser 10 s
+export const config = { maxDuration: 60 };   // télécharger puis compresser un modèle de 50 Mo prend 20 à 40 s
 
 const SB = 'https://jbwlhapwszsuwirspybg.supabase.co';
 // Tripo : API V3 (deux domaines documentés), puis l'ancienne V2 en secours (elle s'arrête le 31 octobre 2026).
@@ -49,7 +54,7 @@ async function tripo(cleTripo, quoi, arg) {
   const essais = [];
   for (const api of TRIPO_API) {
     if (quoi === 'creerImage' && api.v !== 3) continue;   // photo → objet : V3 seulement
-    const qualite = { texture: true, pbr: true, texture_quality: 'detailed', geometry_quality: 'detailed' };
+    const qualite = { texture: true, pbr: true, texture_quality: 'detailed', geometry_quality: 'detailed', face_limit: 300000 };
     const [methode, chemin, corps] = quoi === 'creer'
       ? (api.v === 3 ? ['POST', '/generation/text-to-model', { prompt: arg, model: MODELE_V3, ...qualite }]
                      : ['POST', '/task', { type: 'text_to_model', prompt: arg, model_version: MODELE_V2, texture: true, pbr: true, texture_quality: 'detailed' }])
@@ -65,6 +70,20 @@ async function tripo(cleTripo, quoi, arg) {
     throw new Error(`tripo ${msg}`);   // vraie réponse (modération, crédits, paramètre) : on s'arrête
   }
   throw new Error(`tripo refus partout — ${essais.join(' | ')}`.slice(0, 400));
+}
+
+/** Compresse un GLB de Tripo comme les modèles du jeu : doublons retirés, textures WebP (max 2048 px), géométrie Draco.
+ *  50 Mo → ~5 Mo, aucune perte visible ; le jeu sait déjà lire Draco et WebP. En cas de souci, on garde le fichier d'origine. */
+let ioPromesse = null;
+async function compresserGlb(octets) {
+  try {
+    if (!ioPromesse) ioPromesse = (async () => new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ 'draco3d.encoder': await draco3d.createEncoderModule(), 'draco3d.decoder': await draco3d.createDecoderModule() }))();
+    const io = await ioPromesse;
+    const doc = await io.readBinary(new Uint8Array(octets));
+    await doc.transform(dedup(), prune(), textureCompress({ encoder: sharp, targetFormat: 'webp', quality: 86, resize: [2048, 2048] }), draco());
+    const sortie = Buffer.from(await io.writeBinary(doc));
+    return sortie.length < octets.length ? sortie : octets;
+  } catch (e) { console.warn('compression impossible, fichier gardé tel quel :', String(e).slice(0, 200)); return octets; }
 }
 
 /** Envoie la photo à Tripo (POST /v3/files) et renvoie le jeton de fichier, ou null si l'envoi est refusé. */
@@ -225,8 +244,10 @@ export default async function handler(req, res) {
               const urlM = d.output?.model_url || d.output?.pbr_model_url || d.output?.base_model_url || d.output?.pbr_model || d.output?.model || d.output?.base_model;
               if (!urlM) throw new Error('pas de modèle dans la réponse Tripo');
               const modele = await fetch(urlM); if (!modele.ok) throw new Error(`téléchargement du modèle ${modele.status}`);
-              const octets = Buffer.from(await modele.arrayBuffer());
-              if (octets.length > 50 * 1024 * 1024) throw new Error('modèle trop lourd');
+              const brut = Buffer.from(await modele.arrayBuffer());
+              if (brut.length > 180 * 1024 * 1024) throw new Error('modèle trop lourd');
+              const octets = await compresserGlb(brut);
+              if (octets.length > 50 * 1024 * 1024) throw new Error('modèle trop lourd même compressé');
               const url = await sbUpload(cle, `${c.id}.glb`, octets, 'model/gltf-binary');
               let image = null;
               const o = d.output ?? {};

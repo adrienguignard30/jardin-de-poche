@@ -10,7 +10,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@gltf-transform/core": "^4.1.1",
+    "@gltf-transform/extensions": "^4.1.1",
+    "@gltf-transform/functions": "^4.1.1",
     "@supabase/supabase-js": "^2.117.2",
+    "draco3dgltf": "^1.5.7",
+    "sharp": "^0.33.5",
     "three": "^0.169.0"
   },
   "devDependencies": {
