@@ -13,15 +13,24 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') { res.status(405).json({ erreur: 'methode' }); return; }
   const code = process.env.TABLEAU_CODE, cle = process.env.SUPABASE_SECRET_KEY;
   if (!code || code.length < 12 || !cle) { res.status(503).json({ erreur: 'pas_configure' }); return; }
-  let recu = '', periode = '24h';
-  try { const b = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; recu = String(b?.code ?? ''); if (['24h', '7j', '30j'].includes(b?.periode)) periode = b.periode; } catch { recu = ''; }
+  let recu = '', periode = '24h', b = null;
+  try { b = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; recu = String(b?.code ?? ''); if (['24h', '7j', '30j'].includes(b?.periode)) periode = b.periode; } catch { recu = ''; }
   if (!timingSafeEqual(empreinte(recu), empreinte(code))) { await pause(800); res.status(401).json({ erreur: 'code' }); return; }
   try {
     const SB = 'https://jbwlhapwszsuwirspybg.supabase.co/rest/v1';
+    // marquer un code de l'Atelier comme donné (QR montré, carte remise) ou le remettre libre
+    if (b && b.action === 'donner') {
+      const ca = String(b.code_atelier ?? '').trim().toUpperCase();
+      if (!/^[A-Z0-9-]{6,24}$/.test(ca)) { res.status(400).json({ erreur: 'code_atelier' }); return; }
+      const r = await fetch(`${SB}/codes_atelier?code=eq.${encodeURIComponent(ca)}`, { method: 'PATCH', headers: { apikey: cle, 'Content-Type': 'application/json', Prefer: 'return=representation' }, body: JSON.stringify({ donne_le: b.donne ? new Date().toISOString() : null }) });
+      const t = await r.text();
+      if (!r.ok) { res.status(502).json({ erreur: 'supabase', detail: `${r.status} ${t.slice(0, 300)}` }); return; }
+      res.status(200).json({ ok: true, codes: JSON.parse(t) }); return;
+    }
     const [r, rc] = await Promise.all([
       fetch(`${SB}/rpc/tableau_de_bord`, { method: 'POST', headers: { apikey: cle, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_periode: periode }) }),
       // les codes de l'Atelier et, pour chaque code utilisé, la création qui va avec (si les tables n'existent pas encore, on s'en passe)
-      fetch(`${SB}/codes_atelier?select=code,cree_le,note,utilise_le,creations(statut,progres,prompt,url_image,url_modele,erreur,cree_le)&order=cree_le.asc`, { headers: { apikey: cle } }).catch(() => null),
+      fetch(`${SB}/codes_atelier?select=code,cree_le,note,utilise_le,donne_le,creations(statut,progres,prompt,url_image,url_modele,erreur,cree_le)&order=cree_le.asc`, { headers: { apikey: cle } }).catch(() => null),
     ]);
     const texte = await r.text();
     if (!r.ok) { res.status(502).json({ erreur: 'supabase', detail: `${r.status} ${texte.slice(0, 300)}` }); return; }
