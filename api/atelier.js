@@ -1,7 +1,8 @@
 // L'Atelier : le joueur décrit un objet de déco, Tripo le fabrique en 3D, on le copie dans Supabase Storage.
 // Tout passe par ici : le navigateur ne connaît ni la clé Tripo ni la clé Supabase.
 // Réglages Vercel : TRIPO_API_KEY (clé Tripo, tsk_…), SUPABASE_SECRET_KEY (clé secrète Supabase, sb_secret_…),
-//                   OPENAI_API_KEY (pour « Améliorer ma description », facultatif ; OPENAI_MODEL pour changer le modèle).
+//                   GEMINI_API_KEY (pour « Améliorer ma description », gratuit chez Google AI Studio ; GEMINI_MODEL pour changer le modèle)
+//                   ou OPENAI_API_KEY (OPENAI_MODEL). Gemini est essayé d'abord s'il est réglé.
 // Actions (POST JSON) :
 //   { action: 'creer', code, prompt, langue }  → vérifie le code (usage unique), lance Tripo, renvoie { id }
 //   { action: 'etat', id }                      → où en est la fabrication ; quand c'est prêt, { statut:'pret', url, image }
@@ -65,19 +66,32 @@ async function tripo(cleTripo, quoi, arg) {
 
 /** « Améliorer ma description » : l'IA réécrit la demande du joueur en description structurée [sujet], [détails], [matière], [style], [qualité]. */
 async function ameliorer(texte, langue) {
-  const cleIA = process.env.OPENAI_API_KEY; if (!cleIA) throw new Error('pas_ia');
+  const cleGemini = process.env.GEMINI_API_KEY, cleIA = process.env.OPENAI_API_KEY; if (!cleGemini && !cleIA) throw new Error('pas_ia');
   const nomLangue = langue === 'en' ? 'English' : langue === 'es' ? 'Spanish' : 'French';
   const systeme = `You write prompts for Tripo, a text-to-3D generator, for a balcony-garden game where the visitor's object is displayed in 3D.
 Rewrite the visitor's request into ONE rich description of a SINGLE object, following this order: [subject], [key details/features], [material/texture], [style], [quality]. Keep the visitor's idea and spirit exactly (do not change what they asked for, do not add characters or extra objects). No scene, no background, no ground, no text written on the object. 25 to 60 words.
 Answer ONLY with JSON: {"langue": "<the description in ${nomLangue}, for the visitor to read and approve>", "en": "<the same description in English, for Tripo>"}`;
-  const modele = process.env.OPENAI_MODEL || 'gpt-4o-mini';
-  const r = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST', headers: { Authorization: `Bearer ${cleIA}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: modele, temperature: 0.7, max_tokens: 400, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: systeme }, { role: 'user', content: texte }] }),
-  });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(`ia ${r.status} ${(j?.error?.message || '').slice(0, 160)}`);
-  let out = {}; try { out = JSON.parse(j.choices?.[0]?.message?.content || '{}'); } catch { out = {}; }
+  let contenu = '';
+  if (cleGemini) {
+    const modele = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modele}:generateContent`, {
+      method: 'POST', headers: { 'x-goog-api-key': cleGemini, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ systemInstruction: { parts: [{ text: systeme }] }, contents: [{ role: 'user', parts: [{ text: texte }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 600, responseMimeType: 'application/json' } }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(`ia gemini ${r.status} ${(j?.error?.message || '').slice(0, 160)}`);
+    contenu = j.candidates?.[0]?.content?.parts?.map(x => x.text || '').join('') || '';
+  } else {
+    const modele = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST', headers: { Authorization: `Bearer ${cleIA}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: modele, temperature: 0.7, max_tokens: 400, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: systeme }, { role: 'user', content: texte }] }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(`ia openai ${r.status} ${(j?.error?.message || '').slice(0, 160)}`);
+    contenu = j.choices?.[0]?.message?.content || '';
+  }
+  let out = {}; try { out = JSON.parse(contenu.replace(/^```json\s*|```\s*$/g, '')); } catch { out = {}; }
   const lng = String(out.langue || '').trim().slice(0, 600), en = String(out.en || '').trim().slice(0, 600);
   if (lng.length < 10 || en.length < 10) throw new Error('ia vide');
   return { langue: lng, en };
