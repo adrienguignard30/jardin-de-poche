@@ -18,8 +18,13 @@ export class Assets {
   constructor() {
     this.loader = new GLTFLoader();
     const draco = new DRACOLoader();
-    draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+    draco.setDecoderPath('draco/');   // décodeur hébergé sur le site (public/draco), plus de dépendance à Google
     this.loader.setDRACOLoader(draco);
+  }
+
+  /** Chargement indépendant : les ressources appartiennent à la création, pas au cache des personnages. */
+  async chargerDeco(url: string): Promise<THREE.Object3D> {
+    return (await this.loader.loadAsync(url)).scene;
   }
 
   async loadCollections() {

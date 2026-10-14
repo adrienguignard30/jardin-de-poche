@@ -179,22 +179,22 @@
  ],
  "views": {
   "tour": {
-   "farDay": "fonds/fond_tour_far_day.png",
-   "farNight": "fonds/fond_tour_far_night.png",
-   "nearDay": "fonds/fond_toits_near_day.png",
-   "nearNight": "fonds/fond_toits_near_night.png"
+   "farDay": "fonds/fond_tour_far_day.webp",
+   "farNight": "fonds/fond_tour_far_night.webp",
+   "nearDay": "fonds/fond_toits_near_day.webp",
+   "nearNight": "fonds/fond_toits_near_night.webp"
   },
   "pont": {
-   "farDay": "fonds/fond_pont_far_day.png",
-   "farNight": "fonds/fond_pont_far_night.png",
-   "nearDay": "fonds/fond_toits_near_day.png",
-   "nearNight": "fonds/fond_toits_near_night.png"
+   "farDay": "fonds/fond_pont_far_day.webp",
+   "farNight": "fonds/fond_pont_far_night.webp",
+   "nearDay": "fonds/fond_toits_near_day.webp",
+   "nearNight": "fonds/fond_toits_near_night.webp"
   },
   "arc": {
-   "farDay": "fonds/fond_arc_far_day.png",
-   "farNight": "fonds/fond_arc_far_night.png",
-   "nearDay": "fonds/fond_toits_near_day.png",
-   "nearNight": "fonds/fond_toits_near_night.png"
+   "farDay": "fonds/fond_arc_far_day.webp",
+   "farNight": "fonds/fond_arc_far_night.webp",
+   "nearDay": "fonds/fond_toits_near_day.webp",
+   "nearNight": "fonds/fond_toits_near_night.webp"
   }
  },
  "plants": [
