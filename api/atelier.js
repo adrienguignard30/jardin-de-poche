@@ -1,8 +1,8 @@
 // L'Atelier : le joueur décrit un objet de déco, Tripo le fabrique en 3D, on le copie dans Supabase Storage.
 // Tout passe par ici : le navigateur ne connaît ni la clé Tripo ni la clé Supabase.
 // Réglages Vercel : TRIPO_API_KEY (clé Tripo, tsk_…), SUPABASE_SECRET_KEY (clé secrète Supabase, sb_secret_…),
-//                   GEMINI_API_KEY (pour « Améliorer ma description », gratuit chez Google AI Studio ; GEMINI_MODEL pour changer le modèle)
-//                   ou OPENAI_API_KEY (OPENAI_MODEL). Gemini est essayé d'abord s'il est réglé.
+//                   pour « Améliorer ma description », dans l'ordre d'essai : CEREBRAS_API_KEY (gratuit, CEREBRAS_MODEL), GEMINI_API_KEY (gratuit, GEMINI_MODELS),
+//                   OPENAI_API_KEY (payant, OPENAI_MODEL). Une seule suffit ; plusieurs = secours automatique.
 // Actions (POST JSON) :
 //   { action: 'creer', code, prompt, langue }  → vérifie le code (usage unique), lance Tripo, renvoie { id }
 //   { action: 'etat', id }                      → où en est la fabrication ; quand c'est prêt, { statut:'pret', url, image }
@@ -66,32 +66,48 @@ async function tripo(cleTripo, quoi, arg) {
 
 /** « Améliorer ma description » : l'IA réécrit la demande du joueur en description structurée [sujet], [détails], [matière], [style], [qualité]. */
 async function ameliorer(texte, langue) {
-  const cleGemini = process.env.GEMINI_API_KEY, cleIA = process.env.OPENAI_API_KEY; if (!cleGemini && !cleIA) throw new Error('pas_ia');
+  const cleCerebras = process.env.CEREBRAS_API_KEY, cleGemini = process.env.GEMINI_API_KEY, cleIA = process.env.OPENAI_API_KEY; if (!cleCerebras && !cleGemini && !cleIA) throw new Error('pas_ia');
   const nomLangue = langue === 'en' ? 'English' : langue === 'es' ? 'Spanish' : 'French';
   const systeme = `You write prompts for Tripo, a text-to-3D generator, for a balcony-garden game where the visitor's object is displayed in 3D.
 Rewrite the visitor's request into ONE rich description of a SINGLE object, following this order: [subject], [key details/features], [material/texture], [style], [quality]. Keep the visitor's idea and spirit exactly (do not change what they asked for, do not add characters or extra objects). No scene, no background, no ground, no text written on the object. 25 to 60 words.
 Answer ONLY with JSON: {"langue": "<the description in ${nomLangue}, for the visitor to read and approve>", "en": "<the same description in English, for Tripo>"}`;
-  let contenu = '';
-  if (cleGemini) {
-    const modele = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modele}:generateContent`, {
-      method: 'POST', headers: { 'x-goog-api-key': cleGemini, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ systemInstruction: { parts: [{ text: systeme }] }, contents: [{ role: 'user', parts: [{ text: texte }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 600, responseMimeType: 'application/json' } }),
+  // Les tentatives, dans l'ordre : chaque modèle Gemini (GEMINI_MODEL, ou GEMINI_MODELS séparés par des virgules), puis OpenAI.
+  // Saturation (503/429) : on réessaie une fois après 1,5 s avant de passer au suivant.
+  const tentatives = [];
+  if (cleCerebras) for (const m of String(process.env.CEREBRAS_MODEL || 'llama-3.3-70b').split(',').map(x => x.trim()).filter(Boolean)) tentatives.push({ qui: 'cerebras', modele: m, base: 'https://api.cerebras.ai/v1', cle: cleCerebras });
+  if (cleGemini) for (const m of String(process.env.GEMINI_MODELS || process.env.GEMINI_MODEL || 'gemini-3.8-flash,gemini-2.5-flash').split(',').map(x => x.trim()).filter(Boolean)) tentatives.push({ qui: 'gemini', modele: m });
+  if (cleIA) tentatives.push({ qui: 'openai', modele: process.env.OPENAI_MODEL || 'gpt-4o-mini', base: 'https://api.openai.com/v1', cle: cleIA });
+  const appelIA = async t => {
+    if (t.qui === 'gemini') {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${t.modele}:generateContent`, {
+        method: 'POST', headers: { 'x-goog-api-key': cleGemini, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ systemInstruction: { parts: [{ text: systeme }] }, contents: [{ role: 'user', parts: [{ text: texte }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 600, responseMimeType: 'application/json' } }),
+      });
+      const j = await r.json().catch(() => ({}));
+      return { ok: r.ok, status: r.status, msg: (j?.error?.message || '').slice(0, 120), contenu: j.candidates?.[0]?.content?.parts?.map(x => x.text || '').join('') || '' };
+    }
+    const r = await fetch(`${t.base}/chat/completions`, {   // OpenAI et Cerebras : même format
+      method: 'POST', headers: { Authorization: `Bearer ${t.cle}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: t.modele, temperature: 0.7, max_tokens: 400, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: systeme }, { role: 'user', content: texte }] }),
     });
     const j = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(`ia gemini ${r.status} ${(j?.error?.message || '').slice(0, 160)}`);
-    contenu = j.candidates?.[0]?.content?.parts?.map(x => x.text || '').join('') || '';
-  } else {
-    const modele = process.env.OPENAI_MODEL || 'gpt-4o-mini';
-    const r = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST', headers: { Authorization: `Bearer ${cleIA}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: modele, temperature: 0.7, max_tokens: 400, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: systeme }, { role: 'user', content: texte }] }),
-    });
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(`ia openai ${r.status} ${(j?.error?.message || '').slice(0, 160)}`);
-    contenu = j.choices?.[0]?.message?.content || '';
+    return { ok: r.ok, status: r.status, msg: (j?.error?.message || '').slice(0, 120), contenu: j.choices?.[0]?.message?.content || '' };
+  };
+  let contenu = ''; const echecs = [];
+  for (const t of tentatives) {
+    for (let essai = 0; essai < 2 && !contenu; essai++) {
+      let rep;
+      try { rep = await appelIA(t); } catch (e) { echecs.push(`${t.qui}/${t.modele}: injoignable`); break; }
+      if (rep.ok && rep.contenu) { contenu = rep.contenu; break; }
+      echecs.push(`${t.qui}/${t.modele}: ${rep.status} ${rep.msg}`);
+      if (rep.status === 503 || rep.status === 429) { if (essai === 0) await new Promise(r => setTimeout(r, 1500)); }   // saturé : un 2e essai
+      else break;   // 404 (modèle inconnu), 401 (clé)… : inutile d'insister sur celui-là
+    }
+    if (contenu) break;
   }
-  let out = {}; try { out = JSON.parse(contenu.replace(/^```json\s*|```\s*$/g, '')); } catch { out = {}; }
+  if (!contenu) throw new Error(`ia ${echecs.join(' | ')}`.slice(0, 300));
+  let out = {};
+  try { out = JSON.parse(contenu.replace(/^```json\s*|```\s*$/g, '').trim()); } catch { const m = contenu.match(/\{[\s\S]*\}/); try { out = m ? JSON.parse(m[0]) : {}; } catch { out = {}; } }
   const lng = String(out.langue || '').trim().slice(0, 600), en = String(out.en || '').trim().slice(0, 600);
   if (lng.length < 10 || en.length < 10) throw new Error('ia vide');
   return { langue: lng, en };
