@@ -11,8 +11,9 @@ import { createHash, randomUUID } from 'node:crypto';
 export const config = { maxDuration: 60 };   // copier un modèle de 10 à 30 Mo peut dépasser 10 s
 
 const SB = 'https://jbwlhapwszsuwirspybg.supabase.co';
-const TRIPO = 'https://api.tripo3d.ai/v2/openapi';
-const MODELE_TRIPO = 'v2.5-20250123';
+// Tripo API V3 (la V2 s'arrête le 31 octobre 2026). Deux noms de domaine documentés : on essaie l'un puis l'autre.
+const TRIPO_HOTES = ['https://openapi.tripo3d.com/v3', 'https://openapi.tripo3d.ai/v3'];
+const MODELE_TRIPO = 'v3.1-20260211';   // Tripo H3.1 : 20 crédits avec texture standard
 const INTERDITS = /\b(nu|nue|nus|nude|naked|sex|sexe|sexy|porn|porno|arme|weapon|gun|pistol|rifle|knife|couteau|sang|blood|gore|cadavre|corpse|drogue|drug|cocaine|hitler|nazi|swastika|terror|bomb|bombe|suicide|personne|person|homme|femme|man|woman|girl|boy|fille|garçon|garcon|enfant|child|kid|bébé|baby|visage|face|portrait)\b/i;
 
 const rep = (res, code, corps) => { res.status(code).json(corps); };
@@ -35,10 +36,16 @@ async function sbUpload(cle, chemin, octets, type) {
   return `${SB}/storage/v1/object/public/creations/${chemin}`;
 }
 async function tripo(cleTripo, methode, chemin, corps) {
-  const r = await fetch(`${TRIPO}${chemin}`, { method: methode, headers: { Authorization: `Bearer ${cleTripo}`, 'Content-Type': 'application/json' }, body: corps ? JSON.stringify(corps) : undefined });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok || j.code !== 0) throw new Error(`tripo ${r.status} ${j.code ?? ''} ${(j.message || j.suggestion || '').slice(0, 200)}`);
-  return j.data;
+  let derniere = null;
+  for (const hote of TRIPO_HOTES) {
+    let r;
+    try { r = await fetch(`${hote}${chemin}`, { method: methode, headers: { Authorization: `Bearer ${cleTripo}`, 'Content-Type': 'application/json' }, body: corps ? JSON.stringify(corps) : undefined }); }
+    catch (e) { derniere = e; continue; }   // domaine injoignable : on essaie l'autre
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.code !== 0) throw new Error(`tripo ${r.status} ${j.code ?? ''} ${(j.message || j.suggestion || '').slice(0, 200)}`);
+    return j.data;
+  }
+  throw new Error(`tripo injoignable ${String(derniere).slice(0, 100)}`);
 }
 
 /** Le texte envoyé à Tripo : la description du joueur, encadrée pour obtenir un bel objet de jardin, seul et posé. */
@@ -72,7 +79,7 @@ export default async function handler(req, res) {
       const r = await sbRpc(cle, 'utiliser_code', { p_code: code, p_creation: id, p_prompt: texte, p_prompt_tripo: promptTripo(texte, langue), p_langue: langue, p_joueur: joueur, p_empreinte: empreinte });
       if (!r?.ok) return rep(res, 403, { erreur: r?.raison === 'deja_utilise' ? 'code_deja_utilise' : 'code_inconnu' });
       try {
-        const t = await tripo(cleTripo, 'POST', '/task', { type: 'text_to_model', prompt: promptTripo(texte, langue), model_version: MODELE_TRIPO, face_limit: 30000, texture: true, pbr: false, texture_quality: 'standard' });
+        const t = await tripo(cleTripo, 'POST', '/generation/text-to-model', { prompt: promptTripo(texte, langue), model: MODELE_TRIPO, face_limit: 30000, texture: true, pbr: false, texture_quality: 'standard' });
         await sbTable(cle, 'PATCH', `creations?id=eq.${id}`, { task_id: t.task_id, maj: new Date().toISOString() });
         return rep(res, 200, { id, statut: 'en_cours', progres: 0 });
       } catch (e) {
@@ -98,17 +105,18 @@ export default async function handler(req, res) {
       for (const c of lignes) {
         if (c.statut === 'en_cours' && c.task_id) {
           try {
-            const d = await tripo(cleTripo, 'GET', `/task/${c.task_id}`);
+            const d = await tripo(cleTripo, 'GET', `/tasks/${c.task_id}`);
             if (d.status === 'success') {
-              const urlM = d.output?.pbr_model || d.output?.model || d.output?.base_model;
+              const urlM = d.output?.model_url || d.output?.pbr_model_url || d.output?.base_model_url || d.output?.pbr_model || d.output?.model || d.output?.base_model;
               if (!urlM) throw new Error('pas de modèle dans la réponse Tripo');
               const modele = await fetch(urlM); if (!modele.ok) throw new Error(`téléchargement du modèle ${modele.status}`);
               const octets = Buffer.from(await modele.arrayBuffer());
               if (octets.length > 50 * 1024 * 1024) throw new Error('modèle trop lourd');
               const url = await sbUpload(cle, `${c.id}.glb`, octets, 'model/gltf-binary');
               let image = null;
-              if (d.output?.rendered_image) {
-                try { const im = await fetch(d.output.rendered_image); if (im.ok) image = await sbUpload(cle, `${c.id}.webp`, Buffer.from(await im.arrayBuffer()), im.headers.get('content-type') || 'image/webp'); } catch { /* l'image est un bonus */ }
+              const urlI = d.output?.rendered_image_url || d.output?.rendered_image;
+              if (urlI) {
+                try { const im = await fetch(urlI); if (im.ok) image = await sbUpload(cle, `${c.id}.webp`, Buffer.from(await im.arrayBuffer()), im.headers.get('content-type') || 'image/webp'); } catch { /* l'image est un bonus */ }
               }
               await sbTable(cle, 'PATCH', `creations?id=eq.${c.id}`, { statut: 'pret', progres: 100, url_modele: url, url_image: image, maj: new Date().toISOString() });
               Object.assign(c, { statut: 'pret', progres: 100, url_modele: url, url_image: image });
