@@ -123,9 +123,18 @@ export default async function handler(req, res) {
               if (octets.length > 50 * 1024 * 1024) throw new Error('modèle trop lourd');
               const url = await sbUpload(cle, `${c.id}.glb`, octets, 'model/gltf-binary');
               let image = null;
-              const urlI = d.output?.rendered_image_url || d.output?.rendered_image;
-              if (urlI) {
-                try { const im = await fetch(urlI); if (im.ok) image = await sbUpload(cle, `${c.id}.webp`, Buffer.from(await im.arrayBuffer()), im.headers.get('content-type') || 'image/webp'); } catch { /* l'image est un bonus */ }
+              const o = d.output ?? {};
+              const urlI = o.rendered_image_url || o.rendered_image || o.preview_url || o.preview || o.thumbnail_url || o.thumbnail || o.image_url || o.image;
+              if (typeof urlI === 'string' && /^https?:/.test(urlI)) {
+                try {
+                  const im = await fetch(urlI);
+                  if (im.ok) {
+                    const oct = Buffer.from(await im.arrayBuffer());
+                    // le type d'image d'après les premiers octets (l'en-tête de Tripo n'est pas toujours fiable)
+                    const type = oct.slice(0, 4).toString('hex') === '89504e47' ? 'image/png' : oct.slice(0, 3).toString('hex') === 'ffd8ff' ? 'image/jpeg' : oct.slice(0, 4).toString() === 'RIFF' ? 'image/webp' : null;
+                    if (type) image = await sbUpload(cle, `${c.id}.${type.slice(6)}`, oct, type);
+                  }
+                } catch { /* l'image est un bonus : la visionneuse du téléphone sait faire une capture */ }
               }
               await sbTable(cle, 'PATCH', `creations?id=eq.${c.id}`, { statut: 'pret', progres: 100, url_modele: url, url_image: image, maj: new Date().toISOString() });
               Object.assign(c, { statut: 'pret', progres: 100, url_modele: url, url_image: image });

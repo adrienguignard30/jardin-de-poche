@@ -5,13 +5,17 @@
 // =============================================================================================
 import { lang } from './i18n';
 import { sb } from './enligne';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 export interface Objet { id: string; prompt: string; statut: 'en_cours' | 'pret' | 'echec'; progres: number; url?: string; image?: string; erreur?: string; cree: number }
 const CLE = 'jdp.objets';
 const T = {
-  fr: { titre: 'Atelier', sous: 'Crée tes objets de déco', bientot: 'Bientôt : ton personnage jouable', carteObjet: 'Un objet de déco pour ton balcon', carteObjetTexte: 'Décris-le, Tripo le fabrique en 3D. Tu le retrouveras dans ton téléphone, appli Atelier, pour le poser sur ton balcon.', cartePerso: 'Ton personnage jouable', cartePersoTexte: 'Décris-le, il sera créé avec le même squelette que Léa, Marcel et Jimy, et jouable comme eux.', arrive: 'Arrive bientôt', code: 'Ton code', codeAide: 'Un code = un objet. Demande-le à Adrien.', decris: 'Décris ton objet', exemple: 'ex. : un nain de jardin pirate, un flamant rose en bois', creer: '✨ Créer', fabrique: 'Tripo fabrique ton objet…', patience: '1 à 3 minutes. Tu peux fermer, il t’attendra dans ton téléphone.', pret: 'Ton objet est prêt !', ouTrouver: 'Il est dans ton téléphone, appli Atelier : touche « Poser sur le balcon ».', placer: 'Poser sur le balcon', retirer: 'Retirer du balcon', voir: 'Voir ma création', fermer: 'Fermer', mesObjets: 'Mes objets', aucun: 'Aucun objet pour l’instant.', creerUn: '✨ Créer un objet', echec: 'La fabrication a échoué. Ton code a été rendu si Tripo n’a rien fait.', pose: 'Posé sur le balcon', e_code_inconnu: 'Ce code n’existe pas.', e_code_deja_utilise: 'Ce code a déjà servi.', e_texte_longueur: 'Décris ton objet en 3 à 120 caractères.', e_texte_interdit: 'Ce texte n’est pas accepté : décris un objet de déco (pas de personnes, ni d’armes).', e_pas_configure: 'L’Atelier n’est pas encore branché.', e_reseau: 'Pas de connexion. Réessaie.', e_tripo: 'Tripo n’a pas accepté la demande. Ton code est rendu, réessaie.', retrouverTitre: 'Déjà un code utilisé ?', retrouver: 'Retrouver mon objet', retrouverAide: 'Ton code est la clé de ton objet : tape-le sur n’importe quel téléphone pour le retrouver.', garde: 'Garde ta carte : avec ton code tu retrouveras ton objet sur un autre téléphone. Avec un compte, il te suit partout.', e_code_pas_utilise: 'Ce code n’a pas encore servi : crée ton objet avec.', scanner: '📷 Scanner le QR code', scanAide: 'Vise le QR code, le code se remplit tout seul.', scanErr: 'Caméra indisponible : tape le code à la main.', scanMauvais: 'Ce QR code n’est pas un code Atelier.', confTitre: 'On vérifie avant de lancer', confTexte: 'Tu vas créer :', confAvert: 'Un code = un objet. Une fois lancé, pas de retour en arrière.', modifier: 'Modifier', confirmer: '✨ Confirmer et créer' },
-  en: { titre: 'Workshop', sous: 'Create your decor objects', bientot: 'Coming soon: your playable character', carteObjet: 'A decor object for your balcony', carteObjetTexte: 'Describe it, Tripo builds it in 3D. You will find it in your phone, Workshop app, to place it on your balcony.', cartePerso: 'Your playable character', cartePersoTexte: 'Describe it: it will be built with the same skeleton as Léa, Marcel and Jimy, and playable like them.', arrive: 'Coming soon', code: 'Your code', codeAide: 'One code = one object. Ask Adrien.', decris: 'Describe your object', exemple: 'e.g. a pirate garden gnome, a wooden pink flamingo', creer: '✨ Create', fabrique: 'Tripo is building your object…', patience: '1 to 3 minutes. You can close this, it will wait in your phone.', pret: 'Your object is ready!', ouTrouver: 'It is in your phone, Workshop app: tap “Place on the balcony”.', placer: 'Place on the balcony', retirer: 'Remove from the balcony', voir: 'See my creation', fermer: 'Close', mesObjets: 'My objects', aucun: 'No object yet.', creerUn: '✨ Create an object', echec: 'Building failed. Your code was given back if Tripo did nothing.', pose: 'Placed on the balcony', e_code_inconnu: 'This code does not exist.', e_code_deja_utilise: 'This code was already used.', e_texte_longueur: 'Describe your object in 3 to 120 characters.', e_texte_interdit: 'This text is not accepted: describe a decor object (no people, no weapons).', e_pas_configure: 'The Workshop is not connected yet.', e_reseau: 'No connection. Try again.', e_tripo: 'Tripo refused the request. Your code is given back, try again.', retrouverTitre: 'Already used a code?', retrouver: 'Find my object', retrouverAide: 'Your code is the key to your object: type it on any phone to get it back.', garde: 'Keep your card: with your code you can get your object back on another phone. With an account, it follows you everywhere.', e_code_pas_utilise: 'This code has not been used yet: create your object with it.', scanner: '📷 Scan the QR code', scanAide: 'Point at the QR code, the code fills in by itself.', scanErr: 'Camera unavailable: type the code by hand.', scanMauvais: 'This QR code is not a Workshop code.', confTitre: 'Check before starting', confTexte: 'You are about to create:', confAvert: 'One code = one object. Once started, there is no going back.', modifier: 'Edit', confirmer: '✨ Confirm and create' },
-  es: { titre: 'Taller', sous: 'Crea tus objetos de decoración', bientot: 'Pronto: tu personaje jugable', carteObjet: 'Un objeto de decoración para tu balcón', carteObjetTexte: 'Descríbelo, Tripo lo fabrica en 3D. Lo encontrarás en tu teléfono, app Taller, para ponerlo en tu balcón.', cartePerso: 'Tu personaje jugable', cartePersoTexte: 'Descríbelo: se creará con el mismo esqueleto que Léa, Marcel y Jimy, y será jugable como ellos.', arrive: 'Pronto', code: 'Tu código', codeAide: 'Un código = un objeto. Pídeselo a Adrien.', decris: 'Describe tu objeto', exemple: 'ej.: un gnomo de jardín pirata, un flamenco rosa de madera', creer: '✨ Crear', fabrique: 'Tripo está fabricando tu objeto…', patience: '1 a 3 minutos. Puedes cerrar, te esperará en tu teléfono.', pret: '¡Tu objeto está listo!', ouTrouver: 'Está en tu teléfono, app Taller: toca «Poner en el balcón».', placer: 'Poner en el balcón', retirer: 'Quitar del balcón', voir: 'Ver mi creación', fermer: 'Cerrar', mesObjets: 'Mis objetos', aucun: 'Ningún objeto todavía.', creerUn: '✨ Crear un objeto', echec: 'La fabricación falló. Tu código se devolvió si Tripo no hizo nada.', pose: 'Puesto en el balcón', e_code_inconnu: 'Este código no existe.', e_code_deja_utilise: 'Este código ya se usó.', e_texte_longueur: 'Describe tu objeto en 3 a 120 caracteres.', e_texte_interdit: 'Este texto no se acepta: describe un objeto de decoración (sin personas ni armas).', e_pas_configure: 'El Taller aún no está conectado.', e_reseau: 'Sin conexión. Inténtalo de nuevo.', e_tripo: 'Tripo no aceptó la petición. Tu código se devuelve, inténtalo de nuevo.', retrouverTitre: '¿Ya usaste un código?', retrouver: 'Recuperar mi objeto', retrouverAide: 'Tu código es la llave de tu objeto: escríbelo en cualquier teléfono para recuperarlo.', garde: 'Guarda tu tarjeta: con tu código recuperarás tu objeto en otro teléfono. Con una cuenta, te sigue a todas partes.', e_code_pas_utilise: 'Este código aún no se ha usado: crea tu objeto con él.', scanner: '📷 Escanear el código QR', scanAide: 'Apunta al código QR, el código se rellena solo.', scanErr: 'Cámara no disponible: escribe el código a mano.', scanMauvais: 'Este código QR no es un código del Taller.', confTitre: 'Comprobamos antes de lanzar', confTexte: 'Vas a crear:', confAvert: 'Un código = un objeto. Una vez lanzado, no hay vuelta atrás.', modifier: 'Modificar', confirmer: '✨ Confirmar y crear' },
+  fr: { titre: 'Atelier', sous: 'Crée tes objets de déco', bientot: 'Bientôt : ton personnage jouable', carteObjet: 'Un objet de déco pour ton balcon', carteObjetTexte: 'Décris-le, Tripo le fabrique en 3D. Tu le retrouveras dans ton téléphone, appli Atelier, pour le poser sur ton balcon.', cartePerso: 'Ton personnage jouable', cartePersoTexte: 'Décris-le, il sera créé avec le même squelette que Léa, Marcel et Jimy, et jouable comme eux.', arrive: 'Arrive bientôt', code: 'Ton code', codeAide: 'Un code = un objet. Demande-le à Adrien.', decris: 'Décris ton objet', exemple: 'ex. : un nain de jardin pirate, un flamant rose en bois', creer: '✨ Créer', fabrique: 'Tripo fabrique ton objet…', patience: '1 à 3 minutes. Tu peux fermer, il t’attendra dans ton téléphone.', pret: 'Ton objet est prêt !', ouTrouver: 'Il est dans ton téléphone, appli Atelier : touche « Poser sur le balcon ».', placer: 'Poser sur le balcon', retirer: 'Retirer du balcon', voir: 'Voir ma création', fermer: 'Fermer', mesObjets: 'Mes objets', aucun: 'Aucun objet pour l’instant.', creerUn: '✨ Créer un objet', echec: 'La fabrication a échoué. Ton code a été rendu si Tripo n’a rien fait.', pose: 'Posé sur le balcon', e_code_inconnu: 'Ce code n’existe pas.', e_code_deja_utilise: 'Ce code a déjà servi.', e_texte_longueur: 'Décris ton objet en 3 à 120 caractères.', e_texte_interdit: 'Ce texte n’est pas accepté : décris un objet de déco (pas de personnes, ni d’armes).', e_pas_configure: 'L’Atelier n’est pas encore branché.', e_reseau: 'Pas de connexion. Réessaie.', e_tripo: 'Tripo n’a pas accepté la demande. Ton code est rendu, réessaie.', retrouverTitre: 'Déjà un code utilisé ?', retrouver: 'Retrouver mon objet', retrouverAide: 'Ton code est la clé de ton objet : tape-le sur n’importe quel téléphone pour le retrouver.', garde: 'Garde ta carte : avec ton code tu retrouveras ton objet sur un autre téléphone. Avec un compte, il te suit partout.', e_code_pas_utilise: 'Ce code n’a pas encore servi : crée ton objet avec.', scanner: '📷 Scanner le QR code', scanAide: 'Vise le QR code, le code se remplit tout seul.', scanErr: 'Caméra indisponible : tape le code à la main.', scanMauvais: 'Ce QR code n’est pas un code Atelier.', confTitre: 'On vérifie avant de lancer', confTexte: 'Tu vas créer :', confAvert: 'Un code = un objet. Une fois lancé, pas de retour en arrière.', modifier: 'Modifier', confirmer: '✨ Confirmer et créer', voir3d: 'Voir en 3D', capture: '📸 Capture', captureOk: 'Image enregistrée', chargement: 'Chargement de l’objet…', e_chargement: 'Impossible de charger l’objet.', tourner: 'Tourne avec le doigt · pince pour zoomer' },
+  en: { titre: 'Workshop', sous: 'Create your decor objects', bientot: 'Coming soon: your playable character', carteObjet: 'A decor object for your balcony', carteObjetTexte: 'Describe it, Tripo builds it in 3D. You will find it in your phone, Workshop app, to place it on your balcony.', cartePerso: 'Your playable character', cartePersoTexte: 'Describe it: it will be built with the same skeleton as Léa, Marcel and Jimy, and playable like them.', arrive: 'Coming soon', code: 'Your code', codeAide: 'One code = one object. Ask Adrien.', decris: 'Describe your object', exemple: 'e.g. a pirate garden gnome, a wooden pink flamingo', creer: '✨ Create', fabrique: 'Tripo is building your object…', patience: '1 to 3 minutes. You can close this, it will wait in your phone.', pret: 'Your object is ready!', ouTrouver: 'It is in your phone, Workshop app: tap “Place on the balcony”.', placer: 'Place on the balcony', retirer: 'Remove from the balcony', voir: 'See my creation', fermer: 'Close', mesObjets: 'My objects', aucun: 'No object yet.', creerUn: '✨ Create an object', echec: 'Building failed. Your code was given back if Tripo did nothing.', pose: 'Placed on the balcony', e_code_inconnu: 'This code does not exist.', e_code_deja_utilise: 'This code was already used.', e_texte_longueur: 'Describe your object in 3 to 120 characters.', e_texte_interdit: 'This text is not accepted: describe a decor object (no people, no weapons).', e_pas_configure: 'The Workshop is not connected yet.', e_reseau: 'No connection. Try again.', e_tripo: 'Tripo refused the request. Your code is given back, try again.', retrouverTitre: 'Already used a code?', retrouver: 'Find my object', retrouverAide: 'Your code is the key to your object: type it on any phone to get it back.', garde: 'Keep your card: with your code you can get your object back on another phone. With an account, it follows you everywhere.', e_code_pas_utilise: 'This code has not been used yet: create your object with it.', scanner: '📷 Scan the QR code', scanAide: 'Point at the QR code, the code fills in by itself.', scanErr: 'Camera unavailable: type the code by hand.', scanMauvais: 'This QR code is not a Workshop code.', confTitre: 'Check before starting', confTexte: 'You are about to create:', confAvert: 'One code = one object. Once started, there is no going back.', modifier: 'Edit', confirmer: '✨ Confirm and create', voir3d: 'View in 3D', capture: '📸 Snapshot', captureOk: 'Image saved', chargement: 'Loading the object…', e_chargement: 'Could not load the object.', tourner: 'Drag to rotate · pinch to zoom' },
+  es: { titre: 'Taller', sous: 'Crea tus objetos de decoración', bientot: 'Pronto: tu personaje jugable', carteObjet: 'Un objeto de decoración para tu balcón', carteObjetTexte: 'Descríbelo, Tripo lo fabrica en 3D. Lo encontrarás en tu teléfono, app Taller, para ponerlo en tu balcón.', cartePerso: 'Tu personaje jugable', cartePersoTexte: 'Descríbelo: se creará con el mismo esqueleto que Léa, Marcel y Jimy, y será jugable como ellos.', arrive: 'Pronto', code: 'Tu código', codeAide: 'Un código = un objeto. Pídeselo a Adrien.', decris: 'Describe tu objeto', exemple: 'ej.: un gnomo de jardín pirata, un flamenco rosa de madera', creer: '✨ Crear', fabrique: 'Tripo está fabricando tu objeto…', patience: '1 a 3 minutos. Puedes cerrar, te esperará en tu teléfono.', pret: '¡Tu objeto está listo!', ouTrouver: 'Está en tu teléfono, app Taller: toca «Poner en el balcón».', placer: 'Poner en el balcón', retirer: 'Quitar del balcón', voir: 'Ver mi creación', fermer: 'Cerrar', mesObjets: 'Mis objetos', aucun: 'Ningún objeto todavía.', creerUn: '✨ Crear un objeto', echec: 'La fabricación falló. Tu código se devolvió si Tripo no hizo nada.', pose: 'Puesto en el balcón', e_code_inconnu: 'Este código no existe.', e_code_deja_utilise: 'Este código ya se usó.', e_texte_longueur: 'Describe tu objeto en 3 a 120 caracteres.', e_texte_interdit: 'Este texto no se acepta: describe un objeto de decoración (sin personas ni armas).', e_pas_configure: 'El Taller aún no está conectado.', e_reseau: 'Sin conexión. Inténtalo de nuevo.', e_tripo: 'Tripo no aceptó la petición. Tu código se devuelve, inténtalo de nuevo.', retrouverTitre: '¿Ya usaste un código?', retrouver: 'Recuperar mi objeto', retrouverAide: 'Tu código es la llave de tu objeto: escríbelo en cualquier teléfono para recuperarlo.', garde: 'Guarda tu tarjeta: con tu código recuperarás tu objeto en otro teléfono. Con una cuenta, te sigue a todas partes.', e_code_pas_utilise: 'Este código aún no se ha usado: crea tu objeto con él.', scanner: '📷 Escanear el código QR', scanAide: 'Apunta al código QR, el código se rellena solo.', scanErr: 'Cámara no disponible: escribe el código a mano.', scanMauvais: 'Este código QR no es un código del Taller.', confTitre: 'Comprobamos antes de lanzar', confTexte: 'Vas a crear:', confAvert: 'Un código = un objeto. Una vez lanzado, no hay vuelta atrás.', modifier: 'Modificar', confirmer: '✨ Confirmar y crear', voir3d: 'Ver en 3D', capture: '📸 Captura', captureOk: 'Imagen guardada', chargement: 'Cargando el objeto…', e_chargement: 'No se pudo cargar el objeto.', tourner: 'Gira con el dedo · pellizca para ampliar' },
 };
 const tt = () => T[lang() as 'fr' | 'en' | 'es'] ?? T.fr;
 const el = <K extends HTMLElement = HTMLElement>(tag: string, cls = '', texte?: string) => { const e = document.createElement(tag) as K; if (cls) e.className = cls; if (texte != null) e.textContent = texte; return e; };
@@ -73,6 +77,16 @@ function style() {
 #atelier .atObj img,#atelier .atObj .ph{width:56px;height:56px;border-radius:10px;object-fit:cover;background:#eef1ea;flex:none;display:grid;place-items:center;font-size:22px}
 #atelier .atObj .n{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #atelier .atObj small{display:block;font-weight:400;color:#6b7770}
+#vue3d{position:fixed;inset:0;z-index:970;background:#0f1713;display:flex;flex-direction:column;font:15px Nunito,system-ui,sans-serif;color:#fff}
+#vue3d canvas{flex:1;width:100%;height:100%;display:block;touch-action:none}
+#vue3d .v3Haut{position:absolute;top:0;left:0;right:0;padding:12px 14px;display:flex;align-items:center;gap:10px;background:linear-gradient(rgba(0,0,0,.55),transparent)}
+#vue3d .v3Haut .n{flex:1;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#vue3d .v3Bas{position:absolute;bottom:0;left:0;right:0;padding:14px;display:flex;gap:10px;justify-content:center;align-items:center;background:linear-gradient(transparent,rgba(0,0,0,.6))}
+#vue3d button{border:0;border-radius:14px;padding:12px 16px;font:800 15px Nunito,system-ui,sans-serif;cursor:pointer;background:rgba(255,255,255,.14);color:#fff;min-height:46px}
+#vue3d button.principal{background:#3f9a3a}
+#vue3d .v3Aide{position:absolute;bottom:76px;left:0;right:0;text-align:center;font-size:12.5px;opacity:.8}
+#vue3d .v3Msg{position:absolute;inset:0;display:grid;place-items:center;font-weight:800;pointer-events:none}
+.telObjets .atObj img,.telObjets .atObj .ph{cursor:pointer}
 #atelier .atScan{position:fixed;inset:0;z-index:5;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center}
 #atelier .atScan video{width:100%;max-height:70vh;object-fit:cover}
 #atelier .atScan p{color:#fff;font-weight:700;margin:12px;text-align:center}
@@ -222,7 +236,8 @@ export function ouvrirAtelier(mode: 'creer' | 'retrouver' = 'creer') {
     attente.replaceChildren();
     attente.appendChild(el('h3', '', `🎉 ${x.pret}`)); attente.appendChild(el('p', '', x.ouTrouver)); attente.appendChild(el('p', 'atAide', `🔑 ${x.garde}`));
     if (o.image) { const im = el<HTMLImageElement>('img', 'atImg'); im.src = o.image; im.alt = o.prompt; attente.appendChild(im); }
-    const f = el<HTMLButtonElement>('button', 'atBtn', x.fermer); f.type = 'button'; f.onclick = fermer; attente.appendChild(f);
+    const v3 = el<HTMLButtonElement>('button', 'atBtn', `🧊 ${x.voir3d}`); v3.type = 'button'; v3.onclick = () => voirEn3D(o); attente.appendChild(v3);
+    const f = el<HTMLButtonElement>('button', 'atBtn sec', x.fermer); f.type = 'button'; f.style.marginLeft = '8px'; f.onclick = fermer; attente.appendChild(f);
     surPret?.(o);
   }
   let conf: HTMLElement | null = null;
@@ -303,6 +318,65 @@ function ligneObjet(o: Objet, actions?: HTMLElement[]): HTMLElement {
   return d;
 }
 
+/** La visionneuse 3D d'un objet (comme dans Tripo) : tourner, zoomer, et 📸 pour garder une image (devient la vignette). */
+export function voirEn3D(o: Objet) {
+  style();
+  if (!o.url || document.getElementById('vue3d')) return;
+  const x = tt();
+  const fond = el('div'); fond.id = 'vue3d'; fond.setAttribute('role', 'dialog'); fond.setAttribute('aria-label', x.voir3d);
+  const canvas = el<HTMLCanvasElement>('canvas'); fond.appendChild(canvas);
+  const haut = el('div', 'v3Haut'); const X = el<HTMLButtonElement>('button', '', '✕'); X.type = 'button'; X.setAttribute('aria-label', x.fermer);
+  haut.append(X, el('div', 'n', o.prompt)); fond.appendChild(haut);
+  const msg = el('div', 'v3Msg', x.chargement); fond.appendChild(msg);
+  const aide = el('div', 'v3Aide', x.tourner); fond.appendChild(aide);
+  const bas = el('div', 'v3Bas'); const bCap = el<HTMLButtonElement>('button', 'principal', x.capture); bCap.type = 'button'; bCap.disabled = true;
+  const bFermer = el<HTMLButtonElement>('button', '', x.fermer); bFermer.type = 'button'; bas.append(bCap, bFermer); fond.appendChild(bas);
+  document.body.appendChild(fond);
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, preserveDrawingBuffer: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace;
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(0x1b2a22);
+  const camera = new THREE.PerspectiveCamera(40, 1, .01, 100); camera.position.set(0, .6, 2.4);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x6b7a6e, 1.1));
+  const soleil = new THREE.DirectionalLight(0xffffff, 1.6); soleil.position.set(2, 3, 2); scene.add(soleil);
+  const contre = new THREE.DirectionalLight(0xdde8ff, .6); contre.position.set(-2, 1, -2); scene.add(contre);
+  const sol = new THREE.Mesh(new THREE.CircleGeometry(1.2, 48), new THREE.MeshStandardMaterial({ color: 0x24362c, roughness: 1 })); sol.rotation.x = -Math.PI / 2; sol.position.y = -.5; scene.add(sol);
+  const controles = new OrbitControls(camera, canvas); controles.enableDamping = true; controles.autoRotate = true; controles.autoRotateSpeed = 2.5; controles.target.set(0, 0, 0); controles.minDistance = .8; controles.maxDistance = 6; controles.enablePan = false;
+  let vivant = true;
+  const taille = () => { const w = fond.clientWidth, h = fond.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); };
+  taille(); window.addEventListener('resize', taille);
+  const boucle = () => { if (!vivant) return; controles.update(); renderer.render(scene, camera); requestAnimationFrame(boucle); };
+  boucle();
+  const fermer = () => { vivant = false; window.removeEventListener('resize', taille); controles.dispose(); renderer.dispose(); fond.remove(); };
+  X.onclick = fermer; bFermer.onclick = fermer;
+
+  const loader = new GLTFLoader(); const draco = new DRACOLoader(); draco.setDecoderPath('draco/'); loader.setDRACOLoader(draco);
+  loader.load(o.url, g => {
+    const obj = g.scene; const boite = new THREE.Box3().setFromObject(obj); const dim = new THREE.Vector3(); boite.getSize(dim); const centre = new THREE.Vector3(); boite.getCenter(centre);
+    const k = 1 / Math.max(dim.x, dim.y, dim.z, 1e-6); obj.scale.setScalar(k); obj.position.set(-centre.x * k, -boite.min.y * k - .5, -centre.z * k);
+    scene.add(obj); msg.remove(); bCap.disabled = false;
+    // cadrage : l'objet entier visible, en portrait comme en paysage
+    const sphere = new THREE.Box3().setFromObject(obj).getBoundingSphere(new THREE.Sphere());
+    const vfov = THREE.MathUtils.degToRad(camera.fov), hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
+    const dist = sphere.radius / Math.sin(Math.min(vfov, hfov) / 2) * 1.12;
+    controles.target.copy(sphere.center); camera.position.set(sphere.center.x, sphere.center.y + dist * .25, sphere.center.z + dist); controles.minDistance = dist * .35; controles.maxDistance = dist * 3; controles.update();
+  }, undefined, () => { msg.textContent = x.e_chargement; });
+
+  bCap.onclick = () => {
+    try {
+      controles.update(); renderer.render(scene, camera);
+      // vignette (petite) gardée dans le téléphone + image en grand à télécharger
+      const petit = document.createElement('canvas'); const cote = 320; const w = canvas.width, h = canvas.height, m = Math.min(w, h);
+      petit.width = cote; petit.height = cote; petit.getContext('2d')!.drawImage(canvas, (w - m) / 2, (h - m) / 2, m, m, 0, 0, cote, cote);
+      const vignette = petit.toDataURL('image/jpeg', .85); majObjet({ id: o.id, image: vignette }); o.image = vignette;
+      const a = document.createElement('a'); a.href = canvas.toDataURL('image/png'); a.download = `${(o.prompt || 'objet').slice(0, 40).replace(/[^\w\u00C0-\u017F -]+/g, '')}.png`; a.click();
+      bCap.textContent = `✓ ${x.captureOk}`; setTimeout(() => { bCap.textContent = x.capture; }, 1800);
+      surVignette?.(o);
+    } catch { /* ignore */ }
+  };
+}
+let surVignette: ((o: Objet) => void) | null = null;
+
 /** L'appli « Atelier » du téléphone : mes objets, poser / retirer, créer. */
 export function rendreMesObjets(c: HTMLElement, decoPosee: string | undefined, h: { placer(o: Objet): void; retirer(): void; voir(): void }) {
   style();
@@ -316,17 +390,20 @@ export function rendreMesObjets(c: HTMLElement, decoPosee: string | undefined, h
     for (const o of l) {
       const actions: HTMLElement[] = [];
       if (o.statut === 'pret' && o.url) {
+        const b3 = el<HTMLButtonElement>('button', 'sec', '🧊 3D'); b3.type = 'button'; b3.title = x.voir3d; b3.setAttribute('aria-label', x.voir3d); b3.onclick = () => voirEn3D(o); actions.push(b3);
         if (decoPosee === o.id) {
           const r = el<HTMLButtonElement>('button', 'sec', x.retirer); r.type = 'button'; r.onclick = () => { h.retirer(); decoPosee = undefined; dessiner(); };
           const v = el<HTMLButtonElement>('button', '', '👀'); v.type = 'button'; v.title = x.voir; v.setAttribute('aria-label', x.voir); v.onclick = () => h.voir();
           actions.push(v, r);
         } else { const p = el<HTMLButtonElement>('button', '', x.placer); p.type = 'button'; p.onclick = () => { h.placer(o); decoPosee = o.id; dessiner(); }; actions.push(p); }
       }
-      const ligne = ligneObjet(o, actions); if (decoPosee === o.id) ligne.querySelector('.n')!.appendChild(el('small', '', `✅ ${x.pose}`)); zone.appendChild(ligne);
+      const ligne = ligneObjet(o, actions); if (decoPosee === o.id) ligne.querySelector('.n')!.appendChild(el('small', '', `✅ ${x.pose}`));
+      if (o.statut === 'pret' && o.url) { const im = ligne.querySelector('img, .ph') as HTMLElement | null; if (im) im.onclick = () => voirEn3D(o); }
+      zone.appendChild(ligne);
     }
     const creer = el<HTMLButtonElement>('button', 'buy', x.creerUn); creer.type = 'button'; creer.style.marginTop = '10px'; creer.onclick = () => ouvrirAtelier(); zone.appendChild(creer);
     const retr = el<HTMLButtonElement>('button', 'sec', `🔑 ${x.retrouver}`); retr.type = 'button'; retr.style.cssText = 'margin:8px 0 0 8px;font:800 13px Nunito,system-ui,sans-serif;padding:8px 10px;border:0;border-radius:10px;background:#eef1ea;color:#1e2a24;cursor:pointer'; retr.onclick = () => ouvrirAtelier('retrouver'); zone.appendChild(retr);
   };
-  dessiner();
+  dessiner(); surVignette = () => { if (zone.isConnected) dessiner(); };
   if (objets().some(o => o.statut === 'en_cours')) { rafraichir().then(dessiner); const m = window.setInterval(async () => { if (!zone.isConnected) { clearInterval(m); return; } await rafraichir(); dessiner(); if (!objets().some(o => o.statut === 'en_cours')) clearInterval(m); }, 6000); }
 }
