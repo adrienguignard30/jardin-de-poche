@@ -5,6 +5,7 @@ import { SkyLife } from './sky';
 import { styliserInterieur } from './interieur';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import type { ViewDef } from './state';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 /** Fichier layout_<perso>.json écrit par jdp_assemblage.py (repère Blender). */
 export interface Layout {
@@ -43,6 +44,12 @@ export const SLOTS: Slot[] = [];
 export const FACADE_FRONT = -0.6 * DEPTH + 0.15;   // face avant du mur
 export const LAYOUT = { corridorZ: 0.0, halfW: 1.9 * TUNE.width, backZ: -0.6 * TUNE.depth + 0.35, frontZ: 0.72 * TUNE.depth - 0.3 };   // zone de marche, ajustée au décor chargé
 
+/** Dimensions en mètres ; positions indépendantes des huit pots. */
+export const DECO: Record<string, { x: number; z: number }> = {
+  lea: { x: -3.00, z: .40 }, marcel: { x: 3.05, z: .40 }, jimy: { x: 2.95, z: .48 },
+};
+let decoActive: { x: number; z: number } | null = null;
+
 /** Tout ce qu'on ne traverse pas sur le balcon : pots, chaise, panier (cercles au sol, rayon = objet + demi-corps). */
 export function obstacles(ignore?: string): { x: number; z: number; r: number; id: string }[] {
   const out: { x: number; z: number; r: number; id: string }[] = [];
@@ -50,6 +57,7 @@ export function obstacles(ignore?: string): { x: number; z: number; r: number; i
   SLOTS.forEach((s, i) => { if (!s.roof && `pot${i}` !== ignore) out.push({ x: s.pos.x, z: s.pos.z, r: potR, id: `pot${i}` }); });
   if (ignore !== 'chair') out.push({ x: CHAIR_SPOT.pos.x, z: CHAIR_SPOT.pos.z, r: .42, id: 'chair' });
   if (ignore !== 'basket') out.push({ x: BASKET_SPOT.x, z: BASKET_SPOT.z, r: .38, id: 'basket' });
+  if (decoActive && ignore !== 'deco') out.push({ ...decoActive, r: .51, id: 'deco' });
   return out;
 }
 /** Le point libre le plus proche : sur le balcon (ni barrière ni mur) et hors des obstacles. */
@@ -130,6 +138,162 @@ function hasTransparentTop(tex: THREE.Texture): boolean {
 }
 
 export class World {
+  private socleDeco: THREE.Mesh | null = null;
+  private objetDeco: THREE.Group | null = null;
+  private decoJeton = 0;
+  private decoEffets = new THREE.Group();
+  private decoLiseres = new THREE.MeshStandardMaterial({ color: 0xfacd00, emissive: 0xfacd00, emissiveIntensity: .5, roughness: .5 });
+  private decoSpot: THREE.SpotLight | null = null;
+  private decoAge = 0;
+  private decoLogoMateriau: THREE.MeshStandardMaterial | null = null;
+  private decoParticules: THREE.Sprite[] = [];
+  private decoParticuleAge = 2;
+  private decoTextureHalo: THREE.CanvasTexture | null = null;
+
+  private habillerSocle() {
+    const socle = this.socleDeco!;
+    const noir = new THREE.MeshStandardMaterial({ color: 0x101010, roughness: .72 });
+    const dessus = new THREE.MeshStandardMaterial({ color: 0xd8cfbc, roughness: .87 });
+    (socle.material as THREE.Material).dispose();
+    socle.material = [noir, noir, dessus, noir, noir, noir];
+    socle.add(this.decoEffets);
+    for (const [x, z, largeur, profondeur] of [[0, -.145, .58, .008], [0, .145, .58, .008], [-.295, 0, .008, .28], [.295, 0, .008, .28]]) {
+      const barre = new THREE.Mesh(new THREE.BoxGeometry(largeur, .008, profondeur), this.decoLiseres);
+      barre.position.set(x, .253, z); this.decoEffets.add(barre);
+    }
+    // Quatre surfaces planes : même taille physique, aucun étirement sur les côtés étroits.
+    void this.assets.texture('images/tripo-logo.png').then(texture => {
+      const image = texture.image as { width: number; height: number };
+      const ratio = image.width / image.height;
+      const largeur = Math.min(.23, .23 * ratio), hauteur = largeur / ratio;
+      const mat = new THREE.MeshStandardMaterial({ map: texture, transparent: true, roughness: .7, emissive: 0xffffff, emissiveMap: texture, emissiveIntensity: .12 });
+      // Masque émissif : uniquement les quatre petits contours blancs des coins.
+      const masque = document.createElement('canvas'); masque.width = image.width; masque.height = image.height;
+      const dessin = masque.getContext('2d')!;
+      dessin.drawImage(texture.image as CanvasImageSource, 0, 0);
+      const pixels = dessin.getImageData(0, 0, image.width, image.height);
+      for (let y = 0; y < image.height; y++) for (let x = 0; x < image.width; x++) {
+        const i = (y * image.width + x) * 4;
+        const coin = (x < image.width * .24 || x > image.width * .76) && (y < image.height * .24 || y > image.height * .76);
+        const blanc = Math.min(pixels.data[i], pixels.data[i + 1], pixels.data[i + 2]);
+        const valeur = coin ? Math.max(0, (blanc - 180) / 75) * 255 : 0;
+        pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = valeur;
+      }
+      dessin.putImageData(pixels, 0, 0);
+      const emission = new THREE.CanvasTexture(masque); emission.colorSpace = THREE.SRGBColorSpace;
+      mat.emissiveMap = emission; mat.emissiveIntensity = .9 * this.night;
+      this.decoLogoMateriau = mat;
+      for (const [x, z, angle] of [[0, .151, 0], [0, -.151, Math.PI], [.301, 0, Math.PI / 2], [-.301, 0, -Math.PI / 2]]) {
+        const logo = new THREE.Mesh(new THREE.PlaneGeometry(largeur, hauteur), mat);
+        logo.name = 'logo_tripo'; logo.position.set(x, 0, z); logo.rotation.y = angle; socle.add(logo);
+      }
+    }).catch(e => console.warn('[deco] logo non chargé', e));
+    const canvas = document.createElement('canvas'); canvas.width = canvas.height = 64;
+    const ctx = canvas.getContext('2d')!, gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gradient.addColorStop(0, 'rgba(255,210,50,.6)'); gradient.addColorStop(.5, 'rgba(255,210,50,.20)'); gradient.addColorStop(1, 'rgba(255,210,50,0)');
+    ctx.fillStyle = gradient; ctx.fillRect(0, 0, 64, 64);
+    this.decoTextureHalo = new THREE.CanvasTexture(canvas); this.decoTextureHalo.colorSpace = THREE.SRGBColorSpace;
+    const halo = new THREE.Mesh(new THREE.PlaneGeometry(.94, .64), new THREE.MeshBasicMaterial({ map: this.decoTextureHalo, transparent: true, opacity: .35, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 }));
+    halo.rotation.x = -Math.PI / 2; halo.position.y = -.247; this.decoEffets.add(halo);
+    this.decoSpot = new THREE.SpotLight(0xffefd0, 2, 3, .55, .8, 2);
+    this.decoSpot.castShadow = false; this.decoSpot.position.set(0, 1.65, .65);
+    this.decoSpot.target.position.set(0, .55, 0); this.decoEffets.add(this.decoSpot, this.decoSpot.target);
+    // Un seul groupe réutilisé ; aucun timer, aucune lumière par étincelle.
+    for (let i = 0; i < 24; i++) {
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: this.decoTextureHalo, color: 0xffdf65, transparent: true, depthWrite: false }));
+      sprite.scale.setScalar(.045); sprite.visible = false; sprite.userData.phase = i * 2.39996;
+      this.decoParticules.push(sprite); this.decoEffets.add(sprite);
+    }
+  }
+
+  private animerSocle(dt: number) {
+    if (!this.socleDeco?.visible) return;
+    if (this.decoLogoMateriau) this.decoLogoMateriau.emissiveIntensity = .9 * THREE.MathUtils.clamp(this.night, 0, 1);
+    this.decoAge += Math.max(0, dt); this.decoParticuleAge += Math.max(0, dt);
+    this.decoLiseres.emissiveIntensity = .45 + .1 * Math.sin(this.decoAge * Math.PI / 3);
+    for (let i = 0; i < this.decoParticules.length; i++) {
+      const p = this.decoParticules[i], t = this.decoParticuleAge;
+      p.visible = t < 1.5;
+      if (!p.visible) continue;
+      const phase = p.userData.phase as number;
+      p.position.set(Math.cos(phase) * (.08 + i % 4 * .04), .35 + (i % 6) * .12 + .65 * t - .65 * t * t, Math.sin(phase) * .12);
+      (p.material as THREE.SpriteMaterial).opacity = Math.max(0, (1 - t / 1.5) * .8);
+    }
+  }
+
+  private regardDeco: { temps: number; duree: number; cible: THREE.Vector3 } | null = null;
+
+  private libererDeco(o: THREE.Object3D) {
+    o.removeFromParent();
+    const geometries = new Set<THREE.BufferGeometry>(), materials = new Set<THREE.Material>(), textures = new Set<THREE.Texture>();
+    o.traverse(n => {
+      const m = n as THREE.Mesh;
+      if (!m.isMesh) return;
+      geometries.add(m.geometry);
+      for (const mat of Array.isArray(m.material) ? m.material : [m.material]) {
+        materials.add(mat);
+        for (const v of Object.values(mat)) if (v instanceof THREE.Texture) textures.add(v);
+      }
+    });
+    geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose()); textures.forEach(t => t.dispose());
+  }
+
+  private installerSocleDeco() {
+    decoActive = DECO[this.perso] ?? null;
+    if (!decoActive) { if (this.socleDeco) this.socleDeco.visible = false; return; }
+    if (!this.socleDeco) {
+      this.socleDeco = new THREE.Mesh(new RoundedBoxGeometry(.60, .50, .30, 3, .012),
+        new THREE.MeshStandardMaterial({ color: 0xd8cfbc, roughness: .87, metalness: 0 }));
+      this.socleDeco.name = 'socle_creation';
+      this.habillerSocle();
+      this.socleDeco.castShadow = this.socleDeco.receiveShadow = true;
+      this.root.add(this.socleDeco);
+    }
+    this.socleDeco.visible = true;
+    const p = new THREE.Vector3(decoActive.x, FL, decoActive.z);
+    this.envGroup.updateMatrixWorld(true);
+    this.socleDeco.position.set(p.x, this.solAuPoint(p) + .25, p.z);
+  }
+
+  /** API de l'Atelier, appelée sur World par game.ts. Le modèle précédent reste si le chargement échoue. */
+  async poserDeco(url: string, nom?: string): Promise<void> {
+    if (!this.socleDeco?.visible) throw new Error('Emplacement de décoration indisponible');
+    const jeton = ++this.decoJeton;
+    const modele = await this.assets.chargerDeco(url);
+    if (jeton !== this.decoJeton) { this.libererDeco(modele); return; }
+    const groupe = new THREE.Group(); groupe.add(modele);
+    try {
+      groupe.updateMatrixWorld(true);
+      const boite = new THREE.Box3().setFromObject(groupe), taille = boite.getSize(new THREE.Vector3());
+      if (boite.isEmpty() || ![taille.x, taille.y, taille.z].every(Number.isFinite) || Math.max(taille.x, taille.y, taille.z) < 1e-8) throw new Error('GLB sans géométrie mesurable');
+      const facteur = Math.min(...[.60, .90, .30].map((limite, i) => taille.getComponent(i) > 1e-8 ? limite / taille.getComponent(i) : Infinity));
+      const centre = boite.getCenter(new THREE.Vector3());
+      groupe.scale.setScalar(facteur);
+      groupe.position.set(this.socleDeco.position.x - centre.x * facteur,
+        this.socleDeco.position.y + .25 - boite.min.y * facteur, this.socleDeco.position.z - centre.z * facteur);
+      groupe.name = nom || 'creation_joueur';
+      groupe.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; } });
+      if (this.objetDeco) this.libererDeco(this.objetDeco);
+      this.objetDeco = groupe; this.root.add(groupe);
+      this.decoParticuleAge = 0;
+    } catch (e) { this.libererDeco(groupe); throw e; }
+  }
+
+  retirerDeco(): void {
+    ++this.decoJeton;
+    this.decoParticuleAge = 2; this.decoParticules.forEach(p => p.visible = false);
+    if (this.objetDeco) this.libererDeco(this.objetDeco);
+    this.objetDeco = null;
+  }
+
+  voirDeco(duree = 3000): void {
+    if (!this.socleDeco?.visible || !Number.isFinite(duree)) return;
+    const cible = this.socleDeco.position.clone(); cible.y += .45;
+    // Un double clic ne relance pas la transition, même pendant le retour.
+    if (this.regardDeco) return;
+    this.regardDeco = { temps: 0, duree: Math.max(1600, duree), cible };
+  }
+
   renderer: THREE.WebGLRenderer;
   scene = new THREE.Scene();
   camera: THREE.PerspectiveCamera;
@@ -557,6 +721,10 @@ export class World {
       const b = new THREE.Box3().setFromObject(o).expandByScalar(.20);
       if (b.max.y > FL + .3) boites.push(b);
     });
+    const boiteDeco = decoActive ? new THREE.Box3(
+      new THREE.Vector3(decoActive.x - .51, FL, decoActive.z - .51),
+      new THREE.Vector3(decoActive.x + .51, FL + 1.4, decoActive.z + .51)) : null;
+    if (boiteDeco) boites.push(boiteDeco);
     const dedans = (p: THREE.Vector3, b: THREE.Box3) => p.x > b.min.x && p.x < b.max.x && p.z > b.min.z && p.z < b.max.z;
     const libre = (p: THREE.Vector3) => !boites.some(b => dedans(p, b));
     const b = cible.clone();
@@ -579,7 +747,7 @@ export class World {
     const points = [a.clone(), b];
     for (const o of boites) for (const x of [o.min.x - .01, o.max.x + .01]) for (const z of [o.min.z - .01, o.max.z + .01]) {
       const p = new THREE.Vector3(x, a.y, z);
-      if (libre(p) && dansLaPiece(p)) points.push(p);
+      if (libre(p) && (dansLaPiece(p) || (o === boiteDeco && p.x > -LAYOUT.halfW + .2 && p.x < LAYOUT.halfW - .2 && p.z >= LAYOUT.backZ && p.z <= LAYOUT.frontZ))) points.push(p);
     }
     const d = points.map(() => Infinity), avant = points.map(() => -1), vus = new Set<number>(); d[0] = 0;
     for (;;) {
@@ -719,8 +887,11 @@ export class World {
     if (L.camera) { TUNE.camPitch = L.camera.pitch; TUNE.camDist = L.camera.dist; TUNE.lookY = FL + L.camera.look_z; this.lookAt.x = L.camera.x ?? 0; this.baseX = this.lookAt.x; this.fovPaysage = L.camera.fov ?? 42; this.applyTune(); }
     this.roofGroup.visible = false;                       // avec un décor assemblé, le toit vient du décor
     styliserInterieur(this.envGroup, this.perso);
+    this.installerSocleDeco();
   }
   setEnvironment(env?: { apartment?: string; balcony?: string; extra?: string; roof?: boolean; room?: boolean }, layout?: Layout | null) {
+    this.retirerDeco(); this.regardDeco = null; decoActive = null;
+    if (this.socleDeco) this.socleDeco.visible = false;
     this.hasRoom = env?.room !== false;
     for (const c of [...this.envGroup.children]) this.envGroup.remove(c);
     if (!this.envGroup.parent) this.root.add(this.envGroup);
@@ -1099,9 +1270,10 @@ export class World {
   ciel: Ciel | null = null;
   update(dt: number) {
     this.world_dt = dt;
+    this.animerSocle(dt);
     (this.ciel ??= new Ciel(this.scene, () => this.night, this.camera, () => this.fenetreCiel())).update();
     if (this.enHauteur()) {
-      if (this.suivreX !== null && performance.now() - this.panMain > 4000) this.panCible = this.panVisible ?? (this.suivreX - this.baseX);   // on suit le personnage, là où on le voit
+      if (!this.regardDeco && this.suivreX !== null && performance.now() - this.panMain > 4000) this.panCible = this.panVisible ?? (this.suivreX - this.baseX);   // on suit le personnage, là où on le voit
       this.panCible = THREE.MathUtils.clamp(this.panCible, -this.panMax, this.panMax);
       this.panX += (this.panCible - this.panX) * Math.min(1, dt * 3);
       this.lookAt.x = this.baseX + this.panX;
@@ -1112,7 +1284,17 @@ export class World {
     this.applyNight();
     const d = this.dist * this.zoom;
     this.camera.position.set(this.lookAt.x + d * Math.sin(this.yaw) * Math.cos(this.pitch), this.lookAt.y + d * Math.sin(this.pitch), this.lookAt.z + d * Math.cos(this.yaw) * Math.cos(this.pitch));
-    this.camera.lookAt(this.lookAt);
+    const regard = this.lookAt.clone();
+    if (this.regardDeco) {
+      const v = this.regardDeco; v.temps += Math.max(0, dt) * 1000;
+      const lisse = (x: number) => { x = THREE.MathUtils.clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+      const poids = lisse(v.temps / 700) * lisse((v.duree - v.temps) / 700);
+      // Cadrage translaté : lisible aussi en portrait, sans tourner le personnage.
+      this.camera.position.add(v.cible.clone().sub(this.lookAt).multiplyScalar(poids));
+      regard.lerp(v.cible, poids);
+      if (v.temps >= v.duree) this.regardDeco = null;
+    }
+    this.camera.lookAt(regard);
     if (this.layers) { // parallaxe : le proche bouge plus que le lointain
       this.layers.nearDay.rotation.y = this.layers.nearNight.rotation.y = -this.yaw * .35;
       this.layers.farDay.rotation.y = this.layers.farNight.rotation.y = -this.yaw * .18;

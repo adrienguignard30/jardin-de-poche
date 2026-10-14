@@ -9,9 +9,9 @@ import { sb } from './enligne';
 export interface Objet { id: string; prompt: string; statut: 'en_cours' | 'pret' | 'echec'; progres: number; url?: string; image?: string; erreur?: string; cree: number }
 const CLE = 'jdp.objets';
 const T = {
-  fr: { titre: 'Atelier', sous: 'Crée tes objets de déco', bientot: 'Bientôt : ton personnage jouable', carteObjet: 'Un objet de déco pour ton balcon', carteObjetTexte: 'Décris-le, Tripo le fabrique en 3D. Tu le retrouveras dans ton téléphone, appli Atelier, pour le poser sur ton balcon.', cartePerso: 'Ton personnage jouable', cartePersoTexte: 'Décris-le, il sera créé avec le même squelette que Léa, Marcel et Jimy, et jouable comme eux.', arrive: 'Arrive bientôt', code: 'Ton code', codeAide: 'Un code = un objet. Demande-le à Adrien.', decris: 'Décris ton objet', exemple: 'ex. : un nain de jardin pirate, un flamant rose en bois', creer: '✨ Créer', fabrique: 'Tripo fabrique ton objet…', patience: '1 à 3 minutes. Tu peux fermer, il t’attendra dans ton téléphone.', pret: 'Ton objet est prêt !', ouTrouver: 'Il est dans ton téléphone, appli Atelier : touche « Poser sur le balcon ».', placer: 'Poser sur le balcon', retirer: 'Retirer du balcon', voir: 'Voir ma création', fermer: 'Fermer', mesObjets: 'Mes objets', aucun: 'Aucun objet pour l’instant.', creerUn: '✨ Créer un objet', echec: 'La fabrication a échoué. Ton code a été rendu si Tripo n’a rien fait.', pose: 'Posé sur le balcon', e_code_inconnu: 'Ce code n’existe pas.', e_code_deja_utilise: 'Ce code a déjà servi.', e_texte_longueur: 'Décris ton objet en 3 à 120 caractères.', e_texte_interdit: 'Ce texte n’est pas accepté : décris un objet de déco (pas de personnes, ni d’armes).', e_pas_configure: 'L’Atelier n’est pas encore branché.', e_reseau: 'Pas de connexion. Réessaie.', e_tripo: 'Tripo n’a pas accepté la demande. Ton code est rendu, réessaie.', retrouverTitre: 'Déjà un code utilisé ?', retrouver: 'Retrouver mon objet', retrouverAide: 'Ton code est la clé de ton objet : tape-le sur n’importe quel téléphone pour le retrouver.', garde: 'Garde ta carte : avec ton code tu retrouveras ton objet sur un autre téléphone. Avec un compte, il te suit partout.', e_code_pas_utilise: 'Ce code n’a pas encore servi : crée ton objet avec.' },
-  en: { titre: 'Workshop', sous: 'Create your decor objects', bientot: 'Coming soon: your playable character', carteObjet: 'A decor object for your balcony', carteObjetTexte: 'Describe it, Tripo builds it in 3D. You will find it in your phone, Workshop app, to place it on your balcony.', cartePerso: 'Your playable character', cartePersoTexte: 'Describe it: it will be built with the same skeleton as Léa, Marcel and Jimy, and playable like them.', arrive: 'Coming soon', code: 'Your code', codeAide: 'One code = one object. Ask Adrien.', decris: 'Describe your object', exemple: 'e.g. a pirate garden gnome, a wooden pink flamingo', creer: '✨ Create', fabrique: 'Tripo is building your object…', patience: '1 to 3 minutes. You can close this, it will wait in your phone.', pret: 'Your object is ready!', ouTrouver: 'It is in your phone, Workshop app: tap “Place on the balcony”.', placer: 'Place on the balcony', retirer: 'Remove from the balcony', voir: 'See my creation', fermer: 'Close', mesObjets: 'My objects', aucun: 'No object yet.', creerUn: '✨ Create an object', echec: 'Building failed. Your code was given back if Tripo did nothing.', pose: 'Placed on the balcony', e_code_inconnu: 'This code does not exist.', e_code_deja_utilise: 'This code was already used.', e_texte_longueur: 'Describe your object in 3 to 120 characters.', e_texte_interdit: 'This text is not accepted: describe a decor object (no people, no weapons).', e_pas_configure: 'The Workshop is not connected yet.', e_reseau: 'No connection. Try again.', e_tripo: 'Tripo refused the request. Your code is given back, try again.', retrouverTitre: 'Already used a code?', retrouver: 'Find my object', retrouverAide: 'Your code is the key to your object: type it on any phone to get it back.', garde: 'Keep your card: with your code you can get your object back on another phone. With an account, it follows you everywhere.', e_code_pas_utilise: 'This code has not been used yet: create your object with it.' },
-  es: { titre: 'Taller', sous: 'Crea tus objetos de decoración', bientot: 'Pronto: tu personaje jugable', carteObjet: 'Un objeto de decoración para tu balcón', carteObjetTexte: 'Descríbelo, Tripo lo fabrica en 3D. Lo encontrarás en tu teléfono, app Taller, para ponerlo en tu balcón.', cartePerso: 'Tu personaje jugable', cartePersoTexte: 'Descríbelo: se creará con el mismo esqueleto que Léa, Marcel y Jimy, y será jugable como ellos.', arrive: 'Pronto', code: 'Tu código', codeAide: 'Un código = un objeto. Pídeselo a Adrien.', decris: 'Describe tu objeto', exemple: 'ej.: un gnomo de jardín pirata, un flamenco rosa de madera', creer: '✨ Crear', fabrique: 'Tripo está fabricando tu objeto…', patience: '1 a 3 minutos. Puedes cerrar, te esperará en tu teléfono.', pret: '¡Tu objeto está listo!', ouTrouver: 'Está en tu teléfono, app Taller: toca «Poner en el balcón».', placer: 'Poner en el balcón', retirer: 'Quitar del balcón', voir: 'Ver mi creación', fermer: 'Cerrar', mesObjets: 'Mis objetos', aucun: 'Ningún objeto todavía.', creerUn: '✨ Crear un objeto', echec: 'La fabricación falló. Tu código se devolvió si Tripo no hizo nada.', pose: 'Puesto en el balcón', e_code_inconnu: 'Este código no existe.', e_code_deja_utilise: 'Este código ya se usó.', e_texte_longueur: 'Describe tu objeto en 3 a 120 caracteres.', e_texte_interdit: 'Este texto no se acepta: describe un objeto de decoración (sin personas ni armas).', e_pas_configure: 'El Taller aún no está conectado.', e_reseau: 'Sin conexión. Inténtalo de nuevo.', e_tripo: 'Tripo no aceptó la petición. Tu código se devuelve, inténtalo de nuevo.', retrouverTitre: '¿Ya usaste un código?', retrouver: 'Recuperar mi objeto', retrouverAide: 'Tu código es la llave de tu objeto: escríbelo en cualquier teléfono para recuperarlo.', garde: 'Guarda tu tarjeta: con tu código recuperarás tu objeto en otro teléfono. Con una cuenta, te sigue a todas partes.', e_code_pas_utilise: 'Este código aún no se ha usado: crea tu objeto con él.' },
+  fr: { titre: 'Atelier', sous: 'Crée tes objets de déco', bientot: 'Bientôt : ton personnage jouable', carteObjet: 'Un objet de déco pour ton balcon', carteObjetTexte: 'Décris-le, Tripo le fabrique en 3D. Tu le retrouveras dans ton téléphone, appli Atelier, pour le poser sur ton balcon.', cartePerso: 'Ton personnage jouable', cartePersoTexte: 'Décris-le, il sera créé avec le même squelette que Léa, Marcel et Jimy, et jouable comme eux.', arrive: 'Arrive bientôt', code: 'Ton code', codeAide: 'Un code = un objet. Demande-le à Adrien.', decris: 'Décris ton objet', exemple: 'ex. : un nain de jardin pirate, un flamant rose en bois', creer: '✨ Créer', fabrique: 'Tripo fabrique ton objet…', patience: '1 à 3 minutes. Tu peux fermer, il t’attendra dans ton téléphone.', pret: 'Ton objet est prêt !', ouTrouver: 'Il est dans ton téléphone, appli Atelier : touche « Poser sur le balcon ».', placer: 'Poser sur le balcon', retirer: 'Retirer du balcon', voir: 'Voir ma création', fermer: 'Fermer', mesObjets: 'Mes objets', aucun: 'Aucun objet pour l’instant.', creerUn: '✨ Créer un objet', echec: 'La fabrication a échoué. Ton code a été rendu si Tripo n’a rien fait.', pose: 'Posé sur le balcon', e_code_inconnu: 'Ce code n’existe pas.', e_code_deja_utilise: 'Ce code a déjà servi.', e_texte_longueur: 'Décris ton objet en 3 à 120 caractères.', e_texte_interdit: 'Ce texte n’est pas accepté : décris un objet de déco (pas de personnes, ni d’armes).', e_pas_configure: 'L’Atelier n’est pas encore branché.', e_reseau: 'Pas de connexion. Réessaie.', e_tripo: 'Tripo n’a pas accepté la demande. Ton code est rendu, réessaie.', retrouverTitre: 'Déjà un code utilisé ?', retrouver: 'Retrouver mon objet', retrouverAide: 'Ton code est la clé de ton objet : tape-le sur n’importe quel téléphone pour le retrouver.', garde: 'Garde ta carte : avec ton code tu retrouveras ton objet sur un autre téléphone. Avec un compte, il te suit partout.', e_code_pas_utilise: 'Ce code n’a pas encore servi : crée ton objet avec.', scanner: '📷 Scanner le QR code', scanAide: 'Vise le QR code, le code se remplit tout seul.', scanErr: 'Caméra indisponible : tape le code à la main.', scanMauvais: 'Ce QR code n’est pas un code Atelier.' },
+  en: { titre: 'Workshop', sous: 'Create your decor objects', bientot: 'Coming soon: your playable character', carteObjet: 'A decor object for your balcony', carteObjetTexte: 'Describe it, Tripo builds it in 3D. You will find it in your phone, Workshop app, to place it on your balcony.', cartePerso: 'Your playable character', cartePersoTexte: 'Describe it: it will be built with the same skeleton as Léa, Marcel and Jimy, and playable like them.', arrive: 'Coming soon', code: 'Your code', codeAide: 'One code = one object. Ask Adrien.', decris: 'Describe your object', exemple: 'e.g. a pirate garden gnome, a wooden pink flamingo', creer: '✨ Create', fabrique: 'Tripo is building your object…', patience: '1 to 3 minutes. You can close this, it will wait in your phone.', pret: 'Your object is ready!', ouTrouver: 'It is in your phone, Workshop app: tap “Place on the balcony”.', placer: 'Place on the balcony', retirer: 'Remove from the balcony', voir: 'See my creation', fermer: 'Close', mesObjets: 'My objects', aucun: 'No object yet.', creerUn: '✨ Create an object', echec: 'Building failed. Your code was given back if Tripo did nothing.', pose: 'Placed on the balcony', e_code_inconnu: 'This code does not exist.', e_code_deja_utilise: 'This code was already used.', e_texte_longueur: 'Describe your object in 3 to 120 characters.', e_texte_interdit: 'This text is not accepted: describe a decor object (no people, no weapons).', e_pas_configure: 'The Workshop is not connected yet.', e_reseau: 'No connection. Try again.', e_tripo: 'Tripo refused the request. Your code is given back, try again.', retrouverTitre: 'Already used a code?', retrouver: 'Find my object', retrouverAide: 'Your code is the key to your object: type it on any phone to get it back.', garde: 'Keep your card: with your code you can get your object back on another phone. With an account, it follows you everywhere.', e_code_pas_utilise: 'This code has not been used yet: create your object with it.', scanner: '📷 Scan the QR code', scanAide: 'Point at the QR code, the code fills in by itself.', scanErr: 'Camera unavailable: type the code by hand.', scanMauvais: 'This QR code is not a Workshop code.' },
+  es: { titre: 'Taller', sous: 'Crea tus objetos de decoración', bientot: 'Pronto: tu personaje jugable', carteObjet: 'Un objeto de decoración para tu balcón', carteObjetTexte: 'Descríbelo, Tripo lo fabrica en 3D. Lo encontrarás en tu teléfono, app Taller, para ponerlo en tu balcón.', cartePerso: 'Tu personaje jugable', cartePersoTexte: 'Descríbelo: se creará con el mismo esqueleto que Léa, Marcel y Jimy, y será jugable como ellos.', arrive: 'Pronto', code: 'Tu código', codeAide: 'Un código = un objeto. Pídeselo a Adrien.', decris: 'Describe tu objeto', exemple: 'ej.: un gnomo de jardín pirata, un flamenco rosa de madera', creer: '✨ Crear', fabrique: 'Tripo está fabricando tu objeto…', patience: '1 a 3 minutos. Puedes cerrar, te esperará en tu teléfono.', pret: '¡Tu objeto está listo!', ouTrouver: 'Está en tu teléfono, app Taller: toca «Poner en el balcón».', placer: 'Poner en el balcón', retirer: 'Quitar del balcón', voir: 'Ver mi creación', fermer: 'Cerrar', mesObjets: 'Mis objetos', aucun: 'Ningún objeto todavía.', creerUn: '✨ Crear un objeto', echec: 'La fabricación falló. Tu código se devolvió si Tripo no hizo nada.', pose: 'Puesto en el balcón', e_code_inconnu: 'Este código no existe.', e_code_deja_utilise: 'Este código ya se usó.', e_texte_longueur: 'Describe tu objeto en 3 a 120 caracteres.', e_texte_interdit: 'Este texto no se acepta: describe un objeto de decoración (sin personas ni armas).', e_pas_configure: 'El Taller aún no está conectado.', e_reseau: 'Sin conexión. Inténtalo de nuevo.', e_tripo: 'Tripo no aceptó la petición. Tu código se devuelve, inténtalo de nuevo.', retrouverTitre: '¿Ya usaste un código?', retrouver: 'Recuperar mi objeto', retrouverAide: 'Tu código es la llave de tu objeto: escríbelo en cualquier teléfono para recuperarlo.', garde: 'Guarda tu tarjeta: con tu código recuperarás tu objeto en otro teléfono. Con una cuenta, te sigue a todas partes.', e_code_pas_utilise: 'Este código aún no se ha usado: crea tu objeto con él.', scanner: '📷 Escanear el código QR', scanAide: 'Apunta al código QR, el código se rellena solo.', scanErr: 'Cámara no disponible: escribe el código a mano.', scanMauvais: 'Este código QR no es un código del Taller.' },
 };
 const tt = () => T[lang() as 'fr' | 'en' | 'es'] ?? T.fr;
 const el = <K extends HTMLElement = HTMLElement>(tag: string, cls = '', texte?: string) => { const e = document.createElement(tag) as K; if (cls) e.className = cls; if (texte != null) e.textContent = texte; return e; };
@@ -70,6 +70,10 @@ function style() {
 #atelier .atObj img,#atelier .atObj .ph{width:56px;height:56px;border-radius:10px;object-fit:cover;background:#eef1ea;flex:none;display:grid;place-items:center;font-size:22px}
 #atelier .atObj .n{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #atelier .atObj small{display:block;font-weight:400;color:#6b7770}
+#atelier .atScan{position:fixed;inset:0;z-index:5;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#atelier .atScan video{width:100%;max-height:70vh;object-fit:cover}
+#atelier .atScan p{color:#fff;font-weight:700;margin:12px;text-align:center}
+#atelier .atScan .atBtn{margin:0 0 20px}
 .btnAtelierAccueil{display:block;width:min(360px,100%);margin:6px auto 2px;padding:12px 16px;border:0;border-radius:16px;background:linear-gradient(135deg,#ffd34d,#ff8fab);color:#3a2a00;font:800 16px/1.2 Nunito,system-ui,sans-serif;box-shadow:0 8px 24px rgba(255,150,80,.35);cursor:pointer;text-align:center}
 .btnAtelierAccueil small{display:block;font-weight:700;font-size:12px;opacity:.85;margin-top:3px}
 .telObjets .atObj{display:flex;gap:10px;align-items:center;border-bottom:1px solid #e6ebe3;padding:8px 0}
@@ -119,6 +123,51 @@ let surPret: ((o: Objet) => void) | null = null;
 /** Quand un objet est prêt (pour que le téléphone se rafraîchisse). */
 export function quandPret(f: (o: Objet) => void) { surPret = f; }
 
+/** Le décodeur QR (public/jsqr.js, chargé seulement quand on scanne). */
+function chargerJsQR(): Promise<(d: Uint8ClampedArray, w: number, h: number, o?: any) => { data: string } | null> {
+  return new Promise((ok, ko) => {
+    const w = window as any; if (w.jsQR) { ok(w.jsQR); return; }
+    const sc = document.createElement('script'); sc.src = 'jsqr.js'; sc.onload = () => w.jsQR ? ok(w.jsQR) : ko(new Error('jsqr')); sc.onerror = () => ko(new Error('jsqr')); document.head.appendChild(sc);
+  });
+}
+/** Lit un code Atelier dans le texte d'un QR : le lien du tableau (…?code=POTAGER-XXXX) ou le code tout seul. */
+function codeDansQr(texte: string): string | null {
+  try { const u = new URL(texte); const c = (u.searchParams.get('code') || '').toUpperCase(); if (/^[A-Z0-9-]{6,24}$/.test(c)) return c; } catch { /* pas un lien */ }
+  const t = texte.trim().toUpperCase(); return /^[A-Z0-9-]{6,24}$/.test(t) ? t : null;
+}
+/** Ouvre la caméra dans l'Atelier et appelle quandLu(code) dès qu'un QR code Atelier est vu. */
+async function scannerQr(conteneur: HTMLElement, quandLu: (code: string) => void, erreur: (msg: string) => void) {
+  const x = tt();
+  if (!navigator.mediaDevices?.getUserMedia) { erreur(x.scanErr); return; }
+  let flux: MediaStream | null = null, actif = true;
+  const zone = el('div', 'atScan'); const video = el<HTMLVideoElement>('video'); video.setAttribute('playsinline', ''); video.muted = true;
+  const aide = el('p', '', x.scanAide); const annuler = el<HTMLButtonElement>('button', 'atBtn sec', x.fermer); annuler.type = 'button';
+  zone.append(video, aide, annuler); conteneur.appendChild(zone);
+  const fermer = () => { actif = false; flux?.getTracks().forEach(t => t.stop()); zone.remove(); };
+  annuler.onclick = fermer;
+  try {
+    const [jsQR, f] = await Promise.all([chargerJsQR(), navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })]);
+    flux = f; video.srcObject = f; await video.play();
+    const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+    let dernierMauvais = 0;
+    const tick = () => {
+      if (!actif) return;
+      if (video.readyState >= 2 && video.videoWidth) {
+        const w = Math.min(640, video.videoWidth), h = Math.round(video.videoHeight * w / video.videoWidth);
+        canvas.width = w; canvas.height = h; ctx.drawImage(video, 0, 0, w, h);
+        const r = jsQR(ctx.getImageData(0, 0, w, h).data, w, h, { inversionAttempts: 'dontInvert' });
+        if (r?.data) {
+          const c = codeDansQr(r.data);
+          if (c) { fermer(); quandLu(c); return; }
+          if (Date.now() - dernierMauvais > 2000) { dernierMauvais = Date.now(); aide.textContent = x.scanMauvais; }
+        }
+      }
+      setTimeout(tick, 120);
+    };
+    tick();
+  } catch { fermer(); erreur(x.scanErr); }
+}
+
 /** L'écran de l'Atelier (par-dessus l'accueil ou le jeu). */
 export function ouvrirAtelier(mode: 'creer' | 'retrouver' = 'creer') {
   style();
@@ -141,7 +190,9 @@ export function ouvrirAtelier(mode: 'creer' | 'retrouver' = 'creer') {
   const lTxt = el('label', '', x.decris); const iTxt = el<HTMLTextAreaElement>('textarea'); iTxt.placeholder = x.exemple; iTxt.maxLength = 120;
   const go = el<HTMLButtonElement>('button', 'atBtn', x.creer); go.type = 'button';
   const err = el('div', 'atErr'); err.setAttribute('role', 'alert');
-  form.append(lCode, iCode, el('div', 'atAide', x.codeAide), lTxt, iTxt, go, err);
+  const bScan = el<HTMLButtonElement>('button', 'atBtn sec', x.scanner); bScan.type = 'button'; bScan.style.marginTop = '6px';
+  bScan.onclick = () => scannerQr(at, c => { iCode.value = c; err.textContent = ''; iTxt.focus(); }, m => { err.textContent = m; });
+  form.append(lCode, iCode, bScan, el('div', 'atAide', x.codeAide), lTxt, iTxt, go, err);
   const attente = el('div'); attente.hidden = true; c1.appendChild(attente);
 
   function montrerAttente(o: Objet) {
@@ -189,7 +240,9 @@ export function ouvrirAtelier(mode: 'creer' | 'retrouver' = 'creer') {
   const iR = el<HTMLInputElement>('input'); iR.placeholder = 'POTAGER-XXXX'; iR.autocapitalize = 'characters'; iR.autocomplete = 'off'; iR.maxLength = 24; iR.setAttribute('aria-label', x.code);
   const bR = el<HTMLButtonElement>('button', 'atBtn sec', x.retrouver); bR.type = 'button';
   const errR = el('div', 'atErr'); errR.setAttribute('role', 'alert');
-  cR.append(iR, bR, errR);
+  const bScanR = el<HTMLButtonElement>('button', 'atBtn sec', x.scanner); bScanR.type = 'button'; bScanR.style.marginRight = '8px';
+  bScanR.onclick = () => scannerQr(at, c => { iR.value = c; errR.textContent = ''; bR.click(); }, m => { errR.textContent = m; });
+  cR.append(iR, bScanR, bR, errR);
   bR.onclick = async () => {
     errR.textContent = ''; const code = iR.value.trim().toUpperCase();
     if (!/^[A-Z0-9-]{6,24}$/.test(code)) { errR.textContent = x.e_code_inconnu; return; }

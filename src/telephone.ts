@@ -6,8 +6,9 @@ import { MUSIQUE } from './musique';
 import * as EL from './enligne';
 import { remplirClassement } from './classement';
 import { icon } from './ui';
+import { rendreMesObjets, type Objet } from './atelier';
 
-export type Onglet = 'home' | 'panier' | 'classement' | 'jeu' | 'recette' | 'marche' | 'bourse' | 'boutique' | 'carnet' | 'recus' | 'voisins' | 'notifs' | 'musique' | 'reglages';
+export type Onglet = 'home' | 'panier' | 'classement' | 'jeu' | 'recette' | 'marche' | 'bourse' | 'boutique' | 'carnet' | 'recus' | 'voisins' | 'notifs' | 'musique' | 'reglages' | 'atelier';
 export interface TelHandlers {
   onCuisiner(): void; onOffrir(jardinId: string): void;
   onTroc(donne: E.Ingredient, cherche: E.Ingredient): void; onAccepter(annonceId: string): void; onRetirer(annonceId: string): void;
@@ -15,6 +16,7 @@ export interface TelHandlers {
   onDemain(): void; onChercher(graine: string): void; onFiche(recetteId: string): void; onSemer(graine: string): void; onMontrerPlat(): void; onCompte(): void;
   onApp(app: Onglet, detail?: string): void; onReglage(k: 'fond' | 'vibre' | 'son', v: string | boolean): void;
   onRepondre(evId: string, texte: Bi): void;
+  onPlacerDeco(o: Objet): void; onRetirerDeco(): void; onVoirDeco(): void;
 }
 const el = <T extends HTMLElement = HTMLElement>(tag: string, cls = '', html = '') => { const e = document.createElement(tag) as T; if (cls) e.className = cls; if (html) e.innerHTML = html; return e; };
 const nomG = (id: string) => { const g = ECO.graines.find(x => x.id === id); return g ? texteChamp(g, 'nom') : id; };
@@ -67,6 +69,7 @@ export const APPS: { id: Onglet; couleur: string; svg: string }[] = [
   { id: 'jeu', couleur: '#7b1fa2', svg: SVG('<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 11v3M5.5 12.5h3"/><circle cx="16" cy="11.5" r="1" fill="currentColor"/><circle cx="18.5" cy="13.5" r="1" fill="currentColor"/>') },
   { id: 'classement', couleur: '#f2a33a', svg: SVG('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>') },
   { id: 'musique', couleur: '#c2185b', svg: SVG('<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>') },
+  { id: 'atelier', couleur: '#e8588a', svg: SVG('<path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/>') },
   { id: 'reglages', couleur: '#6b7780', svg: SVG('<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>') },
 ];
 export const FONDS: Record<string, string> = {
@@ -116,7 +119,7 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
   if (onglet === 'home') {                                                  // l'écran d'accueil : les applis
     const g = el('div', 'appsGrid');
     for (const a of APPS) {
-      const b = el('button', 'appBtn', `${iconeApp(a.id)}<span class="appNom">${s.apps[a.id]}</span>`);
+      const b = el('button', 'appBtn', `${iconeApp(a.id)}<span class="appNom">${(s.apps as Record<string, string>)[a.id] ?? (lang() === 'en' ? 'Workshop' : lang() === 'es' ? 'Taller' : 'Atelier')}</span>`);
       b.dataset.app = a.id; b.onclick = () => h.onApp(a.id); g.appendChild(b);
     }
     c.appendChild(g); return;
@@ -249,6 +252,7 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
     }
     return;
   }
+  if (onglet === 'atelier') { rendreMesObjets(c, st.deco?.id, { placer: o => h.onPlacerDeco(o), retirer: () => h.onRetirerDeco(), voir: () => h.onVoirDeco() }); return; }
   if (onglet === 'reglages') {
     const R = reglagesTel();
     if (EL.EN_LIGNE) {                                                     // le compte

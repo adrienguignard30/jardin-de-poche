@@ -193,6 +193,7 @@ export class Game {
       onCompte: () => this.ui.compte(),
       onConnecte: () => { this.recupererNuage().catch(e => console.warn('[en ligne]', e)); },
       onRepondre: (id, texte) => this.repondre(id, texte),
+      onPlacerDeco: (o: { id: string; url?: string; prompt: string }) => this.placerDeco(o), onRetirerDeco: () => this.retirerDeco(), onVoirDeco: () => this.voirDeco(),
       onBuySeed: id => this.buySeed(id),
       onBuyPot: () => this.buyPot(),
       onLang: () => this.ui.refresh(),
@@ -391,6 +392,25 @@ export class Game {
     if (perso && perso !== this.state?.character) { const g = await this.save.loadFor(perso); if (g) this.state = g; }
     await this.enterGame();
   }
+  // ---------- l'objet de deco du joueur (Atelier) : pose sur le socle du balcon (world.poserDeco / retirerDeco / voirDeco)
+  private poserDecoJoueur(url: string, nom?: string) {
+    const w = this.world as any;
+    if (typeof w.poserDeco !== 'function') { console.info('[atelier] poserDeco pas encore disponible dans world.ts'); return; }
+    try { const r = w.poserDeco(url, nom); if (r && typeof r.catch === 'function') r.catch((e: unknown) => console.warn('[atelier] deco', e)); } catch (e) { console.warn('[atelier] deco', e); }
+  }
+  private placerDeco(o: { id: string; url?: string; prompt: string }) {
+    if (!o.url) return;
+    this.state.deco = { id: o.id, url: o.url, nom: o.prompt };
+    this.persist(); this.poserDecoJoueur(o.url, o.prompt); this.voirDeco();
+  }
+  private retirerDeco() {
+    delete this.state.deco; this.persist();
+    const w = this.world as any; if (typeof w.retirerDeco === 'function') { try { w.retirerDeco(); } catch (e) { console.warn('[atelier] deco', e); } }
+  }
+  private voirDeco() {
+    this.ui.togglePhone(false);
+    const w = this.world as any; if (typeof w.voirDeco === 'function') { try { w.voirDeco(3000); } catch (e) { console.warn('[atelier] deco', e); } }
+  }
   private async enterGame() {
     const s = this.state;
     if (this.world.basket) this.world.basket.visible = false;           // le panier est à l'écran et dans le téléphone
@@ -436,6 +456,7 @@ export class Game {
     for (const p of s.pots) this.makeSlotView(p);
     for (const id of s.items) { const d = itemDef(id); if (d?.object) this.world.addDeco(d.object, id); }
     if (s.roof) this.world.unlockRoof(false);
+    if (s.deco) this.poserDecoJoueur(s.deco.url, s.deco.nom);                    // l'objet de l'Atelier, sur son socle
     this.catchUp();
     this.applyNightMode(this.ui.nightMode);
     this.ui.bind(s);

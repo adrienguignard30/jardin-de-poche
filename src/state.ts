@@ -78,6 +78,8 @@ export interface GameState {
   log: { wateredByChar: number; recoltes?: number };
   /** Mon profil : prénom, âge, métier, couleurs des vêtements, photo prise dans le jeu. */
   perso?: Perso;
+  /** L'objet de deco de l'Atelier pose sur le balcon (modele copie dans Supabase Storage). */
+  deco?: { id: string; url: string; nom: string };
   /** Le potager : mon jardin (règles), l'immeuble (voisins, cours, annonces), le carnet, l'horloge. */
   eco: { jardin: E.Jardin; immeuble: E.Immeuble; carnet: E.Plat[]; demo: boolean; t0: number; start: number; vus: number; platEnCours: E.Plat | null; potsAchetes: number; recusVus?: number; notifsVues?: number };
 }

@@ -1,4 +1,5 @@
-﻿import { t, tx, lang, setLang, fmtTime, LANGUES, type Lang } from './i18n';
+﻿import { boutonAtelierAccueil } from './atelier';
+import { t, tx, lang, setLang, fmtTime, LANGUES, type Lang } from './i18n';
 import { remplirClassement, STYLE_CLASSEMENT } from './classement';
 import { CATALOG, ECO, type GameState, type CharacterDef, type Perso } from './state';
 import * as E from './economie';
@@ -28,6 +29,7 @@ export interface UIHandlers {
   onTroc(donne: E.Ingredient, cherche: E.Ingredient): void; onAccepter(annonceId: string): void; onRetirer(annonceId: string): void;
   onDemain(): void; onChercher(graine: string): void; onFiche(recetteId: string): void; onSemer(graine: string): void; onMontrerPlat(): void; onCompte(): void; onConnecte(): void;
   onRepondre(evId: string, texte: { fr: string; en: string }): void;
+  onPlacerDeco(o: { id: string; url?: string; prompt: string }): void; onRetirerDeco(): void; onVoirDeco(): void;
   onLang(l: Lang): void;
   onNight(mode: 'auto' | 'day' | 'night'): void;
   onReset(): void;
@@ -490,7 +492,7 @@ export class UI {
       agir(bouton, () => this.h.onContinue(id)); body.appendChild(bouton);
       const autre = el<HTMLButtonElement>('button', 'autreJardinier', texteAccueil('Jouer avec un autre jardinier', 'Play with another gardener', 'Jugar con otro jardinero'));
       autre.type = 'button'; autre.onclick = () => { this.h.onPick(id); this.showSheet(id); };
-      body.appendChild(autre); return;
+      body.appendChild(autre); body.appendChild(boutonAtelierAccueil()); return;
     }
     const nameInput = el<HTMLInputElement>('input', 'nick'); nameInput.placeholder = s.yourNick; nameInput.maxLength = 18;
     nameInput.setAttribute('aria-label', texteAccueil('Prénom', 'First name', 'Nombre')); nameInput.autocomplete = 'given-name';
@@ -502,7 +504,7 @@ export class UI {
       const perso = { ...(this.perso[id] ?? { age: c.age, metier: tx(c.job), couleurs: {} }), prenom: prenom || this.perso[id]?.prenom || tx(c.name) };
       this.h.onStart(id, prenom, perso);
     });
-    body.append(nameInput, go);
+    body.append(nameInput, go, boutonAtelierAccueil());
   }
   private lancer(id: string) {
     const s = t(), c = CATALOG.characters.find(x => x.id === id)!;
