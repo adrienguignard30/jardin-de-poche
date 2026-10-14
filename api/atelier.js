@@ -1,11 +1,13 @@
 // L'Atelier : le joueur décrit un objet de déco, Tripo le fabrique en 3D, on le copie dans Supabase Storage.
 // Tout passe par ici : le navigateur ne connaît ni la clé Tripo ni la clé Supabase.
-// Réglages Vercel : TRIPO_API_KEY (clé Tripo, tsk_…), SUPABASE_SECRET_KEY (clé secrète Supabase, sb_secret_…).
+// Réglages Vercel : TRIPO_API_KEY (clé Tripo, tsk_…), SUPABASE_SECRET_KEY (clé secrète Supabase, sb_secret_…),
+//                   OPENAI_API_KEY (pour « Améliorer ma description », facultatif ; OPENAI_MODEL pour changer le modèle).
 // Actions (POST JSON) :
 //   { action: 'creer', code, prompt, langue }  → vérifie le code (usage unique), lance Tripo, renvoie { id }
 //   { action: 'etat', id }                      → où en est la fabrication ; quand c'est prêt, { statut:'pret', url, image }
 //   { action: 'liste', ids: [...] }             → l'état de plusieurs créations (pour « Mes objets »)
 //   { action: 'retrouver', code }               → l'objet fabriqué avec ce code (pour le retrouver sur un autre téléphone)
+//   { action: 'ameliorer', code, texte, langue } → l'IA propose une description structurée (dans la langue du joueur + en anglais pour Tripo)
 import { createHash, randomUUID } from 'node:crypto';
 
 export const config = { maxDuration: 60 };   // copier un modèle de 10 à 30 Mo peut dépasser 10 s
@@ -18,7 +20,7 @@ const TRIPO_API = [
   { v: 3, base: 'https://openapi.tripo3d.com/v3' },
   { v: 2, base: 'https://api.tripo3d.ai/v2/openapi' },
 ];
-const MODELE_V3 = 'v3.1-20260211';   // Tripo H3.1, texture détaillée + PBR : 30 crédits, même qualité que l'application
+const MODELE_V3 = 'v3.1-20260211';   // Tripo H3.1, texture détaillée + PBR + géométrie détaillée (« Ultra ») : 50 crédits
 const MODELE_V2 = 'v2.5-20250123';
 // Pas de filtre de mots ici : c'est la modération de Tripo qui décide (si Tripo refuse tout de suite, le code est rendu au joueur).
 
@@ -46,7 +48,7 @@ async function tripo(cleTripo, quoi, arg) {
   const essais = [];
   for (const api of TRIPO_API) {
     const [methode, chemin, corps] = quoi === 'creer'
-      ? (api.v === 3 ? ['POST', '/generation/text-to-model', { prompt: arg, model: MODELE_V3, texture: true, pbr: true, texture_quality: 'detailed' }]
+      ? (api.v === 3 ? ['POST', '/generation/text-to-model', { prompt: arg, model: MODELE_V3, texture: true, pbr: true, texture_quality: 'detailed', geometry_quality: 'detailed' }]
                      : ['POST', '/task', { type: 'text_to_model', prompt: arg, model_version: MODELE_V2, texture: true, pbr: true, texture_quality: 'detailed' }])
       : ['GET', api.v === 3 ? `/tasks/${arg}` : `/task/${arg}`, null];
     let r;
@@ -61,8 +63,25 @@ async function tripo(cleTripo, quoi, arg) {
   throw new Error(`tripo refus partout — ${essais.join(' | ')}`.slice(0, 400));
 }
 
-/** Le texte envoyé à Tripo : exactement celui du joueur, comme dans l'application Tripo. */
-function promptTripo(texte, _langue) { return texte; }
+/** « Améliorer ma description » : l'IA réécrit la demande du joueur en description structurée [sujet], [détails], [matière], [style], [qualité]. */
+async function ameliorer(texte, langue) {
+  const cleIA = process.env.OPENAI_API_KEY; if (!cleIA) throw new Error('pas_ia');
+  const nomLangue = langue === 'en' ? 'English' : langue === 'es' ? 'Spanish' : 'French';
+  const systeme = `You write prompts for Tripo, a text-to-3D generator, for a balcony-garden game where the visitor's object is displayed in 3D.
+Rewrite the visitor's request into ONE rich description of a SINGLE object, following this order: [subject], [key details/features], [material/texture], [style], [quality]. Keep the visitor's idea and spirit exactly (do not change what they asked for, do not add characters or extra objects). No scene, no background, no ground, no text written on the object. 25 to 60 words.
+Answer ONLY with JSON: {"langue": "<the description in ${nomLangue}, for the visitor to read and approve>", "en": "<the same description in English, for Tripo>"}`;
+  const modele = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+  const r = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST', headers: { Authorization: `Bearer ${cleIA}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: modele, temperature: 0.7, max_tokens: 400, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: systeme }, { role: 'user', content: texte }] }),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(`ia ${r.status} ${(j?.error?.message || '').slice(0, 160)}`);
+  let out = {}; try { out = JSON.parse(j.choices?.[0]?.message?.content || '{}'); } catch { out = {}; }
+  const lng = String(out.langue || '').trim().slice(0, 600), en = String(out.en || '').trim().slice(0, 600);
+  if (lng.length < 10 || en.length < 10) throw new Error('ia vide');
+  return { langue: lng, en };
+}
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -76,19 +95,33 @@ export default async function handler(req, res) {
   const empreinte = createHash('sha256').update(`${ip}|${ua}|${cle.slice(-24)}`).digest('hex').slice(0, 24);
 
   try {
+    // ---------- améliorer la description (gratuit pour le joueur, mais il faut un code valide et libre : pas d'usage hors Atelier)
+    if (p.action === 'ameliorer') {
+      const code = String(p.code ?? '').trim().toUpperCase();
+      const texte = String(p.texte ?? '').replace(/\s+/g, ' ').trim();
+      const langue = ['fr', 'en', 'es'].includes(p.langue) ? p.langue : 'fr';
+      if (!/^[A-Z0-9-]{6,24}$/.test(code)) return rep(res, 400, { erreur: 'code_invalide' });
+      if (texte.length < 3 || texte.length > 300) return rep(res, 400, { erreur: 'texte_longueur' });
+      const l = await sbTable(cle, 'GET', `codes_atelier?code=eq.${encodeURIComponent(code)}&select=code,utilise_le`);
+      if (!l?.length) return rep(res, 403, { erreur: 'code_inconnu' });
+      if (l[0].utilise_le) return rep(res, 403, { erreur: 'code_deja_utilise' });
+      try { return rep(res, 200, await ameliorer(texte, langue)); }
+      catch (e) { return rep(res, String(e).includes('pas_ia') ? 503 : 502, { erreur: 'ia', detail: String(e).slice(0, 160) }); }
+    }
     // ---------- créer
     if (p.action === 'creer') {
       const code = String(p.code ?? '').trim().toUpperCase();
       const texte = String(p.prompt ?? '').replace(/\s+/g, ' ').trim();
+      const texteTripo = (typeof p.prompt_tripo === 'string' && p.prompt_tripo.trim().length >= 3 ? p.prompt_tripo : texte).replace(/\s+/g, ' ').trim().slice(0, 600);
       const langue = ['fr', 'en', 'es'].includes(p.langue) ? p.langue : 'fr';
       if (!/^[A-Z0-9-]{6,24}$/.test(code)) return rep(res, 400, { erreur: 'code_invalide' });
-      if (texte.length < 3 || texte.length > 120) return rep(res, 400, { erreur: 'texte_longueur' });
+      if (texte.length < 3 || texte.length > 600) return rep(res, 400, { erreur: 'texte_longueur' });
       const id = randomUUID();
       const joueur = typeof p.joueur === 'string' && /^[0-9a-f-]{36}$/i.test(p.joueur) ? p.joueur : null;
-      const r = await sbRpc(cle, 'utiliser_code', { p_code: code, p_creation: id, p_prompt: texte, p_prompt_tripo: promptTripo(texte, langue), p_langue: langue, p_joueur: joueur, p_empreinte: empreinte });
+      const r = await sbRpc(cle, 'utiliser_code', { p_code: code, p_creation: id, p_prompt: texte, p_prompt_tripo: texteTripo, p_langue: langue, p_joueur: joueur, p_empreinte: empreinte });
       if (!r?.ok) return rep(res, 403, { erreur: r?.raison === 'deja_utilise' ? 'code_deja_utilise' : 'code_inconnu' });
       try {
-        const t = await tripo(cleTripo, 'creer', promptTripo(texte, langue));
+        const t = await tripo(cleTripo, 'creer', texteTripo);
         await sbTable(cle, 'PATCH', `creations?id=eq.${id}`, { task_id: t.task_id, erreur: `api v${t._v} ${t._base}`, maj: new Date().toISOString() });
         return rep(res, 200, { id, statut: 'en_cours', progres: 0 });
       } catch (e) {
