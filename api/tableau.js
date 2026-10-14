@@ -17,15 +17,20 @@ export default async function handler(req, res) {
   try { const b = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; recu = String(b?.code ?? ''); if (['24h', '7j', '30j'].includes(b?.periode)) periode = b.periode; } catch { recu = ''; }
   if (!timingSafeEqual(empreinte(recu), empreinte(code))) { await pause(800); res.status(401).json({ erreur: 'code' }); return; }
   try {
-    const r = await fetch('https://jbwlhapwszsuwirspybg.supabase.co/rest/v1/rpc/tableau_de_bord', {
-      method: 'POST',
-      headers: { apikey: cle, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ p_periode: periode }),
-    });
+    const SB = 'https://jbwlhapwszsuwirspybg.supabase.co/rest/v1';
+    const [r, rc] = await Promise.all([
+      fetch(`${SB}/rpc/tableau_de_bord`, { method: 'POST', headers: { apikey: cle, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_periode: periode }) }),
+      // les codes de l'Atelier et, pour chaque code utilisé, la création qui va avec (si les tables n'existent pas encore, on s'en passe)
+      fetch(`${SB}/codes_atelier?select=code,cree_le,note,utilise_le,creations(statut,progres,prompt,url_image,url_modele,erreur,cree_le)&order=cree_le.asc`, { headers: { apikey: cle } }).catch(() => null),
+    ]);
     const texte = await r.text();
     if (!r.ok) { res.status(502).json({ erreur: 'supabase', detail: `${r.status} ${texte.slice(0, 300)}` }); return; }
+    let codes = null;
+    try { if (rc && rc.ok) codes = await rc.json(); } catch { codes = null; }
+    let corps = texte;
+    try { const j = JSON.parse(texte); if (j && typeof j === 'object' && Array.isArray(codes)) { j.codes = codes; corps = JSON.stringify(j); } } catch { /* on renvoie tel quel */ }
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.status(200).send(texte);
+    res.status(200).send(corps);
   } catch (e) {
     res.status(500).json({ erreur: 'appel', detail: String(e).slice(0, 200) });
   }
