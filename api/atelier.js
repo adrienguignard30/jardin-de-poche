@@ -74,7 +74,7 @@ Answer ONLY with JSON: {"langue": "<the description in ${nomLangue}, for the vis
   // Les tentatives, dans l'ordre : chaque modèle Gemini (GEMINI_MODEL, ou GEMINI_MODELS séparés par des virgules), puis OpenAI.
   // Saturation (503/429) : on réessaie une fois après 1,5 s avant de passer au suivant.
   const tentatives = [];
-  if (cleCerebras) for (const m of String(process.env.CEREBRAS_MODEL || 'gpt-oss-120b,gemma-4-31b,llama-3.3-70b').split(',').map(x => x.trim()).filter(Boolean)) tentatives.push({ qui: 'cerebras', modele: m, base: 'https://api.cerebras.ai/v1', cle: cleCerebras });
+  if (cleCerebras) for (const m of String(process.env.CEREBRAS_MODEL || 'gpt-oss-120b').split(',').map(x => x.trim()).filter(Boolean)) tentatives.push({ qui: 'cerebras', modele: m, base: 'https://api.cerebras.ai/v1', cle: cleCerebras });
   if (cleGemini) for (const m of String(process.env.GEMINI_MODELS || process.env.GEMINI_MODEL || 'gemini-3.8-flash,gemini-2.5-flash').split(',').map(x => x.trim()).filter(Boolean)) tentatives.push({ qui: 'gemini', modele: m });
   if (cleIA) tentatives.push({ qui: 'openai', modele: process.env.OPENAI_MODEL || 'gpt-4o-mini', base: 'https://api.openai.com/v1', cle: cleIA });
   const appelIA = async t => {
@@ -88,10 +88,13 @@ Answer ONLY with JSON: {"langue": "<the description in ${nomLangue}, for the vis
     }
     const r = await fetch(`${t.base}/chat/completions`, {   // OpenAI et Cerebras : même format
       method: 'POST', headers: { Authorization: `Bearer ${t.cle}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: t.modele, temperature: 0.7, max_tokens: 400, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: systeme }, { role: 'user', content: texte }] }),
+      // les modèles « raisonneurs » (gpt-oss…) consomment des tokens avant d'écrire : large place, raisonnement court
+      body: JSON.stringify({ model: t.modele, temperature: 0.7, max_tokens: 2000, ...(t.qui === 'cerebras' ? { reasoning_effort: 'low' } : {}), response_format: { type: 'json_object' }, messages: [{ role: 'system', content: systeme }, { role: 'user', content: texte }] }),
     });
     const j = await r.json().catch(() => ({}));
-    return { ok: r.ok, status: r.status, msg: (j?.error?.message || '').slice(0, 120), contenu: j.choices?.[0]?.message?.content || '' };
+    const m = j.choices?.[0]?.message ?? {};
+    const contenu = (typeof m.content === 'string' && m.content.trim()) ? m.content : (Array.isArray(m.content) ? m.content.map(x => x?.text || '').join('') : '');
+    return { ok: r.ok, status: r.status, msg: (j?.error?.message || (r.ok && !contenu ? `réponse vide (${j.choices?.[0]?.finish_reason || '?'})` : '')).slice(0, 120), contenu };
   };
   let contenu = ''; const echecs = [];
   for (const t of tentatives) {
