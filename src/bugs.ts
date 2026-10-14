@@ -22,6 +22,7 @@ export function appareil(): string {
 export function signalerBug(texte: string) {
   try {
     if (!sb || envoyees.size >= 10) return;
+    if (/^(localhost|127\.0\.0\.1|\[::1\]|192\.168\.|10\.)/.test(location.hostname)) return;   // en local (npm run dev) : rien n'est envoyé
     const [premiere, ...reste] = String(texte).split('\n');
     const message = premiere.trim().slice(0, 500);
     if (!message || BRUIT.test(message) || envoyees.has(message)) return;

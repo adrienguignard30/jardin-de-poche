@@ -12,7 +12,7 @@ const CLE_SESSION = 'jdp.session';
 let session = '';
 let dernierEnvoi = 0, actifDepuis = 0, bootMs: number | null = null, dejaBoot = false;
 let frames = 0, fpsDepuis = 0, fpsMoyen: number | null = null, fpsFaiblesDepuis = 0, fpsSignale = false;
-let derniereFrame = 0;
+let derniereFrame = 0, visibleDepuis = 0, aEteCache = false;
 
 function idSession(): string {
   try {
@@ -49,16 +49,16 @@ async function battement(final = false) {
 function surveillerImages() {
   const boucle = (t: number) => {
     try {
-      if (derniereFrame && document.visibilityState === 'visible') {
+      if (derniereFrame && document.visibilityState === 'visible' && t - visibleDepuis > 2000) {
         const ecart = t - derniereFrame;
-        if (ecart > 4000) signalerBug(`Écran figé ${Math.round(ecart / 1000)} s (${perso() ?? 'accueil'})`);
+        if (ecart > 4000 && ecart < 60000) signalerBug(`Écran figé ${Math.round(ecart / 1000)} s (${perso() ?? 'accueil'})`);   // > 60 s : veille ou onglet mis en pause, pas un gel
       }
       derniereFrame = t; frames++;
       if (!fpsDepuis) fpsDepuis = t;
       if (t - fpsDepuis >= 10000) {
         const fps = Math.round(frames * 1000 / (t - fpsDepuis));
         fpsMoyen = fpsMoyen == null ? fps : Math.round((fpsMoyen * 3 + fps) / 4);
-        if (document.visibilityState === 'visible' && perso()) {
+        if (document.visibilityState === 'visible' && perso() && t - visibleDepuis > 10000) {
           if (fps < 15) { if (!fpsFaiblesDepuis) fpsFaiblesDepuis = t; else if (t - fpsFaiblesDepuis > 30000 && !fpsSignale) { fpsSignale = true; signalerBug(`FPS faibles : ${fps} images/s pendant 30 s (${appareil()})`); } }
           else fpsFaiblesDepuis = 0;
         }
@@ -72,15 +72,17 @@ function surveillerImages() {
 
 function surveillerChargement() {
   const l = document.getElementById('loading'); if (!l) return;
-  const fini = () => { if (dejaBoot) return; dejaBoot = true; bootMs = Math.round(performance.now()); if (bootMs > 25000) signalerBug(`Chargement lent : ${Math.round(bootMs / 1000)} s (${appareil()})`); battement(); };
+  const fini = () => { if (dejaBoot) return; dejaBoot = true; bootMs = Math.round(performance.now()); if (aEteCache) bootMs = null; else if (bootMs > 25000) signalerBug(`Chargement lent : ${Math.round(bootMs / 1000)} s (${appareil()})`); battement(); };
   if (l.classList.contains('hidden')) { fini(); return; }
   new MutationObserver(() => { if (l.classList.contains('hidden')) fini(); }).observe(l, { attributes: true, attributeFilter: ['class'] });
-  setTimeout(() => { if (!dejaBoot) signalerBug(`Chargement bloqué : toujours sur l'écran de chargement après 60 s (${appareil()})`); }, 60000);
+  setTimeout(() => { if (!dejaBoot && !aEteCache && document.visibilityState === 'visible') signalerBug(`Chargement bloqué : toujours sur l'écran de chargement après 60 s (${appareil()})`); }, 60000);
 }
+
+export const EN_LOCAL = /^(localhost|127\.0\.0\.1|\[::1\]|192\.168\.|10\.)/.test(location.hostname);
 
 export function demarrerSuivi() {
   try {
-    if (session) return;
+    if (session || EN_LOCAL) return;                           // en local (npm run dev), rien n'est envoyé
     session = idSession();
     actifDepuis = document.visibilityState === 'visible' ? Date.now() : 0;
     // fichiers qui ne se chargent pas (modèles, images, sons) : l'événement error des éléments, en phase de capture
@@ -93,9 +95,11 @@ export function demarrerSuivi() {
     surveillerChargement();
     surveillerImages();
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') battement(true);
-      else { actifDepuis = Date.now(); if (Date.now() - dernierEnvoi > 30000) battement(); }
+      if (document.visibilityState === 'hidden') { aEteCache = true; battement(true); }
+      else { visibleDepuis = performance.now(); derniereFrame = 0; frames = 0; fpsDepuis = 0; fpsFaiblesDepuis = 0; actifDepuis = Date.now(); if (Date.now() - dernierEnvoi > 30000) battement(); }
     });
+    if (document.visibilityState !== 'visible') aEteCache = true;
+    visibleDepuis = performance.now();
     window.addEventListener('pagehide', () => battement(true));
     setInterval(() => { if (document.visibilityState === 'visible') battement(); }, 30000);
     battement();
