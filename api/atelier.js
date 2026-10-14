@@ -11,9 +11,15 @@ import { createHash, randomUUID } from 'node:crypto';
 export const config = { maxDuration: 60 };   // copier un modèle de 10 à 30 Mo peut dépasser 10 s
 
 const SB = 'https://jbwlhapwszsuwirspybg.supabase.co';
-// Tripo API V3 (la V2 s'arrête le 31 octobre 2026). Deux noms de domaine documentés : on essaie l'un puis l'autre.
-const TRIPO_HOTES = ['https://openapi.tripo3d.com/v3', 'https://openapi.tripo3d.ai/v3'];
-const MODELE_TRIPO = 'v3.1-20260211';   // Tripo H3.1 : 20 crédits avec texture standard
+// Tripo : API V3 (deux domaines documentés), puis l'ancienne V2 en secours (elle s'arrête le 31 octobre 2026).
+// On essaie dans l'ordre ; si un domaine refuse la clé (401/403) ou est injoignable, on passe au suivant.
+const TRIPO_API = [
+  { v: 3, base: 'https://openapi.tripo3d.ai/v3' },
+  { v: 3, base: 'https://openapi.tripo3d.com/v3' },
+  { v: 2, base: 'https://api.tripo3d.ai/v2/openapi' },
+];
+const MODELE_V3 = 'v3.1-20260211';   // Tripo H3.1 : 20 crédits avec texture standard
+const MODELE_V2 = 'v2.5-20250123';
 // Pas de filtre de mots ici : c'est la modération de Tripo qui décide (si Tripo refuse tout de suite, le code est rendu au joueur).
 
 const rep = (res, code, corps) => { res.status(code).json(corps); };
@@ -35,17 +41,24 @@ async function sbUpload(cle, chemin, octets, type) {
   if (!r.ok) throw new Error(`storage ${r.status} ${(await r.text()).slice(0, 200)}`);
   return `${SB}/storage/v1/object/public/creations/${chemin}`;
 }
-async function tripo(cleTripo, methode, chemin, corps) {
-  let derniere = null;
-  for (const hote of TRIPO_HOTES) {
+/** Appelle Tripo : `quoi` = 'creer' (texte → modèle) ou 'etat' (tâche). Renvoie data, avec data._v = version utilisée. */
+async function tripo(cleTripo, quoi, arg) {
+  const essais = [];
+  for (const api of TRIPO_API) {
+    const [methode, chemin, corps] = quoi === 'creer'
+      ? (api.v === 3 ? ['POST', '/generation/text-to-model', { prompt: arg, model: MODELE_V3, face_limit: 30000, texture: true, pbr: false, texture_quality: 'standard' }]
+                     : ['POST', '/task', { type: 'text_to_model', prompt: arg, model_version: MODELE_V2, face_limit: 30000, texture: true, pbr: false, texture_quality: 'standard' }])
+      : ['GET', api.v === 3 ? `/tasks/${arg}` : `/task/${arg}`, null];
     let r;
-    try { r = await fetch(`${hote}${chemin}`, { method: methode, headers: { Authorization: `Bearer ${cleTripo}`, 'Content-Type': 'application/json' }, body: corps ? JSON.stringify(corps) : undefined }); }
-    catch (e) { derniere = e; continue; }   // domaine injoignable : on essaie l'autre
+    try { r = await fetch(`${api.base}${chemin}`, { method: methode, headers: { Authorization: `Bearer ${cleTripo}`, 'Content-Type': 'application/json' }, body: corps ? JSON.stringify(corps) : undefined }); }
+    catch (e) { essais.push(`${api.base}: injoignable`); continue; }
     const j = await r.json().catch(() => ({}));
-    if (!r.ok || j.code !== 0) throw new Error(`tripo ${r.status} ${j.code ?? ''} ${(j.message || j.suggestion || '').slice(0, 200)}`);
-    return j.data;
+    if (r.ok && j.code === 0) { const d = j.data ?? {}; d._v = api.v; d._base = api.base; return d; }
+    const msg = `${r.status} ${j.code ?? ''} ${(j.message || j.suggestion || '').slice(0, 120)}`;
+    if (r.status === 401 || r.status === 403 || r.status === 404) { essais.push(`${api.base}: ${msg}`); continue; }   // clé ou adresse refusée ici : on tente la suivante
+    throw new Error(`tripo ${msg}`);   // vraie réponse (modération, crédits, paramètre) : on s'arrête
   }
-  throw new Error(`tripo injoignable ${String(derniere).slice(0, 100)}`);
+  throw new Error(`tripo refus partout — ${essais.join(' | ')}`.slice(0, 400));
 }
 
 /** Le texte envoyé à Tripo : la description du joueur, encadrée pour obtenir un bel objet de jardin, seul et posé. */
@@ -78,11 +91,11 @@ export default async function handler(req, res) {
       const r = await sbRpc(cle, 'utiliser_code', { p_code: code, p_creation: id, p_prompt: texte, p_prompt_tripo: promptTripo(texte, langue), p_langue: langue, p_joueur: joueur, p_empreinte: empreinte });
       if (!r?.ok) return rep(res, 403, { erreur: r?.raison === 'deja_utilise' ? 'code_deja_utilise' : 'code_inconnu' });
       try {
-        const t = await tripo(cleTripo, 'POST', '/generation/text-to-model', { prompt: promptTripo(texte, langue), model: MODELE_TRIPO, face_limit: 30000, texture: true, pbr: false, texture_quality: 'standard' });
-        await sbTable(cle, 'PATCH', `creations?id=eq.${id}`, { task_id: t.task_id, maj: new Date().toISOString() });
+        const t = await tripo(cleTripo, 'creer', promptTripo(texte, langue));
+        await sbTable(cle, 'PATCH', `creations?id=eq.${id}`, { task_id: t.task_id, erreur: `api v${t._v} ${t._base}`, maj: new Date().toISOString() });
         return rep(res, 200, { id, statut: 'en_cours', progres: 0 });
       } catch (e) {
-        await sbRpc(cle, 'rendre_code', { p_creation: id, p_erreur: String(e).slice(0, 300) }).catch(() => undefined);
+        await sbRpc(cle, 'rendre_code', { p_creation: id, p_erreur: String(e).slice(0, 400) }).catch(() => undefined);
         return rep(res, 502, { erreur: 'tripo', detail: String(e).slice(0, 200) });
       }
     }
@@ -104,7 +117,7 @@ export default async function handler(req, res) {
       for (const c of lignes) {
         if (c.statut === 'en_cours' && c.task_id) {
           try {
-            const d = await tripo(cleTripo, 'GET', `/tasks/${c.task_id}`);
+            const d = await tripo(cleTripo, 'etat', c.task_id);
             if (d.status === 'success') {
               const urlM = d.output?.model_url || d.output?.pbr_model_url || d.output?.base_model_url || d.output?.pbr_model || d.output?.model || d.output?.base_model;
               if (!urlM) throw new Error('pas de modèle dans la réponse Tripo');
