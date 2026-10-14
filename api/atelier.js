@@ -14,7 +14,7 @@ const SB = 'https://jbwlhapwszsuwirspybg.supabase.co';
 // Tripo API V3 (la V2 s'arrête le 31 octobre 2026). Deux noms de domaine documentés : on essaie l'un puis l'autre.
 const TRIPO_HOTES = ['https://openapi.tripo3d.com/v3', 'https://openapi.tripo3d.ai/v3'];
 const MODELE_TRIPO = 'v3.1-20260211';   // Tripo H3.1 : 20 crédits avec texture standard
-const INTERDITS = /\b(nu|nue|nus|nude|naked|sex|sexe|sexy|porn|porno|arme|weapon|gun|pistol|rifle|knife|couteau|sang|blood|gore|cadavre|corpse|drogue|drug|cocaine|hitler|nazi|swastika|terror|bomb|bombe|suicide|personne|person|homme|femme|man|woman|girl|boy|fille|garçon|garcon|enfant|child|kid|bébé|baby|visage|face|portrait)\b/i;
+// Pas de filtre de mots ici : c'est la modération de Tripo qui décide (si Tripo refuse tout de suite, le code est rendu au joueur).
 
 const rep = (res, code, corps) => { res.status(code).json(corps); };
 
@@ -73,7 +73,6 @@ export default async function handler(req, res) {
       const langue = ['fr', 'en', 'es'].includes(p.langue) ? p.langue : 'fr';
       if (!/^[A-Z0-9-]{6,24}$/.test(code)) return rep(res, 400, { erreur: 'code_invalide' });
       if (texte.length < 3 || texte.length > 120) return rep(res, 400, { erreur: 'texte_longueur' });
-      if (INTERDITS.test(texte)) return rep(res, 400, { erreur: 'texte_interdit' });
       const id = randomUUID();
       const joueur = typeof p.joueur === 'string' && /^[0-9a-f-]{36}$/i.test(p.joueur) ? p.joueur : null;
       const r = await sbRpc(cle, 'utiliser_code', { p_code: code, p_creation: id, p_prompt: texte, p_prompt_tripo: promptTripo(texte, langue), p_langue: langue, p_joueur: joueur, p_empreinte: empreinte });
