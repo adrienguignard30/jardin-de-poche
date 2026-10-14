@@ -49,6 +49,7 @@ export const DECO: Record<string, { x: number; z: number }> = {
   lea: { x: -3.00, z: .40 }, marcel: { x: 3.05, z: .40 }, jimy: { x: 2.95, z: .48 },
 };
 let decoActive: { x: number; z: number } | null = null;
+let decoRayon = .51;
 
 /** Tout ce qu'on ne traverse pas sur le balcon : pots, chaise, panier (cercles au sol, rayon = objet + demi-corps). */
 export function obstacles(ignore?: string): { x: number; z: number; r: number; id: string }[] {
@@ -57,7 +58,7 @@ export function obstacles(ignore?: string): { x: number; z: number; r: number; i
   SLOTS.forEach((s, i) => { if (!s.roof && `pot${i}` !== ignore) out.push({ x: s.pos.x, z: s.pos.z, r: potR, id: `pot${i}` }); });
   if (ignore !== 'chair') out.push({ x: CHAIR_SPOT.pos.x, z: CHAIR_SPOT.pos.z, r: .42, id: 'chair' });
   if (ignore !== 'basket') out.push({ x: BASKET_SPOT.x, z: BASKET_SPOT.z, r: .38, id: 'basket' });
-  if (decoActive && ignore !== 'deco') out.push({ ...decoActive, r: .51, id: 'deco' });
+  if (decoActive && ignore !== 'deco') out.push({ ...decoActive, r: decoRayon, id: 'deco' });
   return out;
 }
 /** Le point libre le plus proche : sur le balcon (ni barrière ni mur) et hors des obstacles. */
@@ -141,6 +142,66 @@ export class World {
   private socleDeco: THREE.Mesh | null = null;
   private objetDeco: THREE.Group | null = null;
   private decoJeton = 0;
+  private matDeco: THREE.Group | null = null;
+  private decoHauteur = 1.95;
+  private readonly decoAvance = .60;
+  private decoQuarts = 0;
+
+  private reglerMatDeco(hauteur: number) {
+    this.decoHauteur = hauteur;
+    if (this.matDeco) { this.libererDeco(this.matDeco); this.matDeco = null; }
+    const mat = new THREE.Group(); mat.name = 'mat_creation';
+    const noir = new THREE.MeshStandardMaterial({ color: 0x101010, metalness: .45, roughness: .45 });
+    const jaune = new THREE.MeshStandardMaterial({ color: 0xfacd00, emissive: 0xfacd00, emissiveIntensity: .35, roughness: .5 });
+    // Potence inclinée : pied inchangé, plateau horizontal vers la rue.
+    const pied = new THREE.Vector3(0, .25, 0);
+    const sommet = new THREE.Vector3(0, hauteur - .25 - .025, this.decoAvance);
+    const axe = sommet.clone().sub(pied), longueur = axe.length();
+    const orientation = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), axe.clone().normalize());
+    const tige = new THREE.Mesh(new THREE.CylinderGeometry(.022, .028, longueur, 12), noir);
+    tige.position.copy(pied).lerp(sommet, .5); tige.quaternion.copy(orientation); mat.add(tige);
+    for (const t of [.025, .975]) {
+      const bague = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .012, 12), jaune);
+      bague.position.copy(pied).lerp(sommet, t); bague.quaternion.copy(orientation); mat.add(bague);
+    }
+    const plateau = new THREE.Mesh(new THREE.CylinderGeometry(.12, .105, .025, 20), noir);
+    plateau.position.set(0, hauteur - .25 - .0125, this.decoAvance); mat.add(plateau);
+    mat.traverse(o => { if ((o as THREE.Mesh).isMesh) { (o as THREE.Mesh).castShadow = true; (o as THREE.Mesh).receiveShadow = true; } });
+    this.socleDeco!.add(mat); this.matDeco = mat;
+    if (this.decoSpot) {
+      this.decoSpot.position.set(0, hauteur + 1.15, this.decoAvance + .5);
+      this.decoSpot.target.position.set(0, hauteur + .25, this.decoAvance);
+    }
+  }
+
+  /** Quarts de tour relatifs ; le cœur fourni a sa face avant sur +X. */
+  tournerDeco(quarts: number): void {
+    if (!this.objetDeco || !Number.isFinite(quarts)) return;
+    const precedents = this.decoQuarts;
+    this.decoQuarts = ((this.decoQuarts + Math.round(quarts)) % 4 + 4) % 4;
+    this.objetDeco.rotation.y = Math.PI / 2 + this.decoQuarts * Math.PI / 2;
+    try { this.ajusterHauteurDeco(this.objetDeco); }
+    catch (e) { this.decoQuarts = precedents; this.objetDeco.rotation.y = Math.PI / 2 + precedents * Math.PI / 2; this.objetDeco.updateMatrixWorld(true); throw e; }
+  }
+
+  private ajusterHauteurDeco(objet: THREE.Group) {
+    if (!this.socleDeco) return;
+    objet.updateMatrixWorld(true); this.envGroup.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(objet), h = box.max.y - box.min.y;
+    const sol = this.socleDeco.position.y - .25;
+    let base = sol + 1.95;
+    // Enveloppe conservatrice sous les éléments de couverture : marge de 5 cm.
+    this.envGroup.traverse(o => {
+      if (!(o as THREE.Mesh).isMesh || !/roof|ceiling|canopy|soffit|cornice/i.test(o.name)) return;
+      const b = new THREE.Box3().setFromObject(o);
+      if (b.min.y > sol + 1.5 && b.max.x > box.min.x && b.min.x < box.max.x && b.max.z > box.min.z && b.min.z < box.max.z) base = Math.min(base, b.min.y - h - .05);
+    });
+    if (base < sol + .55) throw new Error('Pas assez de hauteur sous la couverture pour cette création');
+    objet.position.y = base;
+    this.reglerMatDeco(base - sol);
+    if (base < sol + 1.95 - .001) console.info('[deco] base abaissée à', (base - sol).toFixed(3), 'm du sol');
+  }
+
   private decoEffets = new THREE.Group();
   private decoLiseres = new THREE.MeshStandardMaterial({ color: 0xfacd00, emissive: 0xfacd00, emissiveIntensity: .5, roughness: .5 });
   private decoSpot: THREE.SpotLight | null = null;
@@ -216,12 +277,12 @@ export class World {
       p.visible = t < 1.5;
       if (!p.visible) continue;
       const phase = p.userData.phase as number;
-      p.position.set(Math.cos(phase) * (.08 + i % 4 * .04), .35 + (i % 6) * .12 + .65 * t - .65 * t * t, Math.sin(phase) * .12);
+      p.position.set(Math.cos(phase) * (.08 + i % 4 * .04), this.decoHauteur - .15 + (i % 6) * .12 + .65 * t - .65 * t * t, this.decoAvance + Math.sin(phase) * .12);
       (p.material as THREE.SpriteMaterial).opacity = Math.max(0, (1 - t / 1.5) * .8);
     }
   }
 
-  private regardDeco: { temps: number; duree: number; cible: THREE.Vector3 } | null = null;
+  private regardDeco: { temps: number; duree: number; cible: THREE.Vector3; depart?: THREE.Vector3 } | null = null;
 
   private libererDeco(o: THREE.Object3D) {
     o.removeFromParent();
@@ -253,6 +314,7 @@ export class World {
     const p = new THREE.Vector3(decoActive.x, FL, decoActive.z);
     this.envGroup.updateMatrixWorld(true);
     this.socleDeco.position.set(p.x, this.solAuPoint(p) + .25, p.z);
+    this.reglerMatDeco(1.95);
   }
 
   /** API de l'Atelier, appelée sur World par game.ts. Le modèle précédent reste si le chargement échoue. */
@@ -266,21 +328,38 @@ export class World {
       groupe.updateMatrixWorld(true);
       const boite = new THREE.Box3().setFromObject(groupe), taille = boite.getSize(new THREE.Vector3());
       if (boite.isEmpty() || ![taille.x, taille.y, taille.z].every(Number.isFinite) || Math.max(taille.x, taille.y, taille.z) < 1e-8) throw new Error('GLB sans géométrie mesurable');
-      const facteur = Math.min(...[.60, .90, .30].map((limite, i) => taille.getComponent(i) > 1e-8 ? limite / taille.getComponent(i) : Infinity));
+      const facteur = Math.min(...[1.20, 1.20, 1.20].map((limite, i) => taille.getComponent(i) > 1e-8 ? limite / taille.getComponent(i) : Infinity));
       const centre = boite.getCenter(new THREE.Vector3());
-      groupe.scale.setScalar(facteur);
-      groupe.position.set(this.socleDeco.position.x - centre.x * facteur,
-        this.socleDeco.position.y + .25 - boite.min.y * facteur, this.socleDeco.position.z - centre.z * facteur);
+      // Normaliser dans un enfant pour garder le pivot au centre de l'attache.
+      const contenu = new THREE.Group(); groupe.remove(modele); contenu.add(modele); groupe.add(contenu);
+      contenu.scale.setScalar(facteur);
+      contenu.position.set(-centre.x * facteur, -boite.min.y * facteur, -centre.z * facteur);
+      groupe.position.set(this.socleDeco.position.x, this.socleDeco.position.y - .25 + 1.95, this.socleDeco.position.z + this.decoAvance);
+      groupe.rotation.y = Math.PI / 2;
       groupe.name = nom || 'creation_joueur';
       groupe.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; } });
+      this.ajusterHauteurDeco(groupe);
+      this.decoQuarts = 0;
       if (this.objetDeco) this.libererDeco(this.objetDeco);
       this.objetDeco = groupe; this.root.add(groupe);
+      decoRayon = .51;
       this.decoParticuleAge = 0;
+      // Le téléphone peut demander la vue avant la fin du téléchargement.
+      // Repartir de la position visuelle courante évite une coupure et donne
+      // trois secondes complètes une fois la création réellement disponible.
+      if (this.regardDeco) {
+        const offset = this.camera.position.clone().sub(new THREE.Vector3(
+          this.lookAt.x + this.dist * this.zoom * Math.sin(this.yaw) * Math.cos(this.pitch),
+          this.lookAt.y + this.dist * this.zoom * Math.sin(this.pitch),
+          this.lookAt.z + this.dist * this.zoom * Math.cos(this.yaw) * Math.cos(this.pitch)));
+        this.regardDeco = null; this.voirDeco();
+        if (this.regardDeco) (this.regardDeco as { depart?: THREE.Vector3 }).depart = offset;
+      } else this.voirDeco();
     } catch (e) { this.libererDeco(groupe); throw e; }
   }
 
   retirerDeco(): void {
-    ++this.decoJeton;
+    ++this.decoJeton; decoRayon = .51;
     this.decoParticuleAge = 2; this.decoParticules.forEach(p => p.visible = false);
     if (this.objetDeco) this.libererDeco(this.objetDeco);
     this.objetDeco = null;
@@ -288,7 +367,7 @@ export class World {
 
   voirDeco(duree = 3000): void {
     if (!this.socleDeco?.visible || !Number.isFinite(duree)) return;
-    const cible = this.socleDeco.position.clone(); cible.y += .45;
+    const cible = this.objetDeco ? new THREE.Box3().setFromObject(this.objetDeco).getCenter(new THREE.Vector3()) : this.socleDeco.position.clone().add(new THREE.Vector3(0, this.decoHauteur, this.decoAvance));
     // Un double clic ne relance pas la transition, même pendant le retour.
     if (this.regardDeco) return;
     this.regardDeco = { temps: 0, duree: Math.max(1600, duree), cible };
@@ -722,8 +801,8 @@ export class World {
       if (b.max.y > FL + .3) boites.push(b);
     });
     const boiteDeco = decoActive ? new THREE.Box3(
-      new THREE.Vector3(decoActive.x - .51, FL, decoActive.z - .51),
-      new THREE.Vector3(decoActive.x + .51, FL + 1.4, decoActive.z + .51)) : null;
+      new THREE.Vector3(decoActive.x - decoRayon, FL, decoActive.z - decoRayon),
+      new THREE.Vector3(decoActive.x + decoRayon, FL + 1.4, decoActive.z + decoRayon)) : null;
     if (boiteDeco) boites.push(boiteDeco);
     const dedans = (p: THREE.Vector3, b: THREE.Box3) => p.x > b.min.x && p.x < b.max.x && p.z > b.min.z && p.z < b.max.z;
     const libre = (p: THREE.Vector3) => !boites.some(b => dedans(p, b));
@@ -1290,8 +1369,10 @@ export class World {
       const lisse = (x: number) => { x = THREE.MathUtils.clamp(x, 0, 1); return x * x * (3 - 2 * x); };
       const poids = lisse(v.temps / 700) * lisse((v.duree - v.temps) / 700);
       // Cadrage translaté : lisible aussi en portrait, sans tourner le personnage.
-      this.camera.position.add(v.cible.clone().sub(this.lookAt).multiplyScalar(poids));
-      regard.lerp(v.cible, poids);
+      const offset = v.cible.clone().sub(this.lookAt).multiplyScalar(poids);
+      if (v.depart) offset.addScaledVector(v.depart, 1 - lisse(v.temps / 700));
+      this.camera.position.add(offset);
+      regard.add(offset);
       if (v.temps >= v.duree) this.regardDeco = null;
     }
     this.camera.lookAt(regard);

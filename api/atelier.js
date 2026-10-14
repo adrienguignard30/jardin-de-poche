@@ -4,7 +4,7 @@
 //                   pour « Améliorer ma description », dans l'ordre d'essai : CEREBRAS_API_KEY (gratuit, CEREBRAS_MODEL), GEMINI_API_KEY (gratuit, GEMINI_MODELS),
 //                   OPENAI_API_KEY (payant, OPENAI_MODEL). Une seule suffit ; plusieurs = secours automatique.
 // Actions (POST JSON) :
-//   { action: 'creer', code, prompt, langue }  → vérifie le code (usage unique), lance Tripo, renvoie { id }
+//   { action: 'creer', code, prompt, langue, prompt_tripo?, image? }  → vérifie le code (usage unique), lance Tripo (texte, ou photo si image = dataURL jpeg), renvoie { id }
 //   { action: 'etat', id }                      → où en est la fabrication ; quand c'est prêt, { statut:'pret', url, image }
 //   { action: 'liste', ids: [...] }             → l'état de plusieurs créations (pour « Mes objets »)
 //   { action: 'retrouver', code }               → l'objet fabriqué avec ce code (pour le retrouver sur un autre téléphone)
@@ -48,9 +48,12 @@ async function sbUpload(cle, chemin, octets, type) {
 async function tripo(cleTripo, quoi, arg) {
   const essais = [];
   for (const api of TRIPO_API) {
+    if (quoi === 'creerImage' && api.v !== 3) continue;   // photo → objet : V3 seulement
+    const qualite = { texture: true, pbr: true, texture_quality: 'detailed', geometry_quality: 'detailed' };
     const [methode, chemin, corps] = quoi === 'creer'
-      ? (api.v === 3 ? ['POST', '/generation/text-to-model', { prompt: arg, model: MODELE_V3, texture: true, pbr: true, texture_quality: 'detailed', geometry_quality: 'detailed' }]
+      ? (api.v === 3 ? ['POST', '/generation/text-to-model', { prompt: arg, model: MODELE_V3, ...qualite }]
                      : ['POST', '/task', { type: 'text_to_model', prompt: arg, model_version: MODELE_V2, texture: true, pbr: true, texture_quality: 'detailed' }])
+      : quoi === 'creerImage' ? ['POST', '/generation/image-to-model', { ...arg, model: MODELE_V3, ...qualite }]
       : ['GET', api.v === 3 ? `/tasks/${arg}` : `/task/${arg}`, null];
     let r;
     try { r = await fetch(`${api.base}${chemin}`, { method: methode, headers: { Authorization: `Bearer ${cleTripo}`, 'Content-Type': 'application/json' }, body: corps ? JSON.stringify(corps) : undefined }); }
@@ -62,6 +65,28 @@ async function tripo(cleTripo, quoi, arg) {
     throw new Error(`tripo ${msg}`);   // vraie réponse (modération, crédits, paramètre) : on s'arrête
   }
   throw new Error(`tripo refus partout — ${essais.join(' | ')}`.slice(0, 400));
+}
+
+/** Envoie la photo à Tripo (POST /v3/files) et renvoie le jeton de fichier, ou null si l'envoi est refusé. */
+async function tripoFichier(cleTripo, octets, type) {
+  for (const api of TRIPO_API) {
+    if (api.v !== 3) continue;
+    try {
+      const fd = new FormData(); fd.append('file', new Blob([octets], { type }), type === 'image/png' ? 'photo.png' : 'photo.jpg');
+      const r = await fetch(`${api.base}/files`, { method: 'POST', headers: { Authorization: `Bearer ${cleTripo}` }, body: fd });
+      const j = await r.json().catch(() => ({}));
+      const jeton = j?.data?.file_token || j?.data?.token || j?.data?.id || j?.file_token;
+      if (r.ok && jeton) return jeton;
+    } catch { /* on essaie l'autre domaine */ }
+  }
+  return null;
+}
+/** Lance Tripo à partir d'une photo : d'abord avec le jeton de fichier, sinon avec l'adresse publique de la photo. */
+async function tripoDepuisImage(cleTripo, jeton, urlPublique) {
+  const essais = []; if (jeton) essais.push({ file_token: jeton }); essais.push({ input: urlPublique }, { url: urlPublique });
+  let derniere = null;
+  for (const corps of essais) { try { return await tripo(cleTripo, 'creerImage', corps); } catch (e) { derniere = e; } }
+  throw derniere ?? new Error('tripo image');
 }
 
 /** « Améliorer ma description » : l'IA réécrit la demande du joueur en description structurée [sujet], [détails], [matière], [style], [qualité]. */
@@ -144,17 +169,32 @@ export default async function handler(req, res) {
     // ---------- créer
     if (p.action === 'creer') {
       const code = String(p.code ?? '').trim().toUpperCase();
-      const texte = String(p.prompt ?? '').replace(/\s+/g, ' ').trim();
-      const texteTripo = (typeof p.prompt_tripo === 'string' && p.prompt_tripo.trim().length >= 3 ? p.prompt_tripo : texte).replace(/\s+/g, ' ').trim().slice(0, 600);
+      let texte = String(p.prompt ?? '').replace(/\s+/g, ' ').trim();
       const langue = ['fr', 'en', 'es'].includes(p.langue) ? p.langue : 'fr';
+      // photo (dataURL jpeg/png, ≤ 3 Mo) : la description devient facultative
+      let image = null;
+      if (typeof p.image === 'string' && p.image.startsWith('data:image/')) {
+        const m = p.image.match(/^data:(image\/(?:jpeg|png));base64,([A-Za-z0-9+/=]+)$/);
+        if (!m) return rep(res, 400, { erreur: 'image' });
+        const oct = Buffer.from(m[2], 'base64'); if (oct.length < 1000 || oct.length > 3 * 1024 * 1024) return rep(res, 400, { erreur: 'image' });
+        image = { type: m[1], octets: oct };
+        if (!texte) texte = langue === 'en' ? 'My photo' : langue === 'es' ? 'Mi foto' : 'Ma photo';
+      }
+      const texteTripo = (typeof p.prompt_tripo === 'string' && p.prompt_tripo.trim().length >= 3 ? p.prompt_tripo : texte).replace(/\s+/g, ' ').trim().slice(0, 600);
       if (!/^[A-Z0-9-]{6,24}$/.test(code)) return rep(res, 400, { erreur: 'code_invalide' });
-      if (texte.length < 3 || texte.length > 600) return rep(res, 400, { erreur: 'texte_longueur' });
+      if (!image && (texte.length < 3 || texte.length > 600)) return rep(res, 400, { erreur: 'texte_longueur' });
+      if (texte.length > 600) return rep(res, 400, { erreur: 'texte_longueur' });
       const id = randomUUID();
       const joueur = typeof p.joueur === 'string' && /^[0-9a-f-]{36}$/i.test(p.joueur) ? p.joueur : null;
       const r = await sbRpc(cle, 'utiliser_code', { p_code: code, p_creation: id, p_prompt: texte, p_prompt_tripo: texteTripo, p_langue: langue, p_joueur: joueur, p_empreinte: empreinte });
       if (!r?.ok) return rep(res, 403, { erreur: r?.raison === 'deja_utilise' ? 'code_deja_utilise' : 'code_inconnu' });
       try {
-        const t = await tripo(cleTripo, 'creer', texteTripo);
+        let t;
+        if (image) {
+          const urlSrc = await sbUpload(cle, `${id}-photo.${image.type === 'image/png' ? 'png' : 'jpg'}`, image.octets, image.type);   // la photo du joueur, gardée avec sa création
+          const jeton = await tripoFichier(cleTripo, image.octets, image.type);
+          t = await tripoDepuisImage(cleTripo, jeton, urlSrc);
+        } else t = await tripo(cleTripo, 'creer', texteTripo);
         await sbTable(cle, 'PATCH', `creations?id=eq.${id}`, { task_id: t.task_id, erreur: `api v${t._v} ${t._base}`, maj: new Date().toISOString() });
         return rep(res, 200, { id, statut: 'en_cours', progres: 0 });
       } catch (e) {
