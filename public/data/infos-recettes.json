@@ -1,0 +1,4656 @@
+{
+  "version": 1,
+  "recettes": {
+    "fraises_au_basilic": {
+      "portions": 2,
+      "usage": "dessert",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 10
+      },
+      "graines": [
+        "fraise",
+        "basilic"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Fraises au basilic",
+          "resume": "Un dessert frais, fruité et lumineux avec une touche de miel.",
+          "ingredients": [
+            "250 g de fraises",
+            "6 feuilles de basilic",
+            "1 c. à café de miel ou de sucre (facultatif)"
+          ],
+          "etapes": [
+            "Rince et sèche les fraises avant de retirer les queues.",
+            "Coupe-les en deux ou en quatre.",
+            "Déchire le basilic et mélange-le délicatement avec les fruits et, si tu le souhaites, le miel.",
+            "Laisse reposer 10 min au frais puis répartis dans deux coupelles."
+          ],
+          "astuce": "Ajoute le basilic juste avant de servir si tu prépares les fraises à l’avance."
+        },
+        "en": {
+          "titre": "Strawberries with basil",
+          "resume": "A fresh, fruity and bright dessert with a touch of honey.",
+          "ingredients": [
+            "250 g strawberries",
+            "6 basil leaves",
+            "1 tsp honey or sugar (optional)"
+          ],
+          "etapes": [
+            "Rinse and dry the strawberries before removing the stalks.",
+            "Halve or quarter them. Tear the basil and gently mix it with the fruit and the optional honey or sugar.",
+            "Chill for 10 min, then divide between two bowls."
+          ],
+          "astuce": "If preparing the strawberries ahead, add the basil just before serving."
+        },
+        "es": {
+          "titre": "Fresas con albahaca",
+          "resume": "Un postre fresco, afrutado y lleno de color, con un toque de miel.",
+          "ingredients": [
+            "250 g de fresas",
+            "6 hojas de albahaca",
+            "1 cucharadita de miel o azúcar (opcional)"
+          ],
+          "etapes": [
+            "Lava y seca las fresas antes de quitarles el rabito.",
+            "Córtalas por la mitad o en cuartos. Trocea la albahaca con las manos y mézclala con cuidado con la fruta y la miel o el azúcar opcional.",
+            "Deja reposar 10 min en la nevera y reparte en dos cuencos."
+          ],
+          "astuce": "Si preparas las fresas con antelación, añade la albahaca justo antes de servir."
+        }
+      }
+    },
+    "fraises_a_la_menthe": {
+      "portions": 2,
+      "usage": "dessert",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 10
+      },
+      "graines": [
+        "fraise",
+        "menthe"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Fraises à la menthe",
+          "resume": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
+          "ingredients": [
+            "250 g de fraises",
+            "6 feuilles de menthe",
+            "1 c. à café de miel ou de sucre (facultatif)"
+          ],
+          "etapes": [
+            "Rince, sèche et équeute les fraises, puis coupe-les.",
+            "Cisèle la menthe.",
+            "Mélange le tout avec le miel facultatif et laisse reposer 10 min au frais."
+          ],
+          "astuce": "Froisse doucement la menthe entre les doigts pour libérer son parfum."
+        },
+        "en": {
+          "titre": "Minted strawberries",
+          "resume": "Just a few minutes make this naturally delicious dessert.",
+          "ingredients": [
+            "250 g strawberries",
+            "6 mint leaves",
+            "1 tsp honey or sugar (optional)"
+          ],
+          "etapes": [
+            "Rinse, dry and hull the strawberries, then cut them.",
+            "Finely slice the mint. Gently mix everything with the optional honey or sugar.",
+            "Chill for 10 min."
+          ],
+          "astuce": "Gently rub the mint between your fingers to release its aroma."
+        },
+        "es": {
+          "titre": "Fresas con menta",
+          "resume": "Solo necesitas unos minutos para este postre delicioso y natural.",
+          "ingredients": [
+            "250 g de fresas",
+            "6 hojas de menta",
+            "1 cucharadita de miel o azúcar (opcional)"
+          ],
+          "etapes": [
+            "Lava, seca y quita el rabito a las fresas; después córtalas.",
+            "Pica la menta y mezcla todo con la miel o el azúcar opcional.",
+            "Deja reposar 10 min en la nevera."
+          ],
+          "astuce": "Frota suavemente la menta entre los dedos para liberar su aroma."
+        }
+      }
+    },
+    "tomates_au_basilic": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "tomate",
+        "basilic"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Tomates au basilic",
+          "resume": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+          "ingredients": [
+            "300 g de tomates cerises",
+            "6 feuilles de basilic",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Rince et coupe les tomates en deux.",
+            "Déchire le basilic.",
+            "Mélange avec l’huile, le sel et un peu de poivre, puis sers."
+          ],
+          "astuce": "Sors les tomates du réfrigérateur un peu avant de les préparer."
+        },
+        "en": {
+          "titre": "Basil cherry tomatoes",
+          "resume": "A fresh, crunchy starter full of balcony-grown flavor.",
+          "ingredients": [
+            "300 g cherry tomatoes",
+            "6 basil leaves",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Rinse and halve the tomatoes.",
+            "Tear the basil leaves.",
+            "Mix with the oil, salt and a little pepper, then serve."
+          ],
+          "astuce": "Take the tomatoes out of the fridge a little before preparing them."
+        },
+        "es": {
+          "titre": "Tomates con albahaca",
+          "resume": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
+          "ingredients": [
+            "300 g de tomates cherry",
+            "6 hojas de albahaca",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava los tomates y córtalos por la mitad.",
+            "Trocea la albahaca con las manos.",
+            "Mezcla con el aceite, la sal y un poco de pimienta, y sirve."
+          ],
+          "astuce": "Saca los tomates de la nevera un rato antes de prepararlos."
+        }
+      }
+    },
+    "radis_ciboulette": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "radis",
+        "ciboulette"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Radis à la ciboulette",
+          "resume": "Simple, colorée et vive avec un filet d'huile d'olive.",
+          "ingredients": [
+            "200 g de radis sans fanes",
+            "8 brins de ciboulette",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Rince les radis et retire leurs extrémités.",
+            "Coupe-les en rondelles et cisèle la ciboulette.",
+            "Mélange avec l’huile, le sel et le poivre."
+          ],
+          "astuce": "Tranche les radis finement pour adoucir leur piquant."
+        },
+        "en": {
+          "titre": "Radishes with chives",
+          "resume": "Simple, colorful and bright with a drizzle of olive oil.",
+          "ingredients": [
+            "200 g radishes, leaves removed",
+            "8 chive stems",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Rinse the radishes and trim both ends.",
+            "Slice them and finely snip the chives.",
+            "Mix with the oil, salt and pepper."
+          ],
+          "astuce": "Slice the radishes thinly to soften their peppery bite."
+        },
+        "es": {
+          "titre": "Rábanos con cebollino",
+          "resume": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "200 g de rabanitos sin hojas",
+            "8 tallos de cebollino",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava los rabanitos y quítales los extremos.",
+            "Córtalos en rodajas y pica el cebollino.",
+            "Mezcla con el aceite, la sal y la pimienta."
+          ],
+          "astuce": "Corta los rabanitos muy finos para suavizar su picor."
+        }
+      }
+    },
+    "carottes_coriandre": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "carotte",
+        "coriandre"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Carottes à la coriandre",
+          "resume": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+          "ingredients": [
+            "250 g de carottes",
+            "6 brins de coriandre",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Brosse ou épluche les carottes, puis râpe-les.",
+            "Hache la coriandre.",
+            "Mélange avec l’huile, le sel et le poivre."
+          ],
+          "astuce": "Une râpe à gros trous donne plus de croquant."
+        },
+        "en": {
+          "titre": "Carrots with coriander",
+          "resume": "A fresh, crunchy starter full of balcony-grown flavor.",
+          "ingredients": [
+            "250 g carrots",
+            "6 coriander sprigs",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Scrub or peel the carrots, then grate them.",
+            "Chop the coriander.",
+            "Mix with the oil, salt and pepper."
+          ],
+          "astuce": "Use a coarse grater for extra crunch."
+        },
+        "es": {
+          "titre": "Zanahorias con cilantro",
+          "resume": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
+          "ingredients": [
+            "250 g de zanahorias",
+            "6 ramitas de cilantro",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Cepilla o pela las zanahorias y rállalas.",
+            "Pica el cilantro.",
+            "Mezcla con el aceite, la sal y la pimienta."
+          ],
+          "astuce": "Usa un rallador de agujeros grandes para que queden más crujientes."
+        }
+      }
+    },
+    "concombre_a_la_menthe": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "concombre",
+        "menthe"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Concombre à la menthe",
+          "resume": "Simple, colorée et vive avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de concombre",
+            "8 feuilles de menthe",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Rince le concombre et coupe-le en demi-rondelles.",
+            "Cisèle la menthe.",
+            "Mélange avec l’huile, le sel et le poivre juste avant de servir."
+          ],
+          "astuce": "Retire le centre à la cuillère si les graines sont grosses."
+        },
+        "en": {
+          "titre": "Minted cucumber",
+          "resume": "Simple, colorful and bright with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g cucumber",
+            "8 mint leaves",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Rinse the cucumber and cut it into half-moons.",
+            "Finely slice the mint.",
+            "Mix with the oil, salt and pepper just before serving."
+          ],
+          "astuce": "Scoop out the centre with a spoon if the seeds are large."
+        },
+        "es": {
+          "titre": "Pepino con menta",
+          "resume": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de pepino",
+            "8 hojas de menta",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava el pepino y córtalo en medias rodajas.",
+            "Pica la menta.",
+            "Mezcla con el aceite, la sal y la pimienta justo antes de servir."
+          ],
+          "astuce": "Retira el centro con una cuchara si las semillas son grandes."
+        }
+      }
+    },
+    "salade_croquante_du_balcon": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "salade",
+        "radis",
+        "concombre"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Salade croquante du balcon",
+          "resume": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+          "ingredients": [
+            "100 g de laitue",
+            "100 g de radis",
+            "150 g de concombre",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Lave et essore la laitue.",
+            "Rince et tranche les radis et le concombre.",
+            "Mélange avec l’huile, le sel et le poivre au dernier moment."
+          ],
+          "astuce": "Une salade bien essorée garde un assaisonnement plus savoureux."
+        },
+        "en": {
+          "titre": "Crunchy balcony salad",
+          "resume": "A fresh, crunchy starter full of balcony-grown flavor.",
+          "ingredients": [
+            "100 g lettuce",
+            "100 g radishes",
+            "150 g cucumber",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Wash and dry the lettuce.",
+            "Rinse and slice the radishes and cucumber.",
+            "Mix with the oil, salt and pepper at the last moment."
+          ],
+          "astuce": "Well-dried lettuce keeps the dressing flavoursome."
+        },
+        "es": {
+          "titre": "Ensalada crujiente del balcón",
+          "resume": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
+          "ingredients": [
+            "100 g de lechuga",
+            "100 g de rabanitos",
+            "150 g de pepino",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava y escurre bien la lechuga.",
+            "Lava y corta los rabanitos y el pepino.",
+            "Mezcla con el aceite, la sal y la pimienta en el último momento."
+          ],
+          "astuce": "Una lechuga bien escurrida conserva mejor el sabor del aliño."
+        }
+      }
+    },
+    "tomates_persil_oignon": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "tomate",
+        "persil",
+        "oignon"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Tomates fraîches au persil",
+          "resume": "Simple, colorée et vive avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de tomates cerises",
+            "6 brins de persil",
+            "1 oignon nouveau",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Rince et coupe les tomates en deux.",
+            "Émince le blanc et le vert tendre de l’oignon, puis hache le persil.",
+            "Mélange avec l’huile, le sel et le poivre."
+          ],
+          "astuce": "Émince l’oignon très fin pour répartir sa saveur."
+        },
+        "en": {
+          "titre": "Fresh parsley tomatoes",
+          "resume": "Simple, colorful and bright with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g cherry tomatoes",
+            "6 parsley sprigs",
+            "1 spring onion",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Rinse and halve the tomatoes.",
+            "Finely slice the white and tender green parts of the spring onion, then chop the parsley.",
+            "Mix with the oil, salt and pepper."
+          ],
+          "astuce": "Slice the onion very finely to spread its flavour throughout the salad."
+        },
+        "es": {
+          "titre": "Tomates frescos con perejil",
+          "resume": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de tomates cherry",
+            "6 ramitas de perejil",
+            "1 cebolleta",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava los tomates y córtalos por la mitad.",
+            "Corta fina la parte blanca y la verde tierna de la cebolleta y pica el perejil.",
+            "Mezcla con el aceite, la sal y la pimienta."
+          ],
+          "astuce": "Corta la cebolleta muy fina para repartir su sabor."
+        }
+      }
+    },
+    "rubans_courgette_citron": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "courgette",
+        "citron",
+        "basilic"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Rubans de courgette citronnés",
+          "resume": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+          "ingredients": [
+            "250 g de courgette jeune",
+            "1/2 citron",
+            "6 feuilles de basilic",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Lave la courgette et taille-la en rubans à l’économe.",
+            "Presse le demi-citron.",
+            "Mélange les rubans avec le jus, l’huile, le basilic déchiré, le sel et le poivre."
+          ],
+          "astuce": "Arrête les rubans avant le cœur s’il est très rempli de graines."
+        },
+        "en": {
+          "titre": "Lemony zucchini ribbons",
+          "resume": "A fresh, crunchy starter full of balcony-grown flavor.",
+          "ingredients": [
+            "250 g young courgette",
+            "1/2 lemon",
+            "6 basil leaves",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Wash the courgette and use a vegetable peeler to make ribbons.",
+            "Squeeze the lemon half.",
+            "Mix the ribbons with the juice, oil, torn basil, salt and pepper."
+          ],
+          "astuce": "Stop before the centre if it contains lots of seeds."
+        },
+        "es": {
+          "titre": "Cintas de calabacín al limón",
+          "resume": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
+          "ingredients": [
+            "250 g de calabacín joven",
+            "1/2 limón",
+            "6 hojas de albahaca",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava el calabacín y haz cintas con un pelador.",
+            "Exprime el medio limón.",
+            "Mezcla las cintas con el zumo, el aceite, la albahaca troceada, la sal y la pimienta."
+          ],
+          "astuce": "No uses el centro si tiene muchas semillas."
+        }
+      }
+    },
+    "poivron_coriandre_citron": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "poivron",
+        "coriandre",
+        "citron"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Poivron vif à la coriandre",
+          "resume": "Simple, colorée et vive avec un filet d'huile d'olive.",
+          "ingredients": [
+            "250 g de poivron",
+            "6 brins de coriandre",
+            "1/2 citron",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Rince le poivron et retire graines et membranes blanches.",
+            "Taille-le en fines lanières.",
+            "Mélange avec la coriandre hachée, le jus du demi-citron, l’huile, le sel et le poivre."
+          ],
+          "astuce": "Des lanières très fines sont plus agréables à manger crues."
+        },
+        "en": {
+          "titre": "Bright coriander pepper",
+          "resume": "Simple, colorful and bright with a drizzle of olive oil.",
+          "ingredients": [
+            "250 g pepper",
+            "6 coriander sprigs",
+            "1/2 lemon",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Rinse the pepper and remove its seeds and white membranes.",
+            "Cut into thin strips.",
+            "Mix with the chopped coriander, juice of the lemon half, oil, salt and pepper."
+          ],
+          "astuce": "Very thin strips are more pleasant to eat raw."
+        },
+        "es": {
+          "titre": "Pimiento lleno de sabor con cilantro",
+          "resume": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "250 g de pimiento",
+            "6 ramitas de cilantro",
+            "1/2 limón",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava el pimiento y retira las semillas y las partes blancas.",
+            "Córtalo en tiras finas.",
+            "Mezcla con el cilantro picado, el zumo del medio limón, el aceite, la sal y la pimienta."
+          ],
+          "astuce": "Las tiras muy finas resultan más agradables para comer en crudo."
+        }
+      }
+    },
+    "epinards_radis_ciboulette": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "epinard",
+        "radis",
+        "ciboulette"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Épinards aux radis",
+          "resume": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+          "ingredients": [
+            "100 g de jeunes pousses d’épinard",
+            "120 g de radis",
+            "8 brins de ciboulette",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Lave et essore les pousses.",
+            "Rince les radis et coupe-les finement.",
+            "Ajoute la ciboulette ciselée et assaisonne avec l’huile, le sel et le poivre."
+          ],
+          "astuce": "Choisis des jeunes pousses tendres pour cette version crue."
+        },
+        "en": {
+          "titre": "Spinach and radish salad",
+          "resume": "A fresh, crunchy starter full of balcony-grown flavor.",
+          "ingredients": [
+            "100 g baby spinach",
+            "120 g radishes",
+            "8 chive stems",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Wash and dry the baby spinach.",
+            "Rinse and thinly slice the radishes.",
+            "Add the snipped chives and dress with the oil, salt and pepper."
+          ],
+          "astuce": "Use tender baby leaves for this raw salad."
+        },
+        "es": {
+          "titre": "Espinacas con rábanos",
+          "resume": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
+          "ingredients": [
+            "100 g de espinacas baby",
+            "120 g de rabanitos",
+            "8 tallos de cebollino",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava y escurre las espinacas baby.",
+            "Lava los rabanitos y córtalos finos.",
+            "Añade el cebollino picado y aliña con el aceite, la sal y la pimienta."
+          ],
+          "astuce": "Elige hojas jóvenes y tiernas para esta ensalada cruda."
+        }
+      }
+    },
+    "haricots_tomates_persil": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 30,
+        "reposMin": 10
+      },
+      "graines": [
+        "haricot",
+        "tomate",
+        "persil"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Haricots aux tomates",
+          "resume": "Simple, colorée et vive avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de haricots verts frais",
+            "150 g de tomates cerises",
+            "6 brins de persil",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Équeute et rince les haricots, puis cuis-les 30 min à l’eau bouillante.",
+            "Égoutte et laisse tiédir 10 min.",
+            "Ajoute les tomates coupées en deux, le persil haché, l’huile, le sel et le poivre."
+          ],
+          "astuce": "Pour aller plus vite, prends 300 g de haricots déjà cuits et égouttés ; la cuisson préalable disparaît."
+        },
+        "en": {
+          "titre": "Green beans with tomatoes",
+          "resume": "Simple, colorful and bright with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g fresh green beans",
+            "150 g cherry tomatoes",
+            "6 parsley sprigs",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Trim and rinse the beans, then cook in boiling water for 30 min.",
+            "Drain and leave to cool for 10 min.",
+            "Add the halved tomatoes, chopped parsley, oil, salt and pepper."
+          ],
+          "astuce": "For a quicker version, use 300 g of ready-cooked, drained beans and skip the initial cooking."
+        },
+        "es": {
+          "titre": "Judías verdes con tomates",
+          "resume": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de judías verdes frescas",
+            "150 g de tomates cherry",
+            "6 ramitas de perejil",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Despunta y lava las judías; después cuécelas 30 min en agua hirviendo.",
+            "Escurre y deja templar 10 min.",
+            "Añade los tomates partidos por la mitad, el perejil picado, el aceite, la sal y la pimienta."
+          ],
+          "astuce": "Para ir más rápido, usa 300 g de judías ya cocidas y escurridas y omite la cocción previa."
+        }
+      }
+    },
+    "carottes_menthe_citron": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "carotte",
+        "menthe",
+        "citron"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Carottes fraîches à la menthe",
+          "resume": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+          "ingredients": [
+            "250 g de carottes",
+            "8 feuilles de menthe",
+            "1/2 citron",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Brosse ou épluche les carottes et râpe-les.",
+            "Cisèle la menthe.",
+            "Mélange avec le jus du demi-citron, l’huile, le sel et le poivre."
+          ],
+          "astuce": "Râpe les carottes juste avant de servir pour préserver leur croquant."
+        },
+        "en": {
+          "titre": "Fresh minted carrots",
+          "resume": "A fresh, crunchy starter full of balcony-grown flavor.",
+          "ingredients": [
+            "250 g carrots",
+            "8 mint leaves",
+            "1/2 lemon",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Scrub or peel the carrots, then grate them.",
+            "Finely slice the mint.",
+            "Mix with the juice of the lemon half, oil, salt and pepper."
+          ],
+          "astuce": "Grate the carrots just before serving to keep them crunchy."
+        },
+        "es": {
+          "titre": "Zanahorias frescas con menta",
+          "resume": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
+          "ingredients": [
+            "250 g de zanahorias",
+            "8 hojas de menta",
+            "1/2 limón",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Cepilla o pela las zanahorias y rállalas.",
+            "Pica la menta.",
+            "Mezcla con el zumo del medio limón, el aceite, la sal y la pimienta."
+          ],
+          "astuce": "Ralla las zanahorias justo antes de servir para que conserven su textura crujiente."
+        }
+      }
+    },
+    "concombre_oignon_coriandre": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "concombre",
+        "oignon",
+        "coriandre"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Concombre à la coriandre",
+          "resume": "Simple, colorée et vive avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de concombre",
+            "1 oignon nouveau",
+            "6 brins de coriandre",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Rince et coupe le concombre en dés.",
+            "Émince l’oignon et hache la coriandre.",
+            "Mélange avec l’huile, le sel et le poivre au dernier moment."
+          ],
+          "astuce": "Garde le vert tendre de l’oignon : il apporte du parfum et de la couleur."
+        },
+        "en": {
+          "titre": "Coriander cucumber",
+          "resume": "Simple, colorful and bright with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g cucumber",
+            "1 spring onion",
+            "6 coriander sprigs",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Rinse and dice the cucumber.",
+            "Finely slice the onion and chop the coriander.",
+            "Mix with the oil, salt and pepper at the last moment."
+          ],
+          "astuce": "Keep the tender green onion tops for extra flavour and colour."
+        },
+        "es": {
+          "titre": "Pepino con cilantro",
+          "resume": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de pepino",
+            "1 cebolleta",
+            "6 ramitas de cilantro",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava el pepino y córtalo en dados.",
+            "Corta fina la cebolleta y pica el cilantro.",
+            "Mezcla con el aceite, la sal y la pimienta en el último momento."
+          ],
+          "astuce": "Aprovecha la parte verde tierna de la cebolleta para dar sabor y color."
+        }
+      }
+    },
+    "salade_peche_basilic": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "salade",
+        "peche",
+        "basilic"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Laitue pêche basilic",
+          "resume": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+          "ingredients": [
+            "100 g de laitue",
+            "1 pêche mûre",
+            "6 feuilles de basilic",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Lave et essore la laitue.",
+            "Rince la pêche, retire le noyau et coupe la chair en quartiers.",
+            "Ajoute le basilic, l’huile, le sel et le poivre, puis mélange doucement."
+          ],
+          "astuce": "Choisis une pêche mûre mais encore ferme pour garder de beaux quartiers."
+        },
+        "en": {
+          "titre": "Peach basil lettuce",
+          "resume": "A fresh, crunchy starter full of balcony-grown flavor.",
+          "ingredients": [
+            "100 g lettuce",
+            "1 ripe peach",
+            "6 basil leaves",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Wash and dry the lettuce.",
+            "Rinse the peach, remove the stone and cut into wedges.",
+            "Add the basil, oil, salt and pepper, then toss gently."
+          ],
+          "astuce": "Choose a ripe but still firm peach to keep the wedges intact."
+        },
+        "es": {
+          "titre": "Lechuga, melocotón y albahaca",
+          "resume": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
+          "ingredients": [
+            "100 g de lechuga",
+            "1 melocotón maduro",
+            "6 hojas de albahaca",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava y escurre la lechuga.",
+            "Lava el melocotón, quítale el hueso y córtalo en gajos.",
+            "Añade la albahaca, el aceite, la sal y la pimienta y mezcla con cuidado."
+          ],
+          "astuce": "Elige un melocotón maduro pero firme para que los gajos no se deshagan."
+        }
+      }
+    },
+    "radis_persil_citron": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "radis",
+        "persil",
+        "citron"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Radis citron persil",
+          "resume": "Simple, colorée et vive avec un filet d'huile d'olive.",
+          "ingredients": [
+            "200 g de radis",
+            "6 brins de persil",
+            "1/2 citron",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Rince et tranche les radis.",
+            "Hache le persil.",
+            "Mélange avec le jus du demi-citron, l’huile, le sel et le poivre."
+          ],
+          "astuce": "Commence avec la moitié du jus, goûte puis ajoute le reste selon ton goût."
+        },
+        "en": {
+          "titre": "Lemony parsley radishes",
+          "resume": "Simple, colorful and bright with a drizzle of olive oil.",
+          "ingredients": [
+            "200 g radishes",
+            "6 parsley sprigs",
+            "1/2 lemon",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Rinse and slice the radishes.",
+            "Chop the parsley.",
+            "Mix with the juice of the lemon half, oil, salt and pepper."
+          ],
+          "astuce": "Start with half the juice, taste, then add more if you like."
+        },
+        "es": {
+          "titre": "Rábanos, limón y perejil",
+          "resume": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "200 g de rabanitos",
+            "6 ramitas de perejil",
+            "1/2 limón",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava los rabanitos y córtalos en rodajas.",
+            "Pica el perejil.",
+            "Mezcla con el zumo del medio limón, el aceite, la sal y la pimienta."
+          ],
+          "astuce": "Empieza con la mitad del zumo, prueba y añade más si te apetece."
+        }
+      }
+    },
+    "tomate_poivron_ciboulette": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "tomate",
+        "poivron",
+        "ciboulette"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Tomates au poivron croquant",
+          "resume": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+          "ingredients": [
+            "300 g de tomates cerises",
+            "150 g de poivron",
+            "8 brins de ciboulette",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Rince les légumes.",
+            "Coupe les tomates en deux et le poivron épépiné en petits dés.",
+            "Mélange avec la ciboulette ciselée, l’huile, le sel et le poivre."
+          ],
+          "astuce": "De petits dés de poivron équilibrent chaque bouchée."
+        },
+        "en": {
+          "titre": "Tomatoes with crisp pepper",
+          "resume": "A fresh, crunchy starter full of balcony-grown flavor.",
+          "ingredients": [
+            "300 g cherry tomatoes",
+            "150 g pepper",
+            "8 chive stems",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Rinse the vegetables.",
+            "Halve the tomatoes and dice the deseeded pepper finely.",
+            "Mix with the snipped chives, oil, salt and pepper."
+          ],
+          "astuce": "Small pepper pieces give each mouthful a good balance."
+        },
+        "es": {
+          "titre": "Tomates con pimiento crujiente",
+          "resume": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
+          "ingredients": [
+            "300 g de tomates cherry",
+            "150 g de pimiento",
+            "8 tallos de cebollino",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava las verduras.",
+            "Parte los tomates por la mitad y corta el pimiento sin semillas en dados pequeños.",
+            "Mezcla con el cebollino picado, el aceite, la sal y la pimienta."
+          ],
+          "astuce": "Los dados pequeños de pimiento equilibran cada bocado."
+        }
+      }
+    },
+    "courgette_menthe_oignon": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "courgette",
+        "menthe",
+        "oignon"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Courgette fraîche à la menthe",
+          "resume": "Simple, colorée et vive avec un filet d'huile d'olive.",
+          "ingredients": [
+            "250 g de courgette jeune",
+            "8 feuilles de menthe",
+            "1 oignon nouveau",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Lave la courgette et taille-la en très fines demi-rondelles.",
+            "Émince l’oignon et cisèle la menthe.",
+            "Mélange avec l’huile, le sel et le poivre."
+          ],
+          "astuce": "Une petite courgette est plus tendre pour une salade crue."
+        },
+        "en": {
+          "titre": "Fresh minted zucchini",
+          "resume": "Simple, colorful and bright with a drizzle of olive oil.",
+          "ingredients": [
+            "250 g young courgette",
+            "8 mint leaves",
+            "1 spring onion",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Wash the courgette and cut into very thin half-moons.",
+            "Finely slice the onion and mint.",
+            "Mix with the oil, salt and pepper."
+          ],
+          "astuce": "A small courgette is more tender for a raw salad."
+        },
+        "es": {
+          "titre": "Calabacín fresco con menta",
+          "resume": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "250 g de calabacín joven",
+            "8 hojas de menta",
+            "1 cebolleta",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava el calabacín y córtalo en medias rodajas muy finas.",
+            "Corta fina la cebolleta y pica la menta.",
+            "Mezcla con el aceite, la sal y la pimienta."
+          ],
+          "astuce": "Un calabacín pequeño resulta más tierno para una ensalada cruda."
+        }
+      }
+    },
+    "poelee_courgette_ail_thym": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 12,
+        "reposMin": 0
+      },
+      "graines": [
+        "courgette",
+        "ail",
+        "thym"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Courgette dorée au thym",
+          "resume": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+          "ingredients": [
+            "400 g de courgette",
+            "1 gousse d’ail",
+            "2 brins de thym",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Coupe la courgette lavée en demi-rondelles et hache l’ail.",
+            "Fais dorer la courgette dans l’huile 10 min à feu moyen-vif en remuant.",
+            "Ajoute l’ail et le thym effeuillé pour 2 min, puis sale et poivre."
+          ],
+          "astuce": "Une grande poêle évite que la courgette rende trop d’eau."
+        },
+        "en": {
+          "titre": "Golden thyme zucchini",
+          "resume": "A quick, fragrant and generous dish, perfect for tonight.",
+          "ingredients": [
+            "400 g courgette",
+            "1 garlic clove",
+            "2 thyme sprigs",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Cut the washed courgette into half-moons and chop the garlic.",
+            "Brown the courgette in the oil over medium-high heat for 10 min, stirring.",
+            "Add the garlic and thyme leaves for 2 min, then season with salt and pepper."
+          ],
+          "astuce": "A wide frying pan helps stop the courgette releasing too much water."
+        },
+        "es": {
+          "titre": "Calabacín dorado con tomillo",
+          "resume": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
+          "ingredients": [
+            "400 g de calabacín",
+            "1 diente de ajo",
+            "2 ramitas de tomillo",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Corta el calabacín lavado en medias rodajas y pica el ajo.",
+            "Dora el calabacín en el aceite 10 min a fuego medio-alto, removiendo.",
+            "Añade el ajo y las hojas de tomillo durante 2 min y salpimienta."
+          ],
+          "astuce": "Una sartén amplia ayuda a que el calabacín no suelte demasiada agua."
+        }
+      }
+    },
+    "haricots_ail_persil": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 35,
+        "reposMin": 0
+      },
+      "graines": [
+        "haricot",
+        "ail",
+        "persil"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Haricots persillés à l'ail",
+          "resume": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de haricots verts frais",
+            "1 gousse d’ail",
+            "6 brins de persil",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Équeute, rince et cuis les haricots 30 min à l’eau bouillante.",
+            "Égoutte-les.",
+            "Chauffe l’huile avec l’ail haché 1 min à feu doux, ajoute les haricots pour 4 min, puis le persil, le sel et le poivre."
+          ],
+          "astuce": "Le persil ajouté hors du feu garde son parfum."
+        },
+        "en": {
+          "titre": "Garlic parsley beans",
+          "resume": "Tender, flavorful vegetables with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g fresh green beans",
+            "1 garlic clove",
+            "6 parsley sprigs",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Trim, rinse and cook the beans in boiling water for 30 min. Drain.",
+            "Warm the oil with the chopped garlic over low heat for 1 min.",
+            "Add the beans for 4 min, then the parsley, salt and pepper."
+          ],
+          "astuce": "Add parsley off the heat to keep its aroma."
+        },
+        "es": {
+          "titre": "Judías verdes con perejil y ajo",
+          "resume": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de judías verdes frescas",
+            "1 diente de ajo",
+            "6 ramitas de perejil",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Despunta, lava y cuece las judías 30 min en agua hirviendo. Escurre.",
+            "Calienta el aceite con el ajo picado 1 min a fuego suave.",
+            "Añade las judías durante 4 min y termina con el perejil, la sal y la pimienta."
+          ],
+          "astuce": "Añade el perejil fuera del fuego para conservar su aroma."
+        }
+      }
+    },
+    "poivron_tomate_oignon": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 20,
+        "reposMin": 0
+      },
+      "graines": [
+        "poivron",
+        "tomate",
+        "oignon"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Poivron fondant aux tomates",
+          "resume": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+          "ingredients": [
+            "300 g de poivron",
+            "200 g de tomates cerises",
+            "2 oignons nouveaux",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Rince les légumes, épépine et émince le poivron, coupe les tomates et les oignons.",
+            "Fais revenir les oignons et le poivron 5 min dans l’huile.",
+            "Ajoute les tomates, le sel et le poivre, puis couvre et cuis à feu doux 15 min en remuant."
+          ],
+          "astuce": "Découvre quelques minutes à la fin si la sauce est trop liquide."
+        },
+        "en": {
+          "titre": "Tender pepper and tomatoes",
+          "resume": "A quick, fragrant and generous dish, perfect for tonight.",
+          "ingredients": [
+            "300 g pepper",
+            "200 g cherry tomatoes",
+            "2 spring onions",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Rinse the vegetables, deseed and slice the pepper, then cut the tomatoes and onions.",
+            "Cook the onions and pepper in the oil for 5 min.",
+            "Add the tomatoes, salt and pepper, cover and cook gently for 15 min, stirring."
+          ],
+          "astuce": "Uncover for a few minutes at the end if the sauce is too watery."
+        },
+        "es": {
+          "titre": "Pimiento tierno con tomates",
+          "resume": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
+          "ingredients": [
+            "300 g de pimiento",
+            "200 g de tomates cherry",
+            "2 cebolletas",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava las verduras, quita las semillas al pimiento y córtalo en tiras; corta los tomates y las cebolletas.",
+            "Sofríe las cebolletas y el pimiento en el aceite 5 min.",
+            "Añade los tomates, la sal y la pimienta, tapa y cocina a fuego suave 15 min, removiendo."
+          ],
+          "astuce": "Destapa unos minutos al final si la salsa está demasiado líquida."
+        }
+      }
+    },
+    "epinards_ail_citron": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 7,
+        "reposMin": 0
+      },
+      "graines": [
+        "epinard",
+        "ail",
+        "citron"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Épinards ail citron",
+          "resume": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+          "ingredients": [
+            "400 g d’épinards frais",
+            "1 gousse d’ail",
+            "1/2 citron",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Lave et égoutte les épinards, retire les grosses tiges.",
+            "Fais revenir l’ail haché 1 min à feu doux dans l’huile.",
+            "Ajoute les épinards par poignées et cuis 6 min en remuant ; termine avec le citron pressé, le sel et le poivre."
+          ],
+          "astuce": "Ajoute le citron hors du feu pour garder une note fraîche."
+        },
+        "en": {
+          "titre": "Lemony garlic spinach",
+          "resume": "Tender, flavorful vegetables with a drizzle of olive oil.",
+          "ingredients": [
+            "400 g fresh spinach",
+            "1 garlic clove",
+            "1/2 lemon",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Wash and drain the spinach and remove thick stalks.",
+            "Gently fry the chopped garlic in the oil for 1 min.",
+            "Add the spinach in batches and cook for 6 min, stirring. Finish with the squeezed lemon, salt and pepper."
+          ],
+          "astuce": "Add the lemon off the heat for a fresh finish."
+        },
+        "es": {
+          "titre": "Espinacas, ajo y limón",
+          "resume": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "400 g de espinacas frescas",
+            "1 diente de ajo",
+            "1/2 limón",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava y escurre las espinacas y retira los tallos gruesos.",
+            "Sofríe el ajo picado en el aceite 1 min a fuego suave.",
+            "Añade las espinacas por tandas y cocina 6 min, removiendo. Termina con el zumo de limón, la sal y la pimienta."
+          ],
+          "astuce": "Añade el limón fuera del fuego para dar un toque fresco."
+        }
+      }
+    },
+    "carottes_thym_oignon": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 30,
+        "reposMin": 0
+      },
+      "graines": [
+        "carotte",
+        "thym",
+        "oignon"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Carottes rôties au thym",
+          "resume": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+          "ingredients": [
+            "400 g de carottes",
+            "2 brins de thym",
+            "2 oignons nouveaux",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Préchauffe le four à 200 °C chaleur tournante.",
+            "Brosse les carottes et coupe-les en bâtonnets d’environ 1 cm ; coupe les oignons en deux.",
+            "Mélange avec l’huile, le thym, le sel et le poivre, puis enfourne 30 min en retournant à mi-cuisson, jusqu’à tendreté."
+          ],
+          "astuce": "Étale les légumes en une seule couche pour mieux les faire dorer."
+        },
+        "en": {
+          "titre": "Thyme-roasted carrots",
+          "resume": "A quick, fragrant and generous dish, perfect for tonight.",
+          "ingredients": [
+            "400 g carrots",
+            "2 thyme sprigs",
+            "2 spring onions",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Preheat the fan oven to 200 °C.",
+            "Scrub the carrots and cut into sticks about 1 cm thick; halve the onions.",
+            "Mix with the oil, thyme, salt and pepper. Roast for 30 min, turning halfway, until tender."
+          ],
+          "astuce": "Spread the vegetables in one layer to help them brown."
+        },
+        "es": {
+          "titre": "Zanahorias asadas con tomillo",
+          "resume": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
+          "ingredients": [
+            "400 g de zanahorias",
+            "2 ramitas de tomillo",
+            "2 cebolletas",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Precalienta el horno con ventilador a 200 °C.",
+            "Cepilla las zanahorias y córtalas en bastones de aproximadamente 1 cm; parte las cebolletas por la mitad.",
+            "Mezcla con el aceite, el tomillo, la sal y la pimienta. Hornea 30 min, dando la vuelta a mitad de cocción, hasta que estén tiernas."
+          ],
+          "astuce": "Extiende las verduras en una sola capa para que se doren mejor."
+        }
+      }
+    },
+    "courgette_tomate_basilic": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 15,
+        "reposMin": 0
+      },
+      "graines": [
+        "courgette",
+        "tomate",
+        "basilic"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Courgette tomate basilic",
+          "resume": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de courgette",
+            "200 g de tomates cerises",
+            "6 feuilles de basilic",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Coupe la courgette en dés et les tomates en deux.",
+            "Fais revenir la courgette 8 min dans l’huile.",
+            "Ajoute les tomates pour 7 min, sale et poivre, puis incorpore le basilic hors du feu."
+          ],
+          "astuce": "Laisse quelques tomates entières si tu aimes les bouchées juteuses."
+        },
+        "en": {
+          "titre": "Zucchini tomato basil",
+          "resume": "Tender, flavorful vegetables with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g courgette",
+            "200 g cherry tomatoes",
+            "6 basil leaves",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Dice the courgette and halve the tomatoes.",
+            "Cook the courgette in the oil for 8 min.",
+            "Add the tomatoes for 7 min, season with salt and pepper, then stir in the basil off the heat."
+          ],
+          "astuce": "Leave a few tomatoes whole if you like juicy bites."
+        },
+        "es": {
+          "titre": "Calabacín, tomate y albahaca",
+          "resume": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de calabacín",
+            "200 g de tomates cherry",
+            "6 hojas de albahaca",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Corta el calabacín en dados y los tomates por la mitad.",
+            "Saltea el calabacín en el aceite 8 min.",
+            "Añade los tomates durante 7 min, salpimienta e incorpora la albahaca fuera del fuego."
+          ],
+          "astuce": "Deja algunos tomates enteros si te gustan los bocados jugosos."
+        }
+      }
+    },
+    "haricots_poivron_coriandre": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 42,
+        "reposMin": 0
+      },
+      "graines": [
+        "haricot",
+        "poivron",
+        "coriandre"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Haricots au poivron",
+          "resume": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+          "ingredients": [
+            "300 g de haricots verts frais",
+            "200 g de poivron",
+            "6 brins de coriandre",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Équeute, rince et cuis les haricots 30 min à l’eau bouillante, puis égoutte.",
+            "Taille le poivron épépiné en fines lanières et cuis-le 10 min dans l’huile.",
+            "Ajoute les haricots pour 2 min, puis la coriandre hachée, le sel et le poivre."
+          ],
+          "astuce": "Tu peux cuire le poivron pendant que les haricots bouillent pour raccourcir le total."
+        },
+        "en": {
+          "titre": "Green beans and pepper",
+          "resume": "A quick, fragrant and generous dish, perfect for tonight.",
+          "ingredients": [
+            "300 g fresh green beans",
+            "200 g pepper",
+            "6 coriander sprigs",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Trim, rinse and cook the beans in boiling water for 30 min, then drain.",
+            "Deseed the pepper, cut into thin strips and cook in the oil for 10 min.",
+            "Add the beans for 2 min, then the chopped coriander, salt and pepper."
+          ],
+          "astuce": "Cook the pepper while the beans boil if you want to shorten the total time."
+        },
+        "es": {
+          "titre": "Judías verdes con pimiento",
+          "resume": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
+          "ingredients": [
+            "300 g de judías verdes frescas",
+            "200 g de pimiento",
+            "6 ramitas de cilantro",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Despunta, lava y cuece las judías 30 min en agua hirviendo; después escurre.",
+            "Quita las semillas al pimiento, córtalo en tiras finas y cocínalo en el aceite 10 min.",
+            "Añade las judías durante 2 min y termina con el cilantro picado, la sal y la pimienta."
+          ],
+          "astuce": "Puedes cocinar el pimiento mientras hierven las judías para reducir el tiempo total."
+        }
+      }
+    },
+    "epinards_oignon_ciboulette": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 10,
+        "reposMin": 0
+      },
+      "graines": [
+        "epinard",
+        "oignon",
+        "ciboulette"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Épinards aux oignons nouveaux",
+          "resume": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+          "ingredients": [
+            "400 g d’épinards frais",
+            "2 oignons nouveaux",
+            "8 brins de ciboulette",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Lave et égoutte les épinards.",
+            "Émince les oignons et fais-les revenir 3 min dans l’huile.",
+            "Ajoute les épinards pour 7 min en remuant, puis le sel, le poivre et la ciboulette hors du feu."
+          ],
+          "astuce": "Ajoute les épinards en plusieurs fois pour ne pas remplir la poêle d’un seul coup."
+        },
+        "en": {
+          "titre": "Spinach with spring onions",
+          "resume": "Tender, flavorful vegetables with a drizzle of olive oil.",
+          "ingredients": [
+            "400 g fresh spinach",
+            "2 spring onions",
+            "8 chive stems",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Wash and drain the spinach.",
+            "Slice the onions and cook in the oil for 3 min.",
+            "Add the spinach for 7 min, stirring, then the salt, pepper and chives off the heat."
+          ],
+          "astuce": "Add the spinach in batches rather than filling the pan all at once."
+        },
+        "es": {
+          "titre": "Espinacas con cebolletas",
+          "resume": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "400 g de espinacas frescas",
+            "2 cebolletas",
+            "8 tallos de cebollino",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava y escurre las espinacas.",
+            "Corta las cebolletas y sofríelas en el aceite 3 min.",
+            "Añade las espinacas durante 7 min, removiendo, y termina fuera del fuego con la sal, la pimienta y el cebollino."
+          ],
+          "astuce": "Añade las espinacas por tandas para no llenar la sartén de golpe."
+        }
+      }
+    },
+    "carotte_courgette_persil": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 18,
+        "reposMin": 0
+      },
+      "graines": [
+        "carotte",
+        "courgette",
+        "persil"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Poêlée carotte courgette",
+          "resume": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+          "ingredients": [
+            "300 g de carottes",
+            "250 g de courgette",
+            "6 brins de persil",
+            "1 c. à soupe d’huile d’olive",
+            "3 c. à soupe d’eau",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Brosse les carottes et coupe-les en fines demi-rondelles ; coupe aussi la courgette.",
+            "Cuis les carottes avec l’huile et l’eau 8 min à couvert.",
+            "Ajoute la courgette pour 10 min en remuant, puis le persil haché, le sel et le poivre."
+          ],
+          "astuce": "Coupe la carotte plus finement que la courgette pour harmoniser la cuisson."
+        },
+        "en": {
+          "titre": "Carrot zucchini skillet",
+          "resume": "A quick, fragrant and generous dish, perfect for tonight.",
+          "ingredients": [
+            "300 g carrots",
+            "250 g courgette",
+            "6 parsley sprigs",
+            "1 tbsp olive oil",
+            "3 tbsp water",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Scrub the carrots and cut into thin half-moons; slice the courgette too.",
+            "Cook the carrots with the oil and water, covered, for 8 min.",
+            "Add the courgette for 10 min, stirring, then the chopped parsley, salt and pepper."
+          ],
+          "astuce": "Cut the carrots thinner than the courgette so they cook evenly."
+        },
+        "es": {
+          "titre": "Salteado de zanahoria y calabacín",
+          "resume": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
+          "ingredients": [
+            "300 g de zanahorias",
+            "250 g de calabacín",
+            "6 ramitas de perejil",
+            "1 cucharada de aceite de oliva",
+            "3 cucharadas de agua",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Cepilla las zanahorias y córtalas en medias rodajas finas; corta también el calabacín.",
+            "Cocina las zanahorias con el aceite y el agua 8 min con tapa.",
+            "Añade el calabacín durante 10 min, removiendo, y termina con el perejil picado, la sal y la pimienta."
+          ],
+          "astuce": "Corta la zanahoria más fina que el calabacín para igualar la cocción."
+        }
+      }
+    },
+    "tomate_ail_thym": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 15,
+        "reposMin": 0
+      },
+      "graines": [
+        "tomate",
+        "ail",
+        "thym"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Tomates confites minute",
+          "resume": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+          "ingredients": [
+            "400 g de tomates cerises",
+            "1 gousse d’ail",
+            "2 brins de thym",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Rince les tomates et coupe-les en deux.",
+            "Chauffe l’huile avec l’ail haché 1 min à feu doux.",
+            "Ajoute les tomates, le thym, le sel et le poivre, puis laisse fondre 14 min à feu doux en remuant délicatement."
+          ],
+          "astuce": "Cette proposition donne des tomates fondantes ; un véritable confit au four demande plus longtemps."
+        },
+        "en": {
+          "titre": "Quick thyme tomatoes",
+          "resume": "Tender, flavorful vegetables with a drizzle of olive oil.",
+          "ingredients": [
+            "400 g cherry tomatoes",
+            "1 garlic clove",
+            "2 thyme sprigs",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Rinse and halve the tomatoes.",
+            "Warm the oil with the chopped garlic over low heat for 1 min.",
+            "Add the tomatoes, thyme, salt and pepper, then cook gently for 14 min, stirring carefully."
+          ],
+          "astuce": "This gives soft pan-cooked tomatoes; a true oven confit takes longer."
+        },
+        "es": {
+          "titre": "Tomates confitados rápidos",
+          "resume": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "400 g de tomates cherry",
+            "1 diente de ajo",
+            "2 ramitas de tomillo",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava los tomates y córtalos por la mitad.",
+            "Calienta el aceite con el ajo picado 1 min a fuego suave.",
+            "Añade los tomates, el tomillo, la sal y la pimienta y cocina suavemente 14 min, removiendo con cuidado."
+          ],
+          "astuce": "Así quedan unos tomates tiernos a la sartén; un confitado de verdad al horno necesita más tiempo."
+        }
+      }
+    },
+    "poivron_courgette_basilic": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 18,
+        "reposMin": 0
+      },
+      "graines": [
+        "poivron",
+        "courgette",
+        "basilic"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Poêlée du soleil",
+          "resume": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+          "ingredients": [
+            "300 g de poivron",
+            "250 g de courgette",
+            "6 feuilles de basilic",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Épépine et émince le poivron ; coupe la courgette en dés.",
+            "Fais revenir le poivron 8 min dans l’huile, puis ajoute la courgette pour 10 min.",
+            "Sale, poivre et ajoute le basilic hors du feu."
+          ],
+          "astuce": "Garde des morceaux de taille régulière pour une cuisson homogène."
+        },
+        "en": {
+          "titre": "Sunny vegetable skillet",
+          "resume": "A quick, fragrant and generous dish, perfect for tonight.",
+          "ingredients": [
+            "300 g pepper",
+            "250 g courgette",
+            "6 basil leaves",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Deseed and slice the pepper; dice the courgette.",
+            "Cook the pepper in the oil for 8 min, then add the courgette for 10 min.",
+            "Season with salt and pepper and add the basil off the heat."
+          ],
+          "astuce": "Cut the vegetables into evenly sized pieces for even cooking."
+        },
+        "es": {
+          "titre": "Salteado soleado",
+          "resume": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
+          "ingredients": [
+            "300 g de pimiento",
+            "250 g de calabacín",
+            "6 hojas de albahaca",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Quita las semillas al pimiento y córtalo en tiras; corta el calabacín en dados.",
+            "Cocina el pimiento en el aceite 8 min y añade el calabacín durante 10 min.",
+            "Salpimienta y añade la albahaca fuera del fuego."
+          ],
+          "astuce": "Corta trozos regulares para que se cocinen por igual."
+        }
+      }
+    },
+    "haricot_carotte_thym": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 35,
+        "reposMin": 0
+      },
+      "graines": [
+        "haricot",
+        "carotte",
+        "thym"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Haricots carottes au thym",
+          "resume": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de haricots verts frais",
+            "200 g de carottes",
+            "2 brins de thym",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Équeute les haricots et cuis-les 30 min à l’eau bouillante ; ajoute les carottes en fines rondelles dans les 12 dernières minutes.",
+            "Égoutte.",
+            "Réchauffe le tout 5 min avec l’huile et le thym, puis sale et poivre."
+          ],
+          "astuce": "L’ajout décalé des carottes évite de trop les cuire."
+        },
+        "en": {
+          "titre": "Thyme beans and carrots",
+          "resume": "Tender, flavorful vegetables with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g fresh green beans",
+            "200 g carrots",
+            "2 thyme sprigs",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Trim the beans and cook in boiling water for 30 min; add the thinly sliced carrots for the final 12 min.",
+            "Drain.",
+            "Warm everything with the oil and thyme for 5 min, then season with salt and pepper."
+          ],
+          "astuce": "Adding the carrots later keeps them from overcooking."
+        },
+        "es": {
+          "titre": "Judías verdes y zanahorias con tomillo",
+          "resume": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de judías verdes frescas",
+            "200 g de zanahorias",
+            "2 ramitas de tomillo",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Despunta las judías y cuécelas 30 min en agua hirviendo; añade las zanahorias en rodajas finas durante los últimos 12 min.",
+            "Escurre.",
+            "Rehoga todo con el aceite y el tomillo 5 min y salpimienta."
+          ],
+          "astuce": "Añadir las zanahorias más tarde evita que se pasen de cocción."
+        }
+      }
+    },
+    "melon_fraise_menthe": {
+      "portions": 2,
+      "usage": "dessert",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 10
+      },
+      "graines": [
+        "melon",
+        "fraise",
+        "menthe"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Melon fraise menthe",
+          "resume": "Un dessert frais, fruité et lumineux avec une touche de miel.",
+          "ingredients": [
+            "250 g de chair de melon",
+            "150 g de fraises",
+            "8 feuilles de menthe",
+            "1 c. à café de miel ou de sucre (facultatif)"
+          ],
+          "etapes": [
+            "Rince le melon avant de l’ouvrir, puis prélève 250 g de chair en dés.",
+            "Rince, sèche et coupe les fraises.",
+            "Mélange avec la menthe ciselée et le miel facultatif, puis laisse 10 min au frais."
+          ],
+          "astuce": "Garde le jus rendu par les fruits pour arroser les coupelles."
+        },
+        "en": {
+          "titre": "Melon strawberry mint",
+          "resume": "A fresh, fruity and bright dessert with a touch of honey.",
+          "ingredients": [
+            "250 g melon flesh",
+            "150 g strawberries",
+            "8 mint leaves",
+            "1 tsp honey or sugar (optional)"
+          ],
+          "etapes": [
+            "Rinse the melon before cutting it open, then dice 250 g of flesh.",
+            "Rinse, dry and cut the strawberries.",
+            "Mix with the sliced mint and optional honey or sugar, then chill for 10 min."
+          ],
+          "astuce": "Keep the fruit juices to spoon over the bowls."
+        },
+        "es": {
+          "titre": "Melón, fresa y menta",
+          "resume": "Un postre fresco, afrutado y lleno de color, con un toque de miel.",
+          "ingredients": [
+            "250 g de pulpa de melón",
+            "150 g de fresas",
+            "8 hojas de menta",
+            "1 cucharadita de miel o azúcar (opcional)"
+          ],
+          "etapes": [
+            "Lava el melón antes de abrirlo y corta 250 g de pulpa en dados.",
+            "Lava, seca y corta las fresas.",
+            "Mezcla con la menta picada y la miel o el azúcar opcional y deja 10 min en la nevera."
+          ],
+          "astuce": "Aprovecha el jugo que suelta la fruta para regar los cuencos."
+        }
+      }
+    },
+    "peche_framboise_basilic": {
+      "portions": 2,
+      "usage": "dessert",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 10
+      },
+      "graines": [
+        "peche",
+        "framboise",
+        "basilic"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Pêche framboise basilic",
+          "resume": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
+          "ingredients": [
+            "2 pêches (environ 250 g de chair)",
+            "125 g de framboises",
+            "6 feuilles de basilic",
+            "1 c. à café de miel ou de sucre (facultatif)"
+          ],
+          "etapes": [
+            "Rince les fruits délicatement et retire les noyaux des pêches.",
+            "Coupe les pêches en quartiers, puis ajoute les framboises et le basilic déchiré.",
+            "Sucre si besoin et laisse 10 min au frais."
+          ],
+          "astuce": "Ajoute les framboises en dernier pour ne pas les écraser."
+        },
+        "en": {
+          "titre": "Peach raspberry basil",
+          "resume": "Just a few minutes make this naturally delicious dessert.",
+          "ingredients": [
+            "2 peaches (about 250 g flesh)",
+            "125 g raspberries",
+            "6 basil leaves",
+            "1 tsp honey or sugar (optional)"
+          ],
+          "etapes": [
+            "Rinse the fruit gently and remove the peach stones.",
+            "Cut the peaches into wedges, then add the raspberries and torn basil.",
+            "Sweeten if needed and chill for 10 min."
+          ],
+          "astuce": "Add the raspberries last so they do not get crushed."
+        },
+        "es": {
+          "titre": "Melocotón, frambuesa y albahaca",
+          "resume": "Solo necesitas unos minutos para este postre delicioso y natural.",
+          "ingredients": [
+            "2 melocotones (unos 250 g de pulpa)",
+            "125 g de frambuesas",
+            "6 hojas de albahaca",
+            "1 cucharadita de miel o azúcar (opcional)"
+          ],
+          "etapes": [
+            "Lava la fruta con cuidado y quita los huesos a los melocotones.",
+            "Corta los melocotones en gajos y añade las frambuesas y la albahaca troceada.",
+            "Endulza si lo necesitas y deja 10 min en la nevera."
+          ],
+          "astuce": "Añade las frambuesas al final para no aplastarlas."
+        }
+      }
+    },
+    "mangue_citron_menthe": {
+      "portions": 2,
+      "usage": "dessert",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 10
+      },
+      "graines": [
+        "mangue",
+        "citron",
+        "menthe"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Mangue citron menthe",
+          "resume": "Un dessert frais, fruité et lumineux avec une touche de miel.",
+          "ingredients": [
+            "300 g de chair de mangue",
+            "1/2 citron",
+            "8 feuilles de menthe",
+            "1 c. à café de miel ou de sucre (facultatif)"
+          ],
+          "etapes": [
+            "Pèle la mangue et coupe la chair autour du noyau en dés.",
+            "Ajoute le jus du demi-citron, la menthe ciselée et le miel facultatif.",
+            "Mélange doucement et laisse 10 min au frais."
+          ],
+          "astuce": "Goûte avant de sucrer : une mangue mûre suffit souvent."
+        },
+        "en": {
+          "titre": "Mango lemon mint",
+          "resume": "A fresh, fruity and bright dessert with a touch of honey.",
+          "ingredients": [
+            "300 g mango flesh",
+            "1/2 lemon",
+            "8 mint leaves",
+            "1 tsp honey or sugar (optional)"
+          ],
+          "etapes": [
+            "Peel the mango, cut the flesh away from the stone and dice it.",
+            "Add the juice of the lemon half, sliced mint and optional honey or sugar.",
+            "Mix gently and chill for 10 min."
+          ],
+          "astuce": "Taste before sweetening: a ripe mango is often sweet enough."
+        },
+        "es": {
+          "titre": "Mango, limón y menta",
+          "resume": "Un postre fresco, afrutado y lleno de color, con un toque de miel.",
+          "ingredients": [
+            "300 g de pulpa de mango",
+            "1/2 limón",
+            "8 hojas de menta",
+            "1 cucharadita de miel o azúcar (opcional)"
+          ],
+          "etapes": [
+            "Pela el mango, separa la pulpa del hueso y córtala en dados.",
+            "Añade el zumo del medio limón, la menta picada y la miel o el azúcar opcional.",
+            "Mezcla con cuidado y deja 10 min en la nevera."
+          ],
+          "astuce": "Prueba antes de endulzar: un mango maduro suele bastar."
+        }
+      }
+    },
+    "ananas_basilic_citron": {
+      "portions": 2,
+      "usage": "dessert",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 10
+      },
+      "graines": [
+        "ananas",
+        "basilic",
+        "citron"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Ananas basilic citron",
+          "resume": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
+          "ingredients": [
+            "300 g de chair d’ananas",
+            "6 feuilles de basilic",
+            "1/2 citron",
+            "1 c. à café de miel ou de sucre (facultatif)"
+          ],
+          "etapes": [
+            "Retire la peau et le cœur dur de l’ananas, puis coupe la chair en dés.",
+            "Mélange avec le jus du demi-citron, le basilic déchiré et le miel facultatif.",
+            "Laisse 10 min au frais."
+          ],
+          "astuce": "Retire bien les petits yeux d’écorce restés dans la chair."
+        },
+        "en": {
+          "titre": "Pineapple basil lemon",
+          "resume": "Just a few minutes make this naturally delicious dessert.",
+          "ingredients": [
+            "300 g pineapple flesh",
+            "6 basil leaves",
+            "1/2 lemon",
+            "1 tsp honey or sugar (optional)"
+          ],
+          "etapes": [
+            "Remove the pineapple skin and hard core, then dice the flesh.",
+            "Mix with the juice of the lemon half, torn basil and optional honey or sugar.",
+            "Chill for 10 min."
+          ],
+          "astuce": "Remove any small pieces of prickly skin left in the flesh."
+        },
+        "es": {
+          "titre": "Piña, albahaca y limón",
+          "resume": "Solo necesitas unos minutos para este postre delicioso y natural.",
+          "ingredients": [
+            "300 g de pulpa de piña",
+            "6 hojas de albahaca",
+            "1/2 limón",
+            "1 cucharadita de miel o azúcar (opcional)"
+          ],
+          "etapes": [
+            "Retira la piel y el centro duro de la piña y corta la pulpa en dados.",
+            "Mezcla con el zumo del medio limón, la albahaca troceada y la miel o el azúcar opcional.",
+            "Deja 10 min en la nevera."
+          ],
+          "astuce": "Retira bien los pequeños ojos de piel que queden en la pulpa."
+        }
+      }
+    },
+    "papaye_framboise_menthe": {
+      "portions": 2,
+      "usage": "dessert",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 10
+      },
+      "graines": [
+        "papaye",
+        "framboise",
+        "menthe"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Papaye framboise menthe",
+          "resume": "Un dessert frais, fruité et lumineux avec une touche de miel.",
+          "ingredients": [
+            "300 g de chair de papaye mûre",
+            "125 g de framboises",
+            "8 feuilles de menthe",
+            "1 c. à café de miel ou de sucre (facultatif)"
+          ],
+          "etapes": [
+            "Pèle la papaye, retire les graines et coupe la chair en dés.",
+            "Rince délicatement les framboises.",
+            "Mélange avec la menthe et le miel facultatif, puis laisse 10 min au frais."
+          ],
+          "astuce": "Choisis une papaye mûre : sa chair doit céder légèrement sous les doigts."
+        },
+        "en": {
+          "titre": "Papaya raspberry mint",
+          "resume": "A fresh, fruity and bright dessert with a touch of honey.",
+          "ingredients": [
+            "300 g ripe papaya flesh",
+            "125 g raspberries",
+            "8 mint leaves",
+            "1 tsp honey or sugar (optional)"
+          ],
+          "etapes": [
+            "Peel the papaya, remove its seeds and dice the flesh.",
+            "Gently rinse the raspberries.",
+            "Mix with the mint and optional honey or sugar, then chill for 10 min."
+          ],
+          "astuce": "Choose a ripe papaya: its flesh should give slightly when pressed."
+        },
+        "es": {
+          "titre": "Papaya, frambuesa y menta",
+          "resume": "Un postre fresco, afrutado y lleno de color, con un toque de miel.",
+          "ingredients": [
+            "300 g de pulpa de papaya madura",
+            "125 g de frambuesas",
+            "8 hojas de menta",
+            "1 cucharadita de miel o azúcar (opcional)"
+          ],
+          "etapes": [
+            "Pela la papaya, quita las semillas y corta la pulpa en dados.",
+            "Lava las frambuesas con cuidado.",
+            "Mezcla con la menta y la miel o el azúcar opcional y deja 10 min en la nevera."
+          ],
+          "astuce": "Elige una papaya madura: debe ceder un poco al tocarla."
+        }
+      }
+    },
+    "fraise_peche_citron": {
+      "portions": 2,
+      "usage": "dessert",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 10
+      },
+      "graines": [
+        "fraise",
+        "peche",
+        "citron"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Fraise pêche citron",
+          "resume": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
+          "ingredients": [
+            "200 g de fraises",
+            "1 pêche",
+            "1/2 citron",
+            "1 c. à café de miel ou de sucre (facultatif)"
+          ],
+          "etapes": [
+            "Rince, sèche et coupe les fraises ; dénoyaute et coupe la pêche.",
+            "Ajoute le jus du demi-citron et le miel facultatif.",
+            "Mélange délicatement et laisse 10 min au frais."
+          ],
+          "astuce": "Commence par un peu de jus de citron, puis ajuste après avoir goûté."
+        },
+        "en": {
+          "titre": "Strawberry peach lemon",
+          "resume": "Just a few minutes make this naturally delicious dessert.",
+          "ingredients": [
+            "200 g strawberries",
+            "1 peach",
+            "1/2 lemon",
+            "1 tsp honey or sugar (optional)"
+          ],
+          "etapes": [
+            "Rinse, dry and cut the strawberries; stone and cut the peach.",
+            "Add the juice of the lemon half and optional honey or sugar.",
+            "Mix gently and chill for 10 min."
+          ],
+          "astuce": "Start with a little lemon juice, then taste and adjust."
+        },
+        "es": {
+          "titre": "Fresa, melocotón y limón",
+          "resume": "Solo necesitas unos minutos para este postre delicioso y natural.",
+          "ingredients": [
+            "200 g de fresas",
+            "1 melocotón",
+            "1/2 limón",
+            "1 cucharadita de miel o azúcar (opcional)"
+          ],
+          "etapes": [
+            "Lava, seca y corta las fresas; quita el hueso al melocotón y córtalo.",
+            "Añade el zumo del medio limón y la miel o el azúcar opcional.",
+            "Mezcla con cuidado y deja 10 min en la nevera."
+          ],
+          "astuce": "Empieza con un poco de zumo de limón, prueba y ajusta."
+        }
+      }
+    },
+    "salade_jardin_citronnee": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "salade",
+        "concombre",
+        "radis",
+        "citron"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Salade du jardin citronnée",
+          "resume": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+          "ingredients": [
+            "100 g de laitue",
+            "150 g de concombre",
+            "100 g de radis",
+            "1/2 citron",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Lave et essore la laitue, rince et tranche le concombre et les radis.",
+            "Mélange le jus du demi-citron avec l’huile, le sel et le poivre.",
+            "Assaisonne les légumes au dernier moment."
+          ],
+          "astuce": "Réserve la sauce à part si tu prépares la salade en avance."
+        },
+        "en": {
+          "titre": "Lemony garden salad",
+          "resume": "A fresh, crunchy starter full of balcony-grown flavor.",
+          "ingredients": [
+            "100 g lettuce",
+            "150 g cucumber",
+            "100 g radishes",
+            "1/2 lemon",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Wash and dry the lettuce, then rinse and slice the cucumber and radishes.",
+            "Mix the juice of the lemon half with the oil, salt and pepper.",
+            "Dress the vegetables at the last moment."
+          ],
+          "astuce": "Keep the dressing separate if preparing the salad ahead."
+        },
+        "es": {
+          "titre": "Ensalada del huerto al limón",
+          "resume": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
+          "ingredients": [
+            "100 g de lechuga",
+            "150 g de pepino",
+            "100 g de rabanitos",
+            "1/2 limón",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava y escurre la lechuga; lava y corta el pepino y los rabanitos.",
+            "Mezcla el zumo del medio limón con el aceite, la sal y la pimienta.",
+            "Aliña las verduras en el último momento."
+          ],
+          "astuce": "Guarda el aliño aparte si preparas la ensalada con antelación."
+        }
+      }
+    },
+    "tomates_fraiches_aux_herbes": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "tomate",
+        "basilic",
+        "persil",
+        "ciboulette"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Tomates fraîches aux herbes",
+          "resume": "Simple, colorée et vive avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de tomates cerises",
+            "4 feuilles de basilic",
+            "4 brins de persil",
+            "6 brins de ciboulette",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Rince et coupe les tomates en deux.",
+            "Lave, sèche et cisèle les herbes.",
+            "Mélange avec l’huile, le sel et le poivre, puis sers aussitôt."
+          ],
+          "astuce": "Sèche les herbes avant de les couper pour éviter qu’elles collent."
+        },
+        "en": {
+          "titre": "Herby cherry tomatoes",
+          "resume": "Simple, colorful and bright with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g cherry tomatoes",
+            "4 basil leaves",
+            "4 parsley sprigs",
+            "6 chive stems",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Rinse and halve the tomatoes.",
+            "Wash, dry and finely chop the herbs.",
+            "Mix with the oil, salt and pepper, then serve straight away."
+          ],
+          "astuce": "Dry the herbs before chopping so they do not stick together."
+        },
+        "es": {
+          "titre": "Tomates frescos con hierbas",
+          "resume": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de tomates cherry",
+            "4 hojas de albahaca",
+            "4 ramitas de perejil",
+            "6 tallos de cebollino",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava los tomates y córtalos por la mitad.",
+            "Lava, seca y pica las hierbas.",
+            "Mezcla con el aceite, la sal y la pimienta y sirve enseguida."
+          ],
+          "astuce": "Seca las hierbas antes de picarlas para que no se peguen."
+        }
+      }
+    },
+    "carottes_poivron_coriandre": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "carotte",
+        "poivron",
+        "coriandre",
+        "citron"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Carottes poivron coriandre",
+          "resume": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+          "ingredients": [
+            "250 g de carottes",
+            "150 g de poivron",
+            "6 brins de coriandre",
+            "1/2 citron",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Brosse et râpe les carottes.",
+            "Épépine et taille le poivron en très fines lanières.",
+            "Ajoute la coriandre hachée, le jus du demi-citron, l’huile, le sel et le poivre."
+          ],
+          "astuce": "Râpe grossièrement la carotte pour équilibrer le croquant du poivron."
+        },
+        "en": {
+          "titre": "Carrot pepper coriander",
+          "resume": "A fresh, crunchy starter full of balcony-grown flavor.",
+          "ingredients": [
+            "250 g carrots",
+            "150 g pepper",
+            "6 coriander sprigs",
+            "1/2 lemon",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Scrub and grate the carrots.",
+            "Deseed the pepper and cut into very thin strips.",
+            "Add the chopped coriander, juice of the lemon half, oil, salt and pepper."
+          ],
+          "astuce": "Coarsely grate the carrots to balance the crunch of the pepper."
+        },
+        "es": {
+          "titre": "Zanahorias, pimiento y cilantro",
+          "resume": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
+          "ingredients": [
+            "250 g de zanahorias",
+            "150 g de pimiento",
+            "6 ramitas de cilantro",
+            "1/2 limón",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Cepilla y ralla las zanahorias.",
+            "Quita las semillas al pimiento y córtalo en tiras muy finas.",
+            "Añade el cilantro picado, el zumo del medio limón, el aceite, la sal y la pimienta."
+          ],
+          "astuce": "Ralla la zanahoria gruesa para equilibrar la textura crujiente del pimiento."
+        }
+      }
+    },
+    "haricots_radis_persil": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 30,
+        "reposMin": 10
+      },
+      "graines": [
+        "haricot",
+        "radis",
+        "persil",
+        "oignon"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Haricots croquants aux radis",
+          "resume": "Simple, colorée et vive avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de haricots verts frais",
+            "100 g de radis",
+            "6 brins de persil",
+            "1 oignon nouveau",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Équeute et cuis les haricots 30 min à l’eau bouillante, puis égoutte et laisse tiédir 10 min.",
+            "Rince et tranche les radis, émince l’oignon et hache le persil.",
+            "Mélange avec les haricots, l’huile, le sel et le poivre."
+          ],
+          "astuce": "Le croquant vient des radis ; les haricots doivent être bien cuits."
+        },
+        "en": {
+          "titre": "Crunchy bean radish salad",
+          "resume": "Simple, colorful and bright with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g fresh green beans",
+            "100 g radishes",
+            "6 parsley sprigs",
+            "1 spring onion",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Trim and cook the beans in boiling water for 30 min, drain and leave to cool for 10 min.",
+            "Rinse and slice the radishes, finely slice the onion and chop the parsley.",
+            "Mix with the beans, oil, salt and pepper."
+          ],
+          "astuce": "The radishes provide the crunch; the beans must be thoroughly cooked."
+        },
+        "es": {
+          "titre": "Judías verdes, rábanos y perejil",
+          "resume": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de judías verdes frescas",
+            "100 g de rabanitos",
+            "6 ramitas de perejil",
+            "1 cebolleta",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Despunta las judías y cuécelas 30 min en agua hirviendo; escurre y deja templar 10 min.",
+            "Lava y corta los rabanitos, corta fina la cebolleta y pica el perejil.",
+            "Mezcla con las judías, el aceite, la sal y la pimienta."
+          ],
+          "astuce": "El toque crujiente lo dan los rabanitos; las judías deben estar bien cocidas."
+        }
+      }
+    },
+    "courgette_concombre_menthe": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "courgette",
+        "concombre",
+        "menthe",
+        "citron"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Duo vert à la menthe",
+          "resume": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+          "ingredients": [
+            "200 g de courgette jeune",
+            "200 g de concombre",
+            "8 feuilles de menthe",
+            "1/2 citron",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Rince la courgette et le concombre, puis taille-les en fines demi-rondelles.",
+            "Cisèle la menthe.",
+            "Mélange avec le jus du demi-citron, l’huile, le sel et le poivre."
+          ],
+          "astuce": "Assaisonne au dernier moment pour limiter l’eau au fond du saladier."
+        },
+        "en": {
+          "titre": "Minted green duo",
+          "resume": "A fresh, crunchy starter full of balcony-grown flavor.",
+          "ingredients": [
+            "200 g young courgette",
+            "200 g cucumber",
+            "8 mint leaves",
+            "1/2 lemon",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Rinse the courgette and cucumber, then cut into thin half-moons.",
+            "Finely slice the mint.",
+            "Mix with the juice of the lemon half, oil, salt and pepper."
+          ],
+          "astuce": "Dress just before serving to limit water collecting in the bowl."
+        },
+        "es": {
+          "titre": "Calabacín, pepino y menta",
+          "resume": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
+          "ingredients": [
+            "200 g de calabacín joven",
+            "200 g de pepino",
+            "8 hojas de menta",
+            "1/2 limón",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava el calabacín y el pepino y córtalos en medias rodajas finas.",
+            "Pica la menta.",
+            "Mezcla con el zumo del medio limón, el aceite, la sal y la pimienta."
+          ],
+          "astuce": "Aliña justo antes de servir para evitar que se acumule agua en el fondo."
+        }
+      }
+    },
+    "epinards_fraise_basilic": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "epinard",
+        "fraise",
+        "basilic",
+        "oignon"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Épinards fraise basilic",
+          "resume": "Simple, colorée et vive avec un filet d'huile d'olive.",
+          "ingredients": [
+            "100 g de jeunes pousses d’épinard",
+            "150 g de fraises",
+            "6 feuilles de basilic",
+            "1 oignon nouveau",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Lave et essore les pousses.",
+            "Rince, sèche et coupe les fraises ; émince l’oignon.",
+            "Mélange avec le basilic déchiré, l’huile, le sel et le poivre."
+          ],
+          "astuce": "Mélange à la main avec douceur pour garder les fraises intactes."
+        },
+        "en": {
+          "titre": "Strawberry basil spinach",
+          "resume": "Simple, colorful and bright with a drizzle of olive oil.",
+          "ingredients": [
+            "100 g baby spinach",
+            "150 g strawberries",
+            "6 basil leaves",
+            "1 spring onion",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Wash and dry the baby spinach.",
+            "Rinse, dry and cut the strawberries; finely slice the onion.",
+            "Mix with the torn basil, oil, salt and pepper."
+          ],
+          "astuce": "Toss gently by hand to keep the strawberries intact."
+        },
+        "es": {
+          "titre": "Espinacas, fresa y albahaca",
+          "resume": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "100 g de espinacas baby",
+            "150 g de fresas",
+            "6 hojas de albahaca",
+            "1 cebolleta",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava y escurre las espinacas baby.",
+            "Lava, seca y corta las fresas; corta fina la cebolleta.",
+            "Mezcla con la albahaca troceada, el aceite, la sal y la pimienta."
+          ],
+          "astuce": "Mezcla con las manos y con cuidado para que las fresas no se deshagan."
+        }
+      }
+    },
+    "salade_peche_radis": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "salade",
+        "peche",
+        "radis",
+        "ciboulette"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Salade pêche radis",
+          "resume": "Une entrée fraîche, croquante et pleine de saveurs du balcon.",
+          "ingredients": [
+            "100 g de laitue",
+            "1 pêche",
+            "100 g de radis",
+            "8 brins de ciboulette",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Lave et essore la laitue.",
+            "Coupe la pêche dénoyautée en quartiers et les radis rincés en rondelles.",
+            "Ajoute la ciboulette ciselée, l’huile, le sel et le poivre."
+          ],
+          "astuce": "Alterne les quartiers de pêche et les radis pour une assiette colorée."
+        },
+        "en": {
+          "titre": "Peach radish salad",
+          "resume": "A fresh, crunchy starter full of balcony-grown flavor.",
+          "ingredients": [
+            "100 g lettuce",
+            "1 peach",
+            "100 g radishes",
+            "8 chive stems",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Wash and dry the lettuce.",
+            "Stone and cut the peach into wedges; rinse and slice the radishes.",
+            "Add the snipped chives, oil, salt and pepper."
+          ],
+          "astuce": "Alternate peach wedges and radishes for a colourful plate."
+        },
+        "es": {
+          "titre": "Ensalada de melocotón y rábanos",
+          "resume": "Un entrante fresco, crujiente y lleno de sabores del balcón.",
+          "ingredients": [
+            "100 g de lechuga",
+            "1 melocotón",
+            "100 g de rabanitos",
+            "8 tallos de cebollino",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava y escurre la lechuga.",
+            "Quita el hueso al melocotón y córtalo en gajos; lava y corta los rabanitos en rodajas.",
+            "Añade el cebollino picado, el aceite, la sal y la pimienta."
+          ],
+          "astuce": "Alterna los gajos de melocotón y los rabanitos para darle color al plato."
+        }
+      }
+    },
+    "tomate_concombre_coriandre": {
+      "portions": 2,
+      "usage": "entree",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 0
+      },
+      "graines": [
+        "tomate",
+        "concombre",
+        "coriandre",
+        "oignon"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Fraîcheur tomate concombre",
+          "resume": "Simple, colorée et vive avec un filet d'huile d'olive.",
+          "ingredients": [
+            "250 g de tomates cerises",
+            "200 g de concombre",
+            "6 brins de coriandre",
+            "1 oignon nouveau",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Rince et coupe les tomates et le concombre en morceaux.",
+            "Émince l’oignon et hache la coriandre.",
+            "Mélange avec l’huile, le sel et le poivre juste avant de servir."
+          ],
+          "astuce": "Des morceaux de taille proche rendent la salade facile à manger."
+        },
+        "en": {
+          "titre": "Tomato cucumber freshness",
+          "resume": "Simple, colorful and bright with a drizzle of olive oil.",
+          "ingredients": [
+            "250 g cherry tomatoes",
+            "200 g cucumber",
+            "6 coriander sprigs",
+            "1 spring onion",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Rinse and chop the tomatoes and cucumber.",
+            "Finely slice the onion and chop the coriander.",
+            "Mix with the oil, salt and pepper just before serving."
+          ],
+          "astuce": "Similarly sized pieces make the salad easy to eat."
+        },
+        "es": {
+          "titre": "Tomate y pepino frescos",
+          "resume": "Sencillo, colorido y lleno de vida, con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "250 g de tomates cherry",
+            "200 g de pepino",
+            "6 ramitas de cilantro",
+            "1 cebolleta",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava y corta los tomates y el pepino.",
+            "Corta fina la cebolleta y pica el cilantro.",
+            "Mezcla con el aceite, la sal y la pimienta justo antes de servir."
+          ],
+          "astuce": "Los trozos de tamaño parecido hacen que la ensalada sea fácil de comer."
+        }
+      }
+    },
+    "ratatouille_du_balcon": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 30,
+        "reposMin": 0
+      },
+      "graines": [
+        "tomate",
+        "courgette",
+        "poivron",
+        "ail"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Ratatouille du balcon",
+          "resume": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+          "ingredients": [
+            "300 g de tomates cerises",
+            "250 g de courgette",
+            "200 g de poivron",
+            "1 gousse d’ail",
+            "1 c. à soupe d’huile d’olive",
+            "1 à 2 c. à soupe d’eau si besoin",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Rince et coupe les légumes en dés, en retirant les graines du poivron ; hache l’ail.",
+            "Fais revenir le poivron et la courgette 8 min dans l’huile.",
+            "Ajoute les tomates et l’ail, sale et poivre, puis laisse mijoter 22 min à feu doux, partiellement couvert."
+          ],
+          "astuce": "Si les légumes accrochent, ajoute l’eau prévue, une cuillerée à la fois."
+        },
+        "en": {
+          "titre": "Balcony ratatouille",
+          "resume": "A quick, fragrant and generous dish, perfect for tonight.",
+          "ingredients": [
+            "300 g cherry tomatoes",
+            "250 g courgette",
+            "200 g pepper",
+            "1 garlic clove",
+            "1 tbsp olive oil",
+            "1 to 2 tbsp water if needed",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Rinse and dice the vegetables, removing the pepper seeds; chop the garlic.",
+            "Cook the pepper and courgette in the oil for 8 min.",
+            "Add the tomatoes and garlic, season with salt and pepper, then simmer gently for 22 min, partly covered."
+          ],
+          "astuce": "If the vegetables stick, add the measured water one spoonful at a time."
+        },
+        "es": {
+          "titre": "Ratatouille del balcón",
+          "resume": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
+          "ingredients": [
+            "300 g de tomates cherry",
+            "250 g de calabacín",
+            "200 g de pimiento",
+            "1 diente de ajo",
+            "1 cucharada de aceite de oliva",
+            "1 a 2 cucharadas de agua si hace falta",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava las verduras y córtalas en dados, quitando las semillas al pimiento; pica el ajo.",
+            "Rehoga el pimiento y el calabacín en el aceite 8 min.",
+            "Añade los tomates y el ajo, salpimienta y cocina 22 min a fuego suave con la tapa entreabierta."
+          ],
+          "astuce": "Si las verduras se pegan, añade el agua prevista de cucharada en cucharada."
+        }
+      }
+    },
+    "haricots_carottes_persilles": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 35,
+        "reposMin": 0
+      },
+      "graines": [
+        "haricot",
+        "carotte",
+        "persil",
+        "ail"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Haricots carottes persillés",
+          "resume": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de haricots verts frais",
+            "200 g de carottes",
+            "6 brins de persil",
+            "1 gousse d’ail",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Équeute et cuis les haricots 30 min à l’eau bouillante ; ajoute les carottes en fines rondelles pour les 12 dernières minutes.",
+            "Égoutte.",
+            "Chauffe l’ail haché 1 min dans l’huile, ajoute les légumes pour 4 min, puis le persil, le sel et le poivre."
+          ],
+          "astuce": "Ajoute le persil après avoir coupé le feu."
+        },
+        "en": {
+          "titre": "Parsley beans and carrots",
+          "resume": "Tender, flavorful vegetables with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g fresh green beans",
+            "200 g carrots",
+            "6 parsley sprigs",
+            "1 garlic clove",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Trim and cook the beans in boiling water for 30 min; add the thinly sliced carrots for the last 12 min. Drain.",
+            "Warm the chopped garlic in the oil for 1 min, then add the vegetables for 4 min.",
+            "Finish with the parsley, salt and pepper."
+          ],
+          "astuce": "Add the parsley after turning off the heat."
+        },
+        "es": {
+          "titre": "Judías verdes y zanahorias con perejil",
+          "resume": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de judías verdes frescas",
+            "200 g de zanahorias",
+            "6 ramitas de perejil",
+            "1 diente de ajo",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Despunta las judías y cuécelas 30 min en agua hirviendo; añade las zanahorias en rodajas finas durante los últimos 12 min. Escurre.",
+            "Calienta el ajo picado en el aceite 1 min y añade las verduras durante 4 min.",
+            "Termina con el perejil, la sal y la pimienta."
+          ],
+          "astuce": "Añade el perejil después de apagar el fuego."
+        }
+      }
+    },
+    "epinards_courgette_thym": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 15,
+        "reposMin": 0
+      },
+      "graines": [
+        "epinard",
+        "courgette",
+        "thym",
+        "ail"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Épinards courgette thym",
+          "resume": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+          "ingredients": [
+            "300 g d’épinards frais",
+            "250 g de courgette",
+            "2 brins de thym",
+            "1 gousse d’ail",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Lave et égoutte les épinards ; coupe la courgette en dés et hache l’ail.",
+            "Fais dorer la courgette 8 min dans l’huile.",
+            "Ajoute ail, thym et épinards pour 7 min en remuant, puis sale et poivre."
+          ],
+          "astuce": "Ajoute les épinards par poignées pour faciliter le mélange."
+        },
+        "en": {
+          "titre": "Spinach zucchini thyme",
+          "resume": "A quick, fragrant and generous dish, perfect for tonight.",
+          "ingredients": [
+            "300 g fresh spinach",
+            "250 g courgette",
+            "2 thyme sprigs",
+            "1 garlic clove",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Wash and drain the spinach; dice the courgette and chop the garlic.",
+            "Brown the courgette in the oil for 8 min.",
+            "Add the garlic, thyme and spinach for 7 min, stirring, then season with salt and pepper."
+          ],
+          "astuce": "Add the spinach in batches to make mixing easier."
+        },
+        "es": {
+          "titre": "Espinacas, calabacín y tomillo",
+          "resume": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
+          "ingredients": [
+            "300 g de espinacas frescas",
+            "250 g de calabacín",
+            "2 ramitas de tomillo",
+            "1 diente de ajo",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava y escurre las espinacas; corta el calabacín en dados y pica el ajo.",
+            "Dora el calabacín en el aceite 8 min.",
+            "Añade el ajo, el tomillo y las espinacas durante 7 min, removiendo, y salpimienta."
+          ],
+          "astuce": "Añade las espinacas por tandas para que sea más fácil mezclar."
+        }
+      }
+    },
+    "poivrons_tomates_coriandre": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 25,
+        "reposMin": 0
+      },
+      "graines": [
+        "poivron",
+        "tomate",
+        "coriandre",
+        "oignon"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Poivrons fondants coriandre",
+          "resume": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de poivron",
+            "200 g de tomates cerises",
+            "6 brins de coriandre",
+            "2 oignons nouveaux",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Épépine et émince le poivron, coupe les tomates et les oignons.",
+            "Fais revenir les oignons et le poivron 8 min dans l’huile.",
+            "Ajoute les tomates et cuis à couvert 17 min à feu doux ; termine avec la coriandre hachée, le sel et le poivre."
+          ],
+          "astuce": "Le poivron doit se plier facilement quand il est fondant."
+        },
+        "en": {
+          "titre": "Tender coriander peppers",
+          "resume": "Tender, flavorful vegetables with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g pepper",
+            "200 g cherry tomatoes",
+            "6 coriander sprigs",
+            "2 spring onions",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Deseed and slice the pepper, then cut the tomatoes and onions.",
+            "Cook the onions and pepper in the oil for 8 min.",
+            "Add the tomatoes and cook gently, covered, for 17 min; finish with the chopped coriander, salt and pepper."
+          ],
+          "astuce": "The pepper should bend easily when it is tender."
+        },
+        "es": {
+          "titre": "Pimientos tiernos con cilantro",
+          "resume": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de pimiento",
+            "200 g de tomates cherry",
+            "6 ramitas de cilantro",
+            "2 cebolletas",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Quita las semillas al pimiento y córtalo en tiras; corta los tomates y las cebolletas.",
+            "Sofríe las cebolletas y el pimiento en el aceite 8 min.",
+            "Añade los tomates y cocina con tapa 17 min a fuego suave; termina con el cilantro picado, la sal y la pimienta."
+          ],
+          "astuce": "El pimiento debe doblarse fácilmente cuando esté tierno."
+        }
+      }
+    },
+    "carottes_courgettes_thym": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 20,
+        "reposMin": 0
+      },
+      "graines": [
+        "carotte",
+        "courgette",
+        "thym",
+        "oignon"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Carottes courgettes au thym",
+          "resume": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+          "ingredients": [
+            "300 g de carottes",
+            "250 g de courgette",
+            "2 brins de thym",
+            "2 oignons nouveaux",
+            "1 c. à soupe d’huile d’olive",
+            "3 c. à soupe d’eau",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Brosse et tranche finement les carottes ; coupe la courgette et les oignons.",
+            "Fais revenir les oignons 2 min dans l’huile.",
+            "Ajoute les carottes, le thym et l’eau pour 8 min à couvert, puis la courgette pour 10 min ; sale et poivre."
+          ],
+          "astuce": "Découvre en fin de cuisson pour évaporer l’eau restante."
+        },
+        "en": {
+          "titre": "Thyme carrots and zucchini",
+          "resume": "A quick, fragrant and generous dish, perfect for tonight.",
+          "ingredients": [
+            "300 g carrots",
+            "250 g courgette",
+            "2 thyme sprigs",
+            "2 spring onions",
+            "1 tbsp olive oil",
+            "3 tbsp water",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Scrub and thinly slice the carrots; cut the courgette and onions.",
+            "Cook the onions in the oil for 2 min.",
+            "Add the carrots, thyme and water for 8 min, covered, then the courgette for 10 min. Season with salt and pepper."
+          ],
+          "astuce": "Uncover towards the end to evaporate any remaining water."
+        },
+        "es": {
+          "titre": "Zanahorias y calabacines con tomillo",
+          "resume": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
+          "ingredients": [
+            "300 g de zanahorias",
+            "250 g de calabacín",
+            "2 ramitas de tomillo",
+            "2 cebolletas",
+            "1 cucharada de aceite de oliva",
+            "3 cucharadas de agua",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Cepilla y corta finas las zanahorias; corta el calabacín y las cebolletas.",
+            "Sofríe las cebolletas en el aceite 2 min.",
+            "Añade las zanahorias, el tomillo y el agua durante 8 min con tapa; después añade el calabacín durante 10 min. Salpimienta."
+          ],
+          "astuce": "Destapa al final para evaporar el agua que quede."
+        }
+      }
+    },
+    "haricots_tomates_basilic": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 40,
+        "reposMin": 0
+      },
+      "graines": [
+        "haricot",
+        "tomate",
+        "basilic",
+        "ail"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Haricots tomate basilic",
+          "resume": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de haricots verts frais",
+            "200 g de tomates cerises",
+            "6 feuilles de basilic",
+            "1 gousse d’ail",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Équeute et cuis les haricots 30 min à l’eau bouillante, puis égoutte.",
+            "Chauffe l’ail haché 1 min dans l’huile, puis ajoute les tomates coupées pour 7 min.",
+            "Ajoute les haricots pour 2 min et termine avec le basilic, le sel et le poivre."
+          ],
+          "astuce": "Déchire le basilic au dernier moment."
+        },
+        "en": {
+          "titre": "Tomato basil beans",
+          "resume": "Tender, flavorful vegetables with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g fresh green beans",
+            "200 g cherry tomatoes",
+            "6 basil leaves",
+            "1 garlic clove",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Trim and cook the beans in boiling water for 30 min, then drain.",
+            "Warm the chopped garlic in the oil for 1 min, then add the cut tomatoes for 7 min.",
+            "Add the beans for 2 min and finish with the basil, salt and pepper."
+          ],
+          "astuce": "Tear the basil just before serving."
+        },
+        "es": {
+          "titre": "Judías verdes, tomate y albahaca",
+          "resume": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de judías verdes frescas",
+            "200 g de tomates cherry",
+            "6 hojas de albahaca",
+            "1 diente de ajo",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Despunta las judías y cuécelas 30 min en agua hirviendo; después escurre.",
+            "Calienta el ajo picado en el aceite 1 min y añade los tomates cortados durante 7 min.",
+            "Añade las judías durante 2 min y termina con la albahaca, la sal y la pimienta."
+          ],
+          "astuce": "Trocea la albahaca con las manos en el último momento."
+        }
+      }
+    },
+    "epinards_poivron_ciboulette": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 18,
+        "reposMin": 0
+      },
+      "graines": [
+        "epinard",
+        "poivron",
+        "ciboulette",
+        "ail"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Épinards poivron ciboulette",
+          "resume": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+          "ingredients": [
+            "300 g d’épinards frais",
+            "200 g de poivron",
+            "8 brins de ciboulette",
+            "1 gousse d’ail",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Lave et égoutte les épinards ; épépine et émince le poivron, puis hache l’ail.",
+            "Cuis le poivron 10 min dans l’huile.",
+            "Ajoute l’ail pour 1 min, puis les épinards pour 7 min ; sale, poivre et parsème de ciboulette."
+          ],
+          "astuce": "Garde la ciboulette pour le service afin de préserver son goût."
+        },
+        "en": {
+          "titre": "Spinach pepper chives",
+          "resume": "A quick, fragrant and generous dish, perfect for tonight.",
+          "ingredients": [
+            "300 g fresh spinach",
+            "200 g pepper",
+            "8 chive stems",
+            "1 garlic clove",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Wash and drain the spinach; deseed and slice the pepper, then chop the garlic.",
+            "Cook the pepper in the oil for 10 min.",
+            "Add the garlic for 1 min, then the spinach for 7 min; season with salt and pepper and scatter over the chives."
+          ],
+          "astuce": "Keep the chives for serving to preserve their flavour."
+        },
+        "es": {
+          "titre": "Espinacas, pimiento y cebollino",
+          "resume": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
+          "ingredients": [
+            "300 g de espinacas frescas",
+            "200 g de pimiento",
+            "8 tallos de cebollino",
+            "1 diente de ajo",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava y escurre las espinacas; quita las semillas al pimiento y córtalo en tiras, y pica el ajo.",
+            "Cocina el pimiento en el aceite 10 min.",
+            "Añade el ajo durante 1 min y las espinacas durante 7 min; salpimienta y espolvorea el cebollino."
+          ],
+          "astuce": "Reserva el cebollino para el momento de servir y conservarás su sabor."
+        }
+      }
+    },
+    "courgette_oignon_persil": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 15,
+        "reposMin": 0
+      },
+      "graines": [
+        "courgette",
+        "oignon",
+        "persil",
+        "citron"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Courgette persillée citron",
+          "resume": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+          "ingredients": [
+            "400 g de courgette",
+            "2 oignons nouveaux",
+            "6 brins de persil",
+            "1/2 citron",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Coupe la courgette en demi-rondelles et émince les oignons.",
+            "Fais revenir les oignons 3 min dans l’huile, puis ajoute la courgette pour 12 min.",
+            "Termine hors du feu avec le persil haché, le jus du demi-citron, le sel et le poivre."
+          ],
+          "astuce": "Ajoute le citron petit à petit et goûte."
+        },
+        "en": {
+          "titre": "Lemony parsley zucchini",
+          "resume": "Tender, flavorful vegetables with a drizzle of olive oil.",
+          "ingredients": [
+            "400 g courgette",
+            "2 spring onions",
+            "6 parsley sprigs",
+            "1/2 lemon",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Cut the courgette into half-moons and finely slice the onions.",
+            "Cook the onions in the oil for 3 min, then add the courgette for 12 min.",
+            "Off the heat, add the chopped parsley, juice of the lemon half, salt and pepper."
+          ],
+          "astuce": "Add lemon juice a little at a time and taste."
+        },
+        "es": {
+          "titre": "Calabacín con perejil y limón",
+          "resume": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "400 g de calabacín",
+            "2 cebolletas",
+            "6 ramitas de perejil",
+            "1/2 limón",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Corta el calabacín en medias rodajas y las cebolletas finas.",
+            "Sofríe las cebolletas en el aceite 3 min y añade el calabacín durante 12 min.",
+            "Fuera del fuego, añade el perejil picado, el zumo del medio limón, la sal y la pimienta."
+          ],
+          "astuce": "Añade el limón poco a poco y prueba."
+        }
+      }
+    },
+    "carotte_epinard_coriandre": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 20,
+        "reposMin": 0
+      },
+      "graines": [
+        "carotte",
+        "epinard",
+        "coriandre",
+        "ail"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Carotte épinard coriandre",
+          "resume": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+          "ingredients": [
+            "300 g de carottes",
+            "200 g d’épinards frais",
+            "6 brins de coriandre",
+            "1 gousse d’ail",
+            "1 c. à soupe d’huile d’olive",
+            "3 c. à soupe d’eau",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Brosse et coupe finement les carottes ; lave et égoutte les épinards, puis hache l’ail.",
+            "Cuis les carottes avec l’huile et l’eau 12 min à couvert.",
+            "Ajoute l’ail 1 min puis les épinards 7 min ; termine avec la coriandre, le sel et le poivre."
+          ],
+          "astuce": "Les carottes doivent être presque tendres avant d’ajouter les épinards."
+        },
+        "en": {
+          "titre": "Carrot spinach coriander",
+          "resume": "A quick, fragrant and generous dish, perfect for tonight.",
+          "ingredients": [
+            "300 g carrots",
+            "200 g fresh spinach",
+            "6 coriander sprigs",
+            "1 garlic clove",
+            "1 tbsp olive oil",
+            "3 tbsp water",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Scrub and thinly slice the carrots; wash and drain the spinach and chop the garlic.",
+            "Cook the carrots with the oil and water, covered, for 12 min.",
+            "Add the garlic for 1 min, then the spinach for 7 min; finish with the coriander, salt and pepper."
+          ],
+          "astuce": "The carrots should be almost tender before you add the spinach."
+        },
+        "es": {
+          "titre": "Zanahoria, espinacas y cilantro",
+          "resume": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
+          "ingredients": [
+            "300 g de zanahorias",
+            "200 g de espinacas frescas",
+            "6 ramitas de cilantro",
+            "1 diente de ajo",
+            "1 cucharada de aceite de oliva",
+            "3 cucharadas de agua",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Cepilla y corta finas las zanahorias; lava y escurre las espinacas y pica el ajo.",
+            "Cocina las zanahorias con el aceite y el agua 12 min con tapa.",
+            "Añade el ajo durante 1 min y las espinacas durante 7 min; termina con el cilantro, la sal y la pimienta."
+          ],
+          "astuce": "Las zanahorias deben estar casi tiernas antes de añadir las espinacas."
+        }
+      }
+    },
+    "haricot_courgette_thym": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 45,
+        "reposMin": 0
+      },
+      "graines": [
+        "haricot",
+        "courgette",
+        "thym",
+        "oignon"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Haricot courgette thym",
+          "resume": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de haricots verts frais",
+            "250 g de courgette",
+            "2 brins de thym",
+            "2 oignons nouveaux",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Équeute et cuis les haricots 30 min à l’eau bouillante, puis égoutte.",
+            "Fais revenir les oignons émincés 3 min dans l’huile, puis la courgette en dés et le thym 10 min.",
+            "Ajoute les haricots pour 2 min, sale et poivre."
+          ],
+          "astuce": "Avec des haricots déjà cuits, compte seulement 15 min de cuisson à la poêle."
+        },
+        "en": {
+          "titre": "Green bean zucchini thyme",
+          "resume": "Tender, flavorful vegetables with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g fresh green beans",
+            "250 g courgette",
+            "2 thyme sprigs",
+            "2 spring onions",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Trim and cook the beans in boiling water for 30 min, then drain.",
+            "Cook the sliced onions in the oil for 3 min, then the diced courgette and thyme for 10 min.",
+            "Add the beans for 2 min, then season with salt and pepper."
+          ],
+          "astuce": "With ready-cooked beans, only the 15 min of pan cooking is needed."
+        },
+        "es": {
+          "titre": "Judías verdes, calabacín y tomillo",
+          "resume": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de judías verdes frescas",
+            "250 g de calabacín",
+            "2 ramitas de tomillo",
+            "2 cebolletas",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Despunta las judías y cuécelas 30 min en agua hirviendo; después escurre.",
+            "Sofríe las cebolletas cortadas en el aceite 3 min y añade el calabacín en dados y el tomillo durante 10 min.",
+            "Añade las judías durante 2 min y salpimienta."
+          ],
+          "astuce": "Con judías ya cocidas, solo necesitas los 15 min de cocción en la sartén."
+        }
+      }
+    },
+    "poivron_carotte_persil": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 23,
+        "reposMin": 0
+      },
+      "graines": [
+        "poivron",
+        "carotte",
+        "persil",
+        "ail"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Poivron carotte persil",
+          "resume": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+          "ingredients": [
+            "250 g de poivron",
+            "300 g de carottes",
+            "6 brins de persil",
+            "1 gousse d’ail",
+            "1 c. à soupe d’huile d’olive",
+            "4 c. à soupe d’eau",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Brosse et coupe les carottes en fines rondelles ; épépine et émince le poivron.",
+            "Cuis les carottes avec l’huile et l’eau 10 min à couvert.",
+            "Ajoute le poivron pour 12 min, puis l’ail haché pour 1 min ; termine avec le persil, le sel et le poivre."
+          ],
+          "astuce": "Remets une cuillerée d’eau si la poêle sèche avant que les carottes soient tendres."
+        },
+        "en": {
+          "titre": "Pepper carrot parsley",
+          "resume": "A quick, fragrant and generous dish, perfect for tonight.",
+          "ingredients": [
+            "250 g pepper",
+            "300 g carrots",
+            "6 parsley sprigs",
+            "1 garlic clove",
+            "1 tbsp olive oil",
+            "4 tbsp water",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Scrub and thinly slice the carrots; deseed and slice the pepper.",
+            "Cook the carrots with the oil and water, covered, for 10 min.",
+            "Add the pepper for 12 min, then the chopped garlic for 1 min; finish with the parsley, salt and pepper."
+          ],
+          "astuce": "Add a spoonful of water if the pan dries before the carrots are tender."
+        },
+        "es": {
+          "titre": "Pimiento, zanahoria y perejil",
+          "resume": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
+          "ingredients": [
+            "250 g de pimiento",
+            "300 g de zanahorias",
+            "6 ramitas de perejil",
+            "1 diente de ajo",
+            "1 cucharada de aceite de oliva",
+            "4 cucharadas de agua",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Cepilla y corta las zanahorias en rodajas finas; quita las semillas al pimiento y córtalo en tiras.",
+            "Cocina las zanahorias con el aceite y el agua 10 min con tapa.",
+            "Añade el pimiento durante 12 min y el ajo picado durante 1 min; termina con el perejil, la sal y la pimienta."
+          ],
+          "astuce": "Añade una cucharada de agua si la sartén se seca antes de que las zanahorias estén tiernas."
+        }
+      }
+    },
+    "tomate_epinard_ciboulette": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 16,
+        "reposMin": 0
+      },
+      "graines": [
+        "tomate",
+        "epinard",
+        "ciboulette",
+        "oignon"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Tomate épinard ciboulette",
+          "resume": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de tomates cerises",
+            "250 g d’épinards frais",
+            "8 brins de ciboulette",
+            "2 oignons nouveaux",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Lave et égoutte les épinards, coupe les tomates et émince les oignons.",
+            "Fais revenir les oignons 3 min dans l’huile, puis les tomates 6 min.",
+            "Ajoute les épinards pour 7 min et termine avec la ciboulette, le sel et le poivre."
+          ],
+          "astuce": "Laisse évaporer le jus quelques instants avant de servir si besoin."
+        },
+        "en": {
+          "titre": "Tomato spinach chives",
+          "resume": "Tender, flavorful vegetables with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g cherry tomatoes",
+            "250 g fresh spinach",
+            "8 chive stems",
+            "2 spring onions",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Wash and drain the spinach, cut the tomatoes and slice the onions.",
+            "Cook the onions in the oil for 3 min, then the tomatoes for 6 min.",
+            "Add the spinach for 7 min and finish with the chives, salt and pepper."
+          ],
+          "astuce": "Let excess liquid evaporate briefly before serving if needed."
+        },
+        "es": {
+          "titre": "Tomate, espinacas y cebollino",
+          "resume": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de tomates cherry",
+            "250 g de espinacas frescas",
+            "8 tallos de cebollino",
+            "2 cebolletas",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Lava y escurre las espinacas, corta los tomates y las cebolletas.",
+            "Sofríe las cebolletas en el aceite 3 min y añade los tomates durante 6 min.",
+            "Añade las espinacas durante 7 min y termina con el cebollino, la sal y la pimienta."
+          ],
+          "astuce": "Deja evaporar un poco el jugo antes de servir si hace falta."
+        }
+      }
+    },
+    "courgette_poivron_thym": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 10,
+        "cuissonMin": 19,
+        "reposMin": 0
+      },
+      "graines": [
+        "courgette",
+        "poivron",
+        "thym",
+        "ail"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Courgette poivron thym",
+          "resume": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+          "ingredients": [
+            "300 g de courgette",
+            "200 g de poivron",
+            "2 brins de thym",
+            "1 gousse d’ail",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Épépine et taille le poivron en lanières ; coupe la courgette en dés.",
+            "Cuis le poivron 8 min dans l’huile puis ajoute la courgette et le thym pour 10 min.",
+            "Ajoute l’ail haché 1 min avant la fin, sale et poivre."
+          ],
+          "astuce": "L’ail ajouté en fin de cuisson risque moins de brûler."
+        },
+        "en": {
+          "titre": "Zucchini pepper thyme",
+          "resume": "A quick, fragrant and generous dish, perfect for tonight.",
+          "ingredients": [
+            "300 g courgette",
+            "200 g pepper",
+            "2 thyme sprigs",
+            "1 garlic clove",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Deseed the pepper and cut into strips; dice the courgette.",
+            "Cook the pepper in the oil for 8 min, then add the courgette and thyme for 10 min.",
+            "Add the chopped garlic for the final 1 min and season with salt and pepper."
+          ],
+          "astuce": "Adding garlic near the end makes it less likely to burn."
+        },
+        "es": {
+          "titre": "Calabacín, pimiento y tomillo",
+          "resume": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
+          "ingredients": [
+            "300 g de calabacín",
+            "200 g de pimiento",
+            "2 ramitas de tomillo",
+            "1 diente de ajo",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Quita las semillas al pimiento y córtalo en tiras; corta el calabacín en dados.",
+            "Cocina el pimiento en el aceite 8 min y añade el calabacín y el tomillo durante 10 min.",
+            "Añade el ajo picado durante el último 1 min y salpimienta."
+          ],
+          "astuce": "Añadir el ajo al final reduce el riesgo de que se queme."
+        }
+      }
+    },
+    "haricots_epinards_citron": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 39,
+        "reposMin": 0
+      },
+      "graines": [
+        "haricot",
+        "epinard",
+        "citron",
+        "persil"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Haricots épinards citron",
+          "resume": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de haricots verts frais",
+            "200 g d’épinards frais",
+            "1/2 citron",
+            "6 brins de persil",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Équeute et cuis les haricots 30 min à l’eau bouillante, puis égoutte.",
+            "Lave les épinards et fais-les tomber 7 min dans l’huile.",
+            "Ajoute les haricots pour 2 min, puis le citron pressé, le persil haché, le sel et le poivre."
+          ],
+          "astuce": "Égoutte bien les épinards lavés pour éviter une poêlée trop aqueuse."
+        },
+        "en": {
+          "titre": "Lemon beans and spinach",
+          "resume": "Tender, flavorful vegetables with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g fresh green beans",
+            "200 g fresh spinach",
+            "1/2 lemon",
+            "6 parsley sprigs",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Trim and cook the beans in boiling water for 30 min, then drain.",
+            "Wash the spinach and cook it in the oil for 7 min until wilted.",
+            "Add the beans for 2 min, then the lemon juice, chopped parsley, salt and pepper."
+          ],
+          "astuce": "Drain the washed spinach well to avoid a watery dish."
+        },
+        "es": {
+          "titre": "Judías verdes, espinacas y limón",
+          "resume": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de judías verdes frescas",
+            "200 g de espinacas frescas",
+            "1/2 limón",
+            "6 ramitas de perejil",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Despunta las judías y cuécelas 30 min en agua hirviendo; después escurre.",
+            "Lava las espinacas y cocínalas en el aceite 7 min hasta que bajen de volumen.",
+            "Añade las judías durante 2 min y termina con el zumo de limón, el perejil picado, la sal y la pimienta."
+          ],
+          "astuce": "Escurre bien las espinacas lavadas para que el plato no quede aguado."
+        }
+      }
+    },
+    "carottes_tomates_ciboulette": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 21,
+        "reposMin": 0
+      },
+      "graines": [
+        "carotte",
+        "tomate",
+        "ciboulette",
+        "ail"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Carottes tomates ciboulette",
+          "resume": "Un plat rapide, parfumé et généreux, parfait pour ce soir.",
+          "ingredients": [
+            "300 g de carottes",
+            "200 g de tomates cerises",
+            "8 brins de ciboulette",
+            "1 gousse d’ail",
+            "1 c. à soupe d’huile d’olive",
+            "3 c. à soupe d’eau",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Brosse et tranche finement les carottes, puis coupe les tomates.",
+            "Cuis les carottes avec l’huile et l’eau 12 min à couvert.",
+            "Ajoute l’ail haché 1 min puis les tomates 8 min ; termine avec la ciboulette, le sel et le poivre."
+          ],
+          "astuce": "Garde les tomates pour la deuxième partie de cuisson afin de conserver quelques morceaux."
+        },
+        "en": {
+          "titre": "Carrot tomato chives",
+          "resume": "A quick, fragrant and generous dish, perfect for tonight.",
+          "ingredients": [
+            "300 g carrots",
+            "200 g cherry tomatoes",
+            "8 chive stems",
+            "1 garlic clove",
+            "1 tbsp olive oil",
+            "3 tbsp water",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Scrub and thinly slice the carrots, then cut the tomatoes.",
+            "Cook the carrots with the oil and water, covered, for 12 min.",
+            "Add the chopped garlic for 1 min, then the tomatoes for 8 min; finish with the chives, salt and pepper."
+          ],
+          "astuce": "Add the tomatoes in the second part of cooking to keep some pieces intact."
+        },
+        "es": {
+          "titre": "Zanahorias, tomates y cebollino",
+          "resume": "Un plato rápido, aromático y abundante, perfecto para esta noche.",
+          "ingredients": [
+            "300 g de zanahorias",
+            "200 g de tomates cherry",
+            "8 tallos de cebollino",
+            "1 diente de ajo",
+            "1 cucharada de aceite de oliva",
+            "3 cucharadas de agua",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Cepilla y corta finas las zanahorias y corta los tomates.",
+            "Cocina las zanahorias con el aceite y el agua 12 min con tapa.",
+            "Añade el ajo picado durante 1 min y los tomates durante 8 min; termina con el cebollino, la sal y la pimienta."
+          ],
+          "astuce": "Añade los tomates en la segunda parte de la cocción para conservar algunos trozos."
+        }
+      }
+    },
+    "poelee_quatre_du_jardin": {
+      "portions": 2,
+      "usage": "accompagnement",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 50,
+        "reposMin": 0
+      },
+      "graines": [
+        "courgette",
+        "haricot",
+        "poivron",
+        "oignon"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Poêlée quatre du jardin",
+          "resume": "Des légumes tendres et savoureux avec un filet d'huile d'olive.",
+          "ingredients": [
+            "300 g de courgette",
+            "200 g de haricots verts frais",
+            "200 g de poivron",
+            "2 oignons nouveaux",
+            "1 c. à soupe d’huile d’olive",
+            "1 petite pincée de sel",
+            "poivre"
+          ],
+          "etapes": [
+            "Équeute et cuis les haricots 30 min à l’eau bouillante, puis égoutte.",
+            "Émince les oignons et le poivron épépiné, coupe la courgette en dés.",
+            "Fais revenir oignons et poivron 8 min dans l’huile, ajoute la courgette 10 min, puis les haricots 2 min ; sale et poivre."
+          ],
+          "astuce": "Une sauteuse large accueille mieux les quatre légumes."
+        },
+        "en": {
+          "titre": "Four-garden skillet",
+          "resume": "Tender, flavorful vegetables with a drizzle of olive oil.",
+          "ingredients": [
+            "300 g courgette",
+            "200 g fresh green beans",
+            "200 g pepper",
+            "2 spring onions",
+            "1 tbsp olive oil",
+            "1 small pinch of salt",
+            "1 turn of the pepper mill, to taste"
+          ],
+          "etapes": [
+            "Trim and cook the beans in boiling water for 30 min, then drain.",
+            "Slice the onions and deseeded pepper; dice the courgette.",
+            "Cook the onions and pepper in the oil for 8 min, add the courgette for 10 min, then the beans for 2 min; season with salt and pepper."
+          ],
+          "astuce": "A wide sauté pan gives the four vegetables more room."
+        },
+        "es": {
+          "titre": "Salteado de cuatro verduras del huerto",
+          "resume": "Verduras tiernas y sabrosas con un chorrito de aceite de oliva.",
+          "ingredients": [
+            "300 g de calabacín",
+            "200 g de judías verdes frescas",
+            "200 g de pimiento",
+            "2 cebolletas",
+            "1 cucharada de aceite de oliva",
+            "1 pizca pequeña de sal",
+            "1 vuelta de molinillo de pimienta, al gusto"
+          ],
+          "etapes": [
+            "Despunta las judías y cuécelas 30 min en agua hirviendo; después escurre.",
+            "Corta las cebolletas y el pimiento sin semillas en tiras y el calabacín en dados.",
+            "Sofríe las cebolletas y el pimiento en el aceite 8 min, añade el calabacín durante 10 min y las judías durante 2 min; salpimienta."
+          ],
+          "astuce": "Una sartén amplia deja más espacio para las cuatro verduras."
+        }
+      }
+    },
+    "salade_tropicale_menthee": {
+      "portions": 2,
+      "usage": "dessert",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 10
+      },
+      "graines": [
+        "mangue",
+        "ananas",
+        "papaye",
+        "menthe"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Salade tropicale menthée",
+          "resume": "Un dessert frais, fruité et lumineux avec une touche de miel.",
+          "ingredients": [
+            "200 g de chair de mangue",
+            "150 g de chair d’ananas",
+            "150 g de chair de papaye mûre",
+            "8 feuilles de menthe",
+            "1 c. à café de miel ou de sucre (facultatif)"
+          ],
+          "etapes": [
+            "Pèle les fruits et retire noyau, graines et cœur dur de l’ananas.",
+            "Pèse et coupe les chairs en dés.",
+            "Mélange avec la menthe ciselée et le miel facultatif, puis laisse 10 min au frais."
+          ],
+          "astuce": "Prépare des dés de même taille pour mettre chaque fruit en valeur."
+        },
+        "en": {
+          "titre": "Minted tropical salad",
+          "resume": "A fresh, fruity and bright dessert with a touch of honey.",
+          "ingredients": [
+            "200 g mango flesh",
+            "150 g pineapple flesh",
+            "150 g ripe papaya flesh",
+            "8 mint leaves",
+            "1 tsp honey or sugar (optional)"
+          ],
+          "etapes": [
+            "Peel the fruit and remove the mango stone, papaya seeds and hard pineapple core.",
+            "Weigh and dice the flesh.",
+            "Mix with the sliced mint and optional honey or sugar, then chill for 10 min."
+          ],
+          "astuce": "Cut similar-sized cubes to show off each fruit."
+        },
+        "es": {
+          "titre": "Ensalada tropical con menta",
+          "resume": "Un postre fresco, afrutado y lleno de color, con un toque de miel.",
+          "ingredients": [
+            "200 g de pulpa de mango",
+            "150 g de pulpa de piña",
+            "150 g de pulpa de papaya madura",
+            "8 hojas de menta",
+            "1 cucharadita de miel o azúcar (opcional)"
+          ],
+          "etapes": [
+            "Pela las frutas y retira el hueso del mango, las semillas de la papaya y el centro duro de la piña.",
+            "Pesa la pulpa y córtala en dados.",
+            "Mezcla con la menta picada y la miel o el azúcar opcional y deja 10 min en la nevera."
+          ],
+          "astuce": "Haz dados del mismo tamaño para que cada fruta destaque."
+        }
+      }
+    },
+    "papaye_mangue_citron": {
+      "portions": 2,
+      "usage": "dessert",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 10
+      },
+      "graines": [
+        "papaye",
+        "mangue",
+        "citron",
+        "basilic"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Papaye mangue citron",
+          "resume": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
+          "ingredients": [
+            "250 g de chair de papaye mûre",
+            "150 g de chair de mangue",
+            "1/2 citron",
+            "6 feuilles de basilic",
+            "1 c. à café de miel ou de sucre (facultatif)"
+          ],
+          "etapes": [
+            "Pèle les fruits, retire les graines de papaye et le noyau de mangue, puis coupe la chair.",
+            "Ajoute le jus du demi-citron, le basilic et le miel facultatif.",
+            "Mélange doucement et laisse 10 min au frais."
+          ],
+          "astuce": "Un basilic déchiré à la main garde une belle présence dans les coupelles."
+        },
+        "en": {
+          "titre": "Papaya mango lemon",
+          "resume": "Just a few minutes make this naturally delicious dessert.",
+          "ingredients": [
+            "250 g ripe papaya flesh",
+            "150 g mango flesh",
+            "1/2 lemon",
+            "6 basil leaves",
+            "1 tsp honey or sugar (optional)"
+          ],
+          "etapes": [
+            "Peel the fruit, remove the papaya seeds and mango stone, then cut the flesh.",
+            "Add the juice of the lemon half, basil and optional honey or sugar.",
+            "Mix gently and chill for 10 min."
+          ],
+          "astuce": "Basil torn by hand looks lovely in the bowls."
+        },
+        "es": {
+          "titre": "Papaya, mango y limón",
+          "resume": "Solo necesitas unos minutos para este postre delicioso y natural.",
+          "ingredients": [
+            "250 g de pulpa de papaya madura",
+            "150 g de pulpa de mango",
+            "1/2 limón",
+            "6 hojas de albahaca",
+            "1 cucharadita de miel o azúcar (opcional)"
+          ],
+          "etapes": [
+            "Pela las frutas, retira las semillas de la papaya y el hueso del mango y corta la pulpa.",
+            "Añade el zumo del medio limón, la albahaca y la miel o el azúcar opcional.",
+            "Mezcla con cuidado y deja 10 min en la nevera."
+          ],
+          "astuce": "La albahaca troceada con las manos queda muy bonita en los cuencos."
+        }
+      }
+    },
+    "ananas_fraise_menthe": {
+      "portions": 2,
+      "usage": "dessert",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 10
+      },
+      "graines": [
+        "ananas",
+        "fraise",
+        "menthe",
+        "citron"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Ananas fraise menthe",
+          "resume": "Un dessert frais, fruité et lumineux avec une touche de miel.",
+          "ingredients": [
+            "250 g de chair d’ananas",
+            "150 g de fraises",
+            "8 feuilles de menthe",
+            "1/2 citron",
+            "1 c. à café de miel ou de sucre (facultatif)"
+          ],
+          "etapes": [
+            "Retire peau et cœur dur de l’ananas, puis coupe la chair.",
+            "Rince, sèche et coupe les fraises.",
+            "Mélange avec la menthe, le jus du demi-citron et le miel facultatif, puis laisse 10 min au frais."
+          ],
+          "astuce": "Mets seulement un peu de citron au départ : l’ananas est déjà acidulé."
+        },
+        "en": {
+          "titre": "Pineapple strawberry mint",
+          "resume": "A fresh, fruity and bright dessert with a touch of honey.",
+          "ingredients": [
+            "250 g pineapple flesh",
+            "150 g strawberries",
+            "8 mint leaves",
+            "1/2 lemon",
+            "1 tsp honey or sugar (optional)"
+          ],
+          "etapes": [
+            "Remove the pineapple skin and hard core, then cut the flesh.",
+            "Rinse, dry and cut the strawberries.",
+            "Mix with the mint, juice of the lemon half and optional honey or sugar, then chill for 10 min."
+          ],
+          "astuce": "Start with a little lemon: pineapple is already tangy."
+        },
+        "es": {
+          "titre": "Piña, fresa y menta",
+          "resume": "Un postre fresco, afrutado y lleno de color, con un toque de miel.",
+          "ingredients": [
+            "250 g de pulpa de piña",
+            "150 g de fresas",
+            "8 hojas de menta",
+            "1/2 limón",
+            "1 cucharadita de miel o azúcar (opcional)"
+          ],
+          "etapes": [
+            "Retira la piel y el centro duro de la piña y corta la pulpa.",
+            "Lava, seca y corta las fresas.",
+            "Mezcla con la menta, el zumo del medio limón y la miel o el azúcar opcional y deja 10 min en la nevera."
+          ],
+          "astuce": "Empieza con poco limón: la piña ya tiene un toque ácido."
+        }
+      }
+    },
+    "melon_peche_framboise": {
+      "portions": 2,
+      "usage": "dessert",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 10
+      },
+      "graines": [
+        "papaye",
+        "peche",
+        "framboise",
+        "menthe"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Papaye pêche framboise",
+          "resume": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
+          "ingredients": [
+            "250 g de chair de papaye mûre",
+            "1 pêche",
+            "125 g de framboises",
+            "8 feuilles de menthe",
+            "1 c. à café de miel ou de sucre (facultatif)"
+          ],
+          "etapes": [
+            "Pèle et épépine la papaye, puis coupe la chair en dés.",
+            "Rince et dénoyaute la pêche, coupe-la en quartiers.",
+            "Ajoute les framboises rincées délicatement, la menthe et le miel facultatif, puis laisse 10 min au frais."
+          ],
+          "astuce": "Mélange d’abord la papaye et la pêche, puis dépose les framboises avec douceur."
+        },
+        "en": {
+          "titre": "Papaya peach raspberry",
+          "resume": "Just a few minutes make this naturally delicious dessert.",
+          "ingredients": [
+            "250 g ripe papaya flesh",
+            "1 peach",
+            "125 g raspberries",
+            "8 mint leaves",
+            "1 tsp honey or sugar (optional)"
+          ],
+          "etapes": [
+            "Peel and deseed the papaya, then dice the flesh.",
+            "Rinse and stone the peach, then cut into wedges.",
+            "Add the gently rinsed raspberries, mint and optional honey or sugar, then chill for 10 min."
+          ],
+          "astuce": "Mix the papaya and peach first, then gently add the raspberries."
+        },
+        "es": {
+          "titre": "Papaya, melocotón y frambuesa",
+          "resume": "Solo necesitas unos minutos para este postre delicioso y natural.",
+          "ingredients": [
+            "250 g de pulpa de papaya madura",
+            "1 melocotón",
+            "125 g de frambuesas",
+            "8 hojas de menta",
+            "1 cucharadita de miel o azúcar (opcional)"
+          ],
+          "etapes": [
+            "Pela la papaya, quita las semillas y corta la pulpa en dados.",
+            "Lava el melocotón, quítale el hueso y córtalo en gajos.",
+            "Añade las frambuesas lavadas con cuidado, la menta y la miel o el azúcar opcional y deja 10 min en la nevera."
+          ],
+          "astuce": "Mezcla primero la papaya y el melocotón y añade después las frambuesas con cuidado."
+        }
+      }
+    },
+    "framboise_fraise_basilic": {
+      "portions": 2,
+      "usage": "dessert",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 10
+      },
+      "graines": [
+        "ananas",
+        "fraise",
+        "basilic",
+        "citron"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Ananas fraise basilic",
+          "resume": "Un dessert frais, fruité et lumineux avec une touche de miel.",
+          "ingredients": [
+            "250 g de chair d’ananas",
+            "150 g de fraises",
+            "6 feuilles de basilic",
+            "1/2 citron",
+            "1 c. à café de miel ou de sucre (facultatif)"
+          ],
+          "etapes": [
+            "Retire peau et cœur dur de l’ananas, puis coupe la chair en dés.",
+            "Rince, sèche et coupe les fraises.",
+            "Ajoute le basilic déchiré, le jus du demi-citron et le miel facultatif, puis laisse 10 min au frais."
+          ],
+          "astuce": "Choisis des fraises fermes et ajoute-les après avoir mélangé les dés d’ananas."
+        },
+        "en": {
+          "titre": "Pineapple strawberry basil",
+          "resume": "A fresh, fruity and bright dessert with a touch of honey.",
+          "ingredients": [
+            "250 g pineapple flesh",
+            "150 g strawberries",
+            "6 basil leaves",
+            "1/2 lemon",
+            "1 tsp honey or sugar (optional)"
+          ],
+          "etapes": [
+            "Remove the pineapple skin and hard core, then dice the flesh.",
+            "Rinse, dry and cut the strawberries.",
+            "Add the torn basil, juice of the lemon half and optional honey or sugar, then chill for 10 min."
+          ],
+          "astuce": "Choose firm strawberries and add them after mixing the pineapple cubes."
+        },
+        "es": {
+          "titre": "Piña, fresa y albahaca",
+          "resume": "Un postre fresco, afrutado y lleno de color, con un toque de miel.",
+          "ingredients": [
+            "250 g de pulpa de piña",
+            "150 g de fresas",
+            "6 hojas de albahaca",
+            "1/2 limón",
+            "1 cucharadita de miel o azúcar (opcional)"
+          ],
+          "etapes": [
+            "Retira la piel y el centro duro de la piña y corta la pulpa en dados.",
+            "Lava, seca y corta las fresas.",
+            "Añade la albahaca troceada, el zumo del medio limón y la miel o el azúcar opcional y deja 10 min en la nevera."
+          ],
+          "astuce": "Elige fresas firmes y añádelas después de mezclar los dados de piña."
+        }
+      }
+    },
+    "melon_mangue_framboise": {
+      "portions": 2,
+      "usage": "dessert",
+      "temps": {
+        "preparationMin": 15,
+        "cuissonMin": 0,
+        "reposMin": 10
+      },
+      "graines": [
+        "melon",
+        "mangue",
+        "framboise",
+        "menthe"
+      ],
+      "textes": {
+        "fr": {
+          "titre": "Melon mangue framboise",
+          "resume": "Quelques minutes suffisent pour ce dessert naturellement gourmand.",
+          "ingredients": [
+            "250 g de chair de melon",
+            "150 g de chair de mangue",
+            "125 g de framboises",
+            "8 feuilles de menthe",
+            "1 c. à café de miel ou de sucre (facultatif)"
+          ],
+          "etapes": [
+            "Rince le melon avant de l’ouvrir, puis coupe sa chair et celle de la mangue en dés.",
+            "Rince délicatement les framboises.",
+            "Mélange avec la menthe et le miel facultatif, puis laisse 10 min au frais."
+          ],
+          "astuce": "Dépose les framboises sur le dessus des coupelles pour éviter de les écraser."
+        },
+        "en": {
+          "titre": "Melon mango raspberry",
+          "resume": "Just a few minutes make this naturally delicious dessert.",
+          "ingredients": [
+            "250 g melon flesh",
+            "150 g mango flesh",
+            "125 g raspberries",
+            "8 mint leaves",
+            "1 tsp honey or sugar (optional)"
+          ],
+          "etapes": [
+            "Rinse the melon before opening it, then dice its flesh and the mango flesh.",
+            "Gently rinse the raspberries.",
+            "Mix with the mint and optional honey or sugar, then chill for 10 min."
+          ],
+          "astuce": "Place the raspberries on top of the bowls to avoid crushing them."
+        },
+        "es": {
+          "titre": "Melón, mango y frambuesa",
+          "resume": "Solo necesitas unos minutos para este postre delicioso y natural.",
+          "ingredients": [
+            "250 g de pulpa de melón",
+            "150 g de pulpa de mango",
+            "125 g de frambuesas",
+            "8 hojas de menta",
+            "1 cucharadita de miel o azúcar (opcional)"
+          ],
+          "etapes": [
+            "Lava el melón antes de abrirlo y corta su pulpa y la del mango en dados.",
+            "Lava las frambuesas con cuidado.",
+            "Mezcla con la menta y la miel o el azúcar opcional y deja 10 min en la nevera."
+          ],
+          "astuce": "Coloca las frambuesas encima de los cuencos para no aplastarlas."
+        }
+      }
+    }
+  }
+}

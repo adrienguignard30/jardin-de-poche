@@ -1,7 +1,8 @@
 // Les écrans du téléphone : Ma recette · Le marché · Boutique · Carnet. Rendu DOM pur, l'état vient du jeu.
 import { CATALOG, ECO, prixProchainPot, type GameState } from './state';
 import * as E from './economie';
-import { t, tx, lang, quantite, texteChamp, texteNonVide, etapesRecette, locale, typeRecette, type Bi } from './i18n';
+import { t, tx, lang, quantite, texteChamp, texteNonVide, locale, typeRecette, type Bi } from './i18n';
+import { chargerInfos, lirePlante, lireRecette, type LectureRecette } from './infos';
 import { MUSIQUE } from './musique';
 import * as EL from './enligne';
 import { remplirClassement } from './classement';
@@ -28,11 +29,7 @@ const texteRecette = (re: E.Recette, champ: 'phrase' | 'amour') => {
   if (l !== 'es') return re[`${champ}_${l}`];
   return texteNonVide(re[`${champ}_es`]) || texteNonVide(re[`${champ}_en`]) ? texteChamp(re, champ, l) : undefined;
 };
-const etapes = (re: E.Recette) => {
-  const l = lang();
-  if (l !== 'es') return re[`etapes_${l}`];
-  return re.etapes_es?.length || re.etapes_en?.length ? etapesRecette(re, l) : undefined;
-};
+
 
 /** L'image d'un plat, ou ses ingrédients tant qu'elle n'existe pas. */
 export function imagePlat(re: E.Recette, cls = 'platImg'): HTMLElement {
@@ -42,18 +39,155 @@ export function imagePlat(re: E.Recette, cls = 'platImg'): HTMLElement {
 }
 /** La fiche d'une recette : image, nom, ingrédients en quantités de cuisine, étapes, et sa touche d'amour. */
 export function ficheRecette(re: E.Recette): HTMLElement {
-  const s = t(), f = el('div', 'fiche');
-  f.appendChild(imagePlat(re, 'ficheImg'));
-  f.appendChild(el('h3', '', nomR(re)));
-  const ph = texteRecette(re, 'phrase'); if (ph) f.appendChild(el('p', 'phrase', ph));
-  f.appendChild(el('div', 'ttl', s.ingredients));
-  const ul = el('ul', 'ingr'); for (const i of re.ingredients) ul.appendChild(el('li', '', `${icon(i.graine)} ${quantite(i.quantite, ECO.graine(i.graine))}`));
-  const am = texteRecette(re, 'amour'); if (am) ul.appendChild(el('li', 'amour', am));
-  f.appendChild(ul);
-  const et = etapes(re);
-  if (et?.length) { f.appendChild(el('div', 'ttl', s.laRecette)); const ol = el('ol', 'etapes'); for (const e of et) ol.appendChild(el('li', '', e)); f.appendChild(ol); }
+  const f = el('div', 'fiche');
+  const afficher = () => {
+    f.replaceChildren(imagePlat(re, 'ficheImg'), texteInfo('h2', nomR(re)));
+    f.appendChild(resumeCuisine(re, b => ouvrir('recette', re.id, b)));
+    const jeu = habillerLecture(el('section')); jeu.appendChild(texteInfo('h3', t().infosDansJeu));
+    for (const i of re.ingredients) {
+      jeu.appendChild(texteInfo('p', quantite(i.quantite, ECO.graine(i.graine))));
+      const b = boutonInfo(t().infosPlante, () => ouvrir('plante', i.graine, b)); b.dataset.infoPlante = i.graine;
+      b.setAttribute('aria-label', t().infosPlante + ' : ' + nomG(i.graine)); jeu.appendChild(b);
+    }
+    f.appendChild(jeu);
+  };
+  const ouvrir = (type: 'plante' | 'recette', id: string, source: HTMLElement) => {
+    const restaurer = positionsLecture(f);
+    const retour = () => {
+      afficher(); requestAnimationFrame(() => {
+        f.querySelector<HTMLElement>('[data-info-' + type + '="' + id + '"]')?.focus({ preventScroll: true }); restaurer();
+      });
+    };
+    f.replaceChildren(type === 'plante' ? detailPlante(id, retour) : detailCuisine(re, retour));
+    requestAnimationFrame(() => f.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true }));
+    void source;
+  };
+  afficher(); return f;
+}
+// Fiches éditoriales : lecture seule, indépendante des actions du jeu.
+const habillerLecture = (e: HTMLElement) => {
+  Object.assign(e.style, { display: 'flex', flexDirection: 'column', gap: '12px', minWidth: '0', width: '100%', boxSizing: 'border-box', fontSize: '16px', lineHeight: '1.6', color: '#263f35', background: '#fffdf7', padding: '16px', borderRadius: '14px', overflowWrap: 'anywhere', textAlign: 'left' });
+  return e;
+};
+function texteInfo(tag: string, texte: string) {
+  const e = el(tag); e.textContent = texte; e.style.margin = '0'; return e;
+}
+function boutonInfo(label: string, action: () => void) {
+  const b = el<HTMLButtonElement>('button'); b.type = 'button'; b.textContent = label;
+  Object.assign(b.style, { display: 'block', minHeight: '44px', width: '100%', padding: '10px 12px', border: '1px solid #416d4c', borderRadius: '10px', background: '#f0f6e9', color: '#23422b', font: 'inherit', fontSize: '15px', lineHeight: '1.4', whiteSpace: 'normal', cursor: 'pointer', textAlign: 'left', boxSizing: 'border-box' });
+  b.onclick = e => { e.preventDefault(); e.stopPropagation(); action(); };
+  return b;
+}
+function positionsLecture(c: HTMLElement) {
+  const valeurs: { e: HTMLElement; top: number; left: number }[] = [];
+  for (let e: HTMLElement | null = c; e; e = e.parentElement) valeurs.push({ e, top: e.scrollTop, left: e.scrollLeft });
+  return () => { for (const { e, top, left } of valeurs) { e.scrollTop = top; e.scrollLeft = left; } };
+}
+function listeInfo(tag: 'ul' | 'ol', lignes: string[]) {
+  const ul = el(tag); Object.assign(ul.style, { display: 'block', margin: '0', paddingLeft: '24px', listStyle: tag === 'ol' ? 'decimal' : 'disc' });
+  for (const ligne of lignes) { const li = texteInfo('li', ligne); li.style.marginBottom = '8px'; ul.appendChild(li); }
+  return ul;
+}
+function dureeInfo(info: LectureRecette) {
+  const s = t(info.langue), tm = info.temps;
+  return `${s.infosPour(info.portions)} · ${s.infosTotal} ${tm.preparationMin + tm.cuissonMin + tm.reposMin} min`;
+}
+function resumeCuisine(re: E.Recette, ouvrir: (b: HTMLElement) => void) {
+  const f = habillerLecture(el('section')); f.dataset.infosResume = re.id; f.setAttribute('aria-live', 'polite');
+  f.appendChild(texteInfo('p', t().infosChargement));
+  void chargerInfos().then(data => {
+    const info = lireRecette(data.recettes, re.id); f.replaceChildren();
+    if (!info) { f.appendChild(texteInfo('p', t().infosIndisponible)); return; }
+    const s = t(info.langue); f.lang = info.langue;
+    f.append(texteInfo('h3', s.infosChezToi), texteInfo('p', dureeInfo(info)), texteInfo('p', info.texte.resume));
+    const b = boutonInfo(s.infosVoirRecette, () => ouvrir(b)); b.dataset.infoRecette = re.id;
+    f.appendChild(b);
+  });
   return f;
 }
+function detailCuisine(re: E.Recette, retour: () => void) {
+  const f = habillerLecture(el('article')); f.dataset.infosRecette = re.id;
+  f.append(boutonInfo(t().retour, retour), texteInfo('h2', nomR(re)), texteInfo('p', t().infosChargement));
+  void chargerInfos().then(data => {
+    const info = lireRecette(data.recettes, re.id); f.replaceChildren(boutonInfo(t().retour, retour));
+    if (!info) { f.appendChild(texteInfo('p', t().infosIndisponible)); return; }
+    const s = t(info.langue), tm = info.temps; f.lang = info.langue;
+    f.append(texteInfo('h2', info.texte.titre), texteInfo('p', dureeInfo(info)));
+    if (info.usage === 'accompagnement') f.appendChild(texteInfo('p', s.infosAccompagnement));
+    f.append(texteInfo('p', info.texte.resume), listeInfo('ul', [
+      `${s.infosPreparation} : ${tm.preparationMin} min`, `${s.infosCuisson} : ${tm.cuissonMin} min`, `${s.infosRepos} : ${tm.reposMin} min`,
+    ]), texteInfo('p', s.infosQuantitesReelles), texteInfo('h3', s.ingredients), listeInfo('ul', info.texte.ingredients), texteInfo('h3', s.infosEtapes), listeInfo('ol', info.texte.etapes), texteInfo('h3', s.infosAstuce), texteInfo('p', info.texte.astuce));
+    const amour = texteRecette(re, 'amour'); if (amour) f.appendChild(texteInfo('p', `${s.infosToucheJeu} : ${amour}`));
+    f.appendChild(boutonInfo(t().retour, retour));
+  });
+  return f;
+}
+function detailPlante(id: string, retour: () => void) {
+  const f = habillerLecture(el('article')); f.dataset.infosPlante = id;
+  f.append(boutonInfo(t().retour, retour), texteInfo('p', t().infosChargement));
+  void chargerInfos().then(data => {
+    const info = lirePlante(data.plantes, id); f.replaceChildren(boutonInfo(t().retour, retour));
+    if (!info) { f.appendChild(texteInfo('p', t().infosIndisponible)); return; }
+    const s = t(info.langue), p = info.texte; f.lang = info.langue;
+    f.append(texteInfo('h2', p.titre), texteInfo('h3', s.infosBienfaits));
+    for (const ligne of p.bienfaits) f.appendChild(texteInfo('p', ligne));
+    for (const [titre, texte] of [[s.infosExposition, p.exposition], [s.infosArrosage, p.arrosage], [s.infosRecolte, p.recolte]]) {
+      f.append(texteInfo('h3', titre), texteInfo('p', texte));
+    }
+    f.append(texteInfo('p', s.infosCultureReelle), boutonInfo(t().retour, retour));
+  });
+  return f;
+}
+type ContexteLecture = { onglet: Onglet; st: GameState; h: TelHandlers; precedent?: Record<string, number>; cherche?: string };
+type VueLecture = { type: 'plante' | 'recette' | 'resume'; id: string; element: HTMLElement; langue: string; retour: () => void; onglet: Onglet; cherche?: string };
+const contextesLecture = new WeakMap<HTMLElement, ContexteLecture>();
+const lectures = new WeakMap<HTMLElement, VueLecture>();
+const retoursLecture = new WeakSet<HTMLElement>();
+function dessinerLecture(c: HTMLElement, vue: VueLecture) {
+  vue.langue = lang();
+  if (vue.type === 'plante') vue.element = detailPlante(vue.id, vue.retour);
+  else {
+    const re = ECO.recettes.find(r => r.id === vue.id);
+    if (!re) { vue.element = habillerLecture(el('article')); vue.element.append(boutonInfo(t().retour, vue.retour), texteInfo('p', t().infosIndisponible)); }
+    else if (vue.type === 'recette') vue.element = detailCuisine(re, vue.retour);
+    else {
+      vue.element = habillerLecture(el('article'));
+      vue.element.append(boutonInfo(t().retour, vue.retour), texteInfo('h2', nomR(re)), resumeCuisine(re, b => ouvrirLecture(c, 'recette', re.id, b)));
+    }
+  }
+  c.replaceChildren(vue.element);
+  c.parentElement?.querySelector('#telAction')?.classList.add('hidden');
+}
+function ouvrirLecture(c: HTMLElement, type: VueLecture['type'], id: string, source?: HTMLElement) {
+  const ctx = contextesLecture.get(c); if (!ctx) return;
+  const precedente = lectures.get(c), restaurer = positionsLecture(c);
+  const retour = () => {
+    if (lectures.get(c) !== vue) return;
+    if (precedente) {
+      lectures.set(c, precedente);
+      if (precedente.langue !== lang()) dessinerLecture(c, precedente); else c.replaceChildren(precedente.element);
+    } else {
+      lectures.delete(c); const actuel = contextesLecture.get(c) ?? ctx;
+      retoursLecture.add(c);
+      try { renderTelephone(c, actuel.onglet, actuel.st, actuel.h, actuel.precedent, actuel.cherche); }
+      finally { retoursLecture.delete(c); }
+    }
+    const remettre = () => {
+      const cible = source?.isConnected ? source : c.querySelector<HTMLElement>(`[data-info-${type === 'plante' ? 'plante' : 'recette'}="${id}"]`);
+      cible?.focus({ preventScroll: true }); restaurer();
+    };
+    remettre(); requestAnimationFrame(remettre);
+  };
+  const vue: VueLecture = { type, id, element: el('article'), langue: lang(), retour, onglet: ctx.onglet, cherche: ctx.cherche };
+  lectures.set(c, vue); dessinerLecture(c, vue); c.scrollTop = 0;
+  requestAnimationFrame(() => vue.element.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true }));
+}
+function boutonPlante(c: HTMLElement, id: string) {
+  const b = boutonInfo(t().infosPlante, () => ouvrirLecture(c, 'plante', id, b));
+  b.dataset.infoPlante = id; b.setAttribute('aria-label', `${t().infosPlante} : ${nomG(id)}`);
+  return b;
+}
+
 // ---------- les applis du téléphone : icône dessinée (trait), couleur, badge
 const SVG = (d: string) => `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 export const APPS: { id: Onglet; couleur: string; svg: string }[] = [
@@ -109,6 +243,13 @@ function graphique(pts: { x: string; cours: number; demande: number; cultiv: num
 function CATALOG_RECETTE(id: string) { return ECO.recettes.find(r => r.id === id); }
 
 export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h: TelHandlers, precedent?: Record<string, number>, cherche?: string) {
+  contextesLecture.set(c, { onglet, st, h, precedent, cherche });
+  const lecture = lectures.get(c);
+  if (lecture && lecture.onglet === onglet && lecture.cherche === cherche) {
+    if (lecture.langue !== lang() || !c.contains(lecture.element)) dessinerLecture(c, lecture);
+    c.parentElement?.querySelector('#telAction')?.classList.add('hidden'); return;
+  }
+  lectures.delete(c);
   const s = t(), j = st.eco.jardin, im = st.eco.immeuble;
   c.innerHTML = '';
   c.querySelectorAll('iframe.cadreJeu').forEach(f => { try { (f as HTMLIFrameElement).src = 'about:blank'; } catch { /* ignore */ } f.remove(); });
@@ -130,7 +271,7 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
     for (const p of recus) {
       const re = ECO.recette(p.recette);
       const row = el('div', 'row carte'); row.append(imagePlat(re), el('span', '', `<b>${nomR(re)}</b><small>${s.recuDeQui(im.jardins.find(x => x.id === p.par)?.nom ?? '?')} · ${p.jour}</small>`));
-      row.onclick = () => h.onFiche(re.id);
+      row.onclick = () => ouvrirLecture(c, 'resume', re.id, row);
       const ev = im.evenements.find(e => e.type === 'plat_recu' && e.platId === p.id);
       if (ev) { const b = el('button', 'buy' + (ev.repondu ? ' off' : ''), s.repondre); b.onclick = (e) => { e.stopPropagation(); h.onApp('notifs', evId(ev)); }; row.appendChild(b); }
       c.appendChild(row);
@@ -211,6 +352,7 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
       im2.onerror = () => im2.replaceWith(el('span', 'em', icon(id)));
       cel.append(im2, el('b', '', `×${q}`), el('small', '', pl ? tx(pl.name) : id));
       if (besoin.has(id)) cel.appendChild(el('i', 'tagRecette', s.pourRecette));
+      cel.style.height = 'auto'; cel.appendChild(boutonPlante(c, id));
       g.appendChild(cel);
     }
     boite.appendChild(g); c.appendChild(boite);
@@ -296,11 +438,12 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
     const rj = j.recette;
     if (!rj) { c.appendChild(el('p', 'empty', s.pasDeRecette)); return; }
     const re = ECO.recette(rj.recette);
-    const tete = el('div', 'recetteTete'); tete.appendChild(imagePlat(re, 'recetteImg')); tete.onclick = () => h.onFiche(re.id); c.appendChild(tete);
+    const tete = el('div', 'recetteTete'); tete.appendChild(imagePlat(re, 'recetteImg')); tete.onclick = () => ouvrirLecture(c, 'resume', re.id, tete); c.appendChild(tete);
     const demain = rj.jour > E.jourDe(Date.now());
     const titre = (re.accueil ? s.premiereRecette : demain ? s.demainTitre : s.recetteDuJour) + ` · ${demain ? s.pourDemain : s.pourAujourdhui}`;
-    const phrase = texteRecette(re, 'phrase');
-    c.appendChild(el('div', 'recette', `<small>${titre} — ${typeR(re)}</small><b>${nomR(re)}</b>${phrase ? `<em>${phrase}</em>` : ''}`));
+    c.appendChild(el('div', 'recette', `<small>${titre} — ${typeR(re)}</small><b>${nomR(re)}</b>`));
+    c.appendChild(resumeCuisine(re, b => ouvrirLecture(c, 'recette', re.id, b)));
+    c.appendChild(texteInfo('h3', s.infosDansJeu));
     const manque = E.manque(j, ECO);
     let cout = 0;
     for (const ing of re.ingredients) {
@@ -327,12 +470,12 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
         }
         row.appendChild(btns);
       }
+      row.style.flexWrap = 'wrap'; row.appendChild(boutonPlante(c, ing.graine));
       c.appendChild(row);
     }
     const amour = texteRecette(re, 'amour');
     if (amour) c.appendChild(el('div', 'row ingr amour', `<span><b>${amour}</b><br><span class="ok">${s.amourToujours}</span></span>`));
-    const et = etapes(re);
-    if (et?.length) { c.appendChild(el('div', 'ttl', s.laRecette)); const ol = el('ol', 'etapes'); for (const e of et) ol.appendChild(el('li', '', e)); c.appendChild(ol); }
+
     {                                                               // ce que ce plat rapporte : valeur des ingrédients × type (× 3 avec un ingrédient rare)
       const v0 = re.ingredients.reduce((t_, i) => t_ + E.valeur(im, i), 0);
       const rare = re.ingredients.some(i => j.interdites.includes(i.graine));
@@ -467,7 +610,8 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
       const detail = interdite ? texteChamp(g, 'interdit', lang(), lang() === 'es' ? t('en').interdite : s.interdite)
         : `${g.pousse_min >= 60 ? Math.round(g.pousse_min / 60) + ' h' : g.pousse_min + ' min'} · ${g.recoltes} ${s.recoltes}`;
       const row = el('div', 'row' + (owned ? ' owned' : '') + (interdite ? ' locked' : '') + (cherche === g.id ? ' cible' : ''), `<span>${icon(g.id)} ${nomG(g.id)}<small>${detail}</small></span>`);
-      if (cherche === g.id) setTimeout(() => row.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60);
+      row.style.flexWrap = 'wrap';
+      if (cherche === g.id && !retoursLecture.has(c)) setTimeout(() => row.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60);
       if (owned) row.appendChild(el('span', 'tag ok', s.aToi));
       else if (interdite) row.appendChild(el('span', 'tag', t().impossibleIci));
       else {
@@ -475,6 +619,7 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
         const b = el<HTMLButtonElement>('button', 'buy' + (assez ? '' : ' off'), `${prix} pts`);
         b.onclick = () => h.onBuySeed(g.id); row.appendChild(b);            // le jeu dit pourquoi si ce n'est pas possible
       }
+      row.appendChild(boutonPlante(c, g.id));
       c.appendChild(row);
     }
     c.appendChild(el('div', 'ttl', s.pots));
@@ -489,7 +634,7 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
       const re = ECO.recette(p.recette);
       const row = el('div', 'row carte');
       row.append(imagePlat(re), el('span', '', `<b>${nomR(re)}</b><small>${ligne}</small>`));
-      row.onclick = () => h.onFiche(re.id);
+      row.onclick = () => ouvrirLecture(c, 'resume', re.id, row);
       c.appendChild(row);
     };
     c.appendChild(el('div', 'ttl', s.platsOffertsT));
@@ -503,7 +648,7 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
       const fait = cuisinees.has(re.id);
       const cel = el('div', 'coll' + (fait ? ' fait' : ''));
       cel.append(imagePlat(re, 'collImg'), el('small', '', nomR(re)));
-      cel.onclick = () => h.onFiche(re.id);
+      cel.onclick = () => ouvrirLecture(c, 'resume', re.id, cel);
       grille.appendChild(cel);
     }
     c.appendChild(grille);

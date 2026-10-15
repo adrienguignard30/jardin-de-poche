@@ -1,0 +1,947 @@
+{
+  "version": 1,
+  "plantes": {
+    "basilic": {
+      "textes": {
+        "fr": {
+          "titre": "Basilic",
+          "bienfaits": [
+            "Ses feuilles parfument tomates et fruits avec très peu de produit.",
+            "Une petite récolte suffit pour donner du goût à un plat."
+          ],
+          "exposition": "Installe-le au soleil, au chaud et à l’abri du vent.",
+          "arrosage": "Garde le terreau légèrement humide, sans eau dans la soucoupe.",
+          "recolte": "Pince le haut des tiges au-dessus de deux feuilles pour l’aider à se ramifier."
+        },
+        "en": {
+          "titre": "Basil",
+          "bienfaits": [
+            "Its leaves add flavour to tomatoes and fruit in small amounts.",
+            "A small harvest is enough to give a dish extra flavour."
+          ],
+          "exposition": "Keep it in a warm, sunny spot sheltered from the wind.",
+          "arrosage": "Keep the compost slightly moist and empty any water from the saucer.",
+          "recolte": "Pinch out the shoot tips above a pair of leaves to help the plant branch out."
+        },
+        "es": {
+          "titre": "Albahaca",
+          "bienfaits": [
+            "Sus hojas dan sabor a los tomates y a la fruta con muy poca cantidad.",
+            "Una pequeña cosecha basta para dar más sabor a un plato."
+          ],
+          "exposition": "Ponla al sol, en un lugar cálido y protegido del viento.",
+          "arrosage": "Mantén el sustrato ligeramente húmedo y no dejes agua en el plato.",
+          "recolte": "Despunta los tallos por encima de dos hojas para que la planta se ramifique."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/herbs/basil/grow-your-own"
+      ]
+    },
+    "menthe": {
+      "textes": {
+        "fr": {
+          "titre": "Menthe",
+          "bienfaits": [
+            "Elle apporte une saveur fraîche aux salades et aux desserts.",
+            "Quelques feuilles suffisent aussi à parfumer une carafe d’eau."
+          ],
+          "exposition": "Choisis le soleil doux ou la mi-ombre, dans un pot à elle seule.",
+          "arrosage": "Garde la terre fraîche ; elle supporte mal les longues périodes sèches.",
+          "recolte": "Coupe les jeunes tiges régulièrement, avant qu’elles deviennent dures."
+        },
+        "en": {
+          "titre": "Mint",
+          "bienfaits": [
+            "It adds a fresh flavour to salads and desserts.",
+            "A few leaves also make a simple flavouring for a jug of water."
+          ],
+          "exposition": "Choose gentle sunshine or partial shade, in a pot of its own.",
+          "arrosage": "Keep the soil moist; mint struggles with long dry spells.",
+          "recolte": "Cut young stems regularly, before they become tough."
+        },
+        "es": {
+          "titre": "Menta",
+          "bienfaits": [
+            "Da un sabor fresco a las ensaladas y a los postres.",
+            "Unas hojas también bastan para aromatizar una jarra de agua."
+          ],
+          "exposition": "Elige sol suave o semisombra y ponla en una maceta para ella sola.",
+          "arrosage": "Mantén la tierra húmeda; no lleva bien los periodos largos de sequía.",
+          "recolte": "Corta los tallos jóvenes a menudo, antes de que se endurezcan."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/herbs/mint/grow-your-own"
+      ]
+    },
+    "thym": {
+      "textes": {
+        "fr": {
+          "titre": "Thym",
+          "bienfaits": [
+            "Quelques brins donnent beaucoup de parfum aux légumes cuits.",
+            "Il garde aussi son arôme une fois séché."
+          ],
+          "exposition": "Offre-lui du plein soleil et une terre qui laisse bien passer l’eau.",
+          "arrosage": "Laisse sécher la surface entre deux arrosages ; évite l’eau stagnante.",
+          "recolte": "Coupe de petites extrémités tendres, sans rabattre tout le vieux bois."
+        },
+        "en": {
+          "titre": "Thyme",
+          "bienfaits": [
+            "A few sprigs give cooked vegetables plenty of flavour.",
+            "Thyme keeps its aroma when dried, too."
+          ],
+          "exposition": "Give it full sun and soil that lets water drain freely.",
+          "arrosage": "Let the surface dry between waterings and avoid standing water.",
+          "recolte": "Snip off small, tender tips without cutting right back into old woody stems."
+        },
+        "es": {
+          "titre": "Tomillo",
+          "bienfaits": [
+            "Unas ramitas dan mucho sabor a las verduras cocinadas.",
+            "El tomillo también conserva su aroma cuando se seca."
+          ],
+          "exposition": "Ponlo a pleno sol, en una tierra que deje pasar bien el agua.",
+          "arrosage": "Deja que la superficie se seque entre riegos y evita el agua estancada.",
+          "recolte": "Corta pequeñas puntas tiernas, sin recortar toda la parte leñosa."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/herbs/thyme/grow-your-own"
+      ]
+    },
+    "ciboulette": {
+      "textes": {
+        "fr": {
+          "titre": "Ciboulette",
+          "bienfaits": [
+            "Sa saveur douce d’oignon relève une salade ou des légumes.",
+            "Ajoute-la à la fin pour profiter de son parfum."
+          ],
+          "exposition": "Place-la au soleil doux ; une légère mi-ombre convient aussi.",
+          "arrosage": "Arrose régulièrement en pot pour que la terre reste un peu fraîche.",
+          "recolte": "Coupe les feuilles aux ciseaux à quelques centimètres du sol."
+        },
+        "en": {
+          "titre": "Chives",
+          "bienfaits": [
+            "Its mild onion flavour brightens salads and vegetables.",
+            "Add it at the end to enjoy its aroma."
+          ],
+          "exposition": "Choose gentle sunshine; light partial shade is fine too.",
+          "arrosage": "Water regularly in pots to keep the soil slightly moist.",
+          "recolte": "Snip the leaves with scissors a few centimetres above the soil."
+        },
+        "es": {
+          "titre": "Cebollino",
+          "bienfaits": [
+            "Su suave sabor a cebolla realza las ensaladas y las verduras.",
+            "Añádelo al final para disfrutar de su aroma."
+          ],
+          "exposition": "Ponlo al sol suave; también le va bien una semisombra ligera.",
+          "arrosage": "Riega con regularidad en maceta para mantener la tierra algo húmeda.",
+          "recolte": "Corta las hojas con tijeras a unos centímetros del suelo."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/herbs/chives/grow-your-own"
+      ]
+    },
+    "coriandre": {
+      "textes": {
+        "fr": {
+          "titre": "Coriandre",
+          "bienfaits": [
+            "Ses feuilles apportent une note vive et citronnée aux plats.",
+            "Un peu de coriandre fraîche change facilement le goût d’une salade."
+          ],
+          "exposition": "Préfère le soleil doux ou la mi-ombre pendant les fortes chaleurs.",
+          "arrosage": "Garde une humidité régulière pour limiter la montée en fleurs.",
+          "recolte": "Prélève les feuilles au besoin et refais de petits semis pour prolonger la récolte."
+        },
+        "en": {
+          "titre": "Coriander",
+          "bienfaits": [
+            "Its leaves add a bright, citrus-like note to dishes.",
+            "A little fresh coriander easily changes the flavour of a salad."
+          ],
+          "exposition": "Choose gentle sunshine or partial shade during hot weather.",
+          "arrosage": "Keep moisture steady to help delay flowering.",
+          "recolte": "Pick leaves as needed and sow small batches again to extend the harvest."
+        },
+        "es": {
+          "titre": "Cilantro",
+          "bienfaits": [
+            "Sus hojas dan un toque fresco y cítrico a los platos.",
+            "Un poco de cilantro fresco cambia fácilmente el sabor de una ensalada."
+          ],
+          "exposition": "Elige sol suave o semisombra cuando haga mucho calor.",
+          "arrosage": "Mantén una humedad regular para retrasar la floración.",
+          "recolte": "Recoge hojas cuando las necesites y haz pequeñas siembras sucesivas para alargar la cosecha."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/herbs/coriander/grow-your-own"
+      ]
+    },
+    "persil": {
+      "textes": {
+        "fr": {
+          "titre": "Persil plat",
+          "bienfaits": [
+            "Il apporte un parfum frais aux légumes crus comme cuits.",
+            "Ses feuilles et ses tiges tendres peuvent toutes servir en cuisine."
+          ],
+          "exposition": "Installe-le au soleil doux ou à la mi-ombre.",
+          "arrosage": "Garde le terreau frais, sans laisser les racines tremper.",
+          "recolte": "Coupe les tiges extérieures près de la base et laisse pousser le centre."
+        },
+        "en": {
+          "titre": "Flat parsley",
+          "bienfaits": [
+            "It gives both raw and cooked vegetables a fresh flavour.",
+            "You can use the leaves and tender stems in cooking."
+          ],
+          "exposition": "Keep it in gentle sunshine or partial shade.",
+          "arrosage": "Keep the compost moist without leaving the roots standing in water.",
+          "recolte": "Cut outer stems near the base and leave the centre to grow."
+        },
+        "es": {
+          "titre": "Perejil de hoja plana",
+          "bienfaits": [
+            "Da un sabor fresco a las verduras crudas y cocinadas.",
+            "Puedes usar tanto las hojas como los tallos tiernos."
+          ],
+          "exposition": "Ponlo al sol suave o en semisombra.",
+          "arrosage": "Mantén el sustrato húmedo, sin dejar las raíces encharcadas.",
+          "recolte": "Corta los tallos exteriores cerca de la base y deja crecer el centro."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/herbs/parsley/grow-your-own"
+      ]
+    },
+    "radis": {
+      "textes": {
+        "fr": {
+          "titre": "Radis",
+          "bienfaits": [
+            "Il apporte de l’eau et un croquant légèrement piquant.",
+            "C’est une façon simple de varier les légumes d’une entrée."
+          ],
+          "exposition": "Choisis le soleil au printemps et une légère ombre quand il fait très chaud.",
+          "arrosage": "Arrose régulièrement pour garder des racines tendres.",
+          "recolte": "Récolte dès que les racines ont une taille agréable ; trop attendre les durcit."
+        },
+        "en": {
+          "titre": "Radish",
+          "bienfaits": [
+            "It provides water and a lightly peppery crunch.",
+            "It is a simple way to add variety to the vegetables in a starter."
+          ],
+          "exposition": "Choose sunshine in spring and light shade in very hot weather.",
+          "arrosage": "Water regularly to keep the roots tender.",
+          "recolte": "Harvest once the roots reach a useful size; leaving them too long makes them tough."
+        },
+        "es": {
+          "titre": "Rábano",
+          "bienfaits": [
+            "Aporta agua y un toque crujiente ligeramente picante.",
+            "Es una forma sencilla de variar las verduras de un entrante."
+          ],
+          "exposition": "Elige sol en primavera y algo de sombra cuando haga mucho calor.",
+          "arrosage": "Riega con regularidad para que las raíces estén tiernas.",
+          "recolte": "Recógelos cuando tengan un buen tamaño; si esperas demasiado, se endurecen."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/vegetables/radishes/grow-your-own",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/radis/"
+      ]
+    },
+    "salade": {
+      "textes": {
+        "fr": {
+          "titre": "Laitue",
+          "bienfaits": [
+            "Ses feuilles apportent beaucoup d’eau et un peu de fibres.",
+            "Leur fraîcheur et leur volume complètent facilement une assiette."
+          ],
+          "exposition": "Place-la au soleil doux ; protège-la du soleil brûlant de l’été.",
+          "arrosage": "Garde une terre fraîche avec des arrosages réguliers au pied.",
+          "recolte": "Sur une laitue à couper, prends les feuilles extérieures et garde le cœur."
+        },
+        "en": {
+          "titre": "Lettuce",
+          "bienfaits": [
+            "Its leaves provide plenty of water and a little fibre.",
+            "Their freshness and volume make an easy addition to a meal."
+          ],
+          "exposition": "Choose gentle sunshine and shelter it from scorching summer sun.",
+          "arrosage": "Keep the soil moist with regular watering at the base.",
+          "recolte": "For a cut-and-come-again lettuce, pick outer leaves and leave the heart."
+        },
+        "es": {
+          "titre": "Lechuga",
+          "bienfaits": [
+            "Sus hojas aportan mucha agua y algo de fibra.",
+            "Su frescura y volumen completan fácilmente una comida."
+          ],
+          "exposition": "Ponla al sol suave y protégela del sol intenso del verano.",
+          "arrosage": "Mantén la tierra húmeda con riegos regulares en la base.",
+          "recolte": "En una lechuga de corte, recoge las hojas exteriores y conserva el cogollo."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/vegetables/lettuce/grow-your-own",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/laitue/"
+      ]
+    },
+    "epinard": {
+      "textes": {
+        "fr": {
+          "titre": "Épinard",
+          "bienfaits": [
+            "Il apporte des fibres et des folates, aussi appelés vitamine B9.",
+            "Les jeunes feuilles se mangent en salade ; les autres sont délicieuses cuites."
+          ],
+          "exposition": "Préfère une période fraîche et la mi-ombre quand le soleil chauffe fort.",
+          "arrosage": "Arrose régulièrement : la sécheresse favorise la montée en graines.",
+          "recolte": "Prélève les feuilles extérieures avant la floraison en gardant le centre."
+        },
+        "en": {
+          "titre": "Spinach",
+          "bienfaits": [
+            "It provides fibre and folate, also known as vitamin B9.",
+            "Young leaves work well in salads; larger leaves are delicious cooked."
+          ],
+          "exposition": "Choose cool weather and partial shade when the sun is strong.",
+          "arrosage": "Water regularly: dry conditions encourage plants to go to seed.",
+          "recolte": "Pick outer leaves before flowering, leaving the centre to grow."
+        },
+        "es": {
+          "titre": "Espinaca",
+          "bienfaits": [
+            "Aporta fibra y folatos, también llamados vitamina B9.",
+            "Las hojas jóvenes van bien en ensalada; las demás quedan deliciosas cocinadas."
+          ],
+          "exposition": "Prefiere épocas frescas y semisombra cuando el sol caliente mucho.",
+          "arrosage": "Riega con regularidad: la sequía favorece que la planta se espigue.",
+          "recolte": "Recoge las hojas exteriores antes de la floración y conserva el centro."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/vegetables/spinach/grow-your-own",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/epinard/"
+      ]
+    },
+    "oignon": {
+      "textes": {
+        "fr": {
+          "titre": "Oignon nouveau",
+          "bienfaits": [
+            "Le blanc est croquant et le vert parfume doucement les plats.",
+            "Utiliser les deux permet de profiter de presque tout l’oignon nouveau."
+          ],
+          "exposition": "Sème-le au soleil dans un pot assez profond et bien drainé.",
+          "arrosage": "Arrose si la terre sèche, surtout quand les plants sont jeunes.",
+          "recolte": "Arrache au besoin quand les tiges ont environ l’épaisseur d’un crayon."
+        },
+        "en": {
+          "titre": "Spring onion",
+          "bienfaits": [
+            "The white part is crunchy and the green part gently flavours dishes.",
+            "Using both makes the most of almost the whole spring onion."
+          ],
+          "exposition": "Sow in a sunny spot, in a fairly deep, well-drained pot.",
+          "arrosage": "Water when the soil dries, especially while the plants are young.",
+          "recolte": "Pull them as needed when the stems are about as thick as a pencil."
+        },
+        "es": {
+          "titre": "Cebolleta",
+          "bienfaits": [
+            "La parte blanca es crujiente y la verde da un sabor suave a los platos.",
+            "Usar ambas te permite aprovechar casi toda la cebolleta."
+          ],
+          "exposition": "Siémbrala al sol en una maceta bastante profunda y con buen drenaje.",
+          "arrosage": "Riega cuando la tierra se seque, sobre todo mientras las plantas sean jóvenes.",
+          "recolte": "Arráncala cuando la necesites y los tallos tengan más o menos el grosor de un lápiz."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/vegetables/salad-onions/grow-your-own"
+      ]
+    },
+    "carotte": {
+      "textes": {
+        "fr": {
+          "titre": "Carotte",
+          "bienfaits": [
+            "Elle apporte du bêta-carotène, que le corps peut transformer en vitamine A.",
+            "Elle fournit aussi des fibres et une douceur agréable, crue ou cuite."
+          ],
+          "exposition": "Choisis le soleil et un pot profond rempli de terre fine, sans cailloux.",
+          "arrosage": "Arrose régulièrement pour éviter les alternances de sécheresse et de gros apports d’eau.",
+          "recolte": "Dégage doucement une racine quand son épaule paraît assez grosse."
+        },
+        "en": {
+          "titre": "Carrot",
+          "bienfaits": [
+            "It provides beta-carotene, which the body can turn into vitamin A.",
+            "It also adds fibre and a pleasant sweetness, raw or cooked."
+          ],
+          "exposition": "Choose sunshine and a deep pot filled with fine soil without stones.",
+          "arrosage": "Water regularly to avoid alternating drought with heavy watering.",
+          "recolte": "Gently lift a root when its shoulder looks large enough."
+        },
+        "es": {
+          "titre": "Zanahoria",
+          "bienfaits": [
+            "Aporta betacaroteno, que el cuerpo puede transformar en vitamina A.",
+            "También aporta fibra y un agradable dulzor, cruda o cocinada."
+          ],
+          "exposition": "Elige sol y una maceta profunda con tierra fina y sin piedras.",
+          "arrosage": "Riega con regularidad para evitar alternar sequía y riegos abundantes.",
+          "recolte": "Saca una raíz con cuidado cuando la parte superior parezca lo bastante gruesa."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/vegetables/carrots/grow-your-own",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/carotte/"
+      ]
+    },
+    "haricot": {
+      "textes": {
+        "fr": {
+          "titre": "Haricot vert",
+          "bienfaits": [
+            "Une fois cuit, il apporte des fibres et du volume aux repas.",
+            "Il se prête aussi bien aux salades qu’aux poêlées."
+          ],
+          "exposition": "Choisis le soleil et une variété naine pour un pot ; donne un support aux grimpantes.",
+          "arrosage": "Arrose régulièrement, surtout pendant la floraison et la formation des gousses.",
+          "recolte": "Cueille souvent les gousses jeunes et tendres, avant que les graines gonflent."
+        },
+        "en": {
+          "titre": "Green bean",
+          "bienfaits": [
+            "Once cooked, it provides fibre and adds volume to meals.",
+            "It works well in both salads and vegetable dishes."
+          ],
+          "exposition": "Choose sunshine and a dwarf variety for a pot; give climbing varieties a support.",
+          "arrosage": "Water regularly, especially during flowering and pod formation.",
+          "recolte": "Pick pods often while they are young and tender, before the seeds swell."
+        },
+        "es": {
+          "titre": "Judía verde",
+          "bienfaits": [
+            "Una vez cocinada, aporta fibra y volumen a las comidas.",
+            "Va bien tanto en ensaladas como en salteados de verduras."
+          ],
+          "exposition": "Elige sol y una variedad de mata baja para maceta; pon un soporte a las trepadoras.",
+          "arrosage": "Riega con regularidad, sobre todo durante la floración y la formación de las vainas.",
+          "recolte": "Recoge a menudo las vainas jóvenes y tiernas, antes de que las semillas engorden."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/vegetables/french-beans/grow-your-own",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/haricot-vert/"
+      ]
+    },
+    "courgette": {
+      "textes": {
+        "fr": {
+          "titre": "Courgette",
+          "bienfaits": [
+            "Elle apporte beaucoup d’eau et un peu de fibres.",
+            "Sa saveur douce s’associe facilement aux herbes et aux autres légumes."
+          ],
+          "exposition": "Offre-lui du soleil et un grand pot ; une variété compacte prend moins de place.",
+          "arrosage": "Arrose au pied régulièrement, sans détremper le terreau.",
+          "recolte": "Coupe les fruits encore jeunes, autour de 10 à 15 cm selon la variété."
+        },
+        "en": {
+          "titre": "Zucchini",
+          "bienfaits": [
+            "It provides plenty of water and a little fibre.",
+            "Its mild flavour goes easily with herbs and other vegetables."
+          ],
+          "exposition": "Give it sunshine and a large pot; a compact variety takes up less space.",
+          "arrosage": "Water regularly at the base without soaking the compost.",
+          "recolte": "Cut fruits while young, at around 10 to 15 cm depending on the variety."
+        },
+        "es": {
+          "titre": "Calabacín",
+          "bienfaits": [
+            "Aporta mucha agua y algo de fibra.",
+            "Su sabor suave combina fácilmente con hierbas y otras verduras."
+          ],
+          "exposition": "Dale sol y una maceta grande; una variedad compacta ocupa menos espacio.",
+          "arrosage": "Riega con regularidad en la base, sin encharcar el sustrato.",
+          "recolte": "Corta los frutos jóvenes, de unos 10 a 15 cm según la variedad."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/vegetables/courgettes/grow-your-own",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/courgette/"
+      ]
+    },
+    "concombre": {
+      "textes": {
+        "fr": {
+          "titre": "Concombre",
+          "bienfaits": [
+            "Très riche en eau, il apporte de la fraîcheur aux repas.",
+            "Sa texture croquante permet de varier les salades simplement."
+          ],
+          "exposition": "Choisis une variété d’extérieur et un emplacement chaud, ensoleillé et abrité.",
+          "arrosage": "Garde une humidité régulière ; un grand pot sèche moins vite.",
+          "recolte": "Coupe les fruits à la taille indiquée pour la variété, avant qu’ils jaunissent."
+        },
+        "en": {
+          "titre": "Cucumber",
+          "bienfaits": [
+            "Its high water content brings freshness to meals.",
+            "Its crunchy texture is an easy way to vary salads."
+          ],
+          "exposition": "Choose an outdoor variety and a warm, sunny, sheltered spot.",
+          "arrosage": "Keep moisture steady; a large pot dries out less quickly.",
+          "recolte": "Cut fruits at the size recommended for the variety, before they turn yellow."
+        },
+        "es": {
+          "titre": "Pepino",
+          "bienfaits": [
+            "Su alto contenido en agua aporta frescura a las comidas.",
+            "Su textura crujiente permite variar las ensaladas de forma sencilla."
+          ],
+          "exposition": "Elige una variedad de exterior y un lugar cálido, soleado y protegido.",
+          "arrosage": "Mantén una humedad regular; una maceta grande tarda más en secarse.",
+          "recolte": "Corta los frutos al tamaño indicado para la variedad, antes de que amarilleen."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/vegetables/cucumbers/grow-your-own",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/concombre/"
+      ]
+    },
+    "tomate": {
+      "textes": {
+        "fr": {
+          "titre": "Tomate cerise",
+          "bienfaits": [
+            "La tomate cerise apporte de l’eau et de la vitamine C.",
+            "Son goût fruité permet de préparer une entrée avec peu d’ingrédients."
+          ],
+          "exposition": "Place-la au soleil, dans un grand pot, avec un tuteur si la variété en a besoin.",
+          "arrosage": "Arrose au pied avec régularité pour limiter les fruits fendus.",
+          "recolte": "Cueille les tomates bien colorées et légèrement souples."
+        },
+        "en": {
+          "titre": "Cherry tomato",
+          "bienfaits": [
+            "Cherry tomatoes provide water and vitamin C.",
+            "Their fruity flavour makes a simple starter with just a few ingredients."
+          ],
+          "exposition": "Keep it in sunshine in a large pot, with a support if the variety needs one.",
+          "arrosage": "Water regularly at the base to help limit split fruits.",
+          "recolte": "Pick tomatoes when fully coloured and slightly soft."
+        },
+        "es": {
+          "titre": "Tomate cherry",
+          "bienfaits": [
+            "El tomate cherry aporta agua y vitamina C.",
+            "Su sabor afrutado permite preparar un entrante con pocos ingredientes."
+          ],
+          "exposition": "Ponlo al sol en una maceta grande, con un tutor si la variedad lo necesita.",
+          "arrosage": "Riega con regularidad en la base para reducir las grietas en los frutos.",
+          "recolte": "Recoge los tomates cuando tengan buen color y estén ligeramente blandos."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/vegetables/tomatoes/grow-your-own",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/tomate-cerise/"
+      ]
+    },
+    "poivron": {
+      "textes": {
+        "fr": {
+          "titre": "Poivron",
+          "bienfaits": [
+            "Il apporte de la vitamine C et des fibres.",
+            "Sa couleur et son croquant rendent les salades et les poêlées plus variées."
+          ],
+          "exposition": "Installe-le au chaud, au soleil et à l’abri du vent.",
+          "arrosage": "Arrose régulièrement en laissant l’excès d’eau s’écouler.",
+          "recolte": "Coupe le fruit au sécateur ; il peut se récolter vert ou prendre sa couleur mûre."
+        },
+        "en": {
+          "titre": "Bell pepper",
+          "bienfaits": [
+            "It provides vitamin C and fibre.",
+            "Its colour and crunch add variety to salads and vegetable dishes."
+          ],
+          "exposition": "Keep it warm, sunny and sheltered from the wind.",
+          "arrosage": "Water regularly and let excess water drain away.",
+          "recolte": "Cut fruits with secateurs; pick them green or leave them to develop their ripe colour."
+        },
+        "es": {
+          "titre": "Pimiento",
+          "bienfaits": [
+            "Aporta vitamina C y fibra.",
+            "Su color y textura crujiente dan variedad a las ensaladas y a los salteados."
+          ],
+          "exposition": "Ponlo en un lugar cálido, soleado y protegido del viento.",
+          "arrosage": "Riega con regularidad y deja que el agua sobrante escurra.",
+          "recolte": "Corta el fruto con tijeras de podar; puedes recogerlo verde o esperar a que tome su color maduro."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/vegetables/peppers/grow-your-own",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/poivron-rouge/"
+      ]
+    },
+    "ail": {
+      "textes": {
+        "fr": {
+          "titre": "Ail",
+          "bienfaits": [
+            "Une petite gousse donne beaucoup de goût à des légumes simples.",
+            "Cru, il est vif ; cuit doucement, il devient plus doux."
+          ],
+          "exposition": "Plante des caïeux adaptés à ta région au soleil, en terre bien drainée.",
+          "arrosage": "Arrose modérément en période sèche et réduis les apports quand le feuillage jaunit.",
+          "recolte": "Soulève les têtes quand les feuilles jaunissent, puis laisse-les sécher au sec et à l’air."
+        },
+        "en": {
+          "titre": "Garlic",
+          "bienfaits": [
+            "A small clove gives simple vegetables plenty of flavour.",
+            "Raw garlic is sharp; gently cooked garlic becomes milder."
+          ],
+          "exposition": "Plant cloves suited to your region in sunshine and well-drained soil.",
+          "arrosage": "Water moderately in dry spells and reduce watering as the leaves turn yellow.",
+          "recolte": "Lift the bulbs when the leaves yellow, then dry them somewhere airy and dry."
+        },
+        "es": {
+          "titre": "Ajo",
+          "bienfaits": [
+            "Un diente pequeño da mucho sabor a unas verduras sencillas.",
+            "Crudo es intenso; cocinado suavemente se vuelve más dulce."
+          ],
+          "exposition": "Planta dientes adaptados a tu zona, al sol y en una tierra con buen drenaje.",
+          "arrosage": "Riega con moderación en épocas secas y reduce el riego cuando amarilleen las hojas.",
+          "recolte": "Saca las cabezas cuando amarilleen las hojas y déjalas secar en un lugar seco y aireado."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/vegetables/garlic/grow-your-own"
+      ]
+    },
+    "fraise": {
+      "textes": {
+        "fr": {
+          "titre": "Fraise",
+          "bienfaits": [
+            "Elle apporte de la vitamine C et des fibres.",
+            "Bien mûre, elle parfume un dessert sans avoir besoin de beaucoup de sucre ajouté."
+          ],
+          "exposition": "Installe le fraisier au soleil pour obtenir des fruits savoureux.",
+          "arrosage": "Arrose régulièrement au pied, surtout pendant la formation des fruits.",
+          "recolte": "Cueille les fraises bien rouges avec leur petite queue ; elles mûrissent peu après récolte."
+        },
+        "en": {
+          "titre": "Strawberry",
+          "bienfaits": [
+            "It provides vitamin C and fibre.",
+            "When ripe, it gives desserts plenty of flavour without needing much added sugar."
+          ],
+          "exposition": "Keep the strawberry plant in sunshine for flavoursome fruit.",
+          "arrosage": "Water regularly at the base, especially while fruits are forming.",
+          "recolte": "Pick fully red strawberries with their small stalks; they ripen little after picking."
+        },
+        "es": {
+          "titre": "Fresa",
+          "bienfaits": [
+            "Aporta vitamina C y fibra.",
+            "Bien madura, da sabor a un postre sin necesitar mucho azúcar añadido."
+          ],
+          "exposition": "Pon la planta al sol para conseguir fresas sabrosas.",
+          "arrosage": "Riega con regularidad en la base, sobre todo mientras se forman los frutos.",
+          "recolte": "Recoge las fresas bien rojas con su rabito; apenas maduran después de recogerlas."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/fruit/strawberries/grow-your-own",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/fraise/"
+      ]
+    },
+    "framboise": {
+      "textes": {
+        "fr": {
+          "titre": "Framboise",
+          "bienfaits": [
+            "Elle apporte des fibres et une saveur acidulée.",
+            "Ses petits grains et son parfum donnent du relief à une salade de fruits."
+          ],
+          "exposition": "Choisis une variété compacte en grand pot, au soleil ou à mi-ombre lumineuse.",
+          "arrosage": "Garde le terreau frais et couvre-le d’un paillage pour ralentir le dessèchement.",
+          "recolte": "Cueille délicatement quand le fruit se détache presque tout seul."
+        },
+        "en": {
+          "titre": "Raspberry",
+          "bienfaits": [
+            "It provides fibre and a tangy flavour.",
+            "Its small seeds and aroma add interest to a fruit salad."
+          ],
+          "exposition": "Choose a compact variety in a large pot, in sunshine or bright partial shade.",
+          "arrosage": "Keep the compost moist and add mulch to slow drying.",
+          "recolte": "Pick gently when the fruit comes away almost by itself."
+        },
+        "es": {
+          "titre": "Frambuesa",
+          "bienfaits": [
+            "Aporta fibra y un sabor ligeramente ácido.",
+            "Sus pequeñas semillas y su aroma dan un toque especial a una macedonia."
+          ],
+          "exposition": "Elige una variedad compacta en una maceta grande, al sol o en semisombra luminosa.",
+          "arrosage": "Mantén el sustrato húmedo y cúbrelo con acolchado para que tarde más en secarse.",
+          "recolte": "Recoge con cuidado cuando el fruto se desprenda casi solo."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/fruit/raspberries/grow-your-own",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/framboise/"
+      ]
+    },
+    "citron": {
+      "textes": {
+        "fr": {
+          "titre": "Citron",
+          "bienfaits": [
+            "Il apporte de la vitamine C, en quantité liée à la portion utilisée.",
+            "Son jus et son zeste donnent du relief aux plats et aux desserts."
+          ],
+          "exposition": "Place le citronnier au soleil à la belle saison et protège-le du gel en hiver.",
+          "arrosage": "Arrose quand la surface sèche ; réduis les apports en hiver sans dessécher la motte.",
+          "recolte": "Coupe les citrons à maturité ; la couleur seule ne suffit pas toujours, observe aussi leur taille."
+        },
+        "en": {
+          "titre": "Lemon",
+          "bienfaits": [
+            "It provides vitamin C, in amounts that depend on how much you use.",
+            "Its juice and zest bring dishes and desserts to life."
+          ],
+          "exposition": "Keep the lemon tree in sunshine in the warmer months and protect it from frost in winter.",
+          "arrosage": "Water when the surface dries; reduce watering in winter without letting the rootball dry out.",
+          "recolte": "Cut lemons when mature; colour alone is not always enough, so check their size too."
+        },
+        "es": {
+          "titre": "Limón",
+          "bienfaits": [
+            "Aporta vitamina C, en una cantidad que depende de la porción que uses.",
+            "Su zumo y su ralladura realzan platos y postres."
+          ],
+          "exposition": "Pon el limonero al sol en los meses cálidos y protégelo de las heladas en invierno.",
+          "arrosage": "Riega cuando la superficie se seque; reduce el riego en invierno sin dejar que el cepellón se seque.",
+          "recolte": "Corta los limones maduros; el color no siempre basta, fíjate también en su tamaño."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/fruit/citrus/grow-your-own",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/citron/"
+      ]
+    },
+    "peche": {
+      "textes": {
+        "fr": {
+          "titre": "Pêche",
+          "bienfaits": [
+            "La pêche apporte de l’eau et un peu de fibres.",
+            "Son parfum et sa douceur donnent du goût aux salades sans sauce compliquée."
+          ],
+          "exposition": "Pour un balcon, choisis un pêcher nain au soleil et protège les fleurs des gelées.",
+          "arrosage": "Arrose régulièrement en grand pot, surtout pendant le grossissement des fruits.",
+          "recolte": "Cueille quand le fruit sent bon et cède légèrement sous les doigts."
+        },
+        "en": {
+          "titre": "Peach",
+          "bienfaits": [
+            "Peaches provide water and a little fibre.",
+            "Their aroma and sweetness flavour salads without a complicated dressing."
+          ],
+          "exposition": "For a balcony, choose a dwarf peach tree in sunshine and protect its flowers from frost.",
+          "arrosage": "Water regularly in a large pot, especially while fruits are swelling.",
+          "recolte": "Pick when the fruit smells fragrant and gives slightly under your fingers."
+        },
+        "es": {
+          "titre": "Melocotón",
+          "bienfaits": [
+            "El melocotón aporta agua y algo de fibra.",
+            "Su aroma y dulzor dan sabor a las ensaladas sin aliños complicados."
+          ],
+          "exposition": "Para un balcón, elige un melocotonero enano al sol y protege las flores de las heladas.",
+          "arrosage": "Riega con regularidad en una maceta grande, sobre todo mientras engordan los frutos.",
+          "recolte": "Recoge cuando el fruto huela bien y ceda ligeramente al tocarlo."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/fruit/peaches/grow-your-own",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/peche-jaune/"
+      ]
+    },
+    "melon": {
+      "textes": {
+        "fr": {
+          "titre": "Melon",
+          "bienfaits": [
+            "Sa chair apporte beaucoup d’eau.",
+            "Les variétés à chair orange apportent aussi du bêta-carotène."
+          ],
+          "exposition": "Choisis un emplacement très chaud et ensoleillé et une variété adaptée à ta région.",
+          "arrosage": "Arrose au pied régulièrement, surtout quand les fruits grossissent.",
+          "recolte": "Observe le parfum et les signes de maturité de ta variété, notamment les fissures près du pédoncule."
+        },
+        "en": {
+          "titre": "Melon",
+          "bienfaits": [
+            "Its flesh provides plenty of water.",
+            "Orange-fleshed varieties also provide beta-carotene."
+          ],
+          "exposition": "Choose a very warm, sunny spot and a variety suited to your region.",
+          "arrosage": "Water regularly at the base, especially while fruits are swelling.",
+          "recolte": "Look for the aroma and ripeness signs of your variety, such as cracks near the stalk."
+        },
+        "es": {
+          "titre": "Melón",
+          "bienfaits": [
+            "Su pulpa aporta mucha agua.",
+            "Las variedades de pulpa naranja también aportan betacaroteno."
+          ],
+          "exposition": "Elige un lugar muy cálido y soleado y una variedad adaptada a tu zona.",
+          "arrosage": "Riega con regularidad en la base, sobre todo mientras engordan los frutos.",
+          "recolte": "Fíjate en el aroma y en las señales de madurez de tu variedad, como las grietas cerca del rabito."
+        }
+      },
+      "sources": [
+        "https://www.rhs.org.uk/fruit/melons/grow-your-own",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/melon/"
+      ]
+    },
+    "papaye": {
+      "textes": {
+        "fr": {
+          "titre": "Papaye",
+          "bienfaits": [
+            "Elle apporte de la vitamine C et des fibres.",
+            "Sa chair mûre et douce se mélange facilement aux autres fruits."
+          ],
+          "exposition": "Réserve-lui beaucoup de lumière et une chaleur durable ; sous climat frais, une serre chauffée est généralement nécessaire.",
+          "arrosage": "Arrose régulièrement dans un substrat très drainant, sans eau stagnante.",
+          "recolte": "Si elle fructifie, attends que la peau commence à jaunir puis laisse mûrir le fruit à température ambiante."
+        },
+        "en": {
+          "titre": "Papaya",
+          "bienfaits": [
+            "It provides vitamin C and fibre.",
+            "Its ripe, mild flesh mixes easily with other fruits."
+          ],
+          "exposition": "Give it plenty of light and sustained warmth; a heated greenhouse is usually needed in cool climates.",
+          "arrosage": "Water regularly in a very free-draining growing medium, without standing water.",
+          "recolte": "If it fruits, wait until the skin starts turning yellow, then let the fruit ripen at room temperature."
+        },
+        "es": {
+          "titre": "Papaya",
+          "bienfaits": [
+            "Aporta vitamina C y fibra.",
+            "Su pulpa madura y suave combina fácilmente con otras frutas."
+          ],
+          "exposition": "Dale mucha luz y calor constante; en climas frescos suele necesitar un invernadero con calefacción.",
+          "arrosage": "Riega con regularidad en un sustrato con muy buen drenaje, sin agua estancada.",
+          "recolte": "Si da fruto, espera a que la piel empiece a amarillear y deja que madure a temperatura ambiente."
+        }
+      },
+      "sources": [
+        "https://ask.ifas.ufl.edu/publication/MG054",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/papaye/"
+      ]
+    },
+    "mangue": {
+      "textes": {
+        "fr": {
+          "titre": "Mangue",
+          "bienfaits": [
+            "Elle apporte de la vitamine C et des fibres.",
+            "Son parfum et sa chair douce suffisent à composer un dessert simple."
+          ],
+          "exposition": "Installe-la très à la lumière et au chaud ; en climat tempéré, protège-la du froid à l’intérieur.",
+          "arrosage": "Arrose quand la surface commence à sécher, sans laisser le pot tremper.",
+          "recolte": "La fructification en intérieur est incertaine ; sur un arbre productif, cueille les fruits développés qui commencent à mûrir."
+        },
+        "en": {
+          "titre": "Mango",
+          "bienfaits": [
+            "It provides vitamin C and fibre.",
+            "Its aroma and soft flesh are enough to make a simple dessert."
+          ],
+          "exposition": "Keep it in a very bright, warm spot; in temperate climates, protect it from cold indoors.",
+          "arrosage": "Water when the surface starts to dry, without leaving the pot standing in water.",
+          "recolte": "Indoor fruiting is uncertain; on a productive tree, pick fully developed fruits that are starting to ripen."
+        },
+        "es": {
+          "titre": "Mango",
+          "bienfaits": [
+            "Aporta vitamina C y fibra.",
+            "Su aroma y su pulpa suave bastan para preparar un postre sencillo."
+          ],
+          "exposition": "Ponlo en un lugar muy luminoso y cálido; en climas templados, protégelo del frío en el interior.",
+          "arrosage": "Riega cuando la superficie empiece a secarse, sin dejar la maceta encharcada.",
+          "recolte": "No siempre da fruto en el interior; si el árbol produce, recoge los frutos desarrollados que empiecen a madurar."
+        }
+      },
+      "sources": [
+        "https://ask.ifas.ufl.edu/publication/MG216",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/mangue/"
+      ]
+    },
+    "ananas": {
+      "textes": {
+        "fr": {
+          "titre": "Ananas",
+          "bienfaits": [
+            "Il apporte de la vitamine C et des fibres.",
+            "Sa saveur vive se marie bien avec la menthe et le basilic."
+          ],
+          "exposition": "Offre-lui beaucoup de lumière et de chaleur, dans un pot protégé du froid.",
+          "arrosage": "Arrose modérément dans un terreau drainant et laisse la surface ressuyer.",
+          "recolte": "Si un fruit se forme, attends qu’une bonne partie de sa peau vire au jaune ; compte des années plutôt que des semaines."
+        },
+        "en": {
+          "titre": "Pineapple",
+          "bienfaits": [
+            "It provides vitamin C and fibre.",
+            "Its bright flavour goes well with mint and basil."
+          ],
+          "exposition": "Give it plenty of light and warmth, in a pot protected from cold.",
+          "arrosage": "Water moderately in free-draining compost and let the surface dry slightly.",
+          "recolte": "If a fruit forms, wait until a good part of its skin turns yellow; think in years rather than weeks."
+        },
+        "es": {
+          "titre": "Piña",
+          "bienfaits": [
+            "Aporta vitamina C y fibra.",
+            "Su sabor vivo combina bien con la menta y la albahaca."
+          ],
+          "exposition": "Dale mucha luz y calor en una maceta protegida del frío.",
+          "arrosage": "Riega con moderación en un sustrato con buen drenaje y deja secar un poco la superficie.",
+          "recolte": "Si se forma un fruto, espera a que buena parte de la piel amarillee; piensa en años, no en semanas."
+        }
+      },
+      "sources": [
+        "https://ask.ifas.ufl.edu/publication/MG055",
+        "https://www.aprifel.com/fr/fiche-nutritionnelle/ananas/"
+      ]
+    }
+  }
+}

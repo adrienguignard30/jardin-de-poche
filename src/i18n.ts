@@ -6,6 +6,22 @@ export const LANGUES = [
 ] as const;
 export type Lang = typeof LANGUES[number]['id'];
 
+const GUIDE_ACCUEIL = {
+  fr: {
+    titre: 'Bienvenue ! Voici ton menu ⚙', passer: 'Passer', fin: "C'est parti", revoir: 'Revoir le guide',
+    lignes: ['Les règles en 1 minute : semer, arroser, récolter, cuisiner, offrir.', 'Les meilleurs jardiniers. Crée un compte pour y figurer.', 'Léa, Marcel et Jimy en réalité augmentée, dans ta pièce, avec ton appareil photo.', 'Connecte-toi ou crée un compte : tu entres dans le classement et tu retrouves ton balcon sur tous tes appareils.', 'Pour voir tes plantes pousser en accéléré : Normal, ×50 ou ×90.'],
+  },
+  en: {
+    titre: 'Welcome! Here is your menu ⚙', passer: 'Skip', fin: "Let's go", revoir: 'Show the guide again',
+    lignes: ['The rules in 1 minute: sow, water, harvest, cook, give.', 'The best gardeners. Create an account to join the leaderboard.', 'Léa, Marcel and Jimy in augmented reality, in your room, using your camera.', 'Sign in or create an account: join the leaderboard and access your balcony on all your devices.', 'Watch your plants grow faster: Normal, ×50 or ×90.'],
+  },
+  es: {
+    titre: '¡Bienvenido! Este es tu menú ⚙', passer: 'Omitir', fin: '¡Vamos!', revoir: 'Volver a ver la guía',
+    lignes: ['Las reglas en 1 minuto: sembrar, regar, cosechar, cocinar, regalar.', 'Los mejores jardineros. Crea una cuenta para aparecer en la clasificación.', 'Léa, Marcel y Jimy en realidad aumentada, en tu habitación, con tu cámara.', 'Inicia sesión o crea una cuenta: entra en la clasificación y accede a tu balcón desde todos tus dispositivos.', 'Para ver tus plantas crecer más rápido: Normal, ×50 o ×90.'],
+  },
+};
+export function guideAccueil() { return GUIDE_ACCUEIL[lang()]; }
+
 const STRINGS = {
   fr: {
     title: 'Potager de Poche',
@@ -407,12 +423,26 @@ export type DictionnairePartiel<T> = T extends TexteFonction ? T
   : T extends object ? { [K in keyof T]?: DictionnairePartiel<T[K]> } : T;
 
 const EXTRA_EN = {
+  infosPlante: 'Plant info', infosVoirRecette: 'View the full recipe', infosChezToi: 'Cook it at home', infosDansJeu: 'In the game',
+  infosBienfaits: 'Good to know', infosExposition: 'Light', infosArrosage: 'Watering', infosRecolte: 'Harvesting',
+  infosPreparation: 'Preparation', infosCuisson: 'Cooking', infosRepos: 'Resting', infosTotal: 'Total', infosEtapes: 'Steps', infosAstuce: 'A little tip',
+  infosChargement: 'Loading the guide…', infosIndisponible: 'The full guide will be available soon.',
+  infosAccompagnement: 'Two side portions of vegetables.', infosQuantitesReelles: 'Kitchen quantities: these are separate from your game basket. Wash the produce before preparing it.',
+  infosCultureReelle: 'For real-life growing: observe your plant and soil. Growing times in the game are imaginary.', infosToucheJeu: 'A touch from the game',
+  infosPour: (n: number) => 'Serves ' + n,
   unite: 'unit', patienter: 'One moment, almost done!', commentJouer: 'How to play',
   personnagesAR: '📱 Meet the characters in AR', boutonRegles: '📖 How to play', afficherMdp: 'show password',
   pseudoPrefixe: 'Gardener ', typesRecette: { entree: 'starter', plat: 'main', dessert: 'dessert' },
   typesRecetteArticle: { entree: 'a starter', plat: 'a main course', dessert: 'a dessert' }, recoltes: 'harvests',
 } as const;
 const EXTRA_FR = {
+  infosPlante: 'Infos plante', infosVoirRecette: 'Voir la recette complète', infosChezToi: 'À cuisiner chez toi', infosDansJeu: 'Dans le jeu',
+  infosBienfaits: 'Bienfaits', infosExposition: 'Exposition', infosArrosage: 'Arrosage', infosRecolte: 'Récolte',
+  infosPreparation: 'Préparation', infosCuisson: 'Cuisson', infosRepos: 'Repos', infosTotal: 'Total', infosEtapes: 'Étapes', infosAstuce: 'La petite astuce',
+  infosChargement: 'Chargement de la fiche…', infosIndisponible: 'La fiche complète sera bientôt disponible.',
+  infosAccompagnement: 'Deux portions de légumes en accompagnement.', infosQuantitesReelles: 'Quantités de cuisine : elles sont indépendantes de ton panier du jeu. Lave les produits avant de les préparer.',
+  infosCultureReelle: 'Pour cultiver chez toi : observe ta plante et la terre. Les temps de pousse du jeu sont imaginaires.', infosToucheJeu: 'La touche du jeu',
+  infosPour: (n: number) => 'Pour ' + n + ' personne' + (n > 1 ? 's' : ''),
   unite: 'unité', patienter: 'Un instant, je termine !', commentJouer: 'Comment jouer',
   personnagesAR: '📱 Les personnages chez toi', boutonRegles: '📖 Comment jouer', afficherMdp: 'afficher le mot de passe',
   pseudoPrefixe: 'Jardinier ', typesRecette: { entree: 'entrée', plat: 'plat', dessert: 'dessert' },
@@ -511,6 +541,13 @@ export interface GraineQuantite { id: string; famille: string; nom_fr: string; n
 
 
 const ESPAGNOL = {
+  infosPlante: 'Info de la planta', infosVoirRecette: 'Ver la receta completa', infosChezToi: 'Para cocinar en casa', infosDansJeu: 'En el juego',
+  infosBienfaits: 'Qué te aporta', infosExposition: 'Luz', infosArrosage: 'Riego', infosRecolte: 'Cosecha',
+  infosPreparation: 'Preparación', infosCuisson: 'Cocción', infosRepos: 'Reposo', infosTotal: 'Total', infosEtapes: 'Pasos', infosAstuce: 'Un pequeño truco',
+  infosChargement: 'Cargando la ficha…', infosIndisponible: 'La ficha completa estará disponible pronto.',
+  infosAccompagnement: 'Dos raciones de verduras como guarnición.', infosQuantitesReelles: 'Cantidades para cocinar: son independientes de tu cesta del juego. Lava los productos antes de prepararlos.',
+  infosCultureReelle: 'Para cultivar en casa: observa tu planta y la tierra. Los tiempos de crecimiento del juego son imaginarios.', infosToucheJeu: 'El toque del juego',
+  infosPour: (n: number) => 'Para ' + n + ' persona' + (n > 1 ? 's' : ''),
   title: 'Huerto de Bolsillo',
   tagline: 'Un huerto de balcón para quienes no tienen uno.',
   personnaliser: 'Personalizar', plus: 'Más (edad, profesión)', retour: 'Volver', demoJury: '⏩ Demo acelerada', jouerAvec: (n: string) => `Jugar con ${n}`,
