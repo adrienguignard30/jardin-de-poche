@@ -202,8 +202,8 @@ window.PITCH = {
    "ia": 148,
    "q": "How do you make money with it?",
    "qf": "Comment tu gagnes de l'argent avec ça ?",
-   "a": "Playable characters and decor objects made with Tripo cost credits; that's the natural model. No ads.",
-   "af": "Les personnages jouables et les objets de déco faits avec Tripo coûtent des crédits ; c'est le modèle naturel. Pas de pub."
+   "a": "Players will buy their own playable character and decor objects, made with Tripo. No ads.",
+   "af": "Les joueurs achèteront leur propre personnage jouable et leurs objets de déco, fabriqués par Tripo. Pas de pub."
   },
   {
    "iq": 139,
