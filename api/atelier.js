@@ -12,7 +12,8 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
-import { dedup, prune, draco, textureCompress } from '@gltf-transform/functions';
+import { dedup, prune, draco, textureCompress, weld, simplify, getSceneVertexCount, VertexCountMethod } from '@gltf-transform/functions';
+import { MeshoptSimplifier } from 'meshoptimizer';
 import draco3d from 'draco3dgltf';
 import sharp from 'sharp';
 
@@ -75,15 +76,23 @@ async function tripo(cleTripo, quoi, arg) {
 /** Compresse un GLB de Tripo comme les modèles du jeu : doublons retirés, textures WebP (max 2048 px), géométrie Draco.
  *  50 Mo → ~5 Mo, aucune perte visible ; le jeu sait déjà lire Draco et WebP. En cas de souci, on garde le fichier d'origine. */
 let ioPromesse = null;
+const MAX_SOMMETS = 400000;   // au-delà, le maillage est simplifié (comme les plantes du jeu) : un téléphone ne suivrait pas
 async function compresserGlb(octets) {
+  const info = { brut: octets.length };
   try {
     if (!ioPromesse) ioPromesse = (async () => new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ 'draco3d.encoder': await draco3d.createEncoderModule(), 'draco3d.decoder': await draco3d.createDecoderModule() }))();
     const io = await ioPromesse;
     const doc = await io.readBinary(new Uint8Array(octets));
-    await doc.transform(dedup(), prune(), textureCompress({ encoder: sharp, targetFormat: 'webp', quality: 86, resize: [2048, 2048] }), draco());
+    const sommets = getSceneVertexCount(doc.getRoot().getDefaultScene() ?? doc.getRoot().listScenes()[0], VertexCountMethod.RENDER);
+    info.sommets = sommets;
+    const etapes = [dedup(), prune()];
+    if (sommets > MAX_SOMMETS) { await MeshoptSimplifier.ready; etapes.push(weld(), simplify({ simplifier: MeshoptSimplifier, ratio: MAX_SOMMETS / sommets, error: 0.01, lockBorder: false })); }
+    etapes.push(textureCompress({ encoder: sharp, targetFormat: 'webp', quality: 86, resize: [2048, 2048] }), draco());
+    await doc.transform(...etapes);
     const sortie = Buffer.from(await io.writeBinary(doc));
-    return sortie.length < octets.length ? sortie : octets;
-  } catch (e) { console.warn('compression impossible, fichier gardé tel quel :', String(e).slice(0, 200)); return octets; }
+    info.compresse = sortie.length;
+    return { octets: sortie.length < octets.length ? sortie : octets, info };
+  } catch (e) { info.erreur = String(e).slice(0, 160); return { octets, info }; }
 }
 
 /** Envoie la photo à Tripo (POST /v3/files) et renvoie le jeton de fichier, ou null si l'envoi est refusé. */
@@ -246,8 +255,8 @@ export default async function handler(req, res) {
               const modele = await fetch(urlM); if (!modele.ok) throw new Error(`téléchargement du modèle ${modele.status}`);
               const brut = Buffer.from(await modele.arrayBuffer());
               if (brut.length > 180 * 1024 * 1024) throw new Error('modèle trop lourd');
-              const octets = await compresserGlb(brut);
-              if (octets.length > 50 * 1024 * 1024) throw new Error('modèle trop lourd même compressé');
+              const { octets, info } = await compresserGlb(brut);
+              if (octets.length > 50 * 1024 * 1024) throw new Error(`modèle trop lourd même compressé (${JSON.stringify(info)})`);
               const url = await sbUpload(cle, `${c.id}.glb`, octets, 'model/gltf-binary');
               let image = null;
               const o = d.output ?? {};
