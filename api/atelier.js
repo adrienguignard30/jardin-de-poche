@@ -75,19 +75,30 @@ async function tripo(cleTripo, quoi, arg) {
 
 /** Compresse un GLB de Tripo comme les modèles du jeu : doublons retirés, textures WebP (max 2048 px), géométrie Draco.
  *  50 Mo → ~5 Mo, aucune perte visible ; le jeu sait déjà lire Draco et WebP. En cas de souci, on garde le fichier d'origine. */
-let ioPromesse = null;
+let ioPromesse = null, dracoPret = null;
 const MAX_SOMMETS = 400000;   // au-delà, le maillage est simplifié (comme les plantes du jeu) : un téléphone ne suivrait pas
+/** Draco a besoin d'un fichier .wasm livré à côté du serveur (voir vercel.json → includeFiles) ; s'il manque, on continue sans Draco. */
+async function dracoDispo() {
+  if (dracoPret === null) {
+    try {
+      const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ 'draco3d.encoder': await draco3d.createEncoderModule(), 'draco3d.decoder': await draco3d.createDecoderModule() });
+      ioPromesse = io; dracoPret = true;
+    } catch (e) { console.warn('Draco indisponible sur le serveur :', String(e).slice(0, 160)); ioPromesse = new NodeIO().registerExtensions(ALL_EXTENSIONS); dracoPret = false; }
+  }
+  return dracoPret;
+}
 async function compresserGlb(octets) {
   const info = { brut: octets.length };
   try {
-    if (!ioPromesse) ioPromesse = (async () => new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ 'draco3d.encoder': await draco3d.createEncoderModule(), 'draco3d.decoder': await draco3d.createDecoderModule() }))();
-    const io = await ioPromesse;
+    const avecDraco = await dracoDispo(); info.draco = avecDraco;
+    const io = ioPromesse;
     const doc = await io.readBinary(new Uint8Array(octets));
     const sommets = getSceneVertexCount(doc.getRoot().getDefaultScene() ?? doc.getRoot().listScenes()[0], VertexCountMethod.RENDER);
     info.sommets = sommets;
     const etapes = [dedup(), prune()];
     if (sommets > MAX_SOMMETS) { await MeshoptSimplifier.ready; etapes.push(weld(), simplify({ simplifier: MeshoptSimplifier, ratio: MAX_SOMMETS / sommets, error: 0.01, lockBorder: false })); }
-    etapes.push(textureCompress({ encoder: sharp, targetFormat: 'webp', quality: 86, resize: [2048, 2048] }), draco());
+    etapes.push(textureCompress({ encoder: sharp, targetFormat: 'webp', quality: 86, resize: [2048, 2048] }));
+    if (avecDraco) etapes.push(draco());
     await doc.transform(...etapes);
     const sortie = Buffer.from(await io.writeBinary(doc));
     info.compresse = sortie.length;
