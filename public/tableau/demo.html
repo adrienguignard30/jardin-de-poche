@@ -88,7 +88,7 @@
 </style>
 </head>
 <body>
-<div id="aide">→ ou clic : suivant · ← : précédent · M : chapitres · F : plein écran · V : voix</div>
+<div id="aide">→ ou clic : suivant · ← : précédent · M : chapitres · F : plein écran · V : voix · P : auto</div>
 <main id="scene" aria-live="polite">
 
 <section class="d titre" data-chap="Accueil">
@@ -112,6 +112,7 @@
     <div class="n r" style="--i:2">1</div><div class="t r" style="--i:2">Je choisis : <b>un cadeau pour ceux qui n'ont pas de jardin</b>.</div>
     <div class="n r" style="--i:3">2</div><div class="t r" style="--i:3">Le thème se voit dans la 3D : toits de zinc, rambardes, pots serrés — <b>un vrai balcon de Paris</b>.</div>
     <div class="n r" style="--i:4">3</div><div class="t r" style="--i:4">Le nom : « Jardin de poche » devient <b>« Potager de Poche »</b> — on cultive pour manger.</div>
+    <div class="n r" style="--i:5">4</div><div class="t r" style="--i:5"><b>Soumis le 5 octobre.</b> Depuis, j'ai continué : tout ce que vous voyez aujourd'hui est la version du jour.</div>
   </div>
 </section>
 
@@ -119,7 +120,7 @@
   <p class="chap r" style="--i:0">27 septembre · l'idée évolue</p>
   <h2 class="r" style="--i:1">« Planter, attendre, vendre » : trop plat.</h2>
   <div class="fleche r" style="--i:2"><span>Cultiver</span><i>→</i><span>Manquer</span><i>→</i><span>Troquer</span><i>→</i><span>Cuisiner</span><i>→</i><span>Offrir</span></div>
-  <p class="gros r" style="--i:3; text-align:center;margin-top:1em">J'enlève l'argent. <b style="color:var(--jaune)">Le plat devient le cadeau.</b></p>
+  <p class="gros r" style="--i:3; text-align:center;margin-top:1em">Pas d'argent : des <b style="color:var(--jaune)">points</b>, gagnés en <b style="color:var(--jaune)">offrant un plat</b>. Ils achètent les graines et les pots, et rendent les trocs équitables.</p>
   <p class="s r" style="--i:4">Une recette du jour à laquelle il manque toujours un ingrédient → on a besoin des voisins. Chaque balcon a ses graines interdites, racontées par le décor.</p>
 </section>
 
@@ -131,6 +132,7 @@
     <div class="carte r" style="--i:3"><h3>Jimy</h3><p>Sur les toits, Arc de Triomphe, sound system.</p></div>
   </div>
   <p class="s r" style="--i:4; margin-top:1.2em">Trois corps différents, <b style="color:var(--jaune)">un seul squelette</b> pour tous : chaque animation marche pour les trois.</p>
+  <p class="s r" style="--i:5">Et chacun se <b style="color:var(--jaune)">personnalise</b> : peau, cheveux, vêtements, chaussures.</p>
 </section>
 
 <section class="d titre" data-chap="Tripo">
@@ -187,8 +189,8 @@
 <section class="d">
   <p class="chap r" style="--i:0">Blender · ce que j'ai fait moi-même</p>
   <ul>
-    <li class="r" style="--i:1"><b>L'immeuble et les trois balcons</b> : modélisés par moi dans Blender.</li>
-    <li class="r" style="--i:2"><b>Certains objets</b> de déco, les autres par Tripo et par Codex.</li>
+    <li class="r" style="--i:1"><b>L'immeuble et les trois balcons</b> : faits dans Blender, avec des scripts Python.</li>
+    <li class="r" style="--i:2"><b>Les objets de déco</b> : par Tripo et par Codex.</li>
     <li class="r" style="--i:3"><b>Des scripts Python</b> pour exporter, cuire les textures, vérifier le placement des meubles, réparer les squelettes.</li>
   </ul>
 </section>
@@ -374,11 +376,13 @@
 </section>
 
 <section class="d">
-  <p class="chap r" style="--i:0">La suite · et aussi</p>
+  <p class="chap r" style="--i:0">La suite · plus</p>
+  <h2 class="r" style="--i:1">Le jeu grandit.</h2>
   <ul>
-    <li class="r" style="--i:1"><b>Infos plantes et vraies recettes</b> en FR/EN/ES — en ligne depuis aujourd'hui.</li>
-    <li class="r" style="--i:2">Météo réelle de Paris sur le balcon.</li>
-    <li class="r" style="--i:3">Cartes de plats à collectionner, notifications douces.</li>
+    <li class="r" style="--i:2"><b>Plus de recettes.</b></li>
+    <li class="r" style="--i:3"><b>Plus de plantes.</b></li>
+    <li class="r" style="--i:4"><b>Plus de pays</b> : d'autres villes, d'autres balcons.</li>
+    <li class="r" style="--i:5"><b>Plus d'appartements</b> : de nouveaux lieux à cultiver.</li>
   </ul>
 </section>
 
@@ -397,6 +401,7 @@
   <button type="button" id="bMenu">☰ Chapitres</button>
   <button type="button" id="bPlein">⛶</button>
   <button type="button" id="bVoix" aria-pressed="false">🔇 Voix</button>
+  <button type="button" id="bAuto" aria-pressed="false" title="Enchaîner les diapos à la fin de chaque phrase">▶ Auto</button>
   <select id="sLang" aria-label="Langue de la voix"><option value="fr">FR</option><option value="en">EN</option><option value="es">ES</option></select>
   <span id="voixEtat"></span>
   <span id="compteur"></span>
@@ -421,7 +426,7 @@
     liste.querySelectorAll('button').forEach(b => { const k2 = +b.dataset.k; const suivant = [...liste.querySelectorAll('button')].find(x => +x.dataset.k > k2); b.classList.toggle('actif', i >= k2 && (!suivant || i < +suivant.dataset.k)); });
   };
   function ouvrirMenu(o) { menu.classList.toggle('ouvert', o === undefined ? !menu.classList.contains('ouvert') : o); }
-  document.getElementById('scene').addEventListener('click', e => { if (e.target.closest('a')) return; const x = e.clientX / innerWidth; aller(x < .2 ? i - 1 : i + 1); });
+  document.getElementById('scene').addEventListener('click', e => { if (e.target.closest('a')) return; if (autoOn) { autoOn = false; majAuto(); } const x = e.clientX / innerWidth; aller(x < .2 ? i - 1 : i + 1); });
   document.getElementById('bPrec').onclick = () => aller(i - 1);
   document.getElementById('bSuiv').onclick = () => aller(i + 1);
   document.getElementById('bMenu').onclick = () => ouvrirMenu();
@@ -442,23 +447,28 @@
   /* la voix : fichiers fabriqués par le tableau (Gemini TTS), rangés dans Supabase */
   const SBV = 'https://jbwlhapwszsuwirspybg.supabase.co/storage/v1/object/public/voix/';
   const CLE_V = 'jdp.demo.voix', CLE_L = 'jdp.demo.lang';
-  let voixOn = false, lang = 'fr', audio = new Audio(), jeton = 0;
+  let voixOn = false, lang = 'fr', audio = new Audio(), jeton = 0, autoOn = false, minuteur = 0;
   try { voixOn = localStorage.getItem(CLE_V) === '1'; lang = ['fr', 'en', 'es'].includes(localStorage.getItem(CLE_L)) ? localStorage.getItem(CLE_L) : (navigator.language || 'fr').slice(0, 2); if (!['fr', 'en', 'es'].includes(lang)) lang = 'fr'; } catch { /* rien */ }
   const sLang = document.getElementById('sLang'), bVoix = document.getElementById('bVoix'), vEtat = document.getElementById('voixEtat');
   sLang.value = lang;
   async function sha1(t) { const d = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(t)); return [...new Uint8Array(d)].map(x => x.toString(16).padStart(2, '0')).join(''); }
   async function lire() {
-    audio.pause(); vEtat.textContent = '';
+    audio.pause(); clearTimeout(minuteur); vEtat.textContent = '';
     if (!voixOn || !window.VOIX || !window.VOIX[lang] || !window.VOIX[lang][i]) return;
     const mon = ++jeton, texte = window.VOIX[lang][i];
     let h; try { h = await sha1(texte); } catch { vEtat.textContent = 'voix indisponible ici'; return; }
     if (mon !== jeton) return;
-    audio = new Audio(`${SBV}${lang}/${String(i).padStart(2, '0')}-${h.slice(0, 10)}.wav`);
+    audio = new Audio(`${SBV}${lang}/${String(i).padStart(2, '0')}-${h.slice(0, 10)}-${String(window.VOIX_VOIX || 'Charon').toLowerCase()}.wav`);
     audio.onerror = () => { if (mon === jeton) vEtat.textContent = 'voix non préparée (tableau → Démo → Préparer les voix)'; };
+    audio.onended = () => { if (mon === jeton && autoOn && i < diapos.length - 1) minuteur = setTimeout(() => aller(i + 1), 1000); };
     audio.play().catch(() => { if (mon === jeton) vEtat.textContent = 'touche l’écran pour lancer le son'; });
   }
   function majVoix() { bVoix.textContent = voixOn ? '🔊 Voix' : '🔇 Voix'; bVoix.setAttribute('aria-pressed', String(voixOn)); try { localStorage.setItem(CLE_V, voixOn ? '1' : '0'); localStorage.setItem(CLE_L, lang); } catch { /* rien */ } }
-  bVoix.onclick = () => { voixOn = !voixOn; majVoix(); lire(); };
+  bVoix.onclick = () => { voixOn = !voixOn; if (!voixOn) { autoOn = false; majAuto(); } majVoix(); lire(); };
+  const bAuto = document.getElementById('bAuto');
+  function majAuto() { bAuto.textContent = autoOn ? '⏸ Auto' : '▶ Auto'; bAuto.setAttribute('aria-pressed', String(autoOn)); }
+  bAuto.onclick = () => { autoOn = !autoOn; if (autoOn && !voixOn) { voixOn = true; majVoix(); } majAuto(); if (autoOn) lire(); else clearTimeout(minuteur); };
+  document.addEventListener('keydown', e => { if (e.key === 'p' || e.key === 'P') bAuto.onclick(); });
   sLang.onchange = () => { lang = sLang.value; majVoix(); lire(); };
   document.addEventListener('keydown', e => { if (e.key === 'v' || e.key === 'V') bVoix.onclick(); });
   const allerSansVoix = aller;

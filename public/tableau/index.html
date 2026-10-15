@@ -751,7 +751,7 @@ var qrcode=(function(){var P=function(x,w){var g=236,l=17,n=x,s=O[w],t=null,r=0,
     for (const l of langues) for (let i = 0; i < V[l].length; i++) {
       $('prepEtat').textContent = `${fait} / ${total} · ${l.toUpperCase()} ${i + 1}`;
       try {
-        const r = await fetch('/api/voix', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, lang: l, i, texte: V[l][i] }) });
+        const r = await fetch('/api/voix', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, lang: l, i, texte: V[l][i], voix: window.VOIX_VOIX || 'Charon' }) });
         const j = await r.json().catch(() => null);
         if (!r.ok) soucis.push(`${l} ${i + 1} : ${j?.erreur || r.status}${j?.detail ? ' — ' + j.detail : ''}`); else if (j.genere) neuf++;
       } catch (e) { soucis.push(`${l} ${i + 1} : ${e.message}`); }
