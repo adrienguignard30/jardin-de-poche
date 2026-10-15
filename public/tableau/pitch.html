@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Pitch à apprendre</title>
+<link rel="stylesheet" href="/fonts/nunito.css">
+<style>
+  :root { --fond: #0b1a10; --fond2: #11261a; --fond3: #173323; --encre: #f4f1e6; --muet: #a9b9ad; --vert: #7dd49a; --jaune: #ffd166; --orange: #ffb27a; --rose: #ffb3c1; --trait: rgba(255,255,255,.14); }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--fond); color: var(--encre); font: 600 17px/1.45 Nunito, system-ui, sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 18px 16px 140px; }
+  a { color: var(--vert); }
+  header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  header h1 { margin: 0; font-size: 26px; font-weight: 800; flex: 1; min-width: 200px; }
+  header .retour { font-size: 14px; color: var(--muet); text-decoration: none; }
+  .onglets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .onglets button { font: 800 15px Nunito, system-ui, sans-serif; color: var(--muet); background: var(--fond2); border: 1px solid var(--trait); border-radius: 12px; padding: 10px 14px; cursor: pointer; }
+  .onglets button.actif { color: var(--fond); background: var(--vert); border-color: var(--vert); }
+  .aide { color: var(--muet); font-size: 14.5px; margin: 0 0 14px; }
+  .ligne { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: start; background: var(--fond2); border: 1px solid var(--trait); border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; cursor: pointer; transition: border-color .2s, background .2s; }
+  .ligne:hover { border-color: rgba(125,212,154,.5); }
+  .ligne.joue { border-color: var(--vert); background: var(--fond3); box-shadow: 0 0 0 3px rgba(125,212,154,.18); }
+  .ligne .b { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--vert); color: var(--fond); font-size: 18px; cursor: pointer; display: grid; place-items: center; }
+  .ligne.joue .b { background: var(--jaune); }
+  .ligne .t { font-size: 20px; font-weight: 800; line-height: 1.3; }
+  .ligne .ph { color: var(--orange); font-size: 16px; margin-top: 4px; }
+  .ligne .tr { color: var(--muet); font-size: 14.5px; margin-top: 4px; }
+  .ligne.q .t { color: var(--rose); }
+  .ligne.q .b { background: var(--rose); }
+  .qa { margin-bottom: 18px; }
+  .qa .num { font-size: 13px; color: var(--muet); margin: 0 0 6px 4px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+  .masquePh .ph, .masqueTr .tr { display: none; }
+  #barre { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(11,26,16,.96); backdrop-filter: blur(6px); border-top: 1px solid var(--trait); padding: 10px 16px max(10px, env(safe-area-inset-bottom)); }
+  #barre .in { max-width: 860px; margin: 0 auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  #barre button, #barre select, #barre label { font: 800 14.5px Nunito, system-ui, sans-serif; color: var(--encre); background: rgba(255,255,255,.08); border: 1px solid var(--trait); border-radius: 12px; padding: 10px 13px; min-height: 44px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  #barre button.principal { background: var(--vert); color: var(--fond); border-color: var(--vert); }
+  #barre label input { accent-color: var(--vert); width: 18px; height: 18px; }
+  #etat { font-size: 13px; color: var(--muet); flex-basis: 100%; min-height: 1em; }
+  @media (max-width: 560px) { .ligne .t { font-size: 18px; } header h1 { font-size: 22px; } #barre button, #barre select, #barre label { padding: 9px 10px; font-size: 13.5px; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>🎤 Pitch à apprendre</h1>
+    <a class="retour" href="index.html#p-demo">← tableau</a>
+  </header>
+  <nav class="onglets" id="onglets">
+    <button type="button" data-o="en" class="actif">Pitch anglais</button>
+    <button type="button" data-o="fr">Pitch français</button>
+    <button type="button" data-o="qa">Questions du jury</button>
+    <button type="button" data-o="sec">Phrases de secours</button>
+  </nav>
+  <p class="aide" id="aide"></p>
+  <div id="liste"></div>
+</main>
+<div id="barre"><div class="in">
+  <button type="button" id="bTout" class="principal">▶ Tout lire</button>
+  <select id="sVit" aria-label="Vitesse"><option value="1">Vitesse normale</option><option value="0.85">Un peu lent</option><option value="0.7">Lent</option></select>
+  <label title="Après chaque phrase, un silence pour que tu la redises"><input type="checkbox" id="cRep"> Je répète</label>
+  <label><input type="checkbox" id="cPh" checked> Prononciation</label>
+  <label><input type="checkbox" id="cTr" checked> Traduction</label>
+  <div id="etat" aria-live="polite"></div>
+</div></div>
+<script src="pitch-voix.js"></script>
+<script>
+(() => {
+  const SBV = 'https://jbwlhapwszsuwirspybg.supabase.co/storage/v1/object/public/voix/';
+  const P = window.PITCH, V = window.PITCH_VOIX;
+  const liste = document.getElementById('liste'), etat = document.getElementById('etat');
+  const AIDES = {
+    en: 'Touche une phrase pour l’entendre. « Tout lire » enchaîne. Avec « Je répète », un silence après chaque phrase pour la redire à voix haute. En orange : la prononciation, à lire comme du français.',
+    fr: 'Le même pitch en français, pour savoir exactement ce que tu dis en anglais.',
+    qa: 'En rose : la question du jury (voix de femme). En dessous : ta réponse (ta voix). « Tout lire » enchaîne question → réponse.',
+    sec: 'Les phrases qui te sauvent si tu ne comprends pas une question.'
+  };
+  let onglet = 'en', items = [], cour = -1, enchaine = false, audio = new Audio(), jeton = 0, minuteur = 0, enPause = false;
+  const cle = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch { return null; } };
+
+  async function sha1(t) { const d = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(t)); return [...new Uint8Array(d)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+  async function url(it) { return `${SBV}${it.lang}/${String(it.i).padStart(2, '0')}-${(await sha1(it.texte)).slice(0, 10)}-${it.voix.toLowerCase()}.wav`; }
+
+  function el(tag, cls, txt) { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function ligne(it, t, ph, tr, q) {
+    const d = el('div', 'ligne' + (q ? ' q' : ''));
+    const b = el('button', 'b', '▶'); b.type = 'button'; b.setAttribute('aria-label', 'Écouter');
+    const c = el('div'); c.append(el('div', 't', t)); if (ph) c.append(el('div', 'ph', ph)); if (tr) c.append(el('div', 'tr', tr));
+    d.append(b, c);
+    const k = items.length; items.push({ ...it, el: d });
+    d.onclick = () => { enchaine = false; majTout(); jouer(k); };
+    return d;
+  }
+  function dessiner() {
+    liste.replaceChildren(); items = []; cour = -1; arreter();
+    document.getElementById('aide').textContent = AIDES[onglet];
+    if (onglet === 'en') P.pitch_en.forEach(x => liste.append(ligne({ lang: 'en', i: x.i, texte: x.en, voix: V.moi }, x.en, x.ph, x.fr)));
+    if (onglet === 'fr') P.pitch_fr.forEach(x => liste.append(ligne({ lang: 'fr', i: x.i, texte: x.fr, voix: V.moi }, x.fr)));
+    if (onglet === 'sec') P.secours.forEach(x => liste.append(ligne({ lang: 'en', i: x.i, texte: x.en, voix: V.moi }, x.en, x.ph)));
+    if (onglet === 'qa') P.qa.forEach((x, n) => {
+      const bloc = el('div', 'qa'); bloc.append(el('div', 'num', `Question ${n + 1}`));
+      bloc.append(ligne({ lang: 'en', i: x.iq, texte: x.q, voix: V.jury }, x.q, null, x.qf, true));
+      bloc.append(ligne({ lang: 'en', i: x.ia, texte: x.a, voix: V.moi }, x.a, null, x.af));
+      liste.append(bloc);
+    });
+    document.querySelectorAll('#onglets button').forEach(b => b.classList.toggle('actif', b.dataset.o === onglet));
+    cle('jdp.pitch.onglet', onglet);
+  }
+  function arreter() { jeton++; audio.pause(); clearTimeout(minuteur); enPause = false; items.forEach(x => x.el.classList.remove('joue')); }
+  function majTout() { document.getElementById('bTout').textContent = enPause ? '▶ Reprendre' : (enchaine || (!audio.paused && !audio.ended)) ? '⏸ Pause' : '▶ Tout lire'; }
+  async function jouer(k) {
+    arreter(); if (k < 0 || k >= items.length) { enchaine = false; majTout(); etat.textContent = ''; return; }
+    cour = k; const it = items[k], mon = jeton; it.el.classList.add('joue');
+    it.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    etat.textContent = '';
+    let u; try { u = await url(it); } catch { etat.textContent = 'Voix indisponible sur cette page (il faut https).'; return; }
+    if (mon !== jeton) return;
+    audio = new Audio(u); audio.preservesPitch = true; audio.playbackRate = +document.getElementById('sVit').value || 1;
+    audio.onerror = () => { if (mon === jeton) { etat.textContent = 'Voix pas encore préparée : tableau → Démo → Préparer les voix.'; enchaine = false; majTout(); } };
+    audio.onended = () => {
+      if (mon !== jeton) return;
+      it.el.classList.remove('joue');
+      if (!enchaine) { majTout(); return; }
+      const rep = document.getElementById('cRep').checked;
+      const pause = rep ? Math.min(12000, (audio.duration / audio.playbackRate) * 1100 + 800) : 900;
+      if (rep) { etat.textContent = '🗣️ À toi de la redire…'; items[k].el.classList.add('joue'); }
+      minuteur = setTimeout(() => { if (mon === jeton && !enPause) jouer(k + 1); }, pause);
+    };
+    audio.play().then(majTout).catch(() => { if (mon === jeton) etat.textContent = 'Touche l’écran pour autoriser le son.'; });
+  }
+  document.getElementById('bTout').onclick = () => {
+    if (enPause) {                                   // reprendre là où on s'était arrêté
+      enPause = false; etat.textContent = '';
+      if (audio.src && !audio.ended) audio.play().catch(() => {}); else if (enchaine) jouer(cour + 1);
+      majTout(); return;
+    }
+    if (enchaine || (!audio.paused && !audio.ended)) { enPause = true; audio.pause(); clearTimeout(minuteur); etat.textContent = 'En pause'; majTout(); return; }
+    enchaine = true; majTout(); jouer(cour >= 0 && cour < items.length - 1 ? cour : 0);
+  };
+  document.getElementById('sVit').onchange = e => { audio.playbackRate = +e.target.value || 1; cle('jdp.pitch.vit', e.target.value); };
+  const appliquer = () => { liste.classList.toggle('masquePh', !document.getElementById('cPh').checked); liste.classList.toggle('masqueTr', !document.getElementById('cTr').checked); };
+  ['cPh', 'cTr', 'cRep'].forEach(id => { const c = document.getElementById(id); const v = cle('jdp.pitch.' + id); if (v !== null) c.checked = v === '1'; c.onchange = () => { cle('jdp.pitch.' + id, c.checked ? '1' : '0'); appliquer(); }; });
+  { const v = cle('jdp.pitch.vit'); if (v) document.getElementById('sVit').value = v; }
+  document.querySelectorAll('#onglets button').forEach(b => b.onclick = () => { onglet = b.dataset.o; enchaine = false; majTout(); dessiner(); });
+  document.addEventListener('keydown', e => { if (e.key === ' ' && e.target === document.body) { e.preventDefault(); document.getElementById('bTout').onclick(); } });
+  const o = cle('jdp.pitch.onglet'); if (['en', 'fr', 'qa', 'sec'].includes(o)) onglet = o;
+  appliquer(); dessiner();
+})();
+</script>
+</body>
+</html>

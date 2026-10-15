@@ -88,7 +88,7 @@
 </style>
 </head>
 <body>
-<div id="aide">→ ou clic : suivant · ← : précédent · M : chapitres · F : plein écran · V : voix · P : auto</div>
+<div id="aide">→ ou clic : suivant · ← : précédent · M : chapitres · F : plein écran · V : voix · K : pause · P : auto</div>
 <main id="scene" aria-live="polite">
 
 <section class="d titre" data-chap="Accueil">
@@ -106,8 +106,8 @@
 </section>
 
 <section class="d">
-  <p class="chap r" style="--i:0">26 septembre · le Tripothon</p>
-  <h2 class="r" style="--i:1">Thème : « Un cadeau pour ______ ».</h2>
+  <p class="chap r" style="--i:0">26 septembre · je commence</p>
+  <h2 class="r" style="--i:1">Le thème du Tripothon : « Un cadeau pour ______ ».</h2>
   <div class="etape">
     <div class="n r" style="--i:2">1</div><div class="t r" style="--i:2">Je choisis : <b>un cadeau pour ceux qui n'ont pas de jardin</b>.</div>
     <div class="n r" style="--i:3">2</div><div class="t r" style="--i:3">Le thème se voit dans la 3D : toits de zinc, rambardes, pots serrés — <b>un vrai balcon de Paris</b>.</div>
@@ -401,6 +401,7 @@
   <button type="button" id="bMenu">☰ Chapitres</button>
   <button type="button" id="bPlein">⛶</button>
   <button type="button" id="bVoix" aria-pressed="false">🔇 Voix</button>
+  <button type="button" id="bPause" title="Mettre la voix en pause / reprendre (touche K)">⏸ Pause</button>
   <button type="button" id="bAuto" aria-pressed="false" title="Enchaîner les diapos à la fin de chaque phrase">▶ Auto</button>
   <select id="sLang" aria-label="Langue de la voix"><option value="fr">FR</option><option value="en">EN</option><option value="es">ES</option></select>
   <span id="voixEtat"></span>
@@ -447,24 +448,33 @@
   /* la voix : fichiers fabriqués par le tableau (Gemini TTS), rangés dans Supabase */
   const SBV = 'https://jbwlhapwszsuwirspybg.supabase.co/storage/v1/object/public/voix/';
   const CLE_V = 'jdp.demo.voix', CLE_L = 'jdp.demo.lang';
-  let voixOn = false, lang = 'fr', audio = new Audio(), jeton = 0, autoOn = false, minuteur = 0;
+  let voixOn = false, lang = 'fr', audio = new Audio(), jeton = 0, autoOn = false, minuteur = 0, enPause = false;
   try { voixOn = localStorage.getItem(CLE_V) === '1'; lang = ['fr', 'en', 'es'].includes(localStorage.getItem(CLE_L)) ? localStorage.getItem(CLE_L) : (navigator.language || 'fr').slice(0, 2); if (!['fr', 'en', 'es'].includes(lang)) lang = 'fr'; } catch { /* rien */ }
   const sLang = document.getElementById('sLang'), bVoix = document.getElementById('bVoix'), vEtat = document.getElementById('voixEtat');
   sLang.value = lang;
   async function sha1(t) { const d = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(t)); return [...new Uint8Array(d)].map(x => x.toString(16).padStart(2, '0')).join(''); }
   async function lire() {
-    audio.pause(); clearTimeout(minuteur); vEtat.textContent = '';
+    audio.pause(); clearTimeout(minuteur); vEtat.textContent = ''; enPause = false; majPause();
     if (!voixOn || !window.VOIX || !window.VOIX[lang] || !window.VOIX[lang][i]) return;
     const mon = ++jeton, texte = window.VOIX[lang][i];
     let h; try { h = await sha1(texte); } catch { vEtat.textContent = 'voix indisponible ici'; return; }
     if (mon !== jeton) return;
     audio = new Audio(`${SBV}${lang}/${String(i).padStart(2, '0')}-${h.slice(0, 10)}-${String(window.VOIX_VOIX || 'Charon').toLowerCase()}.wav`);
     audio.onerror = () => { if (mon === jeton) vEtat.textContent = 'voix non préparée (tableau → Démo → Préparer les voix)'; };
-    audio.onended = () => { if (mon === jeton && autoOn && i < diapos.length - 1) minuteur = setTimeout(() => aller(i + 1), 1000); };
+    audio.onended = () => { if (mon === jeton && autoOn && !enPause && i < diapos.length - 1) minuteur = setTimeout(() => { if (!enPause) aller(i + 1); }, 1000); };
     audio.play().catch(() => { if (mon === jeton) vEtat.textContent = 'touche l’écran pour lancer le son'; });
   }
   function majVoix() { bVoix.textContent = voixOn ? '🔊 Voix' : '🔇 Voix'; bVoix.setAttribute('aria-pressed', String(voixOn)); try { localStorage.setItem(CLE_V, voixOn ? '1' : '0'); localStorage.setItem(CLE_L, lang); } catch { /* rien */ } }
   bVoix.onclick = () => { voixOn = !voixOn; if (!voixOn) { autoOn = false; majAuto(); } majVoix(); lire(); };
+  const bPause = document.getElementById('bPause');
+  function majPause() { if (bPause) bPause.textContent = enPause ? '▶ Reprendre' : '⏸ Pause'; }
+  bPause.onclick = () => {
+    if (!voixOn) { voixOn = true; majVoix(); lire(); return; }
+    if (!enPause) { enPause = true; audio.pause(); clearTimeout(minuteur); }
+    else { enPause = false; if (audio.src && !audio.ended) audio.play().catch(() => {}); else if (autoOn && i < diapos.length - 1) aller(i + 1); }
+    majPause();
+  };
+  document.addEventListener('keydown', e => { if (e.key === 'k' || e.key === 'K') bPause.onclick(); });
   const bAuto = document.getElementById('bAuto');
   function majAuto() { bAuto.textContent = autoOn ? '⏸ Auto' : '▶ Auto'; bAuto.setAttribute('aria-pressed', String(autoOn)); }
   bAuto.onclick = () => { autoOn = !autoOn; if (autoOn && !voixOn) { voixOn = true; majVoix(); } majAuto(); if (autoOn) lire(); else clearTimeout(minuteur); };

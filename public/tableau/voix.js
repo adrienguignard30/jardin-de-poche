@@ -5,7 +5,7 @@ window.VOIX = {
   fr: [
     "Potager de Poche. Un cadeau pour ceux qui n'ont pas de jardin. Je l'ai fait en trois semaines, avec Tripo et une équipe d'intelligences artificielles.",
     "Au départ, mon idée, c'était un Tamagotchi de balcon : un personnage qui vit tout seul sur son balcon et qui cultive. On vient le voir, on plante, on attend, on vend.",
-    "Le 26 septembre, le Tripothon annonce son thème : un cadeau pour… quelqu'un. Je choisis : un cadeau pour ceux qui n'ont pas de jardin. Le thème se voit dans la 3D : un vrai balcon de Paris. Et le nom devient Potager de Poche, parce qu'on cultive pour manger. J'ai soumis le 5 octobre, et depuis j'ai continué : ce que vous voyez aujourd'hui, c'est la version du jour.",
+    "Le 26 septembre, je commence. Le thème du Tripothon, c'est : un cadeau pour… quelqu'un. Je choisis : un cadeau pour ceux qui n'ont pas de jardin. Le thème se voit dans la 3D : un vrai balcon de Paris. Et le nom devient Potager de Poche, parce qu'on cultive pour manger. J'ai soumis le 5 octobre, et depuis j'ai continué : ce que vous voyez aujourd'hui, c'est la version du jour.",
     "Le lendemain, je me rends compte que planter, attendre, vendre, c'est trop plat. Pas d'argent : des points, qu'on gagne en offrant un plat. Ils servent à acheter les graines et les pots, et à rendre les trocs équitables. On cultive, il nous manque toujours quelque chose, on troque avec les voisins, on cuisine, et on offre.",
     "J'ai trois personnages : Léa, Marcel et Jimy, chacun avec son balcon et sa vue sur Paris. Trois corps différents, mais un seul squelette pour tous : chaque animation marche pour les trois. Et chacun se personnalise : la peau, les cheveux, les vêtements, les chaussures.",
     "Chapitre Tripo. Mes personnages et mes plantes viennent de Tripo.",
@@ -37,9 +37,9 @@ window.VOIX = {
     "À toi de jouer. Scanne le QR code : jardin-de-poche point vercel point app. Sur ton téléphone, sans rien installer, en français, en anglais ou en espagnol."
   ],
   en: [
-    "Pocket Garden. A gift for those who have no garden. I built it in three weeks, with Tripo and a team of AIs.",
+    "Pocket Kitchen Garden. A gift for those who have no garden. I built it in three weeks, with Tripo and a team of AIs.",
     "At first, my idea was a balcony Tamagotchi: a character living alone on his balcony, growing things. You visit, you plant, you wait, you sell.",
-    "On September 26th, the Tripothon announced its theme: a gift for… someone. I chose: a gift for those who have no garden. You can see the theme in the 3D: a real Paris balcony. And the name became Pocket Garden, because we grow food to eat it. I submitted on October 5th, and since then I've kept going: what you see today is today's version.",
+    "On September 26th, I started. The Tripothon theme is: a gift for… someone. I chose: a gift for those who have no garden. You can see the theme in the 3D: a real Paris balcony. And the name became Pocket Kitchen Garden, because we grow food to eat it. I submitted on October 5th, and since then I've kept going: what you see today is today's version.",
     "The next day, I realised that plant, wait, sell was too flat. No money: points, which you earn by giving a dish. They buy seeds and pots, and keep trades fair. You grow, you're always missing something, you trade with your neighbours, you cook, and you give.",
     "I have three characters: Léa, Marcel and Jimy, each with their own balcony and view of Paris. Three different bodies, but one skeleton for all: every animation works for all three. And each one can be customised: skin, hair, clothes, shoes.",
     "Chapter Tripo. My characters and my plants come from Tripo.",
@@ -73,7 +73,7 @@ window.VOIX = {
   es: [
     "Huerto de Bolsillo. Un regalo para quienes no tienen jardín. Lo hice en tres semanas, con Tripo y un equipo de inteligencias artificiales.",
     "Al principio, mi idea era un Tamagotchi de balcón: un personaje que vive solo en su balcón y cultiva. Vienes a verlo, plantas, esperas, vendes.",
-    "El 26 de septiembre, el Tripothon anunció su tema: un regalo para… alguien. Elegí: un regalo para quienes no tienen jardín. El tema se ve en el 3D: un balcón de verdad de París. Y el nombre pasó a ser Huerto de Bolsillo, porque cultivamos para comer. Lo presenté el 5 de octubre, y desde entonces he seguido: lo que veis hoy es la versión de hoy.",
+    "El 26 de septiembre, empiezo. El tema del Tripothon es: un regalo para… alguien. Elegí: un regalo para quienes no tienen jardín. El tema se ve en el 3D: un balcón de verdad de París. Y el nombre pasó a ser Huerto de Bolsillo, porque cultivamos para comer. Lo presenté el 5 de octubre, y desde entonces he seguido: lo que veis hoy es la versión de hoy.",
     "Al día siguiente, me di cuenta de que plantar, esperar, vender era demasiado plano. Sin dinero: puntos, que se ganan regalando un plato. Sirven para comprar semillas y macetas, y para que los intercambios sean justos. Cultivas, siempre te falta algo, intercambias con los vecinos, cocinas y regalas.",
     "Tengo tres personajes: Léa, Marcel y Jimy, cada uno con su balcón y su vista de París. Tres cuerpos distintos, pero un solo esqueleto para todos: cada animación funciona para los tres. Y cada uno se personaliza: la piel, el pelo, la ropa, los zapatos.",
     "Capítulo Tripo. Mis personajes y mis plantas vienen de Tripo.",
