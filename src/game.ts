@@ -548,6 +548,7 @@ export class Game {
       group.position.copy(slot.pos); group.scale.setScalar(POT_SCALE);
       const sock = Assets.socket(potWet, 'plant');
       if (sock) { holder.position.copy(sock.position); }
+      else { holder.position.y = (p.style === 'terracotta' ? .262 : .247) / POT_SCALE; }
       group.add(holder);
       this.world.potGroup.add(group);
       this.world.registerSlotView(p.id, group);
