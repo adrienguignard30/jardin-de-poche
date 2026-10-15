@@ -147,7 +147,7 @@ export class World {
   private readonly decoAvance = .60;
   private decoQuarts = 0;
 
-  private reglerMatDeco(hauteur: number) {
+  private reglerMatDeco(hauteur: number, largeur = .24, profondeur = .24) {
     this.decoHauteur = hauteur;
     if (this.matDeco) { this.libererDeco(this.matDeco); this.matDeco = null; }
     const mat = new THREE.Group(); mat.name = 'mat_creation';
@@ -164,7 +164,8 @@ export class World {
       const bague = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .012, 12), jaune);
       bague.position.copy(pied).lerp(sommet, t); bague.quaternion.copy(orientation); mat.add(bague);
     }
-    const plateau = new THREE.Mesh(new THREE.CylinderGeometry(.12, .105, .025, 20), noir);
+    const plateau = new THREE.Mesh(new RoundedBoxGeometry(largeur, .025, profondeur, 2, .008), noir);
+    plateau.name = 'plateau_creation';
     plateau.position.set(0, hauteur - .25 - .0125, this.decoAvance); mat.add(plateau);
     mat.traverse(o => { if ((o as THREE.Mesh).isMesh) { (o as THREE.Mesh).castShadow = true; (o as THREE.Mesh).receiveShadow = true; } });
     this.socleDeco!.add(mat); this.matDeco = mat;
@@ -179,15 +180,15 @@ export class World {
     if (!this.objetDeco || !Number.isFinite(quarts)) return;
     const precedents = this.decoQuarts;
     this.decoQuarts = ((this.decoQuarts + Math.round(quarts)) % 4 + 4) % 4;
-    this.objetDeco.rotation.y = Math.PI / 2 + this.decoQuarts * Math.PI / 2;
+    this.objetDeco.rotation.y = -Math.PI / 2 + this.decoQuarts * Math.PI / 2;
     try { this.ajusterHauteurDeco(this.objetDeco); }
-    catch (e) { this.decoQuarts = precedents; this.objetDeco.rotation.y = Math.PI / 2 + precedents * Math.PI / 2; this.objetDeco.updateMatrixWorld(true); throw e; }
+    catch (e) { this.decoQuarts = precedents; this.objetDeco.rotation.y = -Math.PI / 2 + precedents * Math.PI / 2; this.objetDeco.updateMatrixWorld(true); throw e; }
   }
 
   private ajusterHauteurDeco(objet: THREE.Group) {
     if (!this.socleDeco) return;
     objet.updateMatrixWorld(true); this.envGroup.updateMatrixWorld(true);
-    const box = new THREE.Box3().setFromObject(objet), h = box.max.y - box.min.y;
+    const box = new THREE.Box3().setFromObject(objet, true), h = box.max.y - box.min.y;
     const sol = this.socleDeco.position.y - .25;
     let base = sol + 1.95;
     // Enveloppe conservatrice sous les éléments de couverture : marge de 5 cm.
@@ -197,8 +198,26 @@ export class World {
       if (b.min.y > sol + 1.5 && b.max.x > box.min.x && b.min.x < box.max.x && b.max.z > box.min.z && b.min.z < box.max.z) base = Math.min(base, b.min.y - h - .05);
     });
     if (base < sol + .55) throw new Error('Pas assez de hauteur sous la couverture pour cette création');
-    objet.position.y = base;
-    this.reglerMatDeco(base - sol);
+    // Mesurer les sommets réels près du point le plus bas (pieds/socle),
+    // et non les limites complètes incluant bras ou accessoires en hauteur.
+    const empreinte = new THREE.Box3(), sommet = new THREE.Vector3();
+    const seuil = box.min.y + Math.max(.015, h * .025);
+    objet.traverse(o => {
+      const mesh = o as THREE.Mesh;
+      if (!mesh.isMesh || !mesh.geometry.attributes.position) return;
+      const positions = mesh.geometry.attributes.position;
+      for (let i = 0; i < positions.count; i++) {
+        mesh.getVertexPosition(i, sommet).applyMatrix4(mesh.matrixWorld);
+        if (sommet.y <= seuil) empreinte.expandByPoint(sommet);
+      }
+    });
+    if (empreinte.isEmpty()) empreinte.copy(box);
+    const centreBase = empreinte.getCenter(new THREE.Vector3());
+    objet.position.x += this.socleDeco.position.x - centreBase.x;
+    objet.position.z += this.socleDeco.position.z + this.decoAvance - centreBase.z;
+    objet.position.y += base - box.min.y;
+    objet.updateMatrixWorld(true);
+    this.reglerMatDeco(base - sol, Math.max(.08, empreinte.max.x - empreinte.min.x + .04), Math.max(.08, empreinte.max.z - empreinte.min.z + .04));
     if (base < sol + 1.95 - .001) console.info('[deco] base abaissée à', (base - sol).toFixed(3), 'm du sol');
   }
 
@@ -326,7 +345,7 @@ export class World {
     const groupe = new THREE.Group(); groupe.add(modele);
     try {
       groupe.updateMatrixWorld(true);
-      const boite = new THREE.Box3().setFromObject(groupe), taille = boite.getSize(new THREE.Vector3());
+      const boite = new THREE.Box3().setFromObject(groupe, true), taille = boite.getSize(new THREE.Vector3());
       if (boite.isEmpty() || ![taille.x, taille.y, taille.z].every(Number.isFinite) || Math.max(taille.x, taille.y, taille.z) < 1e-8) throw new Error('GLB sans géométrie mesurable');
       const facteur = Math.min(...[1.20, 1.20, 1.20].map((limite, i) => taille.getComponent(i) > 1e-8 ? limite / taille.getComponent(i) : Infinity));
       const centre = boite.getCenter(new THREE.Vector3());
@@ -335,7 +354,7 @@ export class World {
       contenu.scale.setScalar(facteur);
       contenu.position.set(-centre.x * facteur, -boite.min.y * facteur, -centre.z * facteur);
       groupe.position.set(this.socleDeco.position.x, this.socleDeco.position.y - .25 + 1.95, this.socleDeco.position.z + this.decoAvance);
-      groupe.rotation.y = Math.PI / 2;
+      groupe.rotation.y = -Math.PI / 2;
       groupe.name = nom || 'creation_joueur';
       groupe.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; } });
       this.ajusterHauteurDeco(groupe);
