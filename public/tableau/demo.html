@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Potager de Poche — Démo</title>
+<link rel="stylesheet" href="/fonts/nunito.css">
+<style>
+  :root { --fond: #0b1a10; --fond2: #11261a; --encre: #f4f1e6; --muet: #a9b9ad; --vert: #7dd49a; --jaune: #ffd166; --rose: #ffb3c1; --trait: rgba(255,255,255,.14); }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--fond); color: var(--encre); font: 600 clamp(19px, 3.3vmin, 38px)/1.4 Nunito, system-ui, sans-serif; overflow: hidden; -webkit-user-select: none; user-select: none; }
+  #scene { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 6vmin 8vmin 10vmin; cursor: pointer; }
+  .d { width: min(1400px, 100%); max-height: 100%; opacity: 0; transform: translateY(14px); transition: opacity .28s ease, transform .28s ease; display: none; }
+  .d.actif { display: block; opacity: 1; transform: none; }
+  .chap { font-size: .55em; letter-spacing: .18em; text-transform: uppercase; color: var(--vert); margin-bottom: 1.2em; font-weight: 800; }
+  h1 { font-size: 2.6em; line-height: 1.08; margin: 0 0 .35em; font-weight: 800; letter-spacing: -.02em; }
+  h2 { font-size: 1.9em; line-height: 1.12; margin: 0 0 .5em; font-weight: 800; letter-spacing: -.015em; }
+  p { margin: 0 0 .6em; color: var(--encre); }
+  p.s { color: var(--muet); font-size: .9em; }
+  .gros { font-size: 1.35em; }
+  ul { margin: 0; padding: 0; list-style: none; }
+  li { padding: .32em 0 .32em 1.4em; position: relative; }
+  li::before { content: ""; position: absolute; left: 0; top: .95em; width: .6em; height: .6em; border-radius: 50%; background: var(--vert); }
+  li b { color: var(--jaune); font-weight: 800; }
+  .deux { display: grid; grid-template-columns: 1fr 1fr; gap: 2em 4em; align-items: start; }
+  .titre { text-align: center; }
+  .titre h1 { font-size: 3.6em; }
+  .titre .sous { font-size: 1.25em; color: var(--muet); }
+  .carte { background: var(--fond2); border: 1px solid var(--trait); border-radius: 1em; padding: 1em 1.3em; }
+  .cartes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1em; }
+  .cartes .carte h3 { margin: 0 0 .2em; font-size: 1.1em; color: var(--jaune); }
+  .cartes .carte p { font-size: .8em; color: var(--muet); margin: 0; }
+  .fleche { display: flex; align-items: center; justify-content: center; gap: .5em; flex-wrap: wrap; font-size: 1.25em; font-weight: 800; }
+  .fleche span { background: var(--fond2); border: 1px solid var(--trait); border-radius: .6em; padding: .35em .8em; }
+  .fleche i { color: var(--vert); font-style: normal; }
+  .chiffres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2em; text-align: center; }
+  .chiffres .n { font-size: 3em; font-weight: 800; color: var(--vert); line-height: 1; }
+  .chiffres .l { color: var(--muet); font-size: .85em; margin-top: .3em; }
+  .fin { text-align: center; }
+  .fin svg { width: min(44vmin, 360px); height: auto; background: #fff; padding: 2.2%; border-radius: 1em; margin: 1em auto; display: block; }
+  .fin .lien { font-size: 1.3em; color: var(--jaune); font-weight: 800; }
+  img.logo { height: 1.6em; vertical-align: middle; border-radius: .3em; margin-left: .3em; }
+  .soucis li b { color: var(--rose); }
+  .soucis li { font-size: .9em; }
+  /* schéma du workflow */
+  svg.schema { width: 100%; height: auto; display: block; }
+  svg.schema text { font: 800 22px Nunito, system-ui, sans-serif; fill: var(--encre); }
+  svg.schema .p { font-weight: 600; font-size: 17px; fill: var(--muet); }
+  svg.schema rect { fill: var(--fond2); stroke: var(--trait); stroke-width: 2; rx: 16; }
+  svg.schema rect.a { stroke: var(--jaune); } svg.schema rect.c { stroke: var(--vert); }
+  svg.schema line, svg.schema path { stroke: var(--vert); stroke-width: 3; fill: none; }
+  /* barre du bas */
+  #barre { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px max(16px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muet); }
+  #barre button { font: 700 14px Nunito, system-ui, sans-serif; color: var(--encre); background: rgba(255,255,255,.08); border: 1px solid var(--trait); border-radius: 10px; padding: 9px 13px; cursor: pointer; min-height: 40px; }
+  #barre select { font: 700 14px Nunito, system-ui, sans-serif; color: var(--encre); background: rgba(255,255,255,.08); border: 1px solid var(--trait); border-radius: 10px; padding: 9px 8px; min-height: 40px; }
+  #voixEtat { font-size: 12px; color: var(--muet); }
+  #barre button:hover { background: rgba(255,255,255,.16); }
+  #compteur { margin-left: auto; font-variant-numeric: tabular-nums; }
+  #progres { position: fixed; left: 0; bottom: 0; height: 4px; background: var(--vert); transition: width .25s; }
+  /* menu des chapitres */
+  #menu { position: fixed; inset: 0; background: rgba(5, 12, 8, .94); display: none; align-items: center; justify-content: center; padding: 5vmin; z-index: 5; }
+  #menu.ouvert { display: flex; }
+  #menu .boite { width: min(900px, 100%); max-height: 100%; overflow: auto; }
+  #menu h2 { font-size: 1.4em; color: var(--muet); margin-bottom: .6em; }
+  #menu .liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+  #menu button { font: 800 1em Nunito, system-ui, sans-serif; color: var(--encre); text-align: left; background: var(--fond2); border: 1px solid var(--trait); border-radius: 14px; padding: 14px 16px; cursor: pointer; }
+  #menu button:hover, #menu button.actif { border-color: var(--vert); }
+  #menu button small { display: block; color: var(--muet); font-weight: 600; font-size: .75em; }
+  #aide { position: fixed; top: 14px; right: 16px; font-size: 13px; color: var(--muet); opacity: .8; }
+  @media (max-width: 760px) { .deux, .cartes, .chiffres { grid-template-columns: 1fr; } #scene { padding: 5vmin 6vmin 16vmin; } .titre h1 { font-size: 2.6em; } h1 { font-size: 2.1em; } #aide { display: none; } body { font-size: 17px; } }
+
+  .d.actif .r { animation: arrive .55s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i, 0) * .45s + .15s); }
+  @keyframes arrive { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+  .d.actif h1.r, .d.actif h2.r { animation-name: titre; }
+  @keyframes titre { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .d.actif .r { animation: none; } }
+  .etape { display: grid; grid-template-columns: auto 1fr; gap: .6em 1em; align-items: start; }
+  .etape .n { font-weight: 800; color: var(--vert); font-size: 1.4em; line-height: 1.1; min-width: 1.6em; }
+  .etape .t b { color: var(--jaune); }
+  .etape .t { padding-top: .15em; }
+  .galere { border-left: 4px solid var(--rose); padding: .3em 0 .3em 1em; margin: .5em 0; }
+  .galere b { color: var(--rose); }
+  .galere .ok { color: var(--vert); font-weight: 800; }
+  .ligne { display: flex; gap: .6em; align-items: center; flex-wrap: wrap; }
+  .tag { background: var(--fond2); border: 1px solid var(--trait); border-radius: .5em; padding: .2em .6em; font-size: .85em; }
+</style>
+</head>
+<body>
+<div id="aide">→ ou clic : suivant · ← : précédent · M : chapitres · F : plein écran · V : voix</div>
+<main id="scene" aria-live="polite">
+
+<section class="d titre" data-chap="Accueil">
+  <p class="chap r" style="--i:0">Tripothon S1 · Demo Day · 17 octobre 2026</p>
+  <h1 class="r" style="--i:1">🌱 Potager de Poche</h1>
+  <p class="sous r" style="--i:2">Un cadeau pour ceux qui n'ont pas de jardin.</p>
+  <p class="s r" style="--i:3">Par Adrien · fait en 3 semaines avec Tripo et une équipe d'IA</p>
+</section>
+
+<section class="d" data-chap="L'idée">
+  <p class="chap r" style="--i:0">Au départ</p>
+  <h1 class="r" style="--i:1">Un Tamagotchi de balcon.</h1>
+  <p class="gros r" style="--i:2">Mon idée de base : un personnage qui vit tout seul sur son balcon et qui cultive. On vient le voir, on plante, on attend, on vend.</p>
+  <p class="s r" style="--i:3">J'avais déjà 3 personnages en tête, et l'habitude de travailler avec plusieurs IA.</p>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">26 septembre · le Tripothon</p>
+  <h2 class="r" style="--i:1">Thème : « Un cadeau pour ______ ».</h2>
+  <div class="etape">
+    <div class="n r" style="--i:2">1</div><div class="t r" style="--i:2">Je choisis : <b>un cadeau pour ceux qui n'ont pas de jardin</b>.</div>
+    <div class="n r" style="--i:3">2</div><div class="t r" style="--i:3">Le thème se voit dans la 3D : toits de zinc, rambardes, pots serrés — <b>un vrai balcon de Paris</b>.</div>
+    <div class="n r" style="--i:4">3</div><div class="t r" style="--i:4">Le nom : « Jardin de poche » devient <b>« Potager de Poche »</b> — on cultive pour manger.</div>
+  </div>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">27 septembre · l'idée évolue</p>
+  <h2 class="r" style="--i:1">« Planter, attendre, vendre » : trop plat.</h2>
+  <div class="fleche r" style="--i:2"><span>Cultiver</span><i>→</i><span>Manquer</span><i>→</i><span>Troquer</span><i>→</i><span>Cuisiner</span><i>→</i><span>Offrir</span></div>
+  <p class="gros r" style="--i:3; text-align:center;margin-top:1em">J'enlève l'argent. <b style="color:var(--jaune)">Le plat devient le cadeau.</b></p>
+  <p class="s r" style="--i:4">Une recette du jour à laquelle il manque toujours un ingrédient → on a besoin des voisins. Chaque balcon a ses graines interdites, racontées par le décor.</p>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">Mes trois personnages</p>
+  <div class="cartes">
+    <div class="carte r" style="--i:1"><h3>Léa</h3><p>Balcon haussmannien, vue sur la tour Eiffel.</p></div>
+    <div class="carte r" style="--i:2"><h3>Marcel</h3><p>Cour d'immeuble, pont Alexandre III.</p></div>
+    <div class="carte r" style="--i:3"><h3>Jimy</h3><p>Sur les toits, Arc de Triomphe, sound system.</p></div>
+  </div>
+  <p class="s r" style="--i:4; margin-top:1.2em">Trois corps différents, <b style="color:var(--jaune)">un seul squelette</b> pour tous : chaque animation marche pour les trois.</p>
+</section>
+
+<section class="d titre" data-chap="Tripo">
+  <p class="chap r" style="--i:0">Chapitre</p>
+  <h1 class="r" style="--i:1">Tripo <img class="logo" src="/images/tripo-logo.png" alt=""></h1>
+  <p class="sous r" style="--i:2">Mes personnages et mes plantes viennent de Tripo.</p>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">Tripo · les personnages</p>
+  <div class="etape">
+    <div class="n r" style="--i:1">1</div><div class="t r" style="--i:1">Je pars d'<b>images</b> de chaque personnage : <b>Tripo les transforme en 3D</b> (image → 3D), puis Tripo Texturing pour les couleurs.</div>
+    <div class="n r" style="--i:2">2</div><div class="t r" style="--i:2">Dans Blender, je prépare le corps pour <b>Mixamo</b> : squelette X Bot, même pour les trois.</div>
+    <div class="n r" style="--i:3">3</div><div class="t r" style="--i:3">J'ai changé de personnages en cours de route : <b>tout refaire</b>, mais le squelette commun a sauvé les animations.</div>
+  </div>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">Tripo · les plantes, avec Codex</p>
+  <h2 class="r" style="--i:1">25 plantes × 7 stades, générées par Codex via l'API Tripo.</h2>
+  <div class="etape">
+    <div class="n r" style="--i:2">1</div><div class="t r" style="--i:2">Je demande à Codex de <b>vérifier d'abord si c'est possible</b> et de me rendre un <b>rapport</b> : méthode, coût en crédits, risques.</div>
+    <div class="n r" style="--i:3">2</div><div class="t r" style="--i:3">Test sur la tomate, puis la fraise : Codex fabrique une <b>planche</b> (les 7 stades sur une image), un seul passage Tripo, séparation dans Blender.</div>
+    <div class="n r" style="--i:4">3</div><div class="t r" style="--i:4"><b>Jamais de génération sans mon ok</b> : essai à blanc, contrôle des crédits, autorisation, puis seulement la dépense.</div>
+    <div class="n r" style="--i:5">4</div><div class="t r" style="--i:5">Un <b>script Blender</b> (écrit par Codex) <b>découpe</b> chaque planche en 7 objets, les <b>renomme</b> et les range par plante : 25 familles, 175 objets, avec une grille de contrôle. Stades manquants, feuillages collés → corrigés un par un.</div>
+    <div class="n r" style="--i:6">5</div><div class="t r" style="--i:6">Pour le téléphone : <b>38,97 Mo → 8,06 Mo</b> (626 964 triangles, Draco, textures réduites).</div>
+  </div>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">Tripo · l'Atelier, en direct aujourd'hui</p>
+  <h2 class="r" style="--i:1">Les visiteurs créent leur objet.</h2>
+  <div class="fleche r" style="--i:2; font-size:1em"><span>Code QR</span><i>→</i><span>Description ou photo</span><i>→</i><span>Aide de l'IA</span><i>→</i><span>Tripo Ultra</span><i>→</i><span>Sur le balcon</span></div>
+  <p class="s r" style="--i:3; margin-top:1em">L'objet est compressé par le serveur, visible en 3D dans le téléphone, et posé en hauteur sur un <b style="color:var(--jaune)">mât Tripo</b> au coin du balcon.</p>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">Tripo · une IA pour écrire la description</p>
+  <h2 class="r" style="--i:1">✨ « Améliorer ma description »</h2>
+  <div class="etape">
+    <div class="n r" style="--i:2">1</div><div class="t r" style="--i:2">Le visiteur écrit <b>trois mots dans sa langue</b> : « un chat qui dort ».</div>
+    <div class="n r" style="--i:3">2</div><div class="t r" style="--i:3">Une IA (Cerebras, sinon Gemini) propose une description complète : <b>sujet, détails, matière, style, qualité</b>.</div>
+    <div class="n r" style="--i:4">3</div><div class="t r" style="--i:4">Il la relit, la modifie s'il veut, et confirme. <b>La version anglaise part à Tripo.</b></div>
+    <div class="n r" style="--i:5">4</div><div class="t r" style="--i:5">Résultat : <b>des objets bien plus beaux</b>, pour les mêmes crédits. Et Tripo garde sa propre modération.</div>
+  </div>
+</section>
+
+<section class="d titre" data-chap="Blender et le décor">
+  <p class="chap r" style="--i:0">Chapitre</p>
+  <h1 class="r" style="--i:1">Blender : le décor, à la main.</h1>
+  <p class="sous r" style="--i:2">L'immeuble, les balcons, les mesures.</p>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">Blender · ce que j'ai fait moi-même</p>
+  <ul>
+    <li class="r" style="--i:1"><b>L'immeuble et les trois balcons</b> : modélisés par moi dans Blender.</li>
+    <li class="r" style="--i:2"><b>Certains objets</b> de déco, les autres par Tripo et par Codex.</li>
+    <li class="r" style="--i:3"><b>Des scripts Python</b> pour exporter, cuire les textures, vérifier le placement des meubles, réparer les squelettes.</li>
+  </ul>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">Blender · la vraie galère : les obstacles</p>
+  <h2 class="r" style="--i:1">Il a fallu connaître chaque taille, chaque emplacement.</h2>
+  <ul>
+    <li class="r" style="--i:2">Le personnage doit <b>marcher entre les pots</b>, s'asseoir au bon endroit, prendre l'arrosoir dans la main.</li>
+    <li class="r" style="--i:3">Mesures de chaque meuble, de chaque squelette, de chaque main → fichiers de mesures et de placement par balcon.</li>
+    <li class="r" style="--i:4">Un panneau de réglage en direct (<span class="tag">?tune=1</span>) pour caler l'arrosoir, la caméra, les pieds.</li>
+    <li class="r" style="--i:5">À chaque changement de personnage ou de plante : <b>tout remesurer</b>.</li>
+  </ul>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">Mixamo · les animations</p>
+  <ul>
+    <li class="r" style="--i:1">Squelette X Bot + bibliothèque d'animations <b>partagée par les trois corps</b>.</li>
+    <li class="r" style="--i:2">Marcher, semer, arroser, récolter, s'asseoir, danser, dormir, cuisiner.</li>
+    <li class="r" style="--i:3"><b>Galère</b> : les animations ne collaient pas aux trois morphologies → mesures, réglages, demi-tours, prises d'objets, interruptions. Plusieurs passes.</li>
+    <li class="r" style="--i:4">Le bras de Marcel figé : la peau accrochée à l'épaule → script Blender qui la rend au bon os.</li>
+  </ul>
+</section>
+
+<section class="d titre" data-chap="L'équipe d'IA">
+  <p class="chap r" style="--i:0">Chapitre</p>
+  <h1 class="r" style="--i:1">Une personne, une équipe d'IA.</h1>
+  <p class="sous r" style="--i:2">Chacun son rôle, et mes règles.</p>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">Le schéma de travail</p>
+  <svg class="schema r" style="--i:1" viewBox="0 0 1200 560" role="img" aria-label="Je dirige Claude, qui coordonne Codex 1, 2 et 3 ; Tripo, Mixamo, Blender, Gemini, GPT et After Effects alimentent le jeu, en ligne sur Vercel avec Supabase">
+    <rect class="a" x="470" y="20" width="260" height="70"/><text x="600" y="64" text-anchor="middle">Moi</text>
+    <line x1="600" y1="90" x2="600" y2="130"/>
+    <rect class="c" x="420" y="130" width="360" height="70"/><text x="600" y="174" text-anchor="middle">Claude · chef d'orchestre</text>
+    <path d="M600 200 V235 H240 V270"/><path d="M600 200 V270"/><path d="M600 235 H960 V270"/>
+    <rect x="130" y="270" width="220" height="60"/><text x="240" y="308" text-anchor="middle">Codex 1</text>
+    <rect x="490" y="270" width="220" height="60"/><text x="600" y="308" text-anchor="middle">Codex 2</text>
+    <rect x="850" y="270" width="220" height="60"/><text x="960" y="308" text-anchor="middle">Codex 3</text>
+    <text class="p" x="240" y="358" text-anchor="middle">persos, animations, accueil, mât</text>
+    <text class="p" x="600" y="358" text-anchor="middle">espagnol, fiches plantes</text>
+    <text class="p" x="960" y="358" text-anchor="middle">plantes 3D, guide</text>
+    <rect x="40" y="400" width="1120" height="60"/>
+    <text x="600" y="438" text-anchor="middle">Tripo · Mixamo · Blender · Gemini · GPT · After Effects</text>
+    <path d="M600 460 V500"/>
+    <rect class="c" x="330" y="500" width="540" height="50"/><text x="600" y="533" text-anchor="middle">Le jeu · Vercel + Supabase</text>
+  </svg>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">Qui fait quoi</p>
+  <div class="deux">
+    <ul>
+      <li class="r" style="--i:1"><b>Moi</b> — l'idée, les décisions, Blender, les tests, chaque mise en ligne.</li>
+      <li class="r" style="--i:2"><b>Claude</b> — chef d'orchestre : coordination, scripts d'installation, tableau de bord, Atelier, compression.</li>
+      <li class="r" style="--i:3"><b>Codex 1 · 2 · 3</b> — le code, en parallèle, chacun son lot.</li>
+      <li class="r" style="--i:4"><b>Tripo</b> — personnages et plantes.</li>
+    </ul>
+    <ul>
+      <li class="r" style="--i:5"><b>Mixamo</b> — squelette et animations.</li>
+      <li class="r" style="--i:6"><b>Gemini</b> — la musique.</li>
+      <li class="r" style="--i:7"><b>GPT</b> — les recettes.</li>
+      <li class="r" style="--i:8"><b>After Effects</b> — la vidéo de démo.</li>
+      <li class="r" style="--i:9"><b>Vercel + Supabase</b> — le site, les comptes, les sauvegardes.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">Les trois Codex</p>
+  <div class="etape">
+    <div class="n r" style="--i:1">1</div><div class="t r" style="--i:1"><b>Codex 1 · depuis le 3 octobre</b> — mesures des squelettes et des meubles, couleurs des persos, animations, montages After Effects, audit du jeu, accueil et langues, mât Tripo.</div>
+    <div class="n r" style="--i:2">2</div><div class="t r" style="--i:2"><b>Codex 2 · depuis le 13 octobre</b> — espagnol complet (« Huerto de Bolsillo »), fiches de 25 plantes et 66 recettes en FR/EN/ES.</div>
+    <div class="n r" style="--i:3">3</div><div class="t r" style="--i:3"><b>Codex 3 · depuis le 29 septembre</b> — les 25 plantes Tripo, la bibliothèque Blender, la compression mobile, le guide de première arrivée.</div>
+  </div>
+  <p class="s r" style="--i:4">Chaque Codex rend un rapport. Je lis, je valide, je teste en local, et c'est moi qui mets en ligne.</p>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">Mes règles</p>
+  <ul>
+    <li class="r" style="--i:1"><b>Une chose à la fois.</b> Chaque changement est testé, puis mis en ligne seul.</li>
+    <li class="r" style="--i:2"><b>Les IA ne publient jamais.</b> Rapport d'abord, mon ok, puis je pousse moi-même.</li>
+    <li class="r" style="--i:3"><b>Toujours pouvoir revenir en arrière</b> : étiquette Git avant chaque mise en ligne, copies datées, retour en une commande.</li>
+    <li class="r" style="--i:4"><b>Ne rien inventer</b> : ni mécanique, ni texte, ni chiffre.</li>
+  </ul>
+</section>
+
+<section class="d titre" data-chap="Sécurité">
+  <p class="chap r" style="--i:0">Chapitre</p>
+  <h1 class="r" style="--i:1">La sécurité.</h1>
+  <p class="sous r" style="--i:2">Codes à usage unique, secrets côté serveur.</p>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">Sécurité · les codes</p>
+  <ul>
+    <li class="r" style="--i:1">Chaque objet Tripo coûte des crédits : on ne crée qu'avec un <b>code à usage unique</b>.</li>
+    <li class="r" style="--i:2">Le code est <b>brûlé au moment de la création</b>, et rendu si Tripo refuse.</li>
+    <li class="r" style="--i:3">Je distribue les codes par <b>QR code depuis mon tableau de bord</b>. Sans code valide, rien n'est généré.</li>
+  </ul>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">Sécurité · les secrets</p>
+  <ul>
+    <li class="r" style="--i:1">Les clés (Tripo, Supabase, Gemini, Cerebras) ne sont <b>que sur le serveur</b> : le navigateur ne les voit jamais.</li>
+    <li class="r" style="--i:2">Les tables sont fermées ; seules des fonctions contrôlées y écrivent.</li>
+    <li class="r" style="--i:3">Les <b>mots de passe sont chiffrés</b> par Supabase : personne n'y a accès, même pas moi.</li>
+    <li class="r" style="--i:4">Pas de chat libre entre joueurs ; anti-robot à la création de compte.</li>
+  </ul>
+</section>
+
+<section class="d titre" data-chap="Les galères">
+  <p class="chap r" style="--i:0">Chapitre</p>
+  <h1 class="r" style="--i:1">Ce qui a cassé, et comment je m'en suis sorti.</h1>
+</section>
+
+<section class="d soucis">
+  <p class="chap r" style="--i:0">Les galères · le jeu</p>
+  <div class="galere r" style="--i:1"><b>Les obstacles.</b> Pour que le perso marche entre les meubles, il a fallu connaître chaque taille, chaque emplacement → fichiers de mesures et de placement par balcon. <span class="ok">Réglé.</span></div>
+  <div class="galere r" style="--i:2"><b>Les animations.</b> Trois corps, un squelette, rien ne collait → passes successives, mesures, réglages en direct. <span class="ok">Réglé.</span></div>
+  <div class="galere r" style="--i:3"><b>J'ai changé de plantes et de personnages</b> en cours de route → tout refaire, tout remesurer. <span class="ok">Fait.</span></div>
+  <div class="galere r" style="--i:4"><b>Les plantes 25 cm sous la terre</b> : pots sans point d'ancrage → hauteur de secours par style de pot. <span class="ok">Réglé.</span></div>
+</section>
+
+<section class="d soucis">
+  <p class="chap r" style="--i:0">Les galères · Tripo et l'Atelier</p>
+  <div class="galere r" style="--i:1"><b>Tripo V2 en fin de vie</b> (31 octobre) → migration V3, trois adresses essayées en cascade quand la clé était refusée. <span class="ok">Réglé.</span></div>
+  <div class="galere r" style="--i:2"><b>Objet « trop lourd »</b> : 65 Mo en Ultra → le serveur compresse (Draco + WebP) et simplifie au-delà de 400 000 sommets. <span class="ok">Réglé.</span></div>
+  <div class="galere r" style="--i:3"><b>Un fichier manquant sur Vercel</b> (le décodeur) → réglage du déploiement. <span class="ok">Réglé.</span></div>
+  <div class="galere r" style="--i:4"><b>Objet minuscule et à l'envers</b> → mât en hauteur, visage vers la rue, plateau adapté. <span class="ok">Réglé.</span></div>
+</section>
+
+<section class="d soucis">
+  <p class="chap r" style="--i:0">Les galères · les IA et la performance</p>
+  <div class="galere r" style="--i:1"><b>Les IA d'aide saturées</b> : OpenAI sans crédit, Gemini saturé → cascade Cerebras → Gemini → OpenAI avec réessais. <span class="ok">Réglé.</span></div>
+  <div class="galere r" style="--i:2"><b>Un Codex a voulu pousser</b> sur Git → règle : jamais de git par une IA. <span class="ok">Règle.</span></div>
+  <div class="galere r" style="--i:3"><b>107 Mo à charger avant l'accueil</b> → compression des modèles et des fonds, décodeur et police hébergés : <b>33 Mo</b>. <span class="ok">Réglé.</span></div>
+  <div class="galere r" style="--i:4"><b>Les plantes : 39 Mo</b>, puis trop moches une fois réduites → compromis trouvé à 8 Mo. <span class="ok">Réglé.</span></div>
+</section>
+
+<section class="d" data-chap="Les chiffres">
+  <p class="chap r" style="--i:0">En chiffres</p>
+  <div class="chiffres">
+    <div class="r" style="--i:1"><div class="n">3</div><div class="l">personnages · balcons · langues</div></div>
+    <div class="r" style="--i:2"><div class="n">25 × 7</div><div class="l">plantes × stades de pousse</div></div>
+    <div class="r" style="--i:3"><div class="n">66</div><div class="l">recettes</div></div>
+    <div class="r" style="--i:4"><div class="n">3</div><div class="l">semaines</div></div>
+    <div class="r" style="--i:5"><div class="n">3</div><div class="l">Codex en parallèle</div></div>
+    <div class="r" style="--i:6"><div class="n">33 Mo</div><div class="l">au lieu de 107</div></div>
+  </div>
+</section>
+
+<section class="d titre" data-chap="La suite">
+  <p class="chap r" style="--i:0">Chapitre</p>
+  <h1 class="r" style="--i:1">Ce que je prépare.</h1>
+  <p class="sous r" style="--i:2">Pas des idées : des chaînes qui existent déjà.</p>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">La suite · ton personnage jouable</p>
+  <h2 class="r" style="--i:1">Même circuit que l'Atelier, plus le squelette.</h2>
+  <div class="etape">
+    <div class="n r" style="--i:2">1</div><div class="t r" style="--i:2">Tu le décris ou tu envoies une photo → <b>Tripo le fabrique</b> (code à usage unique, comme aujourd'hui).</div>
+    <div class="n r" style="--i:3">2</div><div class="t r" style="--i:3"><b>Tripo Rig Check</b> (gratuit) vérifie que c'est un bipède, puis <b>Tripo Auto Rig</b> pose le squelette avec les <b>os nommés comme Mixamo</b> (option « spec : mixamo », 25 crédits).</div>
+    <div class="n r" style="--i:4">3</div><div class="t r" style="--i:4">Mon jeu partage déjà une bibliothèque Mixamo entre Léa, Marcel et Jimy : le nouveau perso <b>utilise les mêmes animations</b>, sans rien refaire.</div>
+    <div class="n r" style="--i:5">4</div><div class="t r" style="--i:5">Secours : Tripo Retarget (100+ animations préréglées) si une animation manque.</div>
+  </div>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">La suite · les vrais joueurs entre eux</p>
+  <h2 class="r" style="--i:1">Offrir, puis troquer, pour de vrai.</h2>
+  <div class="etape">
+    <div class="n r" style="--i:2">1</div><div class="t r" style="--i:2">Les comptes existent déjà (Supabase) : <b>les vrais joueurs apparaissent en haut de la liste des voisins</b>, les voisins simulés restent pour que le jeu vive tous les jours.</div>
+    <div class="n r" style="--i:3">2</div><div class="t r" style="--i:3"><b>Offrir</b> : je choisis un plat ou une récolte, un voisin, et c'est une fonction du serveur qui le retire chez moi et l'ajoute chez lui, <b>en une seule transaction</b> (comme les codes de l'Atelier).</div>
+    <div class="n r" style="--i:4">3</div><div class="t r" style="--i:4"><b>Troquer</b> : je propose « 2 tomates contre 1 basilic » ; l'autre voit l'offre dans son téléphone, accepte ou refuse ; l'échange se fait au moment de l'acceptation, jamais à moitié.</div>
+    <div class="n r" style="--i:5">4</div><div class="t r" style="--i:5">Pas de chat libre : des <b>messages préfaits</b>. Plus tard, des immeubles qui regroupent des joueurs aux besoins complémentaires.</div>
+  </div>
+</section>
+
+<section class="d">
+  <p class="chap r" style="--i:0">La suite · et aussi</p>
+  <ul>
+    <li class="r" style="--i:1"><b>Infos plantes et vraies recettes</b> en FR/EN/ES — en ligne depuis aujourd'hui.</li>
+    <li class="r" style="--i:2">Météo réelle de Paris sur le balcon.</li>
+    <li class="r" style="--i:3">Cartes de plats à collectionner, notifications douces.</li>
+  </ul>
+</section>
+
+<section class="d fin" data-chap="Jouer">
+  <h1 class="r" style="--i:0">À toi de jouer.</h1>
+  <svg class="r" style="--i:1" viewBox="0 0 29 29" shape-rendering="crispEdges" role="img" aria-label="QR code vers jardin-de-poche.vercel.app"><path d="M0,0h1v1h-1zM1,0h1v1h-1zM2,0h1v1h-1zM3,0h1v1h-1zM4,0h1v1h-1zM5,0h1v1h-1zM6,0h1v1h-1zM9,0h1v1h-1zM10,0h1v1h-1zM12,0h1v1h-1zM13,0h1v1h-1zM14,0h1v1h-1zM15,0h1v1h-1zM17,0h1v1h-1zM18,0h1v1h-1zM22,0h1v1h-1zM23,0h1v1h-1zM24,0h1v1h-1zM25,0h1v1h-1zM26,0h1v1h-1zM27,0h1v1h-1zM28,0h1v1h-1zM0,1h1v1h-1zM6,1h1v1h-1zM8,1h1v1h-1zM11,1h1v1h-1zM15,1h1v1h-1zM22,1h1v1h-1zM28,1h1v1h-1zM0,2h1v1h-1zM2,2h1v1h-1zM3,2h1v1h-1zM4,2h1v1h-1zM6,2h1v1h-1zM8,2h1v1h-1zM10,2h1v1h-1zM14,2h1v1h-1zM16,2h1v1h-1zM22,2h1v1h-1zM24,2h1v1h-1zM25,2h1v1h-1zM26,2h1v1h-1zM28,2h1v1h-1zM0,3h1v1h-1zM2,3h1v1h-1zM3,3h1v1h-1zM4,3h1v1h-1zM6,3h1v1h-1zM8,3h1v1h-1zM9,3h1v1h-1zM12,3h1v1h-1zM14,3h1v1h-1zM15,3h1v1h-1zM16,3h1v1h-1zM17,3h1v1h-1zM18,3h1v1h-1zM19,3h1v1h-1zM20,3h1v1h-1zM22,3h1v1h-1zM24,3h1v1h-1zM25,3h1v1h-1zM26,3h1v1h-1zM28,3h1v1h-1zM0,4h1v1h-1zM2,4h1v1h-1zM3,4h1v1h-1zM4,4h1v1h-1zM6,4h1v1h-1zM9,4h1v1h-1zM10,4h1v1h-1zM11,4h1v1h-1zM13,4h1v1h-1zM14,4h1v1h-1zM15,4h1v1h-1zM17,4h1v1h-1zM18,4h1v1h-1zM19,4h1v1h-1zM20,4h1v1h-1zM22,4h1v1h-1zM24,4h1v1h-1zM25,4h1v1h-1zM26,4h1v1h-1zM28,4h1v1h-1zM0,5h1v1h-1zM6,5h1v1h-1zM9,5h1v1h-1zM12,5h1v1h-1zM13,5h1v1h-1zM14,5h1v1h-1zM16,5h1v1h-1zM17,5h1v1h-1zM20,5h1v1h-1zM22,5h1v1h-1zM28,5h1v1h-1zM0,6h1v1h-1zM1,6h1v1h-1zM2,6h1v1h-1zM3,6h1v1h-1zM4,6h1v1h-1zM5,6h1v1h-1zM6,6h1v1h-1zM8,6h1v1h-1zM10,6h1v1h-1zM12,6h1v1h-1zM14,6h1v1h-1zM16,6h1v1h-1zM18,6h1v1h-1zM20,6h1v1h-1zM22,6h1v1h-1zM23,6h1v1h-1zM24,6h1v1h-1zM25,6h1v1h-1zM26,6h1v1h-1zM27,6h1v1h-1zM28,6h1v1h-1zM8,7h1v1h-1zM9,7h1v1h-1zM10,7h1v1h-1zM13,7h1v1h-1zM15,7h1v1h-1zM16,7h1v1h-1zM18,7h1v1h-1zM19,7h1v1h-1zM0,8h1v1h-1zM6,8h1v1h-1zM8,8h1v1h-1zM9,8h1v1h-1zM14,8h1v1h-1zM17,8h1v1h-1zM21,8h1v1h-1zM22,8h1v1h-1zM25,8h1v1h-1zM26,8h1v1h-1zM27,8h1v1h-1zM1,9h1v1h-1zM2,9h1v1h-1zM3,9h1v1h-1zM4,9h1v1h-1zM7,9h1v1h-1zM12,9h1v1h-1zM14,9h1v1h-1zM15,9h1v1h-1zM16,9h1v1h-1zM19,9h1v1h-1zM23,9h1v1h-1zM24,9h1v1h-1zM26,9h1v1h-1zM27,9h1v1h-1zM1,10h1v1h-1zM2,10h1v1h-1zM3,10h1v1h-1zM6,10h1v1h-1zM7,10h1v1h-1zM9,10h1v1h-1zM10,10h1v1h-1zM15,10h1v1h-1zM17,10h1v1h-1zM20,10h1v1h-1zM21,10h1v1h-1zM22,10h1v1h-1zM24,10h1v1h-1zM1,11h1v1h-1zM2,11h1v1h-1zM5,11h1v1h-1zM7,11h1v1h-1zM10,11h1v1h-1zM11,11h1v1h-1zM14,11h1v1h-1zM18,11h1v1h-1zM19,11h1v1h-1zM20,11h1v1h-1zM21,11h1v1h-1zM23,11h1v1h-1zM24,11h1v1h-1zM25,11h1v1h-1zM1,12h1v1h-1zM2,12h1v1h-1zM5,12h1v1h-1zM6,12h1v1h-1zM7,12h1v1h-1zM8,12h1v1h-1zM9,12h1v1h-1zM10,12h1v1h-1zM11,12h1v1h-1zM13,12h1v1h-1zM14,12h1v1h-1zM15,12h1v1h-1zM20,12h1v1h-1zM22,12h1v1h-1zM23,12h1v1h-1zM28,12h1v1h-1zM2,13h1v1h-1zM3,13h1v1h-1zM4,13h1v1h-1zM9,13h1v1h-1zM11,13h1v1h-1zM13,13h1v1h-1zM14,13h1v1h-1zM15,13h1v1h-1zM16,13h1v1h-1zM18,13h1v1h-1zM19,13h1v1h-1zM20,13h1v1h-1zM22,13h1v1h-1zM23,13h1v1h-1zM24,13h1v1h-1zM27,13h1v1h-1zM28,13h1v1h-1zM1,14h1v1h-1zM2,14h1v1h-1zM3,14h1v1h-1zM4,14h1v1h-1zM6,14h1v1h-1zM7,14h1v1h-1zM8,14h1v1h-1zM10,14h1v1h-1zM12,14h1v1h-1zM13,14h1v1h-1zM14,14h1v1h-1zM15,14h1v1h-1zM22,14h1v1h-1zM25,14h1v1h-1zM26,14h1v1h-1zM8,15h1v1h-1zM10,15h1v1h-1zM11,15h1v1h-1zM12,15h1v1h-1zM13,15h1v1h-1zM14,15h1v1h-1zM16,15h1v1h-1zM20,15h1v1h-1zM24,15h1v1h-1zM26,15h1v1h-1zM28,15h1v1h-1zM1,16h1v1h-1zM2,16h1v1h-1zM3,16h1v1h-1zM4,16h1v1h-1zM5,16h1v1h-1zM6,16h1v1h-1zM7,16h1v1h-1zM9,16h1v1h-1zM14,16h1v1h-1zM15,16h1v1h-1zM16,16h1v1h-1zM17,16h1v1h-1zM20,16h1v1h-1zM21,16h1v1h-1zM23,16h1v1h-1zM25,16h1v1h-1zM26,16h1v1h-1zM0,17h1v1h-1zM2,17h1v1h-1zM3,17h1v1h-1zM7,17h1v1h-1zM8,17h1v1h-1zM9,17h1v1h-1zM11,17h1v1h-1zM12,17h1v1h-1zM15,17h1v1h-1zM16,17h1v1h-1zM19,17h1v1h-1zM20,17h1v1h-1zM22,17h1v1h-1zM23,17h1v1h-1zM24,17h1v1h-1zM26,17h1v1h-1zM27,17h1v1h-1zM28,17h1v1h-1zM0,18h1v1h-1zM1,18h1v1h-1zM2,18h1v1h-1zM3,18h1v1h-1zM6,18h1v1h-1zM8,18h1v1h-1zM10,18h1v1h-1zM11,18h1v1h-1zM12,18h1v1h-1zM13,18h1v1h-1zM14,18h1v1h-1zM15,18h1v1h-1zM18,18h1v1h-1zM19,18h1v1h-1zM24,18h1v1h-1zM25,18h1v1h-1zM28,18h1v1h-1zM0,19h1v1h-1zM2,19h1v1h-1zM3,19h1v1h-1zM4,19h1v1h-1zM7,19h1v1h-1zM10,19h1v1h-1zM11,19h1v1h-1zM14,19h1v1h-1zM18,19h1v1h-1zM20,19h1v1h-1zM21,19h1v1h-1zM24,19h1v1h-1zM0,20h1v1h-1zM2,20h1v1h-1zM3,20h1v1h-1zM5,20h1v1h-1zM6,20h1v1h-1zM7,20h1v1h-1zM10,20h1v1h-1zM11,20h1v1h-1zM12,20h1v1h-1zM15,20h1v1h-1zM17,20h1v1h-1zM19,20h1v1h-1zM20,20h1v1h-1zM21,20h1v1h-1zM22,20h1v1h-1zM23,20h1v1h-1zM24,20h1v1h-1zM26,20h1v1h-1zM27,20h1v1h-1zM28,20h1v1h-1zM8,21h1v1h-1zM9,21h1v1h-1zM11,21h1v1h-1zM12,21h1v1h-1zM13,21h1v1h-1zM15,21h1v1h-1zM18,21h1v1h-1zM20,21h1v1h-1zM24,21h1v1h-1zM25,21h1v1h-1zM0,22h1v1h-1zM1,22h1v1h-1zM2,22h1v1h-1zM3,22h1v1h-1zM4,22h1v1h-1zM5,22h1v1h-1zM6,22h1v1h-1zM10,22h1v1h-1zM12,22h1v1h-1zM13,22h1v1h-1zM14,22h1v1h-1zM15,22h1v1h-1zM17,22h1v1h-1zM18,22h1v1h-1zM19,22h1v1h-1zM20,22h1v1h-1zM22,22h1v1h-1zM24,22h1v1h-1zM25,22h1v1h-1zM26,22h1v1h-1zM0,23h1v1h-1zM6,23h1v1h-1zM10,23h1v1h-1zM11,23h1v1h-1zM13,23h1v1h-1zM15,23h1v1h-1zM16,23h1v1h-1zM20,23h1v1h-1zM24,23h1v1h-1zM27,23h1v1h-1zM28,23h1v1h-1zM0,24h1v1h-1zM2,24h1v1h-1zM3,24h1v1h-1zM4,24h1v1h-1zM6,24h1v1h-1zM12,24h1v1h-1zM13,24h1v1h-1zM16,24h1v1h-1zM19,24h1v1h-1zM20,24h1v1h-1zM21,24h1v1h-1zM22,24h1v1h-1zM23,24h1v1h-1zM24,24h1v1h-1zM25,24h1v1h-1zM27,24h1v1h-1zM28,24h1v1h-1zM0,25h1v1h-1zM2,25h1v1h-1zM3,25h1v1h-1zM4,25h1v1h-1zM6,25h1v1h-1zM11,25h1v1h-1zM15,25h1v1h-1zM18,25h1v1h-1zM19,25h1v1h-1zM21,25h1v1h-1zM25,25h1v1h-1zM26,25h1v1h-1zM28,25h1v1h-1zM0,26h1v1h-1zM2,26h1v1h-1zM3,26h1v1h-1zM4,26h1v1h-1zM6,26h1v1h-1zM10,26h1v1h-1zM12,26h1v1h-1zM13,26h1v1h-1zM15,26h1v1h-1zM19,26h1v1h-1zM21,26h1v1h-1zM22,26h1v1h-1zM23,26h1v1h-1zM24,26h1v1h-1zM25,26h1v1h-1zM26,26h1v1h-1zM27,26h1v1h-1zM0,27h1v1h-1zM6,27h1v1h-1zM9,27h1v1h-1zM10,27h1v1h-1zM11,27h1v1h-1zM13,27h1v1h-1zM14,27h1v1h-1zM21,27h1v1h-1zM22,27h1v1h-1zM25,27h1v1h-1zM26,27h1v1h-1zM28,27h1v1h-1zM0,28h1v1h-1zM1,28h1v1h-1zM2,28h1v1h-1zM3,28h1v1h-1zM4,28h1v1h-1zM5,28h1v1h-1zM6,28h1v1h-1zM8,28h1v1h-1zM9,28h1v1h-1zM10,28h1v1h-1zM11,28h1v1h-1zM12,28h1v1h-1zM13,28h1v1h-1zM17,28h1v1h-1zM19,28h1v1h-1zM21,28h1v1h-1zM26,28h1v1h-1z" fill="#000"/></svg>
+  <p class="lien r" style="--i:2">jardin-de-poche.vercel.app</p>
+  <p class="s r" style="--i:3">Sur ton téléphone, sans rien installer. FR · EN · ES</p>
+</section>
+
+</main>
+<div id="progres"></div>
+<div id="barre">
+  <button type="button" id="bPrec" aria-label="Précédent">←</button>
+  <button type="button" id="bSuiv" aria-label="Suivant">→</button>
+  <button type="button" id="bMenu">☰ Chapitres</button>
+  <button type="button" id="bPlein">⛶</button>
+  <button type="button" id="bVoix" aria-pressed="false">🔇 Voix</button>
+  <select id="sLang" aria-label="Langue de la voix"><option value="fr">FR</option><option value="en">EN</option><option value="es">ES</option></select>
+  <span id="voixEtat"></span>
+  <span id="compteur"></span>
+</div>
+<div id="menu" role="dialog" aria-modal="true" aria-label="Chapitres">
+  <div class="boite"><h2>Aller à</h2><div class="liste" id="chapitres"></div></div>
+</div>
+<script src="voix.js"></script>
+<script>
+(() => {
+  const diapos = [...document.querySelectorAll('.d')], CLE = 'jdp.demo.diapo';
+  let i = 0;
+  try { i = Math.min(diapos.length - 1, Math.max(0, parseInt(location.hash.slice(1) || sessionStorage.getItem(CLE) || '0', 10) || 0)); } catch { i = 0; }
+  const menu = document.getElementById('menu'), liste = document.getElementById('chapitres');
+  diapos.forEach((d, k) => { if (!d.dataset.chap) return; const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `${d.dataset.chap}<small>diapo ${k + 1}</small>`; b.onclick = () => { aller(k); ouvrirMenu(false); }; b.dataset.k = k; liste.append(b); });
+  let aller = function (k) {
+    i = Math.min(diapos.length - 1, Math.max(0, k));
+    diapos.forEach((d, j) => d.classList.toggle('actif', j === i));
+    document.getElementById('compteur').textContent = `${i + 1} / ${diapos.length}`;
+    document.getElementById('progres').style.width = `${(i + 1) / diapos.length * 100}%`;
+    try { sessionStorage.setItem(CLE, i); history.replaceState(null, '', '#' + i); } catch { /* rien */ }
+    liste.querySelectorAll('button').forEach(b => { const k2 = +b.dataset.k; const suivant = [...liste.querySelectorAll('button')].find(x => +x.dataset.k > k2); b.classList.toggle('actif', i >= k2 && (!suivant || i < +suivant.dataset.k)); });
+  };
+  function ouvrirMenu(o) { menu.classList.toggle('ouvert', o === undefined ? !menu.classList.contains('ouvert') : o); }
+  document.getElementById('scene').addEventListener('click', e => { if (e.target.closest('a')) return; const x = e.clientX / innerWidth; aller(x < .2 ? i - 1 : i + 1); });
+  document.getElementById('bPrec').onclick = () => aller(i - 1);
+  document.getElementById('bSuiv').onclick = () => aller(i + 1);
+  document.getElementById('bMenu').onclick = () => ouvrirMenu();
+  document.getElementById('bPlein').onclick = () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); };
+  menu.addEventListener('click', e => { if (e.target === menu) ouvrirMenu(false); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'Enter') { e.preventDefault(); if (!menu.classList.contains('ouvert')) aller(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'Backspace') { e.preventDefault(); aller(i - 1); }
+    else if (e.key === 'Home') aller(0);
+    else if (e.key === 'End') aller(diapos.length - 1);
+    else if (e.key === 'm' || e.key === 'M') ouvrirMenu();
+    else if (e.key === 'f' || e.key === 'F') document.getElementById('bPlein').onclick();
+    else if (e.key === 'Escape') ouvrirMenu(false);
+  });
+  let x0 = null;
+  addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+  addEventListener('touchend', e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 60) aller(dx < 0 ? i + 1 : i - 1); }, { passive: true });
+  /* la voix : fichiers fabriqués par le tableau (Gemini TTS), rangés dans Supabase */
+  const SBV = 'https://jbwlhapwszsuwirspybg.supabase.co/storage/v1/object/public/voix/';
+  const CLE_V = 'jdp.demo.voix', CLE_L = 'jdp.demo.lang';
+  let voixOn = false, lang = 'fr', audio = new Audio(), jeton = 0;
+  try { voixOn = localStorage.getItem(CLE_V) === '1'; lang = ['fr', 'en', 'es'].includes(localStorage.getItem(CLE_L)) ? localStorage.getItem(CLE_L) : (navigator.language || 'fr').slice(0, 2); if (!['fr', 'en', 'es'].includes(lang)) lang = 'fr'; } catch { /* rien */ }
+  const sLang = document.getElementById('sLang'), bVoix = document.getElementById('bVoix'), vEtat = document.getElementById('voixEtat');
+  sLang.value = lang;
+  async function sha1(t) { const d = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(t)); return [...new Uint8Array(d)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+  async function lire() {
+    audio.pause(); vEtat.textContent = '';
+    if (!voixOn || !window.VOIX || !window.VOIX[lang] || !window.VOIX[lang][i]) return;
+    const mon = ++jeton, texte = window.VOIX[lang][i];
+    let h; try { h = await sha1(texte); } catch { vEtat.textContent = 'voix indisponible ici'; return; }
+    if (mon !== jeton) return;
+    audio = new Audio(`${SBV}${lang}/${String(i).padStart(2, '0')}-${h.slice(0, 10)}.wav`);
+    audio.onerror = () => { if (mon === jeton) vEtat.textContent = 'voix non préparée (tableau → Démo → Préparer les voix)'; };
+    audio.play().catch(() => { if (mon === jeton) vEtat.textContent = 'touche l’écran pour lancer le son'; });
+  }
+  function majVoix() { bVoix.textContent = voixOn ? '🔊 Voix' : '🔇 Voix'; bVoix.setAttribute('aria-pressed', String(voixOn)); try { localStorage.setItem(CLE_V, voixOn ? '1' : '0'); localStorage.setItem(CLE_L, lang); } catch { /* rien */ } }
+  bVoix.onclick = () => { voixOn = !voixOn; majVoix(); lire(); };
+  sLang.onchange = () => { lang = sLang.value; majVoix(); lire(); };
+  document.addEventListener('keydown', e => { if (e.key === 'v' || e.key === 'V') bVoix.onclick(); });
+  const allerSansVoix = aller;
+  aller = k => { allerSansVoix(k); lire(); };
+  majVoix();
+  aller(i);
+})();
+</script>
+</body>
+</html>
