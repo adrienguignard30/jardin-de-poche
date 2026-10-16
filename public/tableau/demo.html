@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Potager de Poche — Démo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23ffd166'/%3E%3Cpath d='M23 16 L49 32 L23 48 Z' fill='%230b1a10'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#0b1a10">
 <link rel="stylesheet" href="/fonts/nunito.css">
 <style>
   :root { --fond: #0b1a10; --fond2: #11261a; --encre: #f4f1e6; --muet: #a9b9ad; --vert: #7dd49a; --jaune: #ffd166; --rose: #ffb3c1; --trait: rgba(255,255,255,.14); }
@@ -233,8 +235,8 @@
     <rect x="490" y="270" width="220" height="60"/><text x="600" y="308" text-anchor="middle">Codex 2</text>
     <rect x="850" y="270" width="220" height="60"/><text x="960" y="308" text-anchor="middle">Codex 3</text>
     <text class="p" x="240" y="358" text-anchor="middle">persos, animations, accueil, mât</text>
-    <text class="p" x="600" y="358" text-anchor="middle">espagnol, fiches plantes</text>
-    <text class="p" x="960" y="358" text-anchor="middle">plantes 3D, guide</text>
+    <text class="p" x="600" y="358" text-anchor="middle">plantes 3D, guide, façades</text>
+    <text class="p" x="960" y="358" text-anchor="middle">espagnol, fiches plantes</text>
     <rect x="40" y="400" width="1120" height="60"/>
     <text x="600" y="438" text-anchor="middle">Tripo · Mixamo · Blender · Gemini · GPT · After Effects</text>
     <path d="M600 460 V500"/>
@@ -265,8 +267,8 @@
   <p class="chap r" style="--i:0">Les trois Codex</p>
   <div class="etape">
     <div class="n r" style="--i:1">1</div><div class="t r" style="--i:1"><b>Codex 1 · depuis le 3 octobre</b> — mesures des squelettes et des meubles, couleurs des persos, animations, montages After Effects, audit du jeu, accueil et langues, mât Tripo.</div>
-    <div class="n r" style="--i:2">2</div><div class="t r" style="--i:2"><b>Codex 2 · depuis le 13 octobre</b> — espagnol complet (« Huerto de Bolsillo »), fiches de 25 plantes et 66 recettes en FR/EN/ES.</div>
-    <div class="n r" style="--i:3">3</div><div class="t r" style="--i:3"><b>Codex 3 · depuis le 29 septembre</b> — les 25 plantes Tripo, la bibliothèque Blender, la compression mobile, le guide de première arrivée.</div>
+    <div class="n r" style="--i:2">2</div><div class="t r" style="--i:2"><b>Codex 2 · depuis le 29 septembre</b> — les 25 plantes Tripo, la bibliothèque Blender, la compression mobile, le guide de première arrivée, les façades illustrées.</div>
+    <div class="n r" style="--i:3">3</div><div class="t r" style="--i:3"><b>Codex 3 · depuis le 13 octobre</b> — espagnol complet (« Huerto de Bolsillo »), fiches de 25 plantes et 66 recettes en FR/EN/ES.</div>
   </div>
   <p class="s r" style="--i:4">Chaque Codex rend un rapport. Je lis, je valide, je teste en local, et c'est moi qui mets en ligne.</p>
 </section>
@@ -450,6 +452,7 @@
   const CLE_V = 'jdp.demo.voix', CLE_L = 'jdp.demo.lang';
   let voixOn = false, lang = 'fr', audio = new Audio(), jeton = 0, autoOn = false, minuteur = 0, enPause = false;
   try { voixOn = localStorage.getItem(CLE_V) === '1'; lang = ['fr', 'en', 'es'].includes(localStorage.getItem(CLE_L)) ? localStorage.getItem(CLE_L) : (navigator.language || 'fr').slice(0, 2); if (!['fr', 'en', 'es'].includes(lang)) lang = 'fr'; } catch { /* rien */ }
+  { const p = new URLSearchParams(location.search).get('lang'); if (['fr', 'en', 'es'].includes(p)) lang = p; }   // QR codes du tableau : ?lang=en, ?lang=es
   const sLang = document.getElementById('sLang'), bVoix = document.getElementById('bVoix'), vEtat = document.getElementById('voixEtat');
   sLang.value = lang;
   async function sha1(t) { const d = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(t)); return [...new Uint8Array(d)].map(x => x.toString(16).padStart(2, '0')).join(''); }

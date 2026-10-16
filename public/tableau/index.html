@@ -71,6 +71,21 @@
   .demoCarte { padding: 10px 16px 18px; color: var(--encre-2); font-size: 14.5px; line-height: 1.55; }
   .demoGrille { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 760px) { .demoGrille { grid-template-columns: 1fr; } }
+  .qrDemoBoutons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .qrDemoBoutons button { font: inherit; font-weight: 700; padding: 14px 8px; border-radius: 12px; border: 1px solid var(--trait); background: var(--page); color: var(--encre); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .qrDemoBoutons button:hover { border-color: var(--barre); }
+  .qrDemoBoutons .dr { font-size: 26px; line-height: 1; }
+  #qrDemoFond { position: fixed; inset: 0; z-index: 30; background: rgba(10, 20, 15, .75); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  #qrDemoFond[hidden] { display: none; }
+  .qrDemoBoite { background: #fff; color: #111; border-radius: 22px; padding: 22px 22px 18px; width: min(480px, 100%); text-align: center; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+  .qrDemoBoite h3 { margin: 0 0 4px; font-size: 22px; }
+  .qrDemoBoite p { margin: 0 0 12px; color: #555; font-size: 14px; }
+  .qrDemoBoite svg { width: min(380px, 78vw); height: auto; display: block; margin: 0 auto; }
+  .qrDemoBoite .url { font: 600 13px ui-monospace, Consolas, monospace; color: #333; margin: 10px 0 12px; word-break: break-all; }
+  .qrDemoBoite .act { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .qrDemoBoite .act a, .qrDemoBoite .act button { border: 0; border-radius: 12px; padding: 11px 16px; font: 700 14px system-ui, sans-serif; cursor: pointer; background: #eee; color: #111; text-decoration: none; }
+  .qrDemoBoite .act a { background: #1b5e20; color: #fff; }
+  .qrDemoBoite .qrX { position: absolute; top: 10px; right: 10px; width: 38px; height: 38px; border: 0; border-radius: 50%; background: #eee; font-size: 18px; cursor: pointer; }
   .kit { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
   .kit a { display: block; padding: 11px 14px; border: 1px solid var(--trait); border-radius: 10px; color: var(--encre); text-decoration: none; font-weight: 700; background: var(--page); }
   .kit a:hover { border-color: var(--barre); }
@@ -347,8 +362,19 @@
             </ul>
           </div>
         </section>
+        <section class="carte" aria-labelledby="hQrDemo">
+          <h2 id="hQrDemo">4 · QR codes de la démo <span class="nb">FR · EN · ES</span></h2>
+          <div class="demoCarte">
+            Touche une langue : le QR code s'affiche en grand. Le visiteur le scanne et ouvre le diaporama sur son téléphone, avec la voix dans sa langue.
+            <div class="qrDemoBoutons">
+              <button type="button" data-qrdemo="fr"><span class="dr">🇫🇷</span>Français</button>
+              <button type="button" data-qrdemo="en"><span class="dr">🇬🇧</span>English</button>
+              <button type="button" data-qrdemo="es"><span class="dr">🇪🇸</span>Español</button>
+            </div>
+          </div>
+        </section>
         <section class="carte" aria-labelledby="hVoix">
-          <h2 id="hVoix">4 · Les voix <span class="nb">Gemini TTS</span></h2>
+          <h2 id="hVoix">5 · Les voix <span class="nb">Gemini TTS</span></h2>
           <div class="demoCarte">
             Fabrique une fois chaque phrase parlée (diaporama + pitch) et la range dans Supabase. À relancer seulement si un texte change : ce qui existe déjà n'est pas refait.<br>
             <button class="rond" type="button" id="prepVoix" style="margin-top:10px"><span class="ico">🔊</span><span class="txt">Préparer les voix</span></button>
@@ -368,6 +394,16 @@
   </div>
 </main>
 <div id="bulle" role="tooltip" hidden></div>
+<div id="qrDemoFond" hidden role="dialog" aria-modal="true" aria-labelledby="qrDemoTitre">
+  <div class="qrDemoBoite">
+    <button class="qrX" type="button" id="qrDemoFermer" aria-label="Fermer">✕</button>
+    <h3 id="qrDemoTitre"></h3>
+    <p id="qrDemoSous"></p>
+    <div id="qrDemoImage"></div>
+    <div class="url" id="qrDemoUrl"></div>
+    <div class="act"><a id="qrDemoOuvrir" href="#" target="_blank" rel="noopener">Ouvrir la démo</a><button type="button" id="qrDemoCopier">Copier le lien</button></div>
+  </div>
+</div>
 <div id="qrFond" hidden role="dialog" aria-modal="true" aria-labelledby="qrCodeTexte">
   <div class="qrBoite">
     <button class="qrX" type="button" id="qrFermer" aria-label="Fermer">✕</button>
@@ -802,6 +838,26 @@ var qrcode=(function(){var P=function(x,w){var g=236,l=17,n=x,s=O[w],t=null,r=0,
     $('prepEtat').textContent = `Terminé : ${jobs.length - soucis.length} prêtes sur ${jobs.length} (${neuf} fabriquées), ${soucis.length} en échec`;
     $('prepDetail').textContent = soucis.join('\n');
   };
+  /* QR codes de la démo (diaporama public, voix dans la langue choisie) */
+  const QR_DEMO = {
+    fr: { titre: '🇫🇷 Démo — Potager de Poche', sous: 'Scanne pour voir la présentation sur ton téléphone' },
+    en: { titre: '🇬🇧 Demo — Pocket Kitchen Garden', sous: 'Scan to see the presentation on your phone' },
+    es: { titre: '🇪🇸 Demo — Huerto de Bolsillo', sous: 'Escanea para ver la presentación en tu teléfono' },
+  };
+  function ouvrirQrDemo(l) {
+    const u = `${location.origin}/tableau/demo.html?lang=${l}`;
+    $('qrDemoTitre').textContent = QR_DEMO[l].titre; $('qrDemoSous').textContent = QR_DEMO[l].sous;
+    const q = qrcode(0, 'M'); q.addData(u); q.make();
+    $('qrDemoImage').innerHTML = q.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+    $('qrDemoUrl').textContent = u; $('qrDemoOuvrir').href = u;
+    $('qrDemoCopier').textContent = 'Copier le lien';
+    $('qrDemoCopier').onclick = () => { navigator.clipboard?.writeText(u); $('qrDemoCopier').textContent = 'Copié ✓'; };
+    $('qrDemoFond').hidden = false;
+  }
+  document.querySelectorAll('[data-qrdemo]').forEach(b => b.onclick = () => ouvrirQrDemo(b.dataset.qrdemo));
+  $('qrDemoFermer').onclick = () => { $('qrDemoFond').hidden = true; };
+  $('qrDemoFond').addEventListener('click', e => { if (e.target === $('qrDemoFond')) $('qrDemoFond').hidden = true; });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') $('qrDemoFond').hidden = true; });
   /* pages : une par onglet, choisie par le #hash, mémorisée */
   const PAGES = ['vue', 'codes', 'sessions', 'bugs', 'demo'], CLE_PAGE = 'jdp.tableau.page';
   function montrerPage(p) {
