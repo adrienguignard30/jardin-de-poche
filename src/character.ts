@@ -204,7 +204,7 @@ export class Character {
     if (!this.walking) this.busy = v.occupeAvant;
     this.virage = null; for (const resolve of v.resolves) resolve();
   }
-  private walking: { target: THREE.Vector3; face?: number; arrivee?: boolean; resolve: () => void } | null = null;
+  private walking: { target: THREE.Vector3; face?: number; arrivee?: boolean; suite?: THREE.Vector3[]; valide?: () => boolean; resolve: () => void } | null = null;
   private fade = { value: 1, target: 1 };
   private meshes: THREE.Mesh[] = [];
   private marcheLea = false;
@@ -574,7 +574,14 @@ export class Character {
   }
 
   /** Marche en ligne droite jusqu'au point, puis se tourne vers `face` (angle Y). */
-  goTo(target: THREE.Vector3, face?: number): Promise<void> {
+  /** Les points calculés restent inchangés ; seule la destination termine la marche. */
+  suivreChemin(points: THREE.Vector3[], face: number | undefined, valide: () => boolean): Promise<void> {
+    if (!valide() || !points.length) return Promise.resolve();
+    if (points.length === 1) return this.goTo(points[0], face);
+    return this.goTo(points[0], face, { suite: points.slice(1).map(p => p.clone()), valide });
+  }
+
+  goTo(target: THREE.Vector3, face?: number, parcours?: { suite: THREE.Vector3[]; valide: () => boolean }): Promise<void> {
     this.appuisGeste = null; this.mouvementOrigine = null;
     this.solAssis = null;
     this.annulerVirage();
@@ -583,7 +590,7 @@ export class Character {
     const d = target.clone().sub(this.obj.position);
     d.y = 0;
     this.faceCible = null; this.virage = null;
-    if (d.length() < .05) {
+    if (!parcours && d.length() < .05) {
       if (face === undefined) return Promise.resolve();
       this.busy = true; this.play('idle');
       return new Promise(res => { this.walking = { target: this.obj.position.clone(), face, arrivee: true, resolve: res }; });
@@ -592,7 +599,7 @@ export class Character {
     this.play('walk');
     // Le changement de direction utilise le mouvement du clip, puis la marche continue.
     this.debuterVirage(Math.atan2(d.x, d.z));
-    return new Promise(res => { this.walking = { target: target.clone(), face, resolve: res }; });
+    return new Promise(res => { this.walking = { target: target.clone(), face, ...parcours, resolve: res }; });
   }
 
   /** Va quelque part, fait une action, revient en idle. */
@@ -622,7 +629,9 @@ export class Character {
   setFade(target: number) { this.fade.target = target; }
 
   /** Les mains peuvent suivre des cibles dans le monde (remuer la poêle, saupoudrer), par-dessus l'animation en cours. */
-  mains: { droite?: () => THREE.Vector3; gauche?: () => THREE.Vector3; paumes?: boolean; doigts?: boolean; orientationDroite?: () => THREE.Quaternion; priseDroite?: Map<string, THREE.Quaternion>; poseDroite?: Map<string, THREE.Quaternion>; poseCorps?: Map<string, THREE.Quaternion>; poseBassin?: THREE.Vector3 } | null = null;
+  mains: { telephone?: boolean; droite?: () => THREE.Vector3; gauche?: () => THREE.Vector3; paumes?: boolean; doigts?: boolean; orientationDroite?: () => THREE.Quaternion; priseDroite?: Map<string, THREE.Quaternion>; poseDroite?: Map<string, THREE.Quaternion>; poseCorps?: Map<string, THREE.Quaternion>; poseBassin?: THREE.Vector3 } | null = null;
+  get mainDroiteRelachee() { return this.ikBut === 0 && this.ikPoids <= .01; }
+  private telephoneBrasDroit: THREE.Quaternion | null = null;
   private priseDouce = false; private ikProgression = 0; private ikPoids = 0; ikBut = 0;
   private ikOs: Record<string, THREE.Object3D | null> = {};
   private torse: { mesh: THREE.SkinnedMesh; indices: number[] }[] = [];
@@ -880,7 +889,8 @@ export class Character {
     const droite = new THREE.Vector3(-fw.z, 0, fw.x).multiplyScalar(cote === 'Right' ? 1 : -1);
     const large = this.contourTorse.length > 0;
     const guide = this.mains && this.ikBut > 0 && (cote === 'Right' ? this.mains.droite : this.mains.gauche);
-    const pole = jambe ? fw.clone().addScaledVector(droite, .12) : (this.mains?.poseDroite || guide && this.currentName === 'water') ? new THREE.Vector3(0, this.mains?.poseDroite ? -.15 : -1, 0).addScaledVector(droite, this.mains?.poseDroite ? 1.25 : .65).addScaledVector(fw, this.mains?.poseDroite ? -.40 : -.20) : guide ? E0.clone().sub(S) : new THREE.Vector3(0, -1, 0).addScaledVector(droite, large ? 1.15 : .55).addScaledVector(fw, large ? .20 : -.35);
+    const telephone = !jambe && cote === 'Right' && !!this.mains?.telephone;
+    const pole = telephone ? new THREE.Vector3(0, -1, 0).addScaledVector(droite, .55).addScaledVector(fw, .30) : jambe ? fw.clone().addScaledVector(droite, .12) : (this.mains?.poseDroite || guide && this.currentName === 'water') ? new THREE.Vector3(0, this.mains?.poseDroite ? -.15 : -1, 0).addScaledVector(droite, this.mains?.poseDroite ? 1.25 : .65).addScaledVector(fw, this.mains?.poseDroite ? -.40 : -.20) : guide ? E0.clone().sub(S) : new THREE.Vector3(0, -1, 0).addScaledVector(droite, large ? 1.15 : .55).addScaledVector(fw, large ? .20 : -.35);
     let pp = pole.sub(dir.clone().multiplyScalar(pole.dot(dir)));
     if (pp.lengthSq() < 1e-8) { pp = new THREE.Vector3(0, -1, 0).addScaledVector(droite, .55); pp.addScaledVector(dir, -pp.dot(dir)); }
     pp.normalize();   // le pôle, dans le plan perpendiculaire à l'axe épaule → cible
@@ -893,11 +903,16 @@ export class Character {
       let meilleur = Infinity;
       const precedent = this.coudesDebutFrame.get(cote);
       const ancien = precedent ? this.obj.localToWorld(precedent.clone()).sub(centre) : null;
-      const anglePrecedent = ancien ? Math.atan2(ancien.dot(travers), ancien.dot(pp)) : 0;
-      for (const angle of [anglePrecedent, 0, .4, -.4, .8, -.8, 1.2, -1.2, 1.6, -1.6, 2, -2, 2.4, -2.4, 2.8, -2.8, Math.PI]) {
+      const historique = ancien ? Math.atan2(ancien.dot(travers), ancien.dot(pp)) : 0;
+      // Téléphone droit uniquement : coude bas/extérieur, sans bascule derrière l'épaule.
+      const anglePrecedent = telephone ? THREE.MathUtils.clamp(historique, -.6, .6) : historique;
+      const angles = telephone ? [anglePrecedent, 0, .2, -.2, .4, -.4, .6, -.6]
+        : [anglePrecedent, 0, .4, -.4, .8, -.8, 1.2, -1.2, 1.6, -1.6, 2, -2, 2.4, -2.4, 2.8, -2.8, Math.PI];
+      for (const angle of angles) {
         const essai = centre.clone().addScaledVector(pp, Math.cos(angle) * rayon).addScaledVector(travers, Math.sin(angle) * rayon);
         let score = precedent ? this.obj.worldToLocal(essai.clone()).distanceToSquared(precedent) * .002 : angle * angle * 1e-6;
         if (guide && this.currentName === 'water') score += angle * angle * .002;
+        if (telephone) score += angle * angle * .02;
         for (const point of [essai, ...[.25, .5, .75].map(k => essai.clone().lerp(cible, k))]) {
           score += 100 * point.distanceToSquared(this.mainHorsDuTorse(cote, point, this.rayonAvantBras[cote]));
         }
@@ -1002,6 +1017,9 @@ export class Character {
     }
   }
   update(dt: number) {
+    const brasTelephone = this.os('RightArm');
+    const brasAvantTelephone = brasTelephone?.quaternion.clone();
+    if (this.walking?.valide && !this.walking.valide()) this.annulerMarche();
     this.avancerVirage(dt);
     if (this.faceCible !== null) {
       const d = ((this.faceCible - this.obj.rotation.y + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
@@ -1022,6 +1040,7 @@ export class Character {
       const w = this.walking;
       if (!w.arrivee && !this.virage) {
         if (this.currentName !== 'walk') this.play('walk');
+        if (!w.suite) {
         const d = w.target.clone().sub(this.obj.position); d.y = 0;
         const len = d.length(), step = this.speed * dt;
         if (len > step) {
@@ -1032,6 +1051,25 @@ export class Character {
           this.obj.position.copy(w.target); w.arrivee = true;
           this.play('idle');
         } else this.obj.position.add(d.normalize().multiplyScalar(step));
+        } else {
+        let restant = this.speed * dt;
+        // Consommer le pas restant au coin sans idle, sans nouveau goTo et sans
+        // redémarrer le clip : on suit exactement les segments déjà validés.
+        for (;;) {
+          const d = w.target.clone().sub(this.obj.position); d.y = 0;
+          const len = d.length();
+          if (len > restant) {
+            const dy = Math.atan2(Math.sin(Math.atan2(d.x, d.z) - this.obj.rotation.y), Math.cos(Math.atan2(d.x, d.z) - this.obj.rotation.y));
+            this.obj.rotation.y += THREE.MathUtils.clamp(dy, -dt * 3.2, dt * 3.2);
+            this.obj.position.add(d.normalize().multiplyScalar(restant));
+            break;
+          }
+          this.obj.position.copy(w.target); restant -= len;
+          const suivant = w.suite?.shift();
+          if (suivant) { w.target = suivant; continue; }
+          w.arrivee = true; this.play('idle'); break;
+        }
+        }
       }
       if (w.arrivee && !this.virage) {
         const dy = w.face === undefined ? 0 : Math.atan2(Math.sin(w.face - this.obj.rotation.y), Math.cos(w.face - this.obj.rotation.y));
@@ -1075,8 +1113,9 @@ export class Character {
     this.coudesDebutFrame = new Map([...this.coudePrecedent].map(([n, p]) => [n, p.clone()]));
     this.pasCoude = Math.min(.2, dt * 5);
     this.degagerBrasLibres(dt);
+    const telephoneDroit = !!this.mains?.telephone;
     // Le téléphone monte et descend sans impulsion au début du guidage.
-    if (this.mains && this.ikBut > 0) this.priseDouce = /^phone(?:_|$)/.test(this.currentName);
+    if (this.mains && this.ikBut > 0) this.priseDouce = !!this.mains.telephone || /^phone(?:_|$)/.test(this.currentName);
     if (this.priseDouce) {
       const ciblePrise = THREE.MathUtils.clamp(this.ikBut, 0, 1);
       this.ikProgression += THREE.MathUtils.clamp(ciblePrise - this.ikProgression, -dt / .55, dt / .55);
@@ -1115,6 +1154,15 @@ export class Character {
       }
       this.obj.updateMatrixWorld(true);
     } else if (this.ikBut === 0 && this.ikPoids <= .01) this.mains = null;
+    // Limite temporelle du haut du bras droit, réservée au téléphone et à sa
+    // sortie vers repos/assise. Les autres gestes gardent leur solveur intact.
+    if (this.mains && !telephoneDroit || !/^(idle|sit)(?:_|$)/.test(this.currentName)) this.telephoneBrasDroit = null;
+    else if (brasTelephone && brasAvantTelephone && (telephoneDroit || this.telephoneBrasDroit)) {
+      const cible = brasTelephone.quaternion.clone().normalize();
+      brasTelephone.quaternion.copy((this.telephoneBrasDroit ?? brasAvantTelephone).clone().normalize().rotateTowards(cible, Math.max(0, dt) * 3.2));
+      this.telephoneBrasDroit = !telephoneDroit && brasTelephone.quaternion.angleTo(cible) < .0001 ? null : brasTelephone.quaternion.clone();
+      this.obj.updateMatrixWorld(true);
+    }
     if (!jardinage) this.tournerTete(dt);
     if (this.breathing) { this.breathT += dt; const k = 1 + Math.sin(this.breathT * 1.6) * .006; this.obj.scale.set(this.obj.scale.x, this.obj.scale.x * k, this.obj.scale.x); }
     else if (this.obj.scale.y !== this.obj.scale.x) this.obj.scale.y = this.obj.scale.x;

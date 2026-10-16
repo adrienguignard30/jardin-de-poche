@@ -498,7 +498,7 @@ export class Game {
     // chaque rangement est indépendant : l'un qui échoue n'empêche jamais d'entrer dans le jeu
     const sur = (f: () => void) => { try { f(); } catch (e) { console.warn('[remise à zéro]', e); } };
     sur(() => { if (this.assiettePosee) { this.assiettePosee.parent?.remove(this.assiettePosee); this.assiettePosee = null; } clearTimeout(this.poseTimer); });
-    sur(() => this.lacherTel()); sur(() => this.lacherArrosoir()); sur(() => { this.lacher(); }); sur(() => this.release());
+    sur(() => { ++this.telDemande; this.lacherTel(); }); sur(() => this.lacherArrosoir()); sur(() => { this.lacher(); }); sur(() => this.release());
     sur(() => { if (this.poeleEnCours) { this.poeleEnCours.parent?.remove(this.poeleEnCours); this.poeleEnCours = null; } });
     sur(() => { if (this.char) { this.char.regard = null; this.char.mains = null; this.char.ikBut = 0; this.char.busy = false; } });
     this.inside = false; this.sleeping = false;
@@ -839,7 +839,7 @@ export class Game {
     ajouter('Semis', async token => { const p = this.state.pots[0]; await this.gotoSlot(SLOTS[p.id], 'plant'); if (token !== this.autoToken) return; this.char.busy = true; const g = this.char.geste('plant'); this.mainVersLaPlante(p, 'semis', g.effet); await g.fin; });
     ajouter('Arrosage', async token => { const p = this.state.pots[0]; await this.gotoSlot(SLOTS[p.id], 'water'); if (token !== this.autoToken) return; this.char.busy = true; const cible = this.views.get(p.id)!.holder.getWorldPosition(new THREE.Vector3()); this.tenirArrosoir(cible); const g = this.char.geste('water'); this.verser(g.effet); await g.fin; if (token === this.autoToken) this.lacherArrosoir(); });
     ajouter('Récolte', async token => { const p = this.state.pots[0]; await this.gotoSlot(SLOTS[p.id], 'harvest'); if (token !== this.autoToken) return; this.char.busy = true; const g = this.char.geste('harvest'); this.mainVersLaPlante(p, 'recolte', g.effet); await wait(g.effet * 1000); if (token === this.autoToken) this.flyCrops(p.plant?.plant ?? CATALOG.plants[0].id, SLOTS[p.id].pos, 1); await g.fin; });
-    ajouter('Téléphone', () => { this.char.play('phone'); this.tenirTel(); });
+    ajouter('Téléphone', () => { this.tenirTel(); });
     ajouter('Café', () => this.gesteBras('cafe', this.char.clipDuree('cafe') * 1000));
     ajouter('Assiette', () => { this.char.play('idle'); this.porter('prop_plate'); });
     ajouter('Rambarde', async token => { if (await this.approcherRambarde(token, 0)) await this.gesteBras('rambarde', 12000); });
@@ -1053,6 +1053,11 @@ export class Game {
   private telLecture = false;
   private telPrise: THREE.Quaternion | null = null;
   private telContact = 0;
+  private telAge = 0;
+  private telDemande = 0;
+  private telPersonnage: Character | null = null;
+  private telMains: Character['mains'] = null;
+  private telRangement: { fin: Promise<void>; resolve: () => void; occupeAvant: boolean } | null = null;
   private cibleTelephone() {
     const h = this.char.bone('Head')?.getWorldPosition(new THREE.Vector3()) ?? this.char.obj.position.clone().add(new THREE.Vector3(0, 1.5, 0));
     const droite = new THREE.Vector3(-1, 0, 0).applyQuaternion(this.char.obj.quaternion);
@@ -1068,11 +1073,12 @@ export class Game {
     return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(droite, haut, normal));
   }
   private tenirTel() {
-    this.lacherTel(); this.tel = this.fabriquerTel(); this.world.scene.add(this.tel);
+    this.lacherTel(); this.tel = this.fabriquerTel(); this.tel.visible = false; this.world.scene.add(this.tel);
+    this.telPersonnage = this.char; this.telAge = 0;
     this.telLecture = this.phoneOpen && this.char.has('phone_2');
     this.telContact = ({ lea: .03478, marcel: .030642, jimy: .033179 } as Record<string, number>)[this.state.character] ?? .033;
     if (BIBLIO.accessoires.has('telephone')) this.telContact -= .005; // pivot au dos, plutôt qu'au centre de la coque
-    if (this.char.deLaBibliotheque) {
+    {
       const clip = this.telLecture ? 'phone_2' : 'phone', t = Math.min(2.36, this.char.clipDuree(clip) * .25);
       const prise = this.char.priseDansLeGeste(clip, t, 'Right');
       const ph = this.char.osDansLeGeste(clip, t, 'RightHand'), pm = this.char.osDansLeGeste(clip, t, 'RightHandMiddle1'), th = this.char.osDansLeGeste(clip, t, 'Head');
@@ -1083,13 +1089,55 @@ export class Game {
         const haut = new THREE.Vector3().crossVectors(normal, droite).normalize();
         this.telPrise = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(droite, haut, normal)).invert().multiply(prise.orientation);
       }
-      const gripReference = this.telPrise?.clone() ?? new THREE.Quaternion();
-      this.char.mains = { paumes: true, droite: () => this.cibleTelephone(), orientationDroite: () => this.orientationTelephone().multiply(gripReference), priseDroite: prise?.doigts };
+      const personnage = this.char;
+      personnage.obj.updateMatrixWorld(true);
+      const qCorps = personnage.obj.getWorldQuaternion(new THREE.Quaternion());
+      const qTelephone = this.orientationTelephone();
+      const gripReference = this.telPrise?.clone() ?? qTelephone.clone().invert().multiply(personnage.bone('RightHand')?.getWorldQuaternion(new THREE.Quaternion()) ?? qCorps);
+      this.telPrise = gripReference;
+      const cibleLocale = personnage.obj.worldToLocal(this.cibleTelephone());
+      const orientationLocale = qCorps.invert().multiply(qTelephone.multiply(gripReference));
+      // Aucune lecture du clip entier : seule la chaîne droite reçoit une cible.
+      this.telMains = { telephone: true, paumes: true,
+        droite: () => personnage.obj.localToWorld(cibleLocale.clone()),
+        orientationDroite: () => personnage.obj.getWorldQuaternion(new THREE.Quaternion()).multiply(orientationLocale),
+        priseDroite: prise?.doigts };
+      personnage.mains = this.telMains;
       this.char.ikBut = 1;
     }
     this.placerTel();
   }
-  private lacherTel() { if (this.tel) { this.tel.parent?.remove(this.tel); this.tel = null; this.char.ikBut = 0; } this.telPrise = null; }
+  /** Nettoyage immédiat pour quitter la partie ou annuler une prise encore cachée. */
+  private lacherTel() {
+    const personnage = this.telPersonnage, rangement = this.telRangement;
+    this.tel?.removeFromParent(); this.tel = null; this.telPrise = null;
+    if (personnage && (personnage.mains === this.telMains || rangement && personnage.mains === null)) {
+      personnage.ikBut = 0;
+      if (rangement) personnage.busy = rangement.occupeAvant;
+    }
+    this.telPersonnage = null; this.telMains = null; this.telRangement = null;
+    rangement?.resolve();
+  }
+  private rangerTel(): Promise<void> {
+    if (!this.tel?.visible || !this.telPersonnage) { this.lacherTel(); return Promise.resolve(); }
+    if (this.telRangement) return this.telRangement.fin;
+    const personnage = this.telPersonnage;
+    let resolve!: () => void;
+    const fin = new Promise<void>(r => { resolve = r; });
+    this.telRangement = { fin, resolve, occupeAvant: personnage.busy };
+    personnage.busy = true; personnage.ikBut = 0;
+    return fin;
+  }
+  private avancerTelephone(dt: number) {
+    if (!this.tel || !this.telPersonnage) return;
+    const personnage = this.telPersonnage;
+    if (personnage !== this.char || personnage.mains !== this.telMains && !(this.telRangement && personnage.mains === null)) { this.lacherTel(); return; }
+    this.telAge += Math.max(0, dt);
+    // Après la pose réelle de la main : prise retardée, retrait après relâchement.
+    if (this.telRangement) {
+      if (personnage.mainDroiteRelachee) this.lacherTel();
+    } else if (this.telAge >= .12) this.tel.visible = true;
+  }
   private paume(cote: 'Right' | 'Left'): THREE.Vector3 | null {
     const poignet = this.char.bone(cote + 'Hand'), doigt = this.char.bone(cote + 'HandMiddle1');
     if (!poignet) return null;
@@ -1100,7 +1148,8 @@ export class Game {
     if (!this.tel || !this.char) return;
     this.char.obj.updateMatrixWorld(true);
     const p = this.paume('Right'); if (!p) return;
-    const q = this.orientationTelephone(p);
+    const main = this.char.bone('RightHand'); if (!main || !this.telPrise) return;
+    const q = main.getWorldQuaternion(new THREE.Quaternion()).multiply(this.telPrise.clone().invert());
     this.tel.position.copy(p).addScaledVector(new THREE.Vector3(0, 0, 1).applyQuaternion(q), this.telContact);
     this.tel.quaternion.copy(q);
   }
@@ -1236,8 +1285,11 @@ export class Game {
       this.preparationJoueur = (async () => {
         const n = ch.currentName;
         if (this.porte) this.poserAssiette(); // le plat attend l'offrande sur le plan de travail, jamais attaché pendant une autre tâche
-        ch.annulerMarche(); ch.regard = null; ch.ikBut = 0;
-        this.lacherArrosoir(); this.lacherTel(); this.release();
+        ch.annulerMarche(); ch.regard = null;
+        await this.rangerTel();
+        if (token !== this.autoToken || ch !== this.char) return;
+        ch.ikBut = 0;
+        this.lacherArrosoir(); this.release();
         this.poeleEnCours?.parent?.remove(this.poeleEnCours); this.poeleEnCours = null;
         this.dansant = false;
         const sortie = /^(sport_gainage|plank_)/.test(n) ? 'plank_end' : /^(sport_pompes|pushup_)/.test(n) ? 'pushup_end' : /^(sport_abdos|situp_)/.test(n) ? 'situp_end' : null;
@@ -1312,15 +1364,12 @@ export class Game {
     if (epoch !== this.autoToken) return;
     const t = freePoint(target, ignore);
     const points = cheminBalcon(this.char.obj.position, t, ignore);
-    for (let i = 0; i < points.length; i++) { if (epoch !== this.autoToken) return; await this.char.goTo(points[i], i === points.length - 1 ? face : undefined); }
+    await this.char.suivreChemin(points, face, () => epoch === this.autoToken);
   }
   private async marcherMeubles(target: THREE.Vector3, face?: number) {
     const epoch = this.autoToken;
     const points = this.world.cheminMeubles(this.char.obj.position, target);
-    for (let i = 0; i < points.length; i++) {
-      if (epoch !== this.autoToken) return;
-      await this.char.goTo(points[i].clone().setY(FL + this.world.solPiece), i === points.length - 1 ? face : undefined);
-    }
+    await this.char.suivreChemin(points.map(p => p.clone().setY(FL + this.world.solPiece)), face, () => epoch === this.autoToken);
   }
   private standForSansEmpreinte(slot: Slot, geste?: string): { pos: THREE.Vector3; face: number } {
     const g = geste ? this.char.gestures[geste] : undefined;
@@ -1539,16 +1588,17 @@ export class Game {
   private phoneOpen = false;
   /** Téléphone ouvert : le personnage le sort et reste dessus tant que l'écran est ouvert. */
   private async phoneGesture(open: boolean) {
+    const demande = ++this.telDemande;
     this.phoneOpen = open;
     if (!this.char || !this.running) return;
+    const personnage = this.char;
     this.lastPlayerAction = Date.now();
     if (open) {
-      if (!await this.preparerActionJoueur() || !this.phoneOpen || !this.running) return;
+      if (!await this.preparerActionJoueur() || demande !== this.telDemande || personnage !== this.char || !this.phoneOpen || !this.running) return;
       if (this.sleeping) this.wakeUp();
-      this.char.play(this.char.has('phone_2') ? 'phone_2' : 'phone'); this.tenirTel();
+      this.tenirTel();
     } else {
-      if (/^phone(?:_2)?$/.test(this.char.currentName)) this.char.play('idle');
-      this.lacherTel();
+      await this.rangerTel();
     }
   }
   private flyCoins(n: number) {
@@ -2083,10 +2133,10 @@ export class Game {
     } else if (quoi === 'telephone') {                             // debout face à la rue, le nez sur son téléphone
       const spot = freePoint(new THREE.Vector3(-Math.sign(CHAIR_SPOT.pos.x || 1) * LAYOUT.halfW * .45, FL, LAYOUT.corridorZ + .12));
       await this.walk(spot, 0); if (token !== this.autoToken) return;
-      this.tenirTel(); this.char.play('phone', .4);
+      this.tenirTel();
       await vivre(8000);
       if (token !== this.autoToken) return;
-      this.lacherTel(); this.char.play('idle', .4);
+      await this.rangerTel(); if (token !== this.autoToken) return;
     } else if (quoi === 'danse') {                                 // un pas de danse, au milieu du salon, en entier
       await this.danser(token);
       if (this.inside && this.world.hasRoom) await this.goOutside(token);
@@ -2288,7 +2338,8 @@ export class Game {
     const approche = await this.asseoir(token, CHAIR_SPOT.pos, r.yaw, hauteur, anim); if (!approche) return;
     if (then === 'phone') { await wait(1500); if (token === this.autoToken) this.tenirTel(); }
     await wait(anim === 'sleep' ? 40000 : 10000); if (token !== this.autoToken) return;
-    this.release(); this.lacherTel(); await this.relever(token, approche, r.yaw);
+    await this.rangerTel(); if (token !== this.autoToken) return;
+    this.release(); await this.relever(token, approche, r.yaw);
   }
   // ---------- jour et nuit
   private applyNightMode(mode: 'auto' | 'day' | 'night') {
@@ -2351,6 +2402,7 @@ export class Game {
       const W = this.world, y = this.char.obj.position.y, dedans = this.char.obj.position.z < FACADE_FRONT - .1;
       const sol = W.solAuPoint(this.char.obj.position);
       if (this.char.solAssis === null && !/^(sit|sleep)(?:_|$)/.test(this.char.currentName) && (Math.abs(y - FL) < .03 || Math.abs(y - sol) < .03)) this.char.obj.position.y = sol;
+      if (!this.auditEnCours && !this.pauseRevue) this.avancerTelephone(dt);
       if (this.tel) this.placerTel();                                   // après l'animation : les mains sont à leur vraie place
       { const t = this.char.bone('Head'), p = new THREE.Vector3(); if (t) t.getWorldPosition(p); else p.copy(this.char.obj.position).setY(this.char.obj.position.y + 1.4); this.world.voirLaTete(p); }
       if (this.arrosoir) this.placerArrosoir(0);
