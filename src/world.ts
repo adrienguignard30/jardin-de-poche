@@ -610,6 +610,9 @@ export class World {
     window.addEventListener('resize', () => this.resize());
     this.resize();
     this.setupPointer();
+    this.facadesReady = Promise.all([
+      this.loadFacadeLea(), this.loadFacadeExtra('marcel'), this.loadFacadeExtra('jimy'),
+    ]).then(() => undefined);
   }
 
   /** Sous le balcon : deux étages de l'immeuble, pour que le balcon tienne à quelque chose. Tout le reste, ce sont tes fonds. */
@@ -629,12 +632,10 @@ export class World {
     }
   }
   lowerBox: THREE.Mesh | null = null; lowerLedge: THREE.Mesh | null = null; lowerWins: THREE.Mesh[] = [];
-  private facadeLeaActive = false;
   private facadeLeaMaterial: THREE.MeshStandardMaterial | null = null;
-  private facadeLeaLoading = false;
+  private facadesReady: Promise<void>;
   private lowerOriginalMaterial: THREE.Material | THREE.Material[] | null = null;
   private setFacadeLea(active: boolean) {
-    this.facadeLeaActive = active;
     if (!this.lowerBox) return;
     this.lowerOriginalMaterial ??= this.lowerBox.material;
     const material = this.facadeLeaMaterial;
@@ -645,14 +646,14 @@ export class World {
       ? Array.from({ length: 6 }, (_, i) => i === 4 ? material : Array.isArray(original) ? original[i] : original)
       : original;
     for (const window of this.lowerWins) window.visible = !ready;
-    if (!active || material || this.facadeLeaLoading) return;
-    this.facadeLeaLoading = true;
-    new THREE.TextureLoader().load('/fonds/facade-lea-essai.png', map => {
+  }
+  private loadFacadeLea(): Promise<void> {
+    return new Promise(resolve => new THREE.TextureLoader().load('/fonds/facade-lea.webp', map => {
       map.colorSpace = THREE.SRGBColorSpace;
       const canvas = document.createElement('canvas');
       canvas.width = 512; canvas.height = 1024;
       const ctx = canvas.getContext('2d');
-      if (!ctx) { map.dispose(); this.facadeLeaLoading = false; return; }
+      if (!ctx) { map.dispose(); resolve(); return; }
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 512, 1024);
       ctx.fillStyle = '#fff';
       // Glass panes only, in the upper two windows; leave all mullions dark.
@@ -665,18 +666,14 @@ export class World {
       this.facadeLeaMaterial = new THREE.MeshStandardMaterial({
         map, roughness: .95, emissive: 0xffbe72, emissiveMap: mask, emissiveIntensity: .9 * this.night,
       });
-      this.facadeLeaLoading = false;
-      if (this.facadeLeaActive) this.setFacadeLea(true);
+      resolve();
     }, undefined, error => {
-      this.facadeLeaLoading = false;
       console.warn('Facade Lea non chargee : facade originale conservee.', error);
-    });
+      resolve();
+    }));
   }
-  private facadeExtraActive = '';
   private facadeExtraMaterials = new Map<string, THREE.MeshStandardMaterial>();
-  private facadeExtraLoading = new Set<string>();
   private setFacadeExtra(character: string) {
-    this.facadeExtraActive = character;
     if (!character || !this.lowerBox) return;
     const material = this.facadeExtraMaterials.get(character);
     if (material && this.lowerOriginalMaterial) {
@@ -685,14 +682,14 @@ export class World {
       for (const window of this.lowerWins) window.visible = false;
       return;
     }
-    if (this.facadeExtraLoading.has(character)) return;
-    this.facadeExtraLoading.add(character);
-    new THREE.TextureLoader().load(`/fonds/facade-${character}.png`, map => {
+  }
+  private loadFacadeExtra(character: string): Promise<void> {
+    return new Promise(resolve => new THREE.TextureLoader().load(`/fonds/facade-${character}.webp`, map => {
       map.colorSpace = THREE.SRGBColorSpace;
       const canvas = document.createElement('canvas');
       canvas.width = 512; canvas.height = 1024;
       const ctx = canvas.getContext('2d');
-      if (!ctx) { map.dispose(); this.facadeExtraLoading.delete(character); return; }
+      if (!ctx) { map.dispose(); resolve(); return; }
       ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 512, 1024);
       ctx.fillStyle = '#fff';
       // Upper panes only, aligned to each facade; the lower floor stays unlit.
@@ -710,12 +707,11 @@ export class World {
       this.facadeExtraMaterials.set(character, new THREE.MeshStandardMaterial({
         map, roughness: .95, emissive: 0xffbe72, emissiveMap: new THREE.CanvasTexture(canvas), emissiveIntensity: .9 * this.night,
       }));
-      this.facadeExtraLoading.delete(character);
-      if (this.facadeExtraActive === character) this.setFacadeExtra(character);
+      resolve();
     }, undefined, error => {
-      this.facadeExtraLoading.delete(character);
       console.warn(`Facade ${character} non chargee : facade originale conservee.`, error);
-    });
+      resolve();
+    }));
   }
   /** Sous un décor assemblé : l'immeuble du dessous s'aligne sur la façade (le balcon dépasse en console) et prend sa largeur. */
   private fitLowerFloors(width: number, frontZ: number, backZ: number, topY = 0) {
@@ -732,6 +728,8 @@ export class World {
   // ---------- fonds
   async setView(view: ViewDef) {
     let [fd, fn, nd, nn] = await Promise.all([view.farDay, view.farNight, view.nearDay, view.nearNight].map(u => this.assets.texture(u).catch(() => null)));
+    // enterGame awaits setView under its loading screen, before applying the layout.
+    await this.facadesReady;
     // un calque proche doit être transparent au-dessus des toits ; s'il est opaque, il boucherait le ciel : on l'ignore
     if (nd && !hasTransparentTop(nd)) { console.warn('calque toits jour opaque : ignoré (à régénérer sur fond vert)'); nd = null; }
     if (nn && !hasTransparentTop(nn)) { console.warn('calque toits nuit opaque : ignoré'); nn = null; }
