@@ -360,6 +360,8 @@ export class UI {
       const b = el<HTMLButtonElement>('button', 'menuAccueilItem', texte); b.type = 'button';
       b.onclick = () => { this.fermerModal(); action(); }; items.appendChild(b);
     };
+    ajouter(texteAccueil('🎬 La vidéo du jeu', '🎬 The game video', '🎬 El vídeo del juego'), () => { window.open(`/video/potager-${lang()}.mp4`, '_blank', 'noopener'); });
+    ajouter(texteAccueil('🛠️ Comment je l’ai fait', '🛠️ How I made it', '🛠️ Cómo lo hice'), () => { window.open(`/tableau/demo.html?lang=${lang()}`, '_blank', 'noopener'); });
     ajouter(texteAccueil('📖 Comment jouer', '📖 How to play', '📖 Cómo jugar'), () => this.ouvrirRegles());
     ajouter(texteAccueil('🏆 Classement', '🏆 Leaderboard', '🏆 Clasificación'), () => this.ouvrirClassement());
     ajouter(texteAccueil('📱 Les personnages chez toi', '📱 Meet the characters in AR', '📱 Los personajes en tu casa'), () => { location.href = '/ar/index.html'; });
