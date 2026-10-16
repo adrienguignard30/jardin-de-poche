@@ -71,7 +71,7 @@
   #menu button:hover, #menu button.actif { border-color: var(--vert); }
   #menu button small { display: block; color: var(--muet); font-weight: 600; font-size: .75em; }
   #aide { position: fixed; top: 14px; right: 16px; font-size: 13px; color: var(--muet); opacity: .8; }
-  @media (max-width: 760px) { .deux, .cartes, .chiffres { grid-template-columns: 1fr; } #scene { padding: 5vmin 6vmin 16vmin; } .titre h1 { font-size: 2.6em; } h1 { font-size: 2.1em; } #aide { display: none; } body { font-size: 17px; } }
+  @media (max-width: 760px) { .deux, .cartes, .chiffres { grid-template-columns: 1fr; } #scene { padding: 5vmin 6vmin 30vmin; } .titre h1 { font-size: 2.6em; } h1 { font-size: 2.1em; } #aide { display: none; } body { font-size: 17px; } #barre { flex-wrap: wrap; justify-content: center; gap: 8px; padding-top: 8px; } #barre button, #barre select { padding: 8px 10px; font-size: 13px; min-height: 38px; } #compteur { width: 100%; text-align: center; } }
 
   .d.actif .r { animation: arrive .55s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i, 0) * .45s + .15s); }
   @keyframes arrive { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
