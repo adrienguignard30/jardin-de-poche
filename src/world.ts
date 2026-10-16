@@ -612,7 +612,12 @@ export class World {
     this.setupPointer();
     this.facadesReady = Promise.all([
       this.loadFacadeLea(), this.loadFacadeExtra('marcel'), this.loadFacadeExtra('jimy'),
-    ]).then(() => undefined);
+    ]).then(() => {
+      for (const material of [this.facadeLeaMaterial, ...this.facadeExtraMaterials.values()]) {
+        if (material?.map) this.renderer.initTexture(material.map);
+        if (material?.emissiveMap) this.renderer.initTexture(material.emissiveMap);
+      }
+    });
   }
 
   /** Sous le balcon : deux étages de l'immeuble, pour que le balcon tienne à quelque chose. Tout le reste, ce sont tes fonds. */
@@ -635,11 +640,11 @@ export class World {
   private facadeLeaMaterial: THREE.MeshStandardMaterial | null = null;
   private facadesReady: Promise<void>;
   private lowerOriginalMaterial: THREE.Material | THREE.Material[] | null = null;
-  private setFacadeLea(active: boolean) {
+  private applyFacade(character: string) {
     if (!this.lowerBox) return;
     this.lowerOriginalMaterial ??= this.lowerBox.material;
-    const material = this.facadeLeaMaterial;
-    const ready = active && material !== null;
+    const material = character === 'lea' ? this.facadeLeaMaterial : this.facadeExtraMaterials.get(character);
+    const ready = material != null;
     const original = this.lowerOriginalMaterial;
     // BoxGeometry: material 4 is the front (+Z); keep the other faces unchanged.
     this.lowerBox.material = ready
@@ -673,16 +678,6 @@ export class World {
     }));
   }
   private facadeExtraMaterials = new Map<string, THREE.MeshStandardMaterial>();
-  private setFacadeExtra(character: string) {
-    if (!character || !this.lowerBox) return;
-    const material = this.facadeExtraMaterials.get(character);
-    if (material && this.lowerOriginalMaterial) {
-      const original = this.lowerOriginalMaterial;
-      this.lowerBox.material = Array.from({ length: 6 }, (_, i) => i === 4 ? material : Array.isArray(original) ? original[i] : original);
-      for (const window of this.lowerWins) window.visible = false;
-      return;
-    }
-  }
   private loadFacadeExtra(character: string): Promise<void> {
     return new Promise(resolve => new THREE.TextureLoader().load(`/fonds/facade-${character}.webp`, map => {
       map.colorSpace = THREE.SRGBColorSpace;
@@ -964,8 +959,7 @@ export class World {
   /** Applique un layout_<perso>.json écrit par jdp_assemblage.py : tout est posé là où tu l'as mis dans Blender. */
   applyLayout(L: Layout) {
     this.perso = L.character ?? ''; this.decaleMarcel = false;
-    this.setFacadeLea(this.perso === 'lea');
-    this.setFacadeExtra(this.perso === 'marcel' || this.perso === 'jimy' ? this.perso : '');
+    this.applyFacade(this.perso);
     const A = this.assets;
     const boxOf = (o: THREE.Object3D) => new THREE.Box3().setFromObject(o);
     let aptBox: THREE.Box3 | null = null; let balW = 0;
@@ -1076,8 +1070,7 @@ export class World {
     this.installerSocleDeco();
   }
   setEnvironment(env?: { apartment?: string; balcony?: string; extra?: string; roof?: boolean; room?: boolean }, layout?: Layout | null) {
-    this.setFacadeLea(false);
-    this.setFacadeExtra('');
+    this.applyFacade(layout?.character ?? '');
     this.retirerDeco(); this.regardDeco = null; decoActive = null;
     if (this.socleDeco) this.socleDeco.visible = false;
     this.hasRoom = env?.room !== false;
