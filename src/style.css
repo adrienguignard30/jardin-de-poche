@@ -795,6 +795,50 @@ html, body { background: #0f1a24; }
 #modal.depuisAccueil .accueilMenuItems { display: flex; flex-direction: column; }
 #modal.depuisAccueil .menuAccueilItem { position: static; width: 100%; min-height: 48px; border-radius: 12px; padding: 10px 14px; border: 1px solid var(--line); background: rgba(36,49,58,.05); color: var(--ink); text-align: left; box-shadow: none; font-size: 15px; overflow-wrap: anywhere; }
 #modal.depuisAccueil .menuAccueilItem:disabled { opacity: .5; }
+#start .menuAccueilBtn.guideAccueilCible { outline: 3px solid white; outline-offset: 4px; background: var(--sage); color: white; box-shadow: 0 0 0 8px rgba(95,163,90,.35), 0 8px 24px rgba(36,49,58,.22); z-index: 1001; }
+#modal.guideAccueilModal .accueilGuide { display: flex; flex-direction: column; max-height: calc(100dvh - 100px - var(--sat, 0px)); padding: 12px; overflow: hidden; }
+#modal.guideAccueilModal .x { display: none; }
+.accueilGuideEntete { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-shrink: 0; padding: 4px 0 12px; border-bottom: 1px solid var(--line); }
+#modal.depuisAccueil .accueilGuideEntete h2 { margin: 0; font-size: 19px; line-height: 1.3; }
+.accueilGuidePasser { flex-shrink: 0; min-height: 44px; padding: 8px 12px; }
+#modal.depuisAccueil .accueilGuide .accueilMenuItems { overflow-y: auto; min-height: 0; padding: 12px 4px 4px; gap: 5px; }
+.accueilGuideDescription { margin: 8px 14px 18px; font-size: 14px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
+.accueilGuideFin { min-height: 44px; flex-shrink: 0; }
+#modal.guideAccueilModal .modalBox { overflow: hidden; padding: 12px; background: rgba(255,255,255,.96); border: 1px solid rgba(255,255,255,.8); box-shadow: 0 24px 64px rgba(36,49,58,.22); }
+.accueilGuide button:focus-visible { outline: 3px solid #23784c; outline-offset: 2px; }
+@keyframes accueilGuideApparition {
+  from { opacity: 0; transform: translateY(24px); visibility: hidden; }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes accueilGuidePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .accueilGuideEntree { animation: accueilGuideApparition 500ms ease-out var(--guide-delai, 0ms) both; }
+  #start .menuAccueilBtn.guideAccueilCible { animation: accueilGuidePulse 2.4s ease-in-out infinite; }
+  #start .menuAccueilBtn.guideAccueilCible::after { animation: accueilGuidePointer 1s ease-in-out infinite; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .accueilGuideEntree, #start .menuAccueilBtn.guideAccueilCible { animation: none; transform: none; }
+  #start .menuAccueilBtn.guideAccueilCible::after { animation: none; transform: none; }
+  #modal.guideAccueilModal .accueilGuide button { transition: none !important; }
+}
+#start .menuAccueilBtn.guideAccueilCible::after { content: ''; position: absolute; left: calc(100% + 18px); top: 4px; width: 64px; height: 34px; background: var(--warm); clip-path: polygon(0 50%, 38% 0, 38% 30%, 100% 30%, 100% 70%, 38% 70%, 38% 100%); pointer-events: none; }
+@keyframes accueilGuidePointer {
+  0%, 100% { transform: translateX(8px); }
+  50% { transform: translateX(0); }
+}
+.accueilGuideEntree { flex-shrink: 0; }
+#modal.guideAccueilModal .accueilGuide button { cursor: pointer; border: 1px solid var(--line); background: white; color: var(--ink); border-radius: 12px; box-shadow: 0 2px 8px rgba(36,49,58,.06); transition: background-color 180ms, box-shadow 180ms, border-color 180ms; }
+#modal.guideAccueilModal .accueilGuide button:hover:not(:disabled) { background: #edf6f0; border-color: var(--sage); box-shadow: 0 5px 16px rgba(36,49,58,.1); }
+#modal.guideAccueilModal .accueilGuide button:active:not(:disabled) { background: #dcece1; border-color: var(--sage); box-shadow: none; }
+#modal.guideAccueilModal .accueilGuide button:disabled { cursor: not-allowed; box-shadow: none; }
+#modal.guideAccueilModal .accueilGuide .accueilGuideFin { background: var(--sage); color: white; border-color: transparent; min-height: 48px; }
+#modal.guideAccueilModal .accueilGuide .accueilGuideFin:hover { background: #4d8d49; }
+#modal.guideAccueilModal .accueilGuide .accueilGuidePasser { background: transparent; border-color: transparent; box-shadow: none; color: var(--muted); }
+#modal.guideAccueilModal .accueilGuide .accueilGuidePasser:hover { background: #edf2f5; color: var(--ink); }
+#modal.guideAccueilModal .accueilGuide .demoChoix button[aria-pressed='true'] { background: var(--sage); border-color: transparent; color: white; }
 #ui:has(#modal.depuisAccueil:not(.hidden)) #startBody > .primary, #ui:has(#modal.depuisAccueil:not(.hidden)) #start .sheet .primary { visibility: hidden; }
 #modal.depuisAccueil .fenCompte > .primary:not(:last-child) { background: rgba(36,49,58,.05); color: var(--ink); border: 1px solid var(--line); box-shadow: none; }
 #start button:focus-visible, #modal.depuisAccueil button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }

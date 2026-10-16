@@ -1,5 +1,5 @@
 ﻿import { boutonAtelierAccueil } from './atelier';
-import { t, tx, lang, setLang, fmtTime, LANGUES, type Lang } from './i18n';
+import { t, tx, lang, setLang, fmtTime, LANGUES, guideAccueil, type Lang } from './i18n';
 import { remplirClassement, STYLE_CLASSEMENT } from './classement';
 import { CATALOG, ECO, type GameState, type CharacterDef, type Perso } from './state';
 import * as E from './economie';
@@ -60,13 +60,18 @@ const DRAPEAUX: Record<Lang, string> = {
 };
 // Textes locaux provisoires, avec le même repli anglais que les données du jeu.
 const texteAccueil = (fr: string, en: string, es: string) => tx({ fr, en, es });
+// L'Atelier retire le code de l'URL avant que l'accueil soit affiché.
+const arriveeAvecCodeAtelier = new URLSearchParams(location.search).has('code');
 function initialiserLangueAccueil() {
   const param = new URLSearchParams(location.search).get('lang');
   // i18n.ts a déjà appliqué le paramètre ou la préférence : ne pas la réécrire.
   if (LANGUES.some(l => l.id === param)) { document.documentElement.lang = lang(); return; }
   let premiereVisite = false;
   try { premiereVisite = localStorage.getItem('jdp.lang') === null; } catch { /* ne pas supposer que la préférence est absente */ }
-  if (premiereVisite) setLang(navigator.language.toLowerCase().startsWith('fr') ? 'fr' : 'en');
+  if (premiereVisite) {
+    const appareil = navigator.language.toLowerCase().split('-')[0];
+    setLang(LANGUES.find(l => l.id === appareil)?.id ?? 'en');
+  }
   document.documentElement.lang = lang();
 }
 const LISIBLE = 'color:#24313a;background:rgba(36,49,58,.08);border:1px solid rgba(36,49,58,.2);font-weight:600;';
@@ -169,6 +174,13 @@ export class UI {
     $('#menuAccueilBtn').onclick = () => this.ouvrirMenuAccueil();
     window.addEventListener('keydown', e => {
       if (e.key === 'Escape' && !$('#modal').classList.contains('hidden') && $('#modal .accueilMenu')) { this.fermerModal(); $('#menuAccueilBtn').focus(); }
+      if (e.key === 'Tab' && this.guideAccueilActif) {
+        const boutons = Array.from($('#modal').querySelectorAll<HTMLButtonElement>('button:not(:disabled)')).filter(b => b.getClientRects().length);
+        const premier = boutons[0], dernier = boutons[boutons.length - 1];
+        if (premier && dernier && (e.shiftKey ? document.activeElement === premier : document.activeElement === dernier)) {
+          e.preventDefault(); (e.shiftKey ? dernier : premier).focus();
+        }
+      }
     });
     $('#btnPhone').onclick = () => this.togglePhone();
     $('#phoneClose').onclick = () => this.togglePhone(false);
@@ -275,6 +287,12 @@ export class UI {
     this.renderStart(hasSave);
     $('#sheet').classList.add('hidden'); $('#sheet').classList.remove('perso'); $('#start .startTop').classList.remove('hidden');
     $('#startBody').classList.remove('hidden');
+    if (!this.guideAccueilVu && !arriveeAvecCodeAtelier) {
+      this.guideAccueilVu = true;
+      let vu = false;
+      try { vu = localStorage.getItem('jdp.accueilGuide.v1') === 'vu'; } catch { /* stockage indisponible */ }
+      if (!vu) this.ouvrirMenuAccueil(true);
+    }
   }
   private chosen = 'lea';
   private confirme = false;
@@ -319,10 +337,24 @@ export class UI {
       zone.appendChild(b);
     }
   }
-  private ouvrirMenuAccueil() {
+  private guideAccueilVu = false;
+  private guideAccueilActif = false;
+  private ouvrirMenuAccueil(guide = false) {
+    this.guideAccueilActif = guide;
+    const textes = guideAccueil();
+    $('#menuAccueilBtn').classList.toggle('guideAccueilCible', guide);
     const c = el('div', 'fenClassement accueilMenu');
+    c.classList.toggle('accueilGuide', guide);
     c.setAttribute('role', 'dialog'); c.setAttribute('aria-modal', 'true'); c.setAttribute('aria-label', texteAccueil('Menu', 'Menu', 'Menú'));
     c.appendChild(el('h2', '', texteAccueil('Menu', 'Menu', 'Menú')));
+    if (guide) {
+      c.setAttribute('aria-label', textes.titre);
+      c.querySelector('h2')!.textContent = textes.titre;
+      const entete = el('div', 'accueilGuideEntete');
+      entete.appendChild(c.querySelector('h2')!);
+      const passer = el<HTMLButtonElement>('button', 'accueilGuidePasser', textes.passer); passer.type = 'button';
+      passer.onclick = () => this.fermerModal(); entete.appendChild(passer); c.appendChild(entete);
+    }
     const items = el('div', 'accueilMenuItems'); c.appendChild(items);
     const ajouter = (texte: string, action: () => void) => {
       const b = el<HTMLButtonElement>('button', 'menuAccueilItem', texte); b.type = 'button';
@@ -344,10 +376,31 @@ export class UI {
       b.onclick = () => this.choisirDemo(vitesse); choix.appendChild(b);
     }
     demo.appendChild(choix); items.appendChild(demo);
+    if (guide) {
+      Array.from(items.children).forEach((item, i) => {
+        const description = el('p', 'accueilGuideDescription', textes.lignes[i]);
+        description.id = `accueil-guide-description-${i}`;
+        item.setAttribute('aria-describedby', description.id);
+        const entree = el('div', 'accueilGuideEntree');
+        item.replaceWith(entree); entree.append(item, description);
+        entree.style.setProperty('--guide-delai', `${i * 600}ms`);
+        entree.addEventListener('animationstart', e => {
+          if (e.target !== entree || e.animationName !== 'accueilGuideApparition') return;
+          if (!this.guideAccueilActif || !entree.isConnected || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          entree.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        });
+      });
+      const fin = el<HTMLButtonElement>('button', 'primary accueilGuideFin', textes.fin); fin.type = 'button';
+      fin.onclick = () => this.fermerModal(); items.appendChild(fin);
+    } else ajouter(textes.revoir, () => this.ouvrirMenuAccueil(true));
     this.modal(c, true);
+    $('#modal').classList.toggle('guideAccueilModal', guide);
+    if (guide) {
+      try { localStorage.setItem('jdp.accueilGuide.v1', 'vu'); } catch { /* garde en mémoire pour cette session */ }
+    }
     this.majCompte();
     const fermer = $('#modal .x'); fermer?.setAttribute('aria-label', texteAccueil('Fermer', 'Close', 'Cerrar'));
-    items.querySelector<HTMLButtonElement>('button')?.focus();
+    (guide ? c.querySelector<HTMLButtonElement>('.accueilGuidePasser') : items.querySelector<HTMLButtonElement>('button'))?.focus();
   }
   private vitesseDemo(): 1 | 50 | 90 {
     const valeur = new URLSearchParams(location.search).get('demo');
@@ -790,7 +843,15 @@ export class UI {
     m.classList.toggle('depuisAccueil', !$('#start').classList.contains('hidden'));
     m.classList.remove('hidden');
   }
-  fermerModal() { $('#modal').classList.add('hidden'); }
+  fermerModal() {
+    $('#modal').classList.add('hidden');
+    if (this.guideAccueilActif) {
+      this.guideAccueilActif = false;
+      $('#modal').classList.remove('guideAccueilModal');
+      $('#menuAccueilBtn').classList.remove('guideAccueilCible');
+      $('#menuAccueilBtn').focus();
+    }
+  }
   /** La fiche d'une recette, à la demande. */
   fiche(id: string) { this.modal(ficheRecette(ECO.recette(id))); }
   /** Le plat vient d'être cuisiné : il apparaît à l'écran, avec son nom, et on choisit à qui l'offrir. */
