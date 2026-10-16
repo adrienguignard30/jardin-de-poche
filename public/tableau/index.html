@@ -374,8 +374,18 @@
             </div>
           </div>
         </section>
+        <section class="carte" aria-labelledby="hCarteVisite">
+          <h2 id="hCarteVisite">5 · Ma carte de visite <span class="nb">QR code</span></h2>
+          <div class="demoCarte">
+            Quand quelqu'un te demande ton contact : montre ce QR. Il ouvre ta carte (nom, e-mail, le jeu, la démo) avec un bouton « Enregistrer le contact ».
+            <div class="qrDemoBoutons" style="grid-template-columns:1fr 1fr">
+              <button type="button" id="bCarteQr"><span class="dr">📇</span>Montrer le QR</button>
+              <button type="button" id="bCarteOuvrir"><span class="dr">👤</span>Voir ma carte</button>
+            </div>
+          </div>
+        </section>
         <section class="carte" aria-labelledby="hVoix">
-          <h2 id="hVoix">5 · Les voix <span class="nb">Gemini TTS</span></h2>
+          <h2 id="hVoix">6 · Les voix <span class="nb">Gemini TTS</span></h2>
           <div class="demoCarte">
             Fabrique une fois chaque phrase parlée (diaporama + pitch) et la range dans Supabase. À relancer seulement si un texte change : ce qui existe déjà n'est pas refait.<br>
             <button class="rond" type="button" id="prepVoix" style="margin-top:10px"><span class="ico">🔊</span><span class="txt">Préparer les voix</span></button>
@@ -859,12 +869,23 @@ var qrcode=(function(){var P=function(x,w){var g=236,l=17,n=x,s=O[w],t=null,r=0,
     $('qrDemoTitre').textContent = QR_DEMO[l].titre; $('qrDemoSous').textContent = QR_DEMO[l].sous;
     const q = qrcode(0, 'M'); q.addData(u); q.make();
     $('qrDemoImage').innerHTML = q.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
-    $('qrDemoUrl').textContent = u; $('qrDemoOuvrir').href = u;
+    $('qrDemoUrl').textContent = u; $('qrDemoOuvrir').href = u; $('qrDemoOuvrir').textContent = 'Ouvrir la démo';
     $('qrDemoCopier').textContent = 'Copier le lien';
     $('qrDemoCopier').onclick = () => { navigator.clipboard?.writeText(u); $('qrDemoCopier').textContent = 'Copié ✓'; };
     $('qrDemoFond').hidden = false;
   }
   document.querySelectorAll('[data-qrdemo]').forEach(b => b.onclick = () => ouvrirQrDemo(b.dataset.qrdemo));
+  // carte de visite : même fenêtre QR, autre lien
+  $('bCarteQr').onclick = () => {
+    const u = `${location.origin}/carte/`;
+    $('qrDemoTitre').textContent = '📇 Adrien Guignard'; $('qrDemoSous').textContent = 'Scanne pour enregistrer mon contact · Scan to save my contact · Escanea para guardar mi contacto';
+    const q = qrcode(0, 'M'); q.addData(u); q.make();
+    $('qrDemoImage').innerHTML = q.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+    $('qrDemoUrl').textContent = u; $('qrDemoOuvrir').href = u; $('qrDemoOuvrir').textContent = 'Ouvrir la carte';
+    $('qrDemoCopier').textContent = 'Copier le lien'; $('qrDemoCopier').onclick = () => { navigator.clipboard?.writeText(u); $('qrDemoCopier').textContent = 'Copié ✓'; };
+    $('qrDemoFond').hidden = false;
+  };
+  $('bCarteOuvrir').onclick = () => window.open('/carte/', '_blank', 'noopener');
   $('qrDemoFermer').onclick = () => { $('qrDemoFond').hidden = true; };
   $('qrDemoFond').addEventListener('click', e => { if (e.target === $('qrDemoFond')) $('qrDemoFond').hidden = true; });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') $('qrDemoFond').hidden = true; });
