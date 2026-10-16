@@ -629,6 +629,94 @@ export class World {
     }
   }
   lowerBox: THREE.Mesh | null = null; lowerLedge: THREE.Mesh | null = null; lowerWins: THREE.Mesh[] = [];
+  private facadeLeaActive = false;
+  private facadeLeaMaterial: THREE.MeshStandardMaterial | null = null;
+  private facadeLeaLoading = false;
+  private lowerOriginalMaterial: THREE.Material | THREE.Material[] | null = null;
+  private setFacadeLea(active: boolean) {
+    this.facadeLeaActive = active;
+    if (!this.lowerBox) return;
+    this.lowerOriginalMaterial ??= this.lowerBox.material;
+    const material = this.facadeLeaMaterial;
+    const ready = active && material !== null;
+    const original = this.lowerOriginalMaterial;
+    // BoxGeometry: material 4 is the front (+Z); keep the other faces unchanged.
+    this.lowerBox.material = ready
+      ? Array.from({ length: 6 }, (_, i) => i === 4 ? material : Array.isArray(original) ? original[i] : original)
+      : original;
+    for (const window of this.lowerWins) window.visible = !ready;
+    if (!active || material || this.facadeLeaLoading) return;
+    this.facadeLeaLoading = true;
+    new THREE.TextureLoader().load('/fonds/facade-lea-essai.png', map => {
+      map.colorSpace = THREE.SRGBColorSpace;
+      const canvas = document.createElement('canvas');
+      canvas.width = 512; canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { map.dispose(); this.facadeLeaLoading = false; return; }
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 512, 1024);
+      ctx.fillStyle = '#fff';
+      // Glass panes only, in the upper two windows; leave all mullions dark.
+      for (const [x1, x2] of [[140, 214], [239, 312], [578, 651], [677, 750]]) {
+        for (const [y1, y2] of [[231, 405], [420, 670]]) {
+          ctx.fillRect(x1 / 888 * 512, y1 / 1776 * 1024, (x2 - x1) / 888 * 512, (y2 - y1) / 1776 * 1024);
+        }
+      }
+      const mask = new THREE.CanvasTexture(canvas);
+      this.facadeLeaMaterial = new THREE.MeshStandardMaterial({
+        map, roughness: .95, emissive: 0xffbe72, emissiveMap: mask, emissiveIntensity: .9 * this.night,
+      });
+      this.facadeLeaLoading = false;
+      if (this.facadeLeaActive) this.setFacadeLea(true);
+    }, undefined, error => {
+      this.facadeLeaLoading = false;
+      console.warn('Facade Lea non chargee : facade originale conservee.', error);
+    });
+  }
+  private facadeExtraActive = '';
+  private facadeExtraMaterials = new Map<string, THREE.MeshStandardMaterial>();
+  private facadeExtraLoading = new Set<string>();
+  private setFacadeExtra(character: string) {
+    this.facadeExtraActive = character;
+    if (!character || !this.lowerBox) return;
+    const material = this.facadeExtraMaterials.get(character);
+    if (material && this.lowerOriginalMaterial) {
+      const original = this.lowerOriginalMaterial;
+      this.lowerBox.material = Array.from({ length: 6 }, (_, i) => i === 4 ? material : Array.isArray(original) ? original[i] : original);
+      for (const window of this.lowerWins) window.visible = false;
+      return;
+    }
+    if (this.facadeExtraLoading.has(character)) return;
+    this.facadeExtraLoading.add(character);
+    new THREE.TextureLoader().load(`/fonds/facade-${character}.png`, map => {
+      map.colorSpace = THREE.SRGBColorSpace;
+      const canvas = document.createElement('canvas');
+      canvas.width = 512; canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { map.dispose(); this.facadeExtraLoading.delete(character); return; }
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 512, 1024);
+      ctx.fillStyle = '#fff';
+      // Upper panes only, aligned to each facade; the lower floor stays unlit.
+      const columns = character === 'jimy'
+        ? [[129, 213], [233, 317], [572, 656], [676, 760]]
+        : [[128, 226], [243, 340], [548, 645], [662, 759]];
+      const rows = character === 'jimy'
+        ? [[183, 354], [374, 553]]
+        : [[247, 376], [395, 524], [543, 678]];
+      for (const [x1, x2] of columns) {
+        for (const [y1, y2] of rows) {
+          ctx.fillRect(x1 / 888 * 512, y1 / 1776 * 1024, (x2 - x1) / 888 * 512, (y2 - y1) / 1776 * 1024);
+        }
+      }
+      this.facadeExtraMaterials.set(character, new THREE.MeshStandardMaterial({
+        map, roughness: .95, emissive: 0xffbe72, emissiveMap: new THREE.CanvasTexture(canvas), emissiveIntensity: .9 * this.night,
+      }));
+      this.facadeExtraLoading.delete(character);
+      if (this.facadeExtraActive === character) this.setFacadeExtra(character);
+    }, undefined, error => {
+      this.facadeExtraLoading.delete(character);
+      console.warn(`Facade ${character} non chargee : facade originale conservee.`, error);
+    });
+  }
   /** Sous un décor assemblé : l'immeuble du dessous s'aligne sur la façade (le balcon dépasse en console) et prend sa largeur. */
   private fitLowerFloors(width: number, frontZ: number, backZ: number, topY = 0) {
     const ourD = 1.6 * DEPTH, BOTTOM = -9.0, H = -BOTTOM;
@@ -878,6 +966,8 @@ export class World {
   /** Applique un layout_<perso>.json écrit par jdp_assemblage.py : tout est posé là où tu l'as mis dans Blender. */
   applyLayout(L: Layout) {
     this.perso = L.character ?? ''; this.decaleMarcel = false;
+    this.setFacadeLea(this.perso === 'lea');
+    this.setFacadeExtra(this.perso === 'marcel' || this.perso === 'jimy' ? this.perso : '');
     const A = this.assets;
     const boxOf = (o: THREE.Object3D) => new THREE.Box3().setFromObject(o);
     let aptBox: THREE.Box3 | null = null; let balW = 0;
@@ -988,6 +1078,8 @@ export class World {
     this.installerSocleDeco();
   }
   setEnvironment(env?: { apartment?: string; balcony?: string; extra?: string; roof?: boolean; room?: boolean }, layout?: Layout | null) {
+    this.setFacadeLea(false);
+    this.setFacadeExtra('');
     this.retirerDeco(); this.regardDeco = null; decoActive = null;
     if (this.socleDeco) this.socleDeco.visible = false;
     this.hasRoom = env?.room !== false;
@@ -1167,6 +1259,8 @@ export class World {
   setNight(n: number) { this.targetNight = n; }
   private applyNight() {
     const n = this.night;
+    if (this.facadeLeaMaterial) this.facadeLeaMaterial.emissiveIntensity = .9 * n;
+    for (const material of this.facadeExtraMaterials.values()) material.emissiveIntensity = .9 * n;
     this.skyMat.uniforms.top.value.set('#9cc4e0').lerp(new THREE.Color('#1f2c48'), n);
     this.skyMat.uniforms.bottom.value.set('#eef1f3').lerp(new THREE.Color('#34456b'), n);
     this.hemi.intensity = .95 - .6 * n;
