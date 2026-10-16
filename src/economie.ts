@@ -440,7 +440,7 @@ export const CARACTERES: Record<string, { fr: string; accepte: number; poste: [n
   genereux: { fr: 'offre souvent', accepte: 0.75, poste: [7, 23] },
   discret:  { fr: 'peu d\'annonces', accepte: 0.85, poste: [9, 12] },
 };
-export function tickBot(im: Immeuble, b: Jardin, cat: Catalogue, now: number, r: () => number) {
+export function tickBot(im: Immeuble, b: Jardin, cat: Catalogue, now: number, r: () => number, echelle = 1) {
   tickJardin(b, cat, now); livrer(im, b, now, cat);
   const heure = new Date(now).getUTCHours() + 1;                                  // ~Paris
   const car = CARACTERES[b.caractere ?? 'rapide'];
@@ -455,6 +455,16 @@ export function tickBot(im: Immeuble, b: Jardin, cat: Catalogue, now: number, r:
   const humain0 = im.jardins.find(j => !j.bot);
   if (humain0 && !im._chauffe) for (const a of im.annonces) {
     if (a.accepte_par || a.de !== humain0.id || a.cherche.graine === POINTS) continue;
+    // Démo seulement : après 20 minutes simulées, un voisin fournit le stock manquant.
+    // Le troc et sa livraison passent toujours par les fonctions habituelles.
+    if ((echelle === 50 || echelle === 90) && now - a.cree_a >= 20 * MIN && now <= a.expire_a
+      && a.donne.graine !== POINTS && a.donne.graine !== a.cherche.graine
+      && cat.graines.some(g => g.id === a.donne.graine) && cat.graines.some(g => g.id === a.cherche.graine)
+      && Number.isInteger(a.donne.quantite) && a.donne.quantite > 0
+      && Number.isInteger(a.cherche.quantite) && a.cherche.quantite > 0) {
+      b.panier[a.cherche.graine] = Math.max(b.panier[a.cherche.graine] ?? 0, a.cherche.quantite);
+      if (accepterAnnonce(im, a, b, now)) break;
+    }
     const pourLui = valeur(im, a.donne) / Math.max(.01, valeur(im, a.cherche));        // ce qu'il reçoit / ce qu'il donne
     const chance = Math.min(.95, Math.max(.03, .85 * pourLui * pourLui));
     if ((b.panier[a.cherche.graine] ?? 0) >= a.cherche.quantite && r() < chance && accepterAnnonce(im, a, b, now)) break;
@@ -586,12 +596,11 @@ export function tickImmeuble(im: Immeuble, cat: Catalogue, now: number, r: () =>
   }
   if (im.reponses) im.reponses = im.reponses.filter(x => x.a > now);
   const p_cours = REGLES.COURS_PERIODE_MIN * MIN, p_bot = REGLES.BOT_PERIODE_MIN * MIN;
-  void echelle;
   if (now - im.cours_calcule_a >= p_cours) calculerCours(im, cat, now);
   nouveauJour(im, cat, now);
   for (const b of im.jardins) if (b.bot) {
     const bb = b as Jardin & { _tick?: number };
-    if (!bb._tick || now - bb._tick >= p_bot) { bb._tick = now; tickBot(im, b, cat, now, r); }
+    if (!bb._tick || now - bb._tick >= p_bot) { bb._tick = now; tickBot(im, b, cat, now, r, echelle); }
   }
   purgerAnnonces(im, now);
 }

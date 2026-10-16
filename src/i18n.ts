@@ -423,6 +423,7 @@ export type DictionnairePartiel<T> = T extends TexteFonction ? T
   : T extends object ? { [K in keyof T]?: DictionnairePartiel<T[K]> } : T;
 
 const EXTRA_EN = {
+  trocAttenteVoisin: 'If your offer is unfair to your neighbour, you may wait longer.',
   infosPlante: 'Plant info', infosVoirRecette: 'View the full recipe', infosChezToi: 'Cook it at home', infosDansJeu: 'In the game',
   infosBienfaits: 'Good to know', infosExposition: 'Light', infosArrosage: 'Watering', infosRecolte: 'Harvesting',
   infosPreparation: 'Preparation', infosCuisson: 'Cooking', infosRepos: 'Resting', infosTotal: 'Total', infosEtapes: 'Steps', infosAstuce: 'A little tip',
@@ -436,6 +437,7 @@ const EXTRA_EN = {
   typesRecetteArticle: { entree: 'a starter', plat: 'a main course', dessert: 'a dessert' }, recoltes: 'harvests',
 } as const;
 const EXTRA_FR = {
+  trocAttenteVoisin: "Si ton offre est désavantageuse pour le voisin, tu risques d'attendre plus longtemps.",
   infosPlante: 'Infos plante', infosVoirRecette: 'Voir la recette complète', infosChezToi: 'À cuisiner chez toi', infosDansJeu: 'Dans le jeu',
   infosBienfaits: 'Bienfaits', infosExposition: 'Exposition', infosArrosage: 'Arrosage', infosRecolte: 'Récolte',
   infosPreparation: 'Préparation', infosCuisson: 'Cuisson', infosRepos: 'Repos', infosTotal: 'Total', infosEtapes: 'Étapes', infosAstuce: 'La petite astuce',
@@ -541,6 +543,7 @@ export interface GraineQuantite { id: string; famille: string; nom_fr: string; n
 
 
 const ESPAGNOL = {
+  trocAttenteVoisin: 'Si tu oferta es desventajosa para el vecino, puede que esperes más tiempo.',
   infosPlante: 'Info de la planta', infosVoirRecette: 'Ver la receta completa', infosChezToi: 'Para cocinar en casa', infosDansJeu: 'En el juego',
   infosBienfaits: 'Qué te aporta', infosExposition: 'Luz', infosArrosage: 'Riego', infosRecolte: 'Cosecha',
   infosPreparation: 'Preparación', infosCuisson: 'Cocción', infosRepos: 'Reposo', infosTotal: 'Total', infosEtapes: 'Pasos', infosAstuce: 'Un pequeño truco',

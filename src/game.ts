@@ -134,12 +134,13 @@ export class Game {
   /** Un tour des règles : voisins, cours, jour, livraisons, événements. À appeler souvent, rattrape le temps passé. */
   private ecoTick(rattrapage = false) {
     const e = this.state.eco, now = this.ecoNow();
+    const echelle = this.demo ? (new URLSearchParams(location.search).get('demo') === '50' ? 50 : 90) : 1;
     this.syncJardin();
     let cur = rattrapage ? Math.max(e.immeuble.cours_calcule_a || now, now - 24 * E.H) : now;
     const pas = E.REGLES.BOT_PERIODE_MIN * E.MIN;
     let n = 0;
-    while (cur < now && n++ < 400) { E.tickImmeuble(e.immeuble, ECO, cur, this.ecoRng); cur += pas; }
-    E.tickImmeuble(e.immeuble, ECO, now, this.ecoRng);
+    while (cur < now && n++ < 400) { E.tickImmeuble(e.immeuble, ECO, cur, this.ecoRng, echelle); cur += pas; }
+    E.tickImmeuble(e.immeuble, ECO, now, this.ecoRng, echelle);
     E.livrer(e.immeuble, e.jardin, now, ECO);
     if ((e.jardin.etape ?? 0) >= 5) E.garantirMarche(e.immeuble, e.jardin, ECO, now);   // jamais bloqué : un voisin en a, et une annonce payable existe
     this.ecoEvenements();

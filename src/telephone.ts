@@ -594,7 +594,13 @@ export function renderTelephone(c: HTMLElement, onglet: Onglet, st: GameState, h
     }
     // 3. mes annonces (en vert), puis celles des voisins
     const miennes = ouvertes.filter(a => a.de === j.id);
-    if (miennes.length) { c.appendChild(el('div', 'ttl vert', s.mesAnnonces)); for (const a of miennes) c.appendChild(ligneAnnonce(a)); }
+    if (miennes.length) {
+      c.appendChild(el('div', 'ttl vert', s.mesAnnonces));
+      const attente = el('p', 'small'); attente.textContent = s.trocAttenteVoisin;
+      attente.style.color = '#687078'; attente.style.margin = '0 0 6px';
+      c.appendChild(attente);
+      for (const a of miennes) c.appendChild(ligneAnnonce(a));
+    }
     const autres = ouvertes.filter(a => a.de !== j.id && !mq.some(m => m.graine === a.donne.graine));
     c.appendChild(el('div', 'ttl', s.autresAnnonces));
     if (!autres.length) c.appendChild(el('p', 'empty', s.pasDAnnonce));
