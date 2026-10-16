@@ -724,6 +724,7 @@ export class UI {
     const brand0 = this.root.querySelector('#start .startTop .brand') as HTMLElement | null;
     const rb0 = brand0?.getBoundingClientRect();
     const sousTitre0 = rb0 && rb0.height > 0 && !$('#start').classList.contains('hidden') ? rb0.bottom + 8 : 0;
+    const desktop = !window.matchMedia('(max-width: 700px), (max-height: 520px) and (pointer: coarse)').matches;
     for (const l of list) {
       let e = this.tags.get(l.id);
       if (!e) { e = el('div', 'nameTag'); $('#bubbles').appendChild(e); this.tags.set(l.id, e); }
@@ -731,10 +732,11 @@ export class UI {
       const html = `${c ? tx(c.name) : l.id}<small>${c?.age ? s.years(c.age) : ''}</small>`; if (e.innerHTML !== html) e.innerHTML = html;
       const cls = 'nameTag' + (l.id === chosen ? ' chosen' : ''); if (e.className !== cls) e.className = cls;
       const place = Math.max(0, l.y - sousTitre0);                       // la place entre le bas du titre et la tete
-      const k = Math.min(1, place / 44);                                 // pas assez de place : le prenom retrecit, toujours entre les deux
+      const k = desktop ? 1 : Math.min(1, place / 44);
+      const y = desktop ? Math.max(l.y, sousTitre0 + 44) : l.y;
       e.style.display = l.visible && k > .3 ? 'block' : 'none';
       e.style.transformOrigin = '50% 100%';
-      e.style.transform = `translate(${l.x}px, ${l.y}px) translate(-50%, -100%) scale(${k.toFixed(3)})`;
+      e.style.transform = `translate(${l.x}px, ${y}px) translate(-50%, -100%) scale(${k.toFixed(3)})`;
     }
   }
   hideNameTags() { for (const e of this.tags.values()) e.style.display = 'none'; }
