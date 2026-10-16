@@ -7,6 +7,23 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 const empreinte = s => createHash('sha256').update(String(s)).digest();
 const pause = ms => new Promise(r => setTimeout(r, ms));
 
+/** Solde Tripo (TRIPO_API_KEY, déjà dans Vercel) : jamais bloquant, 4 s au plus, plusieurs adresses comme pour l'Atelier. */
+async function soldeTripo() {
+  const cle = process.env.TRIPO_API_KEY; if (!cle) return null;
+  const urls = ['https://openapi.tripo3d.ai/v3/account/balance', 'https://openapi.tripo3d.com/v3/account/balance', 'https://api.tripo3d.ai/v2/openapi/user/balance'];
+  for (const u of urls) {
+    try {
+      const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 4000);
+      const r = await fetch(u, { headers: { Authorization: `Bearer ${cle}` }, signal: ctl.signal }); clearTimeout(t);
+      if (!r.ok) continue;
+      const j = await r.json().catch(() => null), d = j && (j.data ?? j);
+      const solde = Number(d?.balance);
+      if (Number.isFinite(solde)) return { solde, gele: Number(d?.frozen) || 0 };
+    } catch { /* adresse suivante */ }
+  }
+  return null;
+}
+
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Robots-Tag', 'noindex');
@@ -27,17 +44,18 @@ export default async function handler(req, res) {
       if (!r.ok) { res.status(502).json({ erreur: 'supabase', detail: `${r.status} ${t.slice(0, 300)}` }); return; }
       res.status(200).json({ ok: true, codes: JSON.parse(t) }); return;
     }
-    const [r, rc] = await Promise.all([
+    const [r, rc, tripo] = await Promise.all([
       fetch(`${SB}/rpc/tableau_de_bord`, { method: 'POST', headers: { apikey: cle, 'Content-Type': 'application/json' }, body: JSON.stringify({ p_periode: periode }) }),
       // les codes de l'Atelier et, pour chaque code utilisé, la création qui va avec (si les tables n'existent pas encore, on s'en passe)
       fetch(`${SB}/codes_atelier?select=code,cree_le,note,utilise_le,donne_le,creations(statut,progres,prompt,url_image,url_modele,erreur,cree_le)&order=cree_le.asc`, { headers: { apikey: cle } }).catch(() => null),
+      soldeTripo().catch(() => null),
     ]);
     const texte = await r.text();
     if (!r.ok) { res.status(502).json({ erreur: 'supabase', detail: `${r.status} ${texte.slice(0, 300)}` }); return; }
     let codes = null;
     try { if (rc && rc.ok) codes = await rc.json(); } catch { codes = null; }
     let corps = texte;
-    try { const j = JSON.parse(texte); if (j && typeof j === 'object' && Array.isArray(codes)) { j.codes = codes; corps = JSON.stringify(j); } } catch { /* on renvoie tel quel */ }
+    try { const j = JSON.parse(texte); if (j && typeof j === 'object') { if (Array.isArray(codes)) j.codes = codes; j.tripo = tripo; corps = JSON.stringify(j); } } catch { /* on renvoie tel quel */ }
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.status(200).send(corps);
   } catch (e) {

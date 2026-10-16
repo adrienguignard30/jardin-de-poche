@@ -102,7 +102,7 @@
   .message { margin: 12px 0 0; color: var(--alerte); font-size: 14px; min-height: 1em; }
 
   /* chiffres clés */
-  .tuiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .tuiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-bottom: 14px; }
   .tuile { background: var(--carte); border: 1px solid var(--trait); border-radius: 14px; padding: 12px 14px; box-shadow: var(--ombre); min-width: 0; }
   .tuile .lib { font-size: 12.5px; color: var(--encre-2); display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tuile .val { font-size: 28px; font-weight: 650; line-height: 1.1; margin-top: 5px; }
@@ -277,6 +277,7 @@
       <div class="tuile"><div class="lib">Nouveaux visiteurs</div><div class="val num" id="tNouveaux">–</div><div class="sous" id="tNouveauxSous">&nbsp;</div></div>
       <div class="tuile"><div class="lib">Revenus jouer</div><div class="val num" id="tRevenus">–</div><div class="sous">venus 2 jours différents ou plus</div></div>
       <div class="tuile"><div class="lib">Chargement · FPS</div><div class="val num" id="tPerf">–</div><div class="sous" id="tPerfSous">&nbsp;</div></div>
+      <div class="tuile cliquable" id="tuileTripo" data-va="codes" title="Voir les codes"><div class="lib">Crédits Tripo</div><div class="val num" id="tTripo">–</div><div class="sous" id="tTripoSous">&nbsp;</div></div>
       <div class="tuile cliquable" id="tuileBugs" data-va="bugs" title="Voir les bugs"><div class="lib">Bugs</div><div class="val num" id="tBugs">–</div><div class="sous" id="tBugsSous">&nbsp;</div></div>
     </div>
 
@@ -521,6 +522,14 @@ var qrcode=(function(){var P=function(x,w){var g=236,l=17,n=x,s=O[w],t=null,r=0,
     $('tuileBugs').className = 'tuile cliquable ' + (nb > 0 ? 'ko' : 'ok');
     $('tBugs').textContent = nb > 0 ? `⚠ ${nombre(nb)}` : '✓ 0';
     $('tBugsSous').textContent = nb > 0 ? `dans ${pluriel(K.sessions_bug || 0, 'session', 'sessions')} · ${periodeTexte()}` : `aucune erreur · ${periodeTexte()}`;
+    // crédits Tripo : environ 50 par objet en qualité Ultra
+    const T = d.tripo;
+    if (T && Number.isFinite(T.solde)) {
+      $('tTripo').textContent = nombre(Math.round(T.solde));
+      $('tTripoSous').textContent = `≈ ${nombre(Math.floor(T.solde / 50))} objets Ultra${T.gele ? ` · ${nombre(Math.round(T.gele))} en cours` : ''}`;
+      $('tuileTripo').className = 'tuile cliquable ' + (T.solde < 250 ? 'ko' : 'ok');
+      $('oCodes').dataset.tripo = Math.round(T.solde);
+    } else { $('tTripo').textContent = '?'; $('tTripoSous').textContent = 'solde indisponible'; $('tuileTripo').className = 'tuile cliquable'; }
     dessinerActivite(d.serie || []);
     dessinerRepartition(d);
     dessinerDurees(d.durees || {}, K.sessions || 0);
@@ -684,7 +693,8 @@ var qrcode=(function(){var P=function(x,w){var g=236,l=17,n=x,s=O[w],t=null,r=0,
     const libres = liste.filter(c => !c.utilise_le && !c.donne_le), donnes = liste.filter(c => !c.utilise_le && c.donne_le), pris = liste.filter(c => c.utilise_le);
     $('nbCodes').textContent = liste.length ? `${liste.length}` : '';
     $('oCodes').textContent = liste.length ? pluriel(libres.length, 'libre', 'libres') : '';
-    $('codesResume').textContent = liste.length ? `${pluriel(libres.length, 'code libre', 'codes libres')} · ${pluriel(donnes.length, 'donné', 'donnés')} · ${pluriel(pris.length, 'utilisé', 'utilisés')}` : 'Aucun code : lance  select * from creer_codes(30, \'POTAGER\');  dans Supabase.';
+    const cr = donnees && donnees.tripo && Number.isFinite(donnees.tripo.solde) ? ` · crédits Tripo : ${nombre(Math.round(donnees.tripo.solde))} (≈ ${nombre(Math.floor(donnees.tripo.solde / 50))} objets)` : '';
+    $('codesResume').textContent = liste.length ? `${pluriel(libres.length, 'code libre', 'codes libres')} · ${pluriel(donnes.length, 'donné', 'donnés')} · ${pluriel(pris.length, 'utilisé', 'utilisés')}${cr}` : 'Aucun code : lance  select * from creer_codes(30, \'POTAGER\');  dans Supabase.';
     $('copierCodes').hidden = !libres.length;
     liste.forEach((c, i) => {
       const cr = Array.isArray(c.creations) ? c.creations[0] : c.creations;
