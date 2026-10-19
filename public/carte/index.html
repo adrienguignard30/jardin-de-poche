@@ -3,70 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Adrien Guignard — Potager de Poche</title>
-<meta name="description" content="Adrien Guignard · Potager de Poche, un jeu 3D fait avec Tripo.">
-<meta name="theme-color" content="#2f6b2a">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f6b2a'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial' font-weight='700' font-size='28' fill='%23fff'%3EAG%3C/text%3E%3C/svg%3E">
+<title>Agent Frog — Potager de Poche</title>
+<meta name="description" content="Agent Frog · Potager de Poche">
+<meta name="theme-color" content="#7b86e6">
+<link rel="icon" href="pfp.png">
 <link rel="stylesheet" href="/fonts/nunito.css">
 <style>
-  :root { --vert: #2f6b2a; --terre: #c9714b; --encre: #1f2a22; --muet: #5f6b62; --fond: #f4f1e8; --carte: #fffdf8; --trait: #e4ded0; }
+  :root { --encre: #1f2a22; --muet: #5f6b62; --fond: #f4f1e8; --carte: #fffdf8; --trait: #e4ded0; --x: #111; }
   * { box-sizing: border-box; }
   body { margin: 0; min-height: 100dvh; background: var(--fond); color: var(--encre); font: 600 16px/1.45 Nunito, system-ui, sans-serif; display: flex; align-items: center; justify-content: center; padding: 20px 16px; }
-  .carte { width: min(420px, 100%); background: var(--carte); border: 1px solid var(--trait); border-radius: 24px; padding: 28px 22px 22px; box-shadow: 0 18px 50px rgba(31,42,34,.12); text-align: center; }
-  .avatar { width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 12px; display: grid; place-items: center; background: var(--vert); color: #fff; font-weight: 800; font-size: 30px; letter-spacing: .02em; }
-  h1 { margin: 0; font-size: 26px; font-weight: 800; }
-  .role { margin: 4px 0 2px; color: var(--terre); font-weight: 800; font-size: 17px; }
-  .sous { margin: 0 0 18px; color: var(--muet); font-size: 14.5px; }
-  .actions { display: grid; gap: 10px; }
-  .actions a { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; border-radius: 14px; text-decoration: none; font-weight: 800; font-size: 16px; border: 1px solid var(--trait); color: var(--encre); background: #fff; }
-  .actions a.principal { background: var(--vert); color: #fff; border-color: var(--vert); }
-  .actions a:active { transform: scale(.98); }
-  .mail { margin-top: 16px; font-size: 14px; color: var(--muet); word-break: break-all; }
-  .langues { margin-top: 14px; display: flex; justify-content: center; gap: 6px; }
-  .langues button { font: 800 13px Nunito, system-ui, sans-serif; border: 1px solid var(--trait); background: transparent; color: var(--muet); border-radius: 10px; padding: 6px 10px; cursor: pointer; }
-  .langues button.actif { background: var(--encre); color: #fff; border-color: var(--encre); }
-  .pied { margin-top: 14px; font-size: 12px; color: var(--muet); }
+  .carte { width: min(380px, 100%); background: var(--carte); border: 1px solid var(--trait); border-radius: 24px; padding: 30px 22px 26px; box-shadow: 0 18px 50px rgba(31,42,34,.12); text-align: center; }
+  .pfp { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 16px; display: block; object-fit: cover; box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+  h1 { margin: 0; font-size: 30px; font-weight: 800; letter-spacing: .01em; }
+  .prenom { margin: 4px 0 22px; color: var(--muet); font-weight: 700; font-size: 17px; }
+  a.x { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 54px; border-radius: 14px; text-decoration: none; font-weight: 800; font-size: 17px; background: var(--x); color: #fff; }
+  a.x:active { transform: scale(.98); }
+  a.x svg { width: 20px; height: 20px; fill: #fff; }
 </style>
 </head>
 <body>
 <main class="carte">
-  <div class="avatar" aria-hidden="true">AG</div>
-  <h1>Adrien Guignard</h1>
-  <p class="role" id="role"></p>
-  <p class="sous" id="sous"></p>
-  <div class="actions">
-    <a class="principal" href="adrien-guignard.vcf" download="adrien-guignard.vcf" id="aContact"></a>
-    <a href="mailto:adrienguignard30@gmail.com" id="aMail"></a>
-    <a href="/" id="aJeu"></a>
-    <a href="/tableau/demo.html" id="aDemo"></a>
-  </div>
-  <div class="mail">adrienguignard30@gmail.com</div>
-  <div class="langues" id="langues"><button type="button" data-l="fr">FR</button><button type="button" data-l="en">EN</button><button type="button" data-l="es">ES</button></div>
-  <div class="pied">Tripothon S1 · Demo Day · Barcelona 2026</div>
+  <img class="pfp" src="pfp.png" alt="Agent Frog">
+  <h1>Agent Frog</h1>
+  <p class="prenom">Adrien</p>
+  <a class="x" href="https://x.com/Adrienfam_arts" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-7.2 8.3L23.3 22h-6.6l-5.2-6.8L5.6 22H2.4l7.7-8.8L1.6 2h6.8l4.7 6.2L18.9 2zm-1.2 18h1.8L7.4 3.9H5.5L17.7 20z"/></svg>@Adrienfam_arts</a>
 </main>
-<script>
-(() => {
-  const T = {
-    fr: { role: 'Créateur de Potager de Poche', sous: 'Un jeu 3D fait avec Tripo : un potager de balcon pour ceux qui n’ont pas de jardin.', contact: '👤 Enregistrer le contact', mail: '✉️ M’écrire', jeu: '🌱 Jouer', demo: '▶ Voir la présentation' },
-    en: { role: 'Creator of Pocket Kitchen Garden', sous: 'A 3D game made with Tripo: a balcony vegetable garden for those who have no garden.', contact: '👤 Save contact', mail: '✉️ Email me', jeu: '🌱 Play', demo: '▶ See the presentation' },
-    es: { role: 'Creador de Huerto de Bolsillo', sous: 'Un juego 3D hecho con Tripo: un huerto de balcón para quienes no tienen jardín.', contact: '👤 Guardar contacto', mail: '✉️ Escríbeme', jeu: '🌱 Jugar', demo: '▶ Ver la presentación' },
-  };
-  const $ = id => document.getElementById(id);
-  function appliquer(l) {
-    const t = T[l] || T.en;
-    $('role').textContent = t.role; $('sous').textContent = t.sous;
-    $('aContact').textContent = t.contact; $('aMail').textContent = t.mail; $('aJeu').textContent = t.jeu; $('aDemo').textContent = t.demo;
-    $('aJeu').href = `/?lang=${l}`; $('aDemo').href = `/tableau/demo.html?lang=${l}`;
-    document.documentElement.lang = l;
-    document.querySelectorAll('#langues button').forEach(b => b.classList.toggle('actif', b.dataset.l === l));
-  }
-  const p = new URLSearchParams(location.search).get('lang');
-  const nav = (navigator.language || 'en').slice(0, 2);
-  const l = ['fr', 'en', 'es'].includes(p) ? p : ['fr', 'en', 'es'].includes(nav) ? nav : 'en';
-  document.querySelectorAll('#langues button').forEach(b => b.onclick = () => appliquer(b.dataset.l));
-  appliquer(l);
-})();
-</script>
 <script src="/suivi-page.js"></script>
 </body>
 </html>
