@@ -145,6 +145,8 @@
   .hbarres .nom { font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .hbarres .piste { height: 10px; background: var(--barre-piste); border-radius: 0 4px 4px 0; overflow: hidden; }
   .hbarres .rempli { height: 100%; background: var(--barre); border-radius: 0 4px 4px 0; min-width: 2px; }
+  .tab .piste { display: inline-block; vertical-align: middle; width: 90px; height: 8px; background: var(--barre-piste); border-radius: 4px; overflow: hidden; margin-right: 6px; }
+  .tab .rempli { height: 100%; background: var(--barre); border-radius: 4px; min-width: 2px; }
   .hbarres .n { font-size: 13px; color: var(--encre-2); text-align: right; }
 
   /* codes de l'Atelier */
@@ -273,7 +275,8 @@
       <div class="tuile cliquable" data-va="sessions" title="Voir les sessions"><div class="lib"><span class="pastille" id="pDirect"></span>En ce moment</div><div class="val num" id="tDirect">–</div><div class="sous">en train de jouer</div></div>
       <div class="tuile cliquable" data-va="sessions" title="Voir les visiteurs"><div class="lib">Visiteurs</div><div class="val num" id="tVisiteurs">–</div><div class="sous" id="tVisiteursSous">&nbsp;</div></div>
       <div class="tuile cliquable" data-va="sessions" title="Voir les sessions"><div class="lib">Sessions</div><div class="val num" id="tSessions">–</div><div class="sous" id="tSessionsSous">&nbsp;</div></div>
-      <div class="tuile"><div class="lib">Temps joué</div><div class="val num" id="tTemps">–</div><div class="sous" id="tTempsSous">&nbsp;</div></div>
+      <div class="tuile"><div class="lib">Temps dans le jeu</div><div class="val num" id="tTemps">–</div><div class="sous" id="tTempsSous">&nbsp;</div></div>
+      <div class="tuile cliquable" data-va="sessions" title="Voir le détail par page"><div class="lib">Vidéo · démo · pitch…</div><div class="val num" id="tPages">–</div><div class="sous" id="tPagesSous">&nbsp;</div></div>
       <div class="tuile"><div class="lib">Nouveaux visiteurs</div><div class="val num" id="tNouveaux">–</div><div class="sous" id="tNouveauxSous">&nbsp;</div></div>
       <div class="tuile"><div class="lib">Revenus jouer</div><div class="val num" id="tRevenus">–</div><div class="sous">venus 2 jours différents ou plus</div></div>
       <div class="tuile"><div class="lib">Chargement · FPS</div><div class="val num" id="tPerf">–</div><div class="sous" id="tPerfSous">&nbsp;</div></div>
@@ -310,13 +313,18 @@
 
     <div class="page" id="pageSessions">
     <div class="grille">
+      <section class="carte large" id="cPages" aria-labelledby="hPages">
+        <h2 id="hPages">Temps par page <span class="nb">sur la période</span><span class="droite">où passent les visiteurs</span></h2>
+        <div class="tabWrap"><table class="tab" id="pages"></table></div>
+      </section>
+
       <section class="carte large" id="cSessions" aria-labelledby="hSessions">
         <h2 id="hSessions">Sessions récentes <span class="nb" id="nbSessions"></span></h2>
         <div class="tabWrap defile"><table class="tab" id="sessions"></table></div>
       </section>
 
       <section class="carte large" id="cVisiteurs" aria-labelledby="hVisiteurs">
-        <h2 id="hVisiteurs">Visiteurs <span class="nb" id="nbVisiteurs"></span><span class="droite">60 derniers · temps de jeu total</span></h2>
+        <h2 id="hVisiteurs">Visiteurs <span class="nb" id="nbVisiteurs"></span><span class="droite">60 derniers · temps total, toutes pages</span></h2>
         <div class="recherche"><input type="search" id="filtre" placeholder="Chercher un nom, une ville, un appareil…" aria-label="Chercher"></div>
         <div class="tabWrap defile"><table class="tab" id="visiteurs"></table></div>
       </section>
@@ -523,6 +531,8 @@ var qrcode=(function(){var P=function(x,w){var g=236,l=17,n=x,s=O[w],t=null,r=0,
     $('tSessionsSous').textContent = K.visiteurs ? `${(K.sessions / K.visiteurs).toFixed(1)} par visiteur` : 'aucune';
     $('tTemps').textContent = duree(K.secondes);
     $('tTempsSous').textContent = K.moyenne ? `${duree(K.moyenne)} par session en moyenne` : 'pas encore de session';
+    { const hors = Math.max(0, (K.secondes_tout || 0) - (K.secondes || 0)); $('tPages').textContent = duree(hors); $('tPagesSous').textContent = hors ? `hors jeu · ${duree(K.secondes_tout || 0)} en tout` : 'personne sur les autres pages'; }
+    dessinerPages(d.pages || []);
     $('tNouveaux').textContent = nombre(K.nouveaux);
     $('tNouveauxSous').textContent = `jamais vus avant · ${pluriel(K.comptes || 0, 'compte créé', 'comptes créés')} en tout`;
     $('tRevenus').textContent = nombre(K.revenus);
@@ -613,6 +623,32 @@ var qrcode=(function(){var P=function(x,w){var g=236,l=17,n=x,s=O[w],t=null,r=0,
     dessinerHBarres(box, [['moins1', 'moins d’1 min'], ['de1a5', '1 à 5 min'], ['de5a15', '5 à 15 min'], ['plus15', 'plus de 15 min']].map(([k, nom]) => ({ nom, n: du[k] || 0 })));
   }
 
+  // ---------- les pages suivies : libellé lisible
+  const NOMS_PAGES = { '/': '🌱 Jeu', '/?demo': '⏩ Jeu (démo)', '/video/': '🎬 Vidéo', '/tableau/demo.html': '🛠️ Comment je l’ai fait', '/tableau/pitch.html': '🎤 Pitch', '/carte/': '👤 Carte de visite', '/ar/': '📱 AR' };
+  const nomPage = p => NOMS_PAGES[p] || (p && p.startsWith('/ar') ? '📱 AR' : p && p.startsWith('/index') ? '🌱 Jeu' : (p || '🌱 Jeu'));
+  const estJeu = p => !p || !/^\/(tableau\/|carte|ar\/|video)/.test(p);
+  function dessinerPages(liste) {
+    const t = $('pages'); if (!t) return; t.replaceChildren();
+    // le jeu en une ligne (toutes ses variantes), puis les autres pages
+    const agg = new Map();
+    for (const x of liste) { const k = estJeu(x.page) ? '/' : x.page; const a = agg.get(k) || { page: k, secondes: 0, visiteurs: 0, sessions: 0 }; a.secondes += x.secondes || 0; a.visiteurs = Math.max(a.visiteurs, x.visiteurs || 0); a.sessions += x.sessions || 0; agg.set(k, a); }
+    const lignes = [...agg.values()].sort((a, b) => b.secondes - a.secondes);
+    if (!lignes.length) { t.append(h('caption', 'vide', 'Rien pour l’instant.')); return; }
+    const total = lignes.reduce((a, x) => a + x.secondes, 0) || 1;
+    const thead = h('thead'); const tr = h('tr'); for (const c of ['Page', 'Temps', 'Part', 'Visiteurs', 'Ouvertures']) tr.append(h('th', null, c)); thead.append(tr); t.append(thead);
+    const tb = h('tbody');
+    for (const x of lignes) {
+      const r = h('tr');
+      r.append(h('td', null, nomPage(x.page)));
+      r.append(h('td', 'num', duree(x.secondes)));
+      const tdP = h('td'); const piste = h('div', 'piste'); piste.style.minWidth = '90px'; const rem = h('div', 'rempli'); rem.style.width = `${Math.round(x.secondes / total * 100)}%`; piste.append(rem); tdP.append(piste, h('span', 'sousligne', ` ${Math.round(x.secondes / total * 100)} %`)); r.append(tdP);
+      r.append(h('td', 'num', nombre(x.visiteurs)));
+      r.append(h('td', 'num', nombre(x.sessions)));
+      tb.append(r);
+    }
+    t.append(tb);
+  }
+
   // ---------- visiteurs
   let visiteursListe = [];
   function dessinerVisiteurs(liste) {
@@ -625,7 +661,7 @@ var qrcode=(function(){var P=function(x,w){var g=236,l=17,n=x,s=O[w],t=null,r=0,
     $('nbVisiteurs').textContent = visiteursListe.length ? (f ? `${liste.length} sur ${visiteursListe.length}` : `${visiteursListe.length}`) : '';
     if (!liste.length) { t.append(h('caption', 'vide', visiteursListe.length ? 'Aucun visiteur ne correspond.' : 'Personne n’a encore joué.')); return; }
     const thead = h('thead'); const tr = h('tr');
-    for (const c of ['Qui', 'Où', 'Appareil', 'Langue', 'Temps joué', 'Sessions', 'Jours', 'Persos', 'Plats', 'Bugs', 'Dernière visite', 'Première visite']) tr.append(h('th', null, c));
+    for (const c of ['Qui', 'Où', 'Appareil', 'Langue', 'Temps total', 'Par page', 'Sessions', 'Jours', 'Persos', 'Plats', 'Bugs', 'Dernière visite', 'Première visite']) tr.append(h('th', null, c));
     thead.append(tr); t.append(thead);
     const tb = h('tbody');
     for (const v of liste) {
@@ -638,6 +674,10 @@ var qrcode=(function(){var P=function(x,w){var g=236,l=17,n=x,s=O[w],t=null,r=0,
       r.append(h('td', null, v.appareil || '?'));
       r.append(h('td', null, LANGUES[v.langue] || v.langue || '?'));
       r.append(h('td', 'num', duree(v.secondes)));
+      { const tdPg = h('td'); const pg = new Map(); for (const [k, sec] of Object.entries(v.pages || {})) { const n = estJeu(k) ? '/' : k; pg.set(n, (pg.get(n) || 0) + (sec || 0)); }
+        const l = [...pg.entries()].filter(([, sec]) => sec > 0).sort((a, b) => b[1] - a[1]);
+        if (!l.length) tdPg.textContent = '–'; else for (const [k, sec] of l) { const puce = h('span', 'puce', `${nomPage(k)} ${duree(sec)}`); puce.style.marginRight = '4px'; tdPg.append(puce); }
+        r.append(tdPg); }
       r.append(h('td', 'num', nombre(v.sessions)));
       r.append(h('td', 'num', nombre(v.jours)));
       const tdP = h('td'); for (const p of (v.persos || [])) tdP.append(h('span', 'puce', PERSOS[p] || p)); r.append(tdP);
@@ -664,7 +704,7 @@ var qrcode=(function(){var P=function(x,w){var g=236,l=17,n=x,s=O[w],t=null,r=0,
       const td0 = h('td', null, fmtDateHeure.format(new Date(s.debut))); if (s.en_cours) td0.append(' ', h('span', 'puce', 'en cours')); r.append(td0);
       const qui = h('div', 'qui'); qui.append(h('span', null, s.pseudo ? `@${s.pseudo}` : (s.nom || 'Visiteur')), h('span', 'id', s.empreinte.slice(0, 6))); const tdQ = h('td'); tdQ.append(qui); r.append(tdQ);
       r.append(h('td', null, `${drapeau(s.pays)} ${lieu(s.ville, s.pays)}`.trim()));
-      r.append(h('td', null, PERSOS[s.perso] || s.perso || '–'));
+      r.append(h('td', null, estJeu(s.page) ? (PERSOS[s.perso] || s.perso || '–') : nomPage(s.page)));
       r.append(h('td', 'num', duree(s.secondes)));
       r.append(h('td', null, s.appareil || '?'));
       r.append(h('td', null, LANGUES[s.langue] || s.langue || '?'));

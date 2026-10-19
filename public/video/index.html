@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr" data-suivi="/video/">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Potager de Poche · la vidéo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23f2a33a'/%3E%3Cpath d='M24 18l22 14-22 14z' fill='%23111'/%3E%3C/svg%3E">
+<style>
+  :root { --fond: #0f1a14; --encre: #f6f1e7; --muet: #a9b3ad; --trait: rgba(255,255,255,.14); }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--fond); color: var(--encre); font: 16px Nunito, system-ui, -apple-system, sans-serif; }
+  body { display: flex; flex-direction: column; min-height: 100dvh; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); gap: 12px; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  h1 { margin: 0; font-size: 18px; font-weight: 800; }
+  .langs { display: flex; gap: 6px; }
+  .langs a { color: var(--encre); text-decoration: none; font-weight: 800; font-size: 13px; padding: 6px 10px; border: 1px solid var(--trait); border-radius: 10px; }
+  .langs a.actif { background: var(--encre); color: var(--fond); border-color: var(--encre); }
+  main { flex: 1; display: flex; align-items: center; justify-content: center; }
+  video { width: 100%; max-width: 1100px; max-height: calc(100dvh - 140px); border-radius: 14px; background: #000; box-shadow: 0 18px 50px rgba(0,0,0,.4); }
+  footer { display: flex; justify-content: center; }
+  footer a { color: var(--fond); background: #8fd19e; text-decoration: none; font-weight: 800; padding: 11px 18px; border-radius: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="titre">Potager de Poche · la vidéo</h1>
+  <nav class="langs" aria-label="Langue"><a href="?lang=fr" data-l="fr">FR</a><a href="?lang=en" data-l="en">EN</a><a href="?lang=es" data-l="es">ES</a></nav>
+</header>
+<main><video id="v" controls autoplay playsinline preload="metadata"></video></main>
+<footer><a id="jouer" href="/">🌱 Jouer</a></footer>
+<script>
+  (function () {
+    var l = (new URLSearchParams(location.search).get('lang') || 'fr').toLowerCase(); if (['fr', 'en', 'es'].indexOf(l) < 0) l = 'fr';
+    document.documentElement.lang = l;
+    var T = { fr: ['Potager de Poche · la vidéo', '🌱 Jouer'], en: ['Pocket Kitchen Garden · the video', '🌱 Play'], es: ['Huerto de Bolsillo · el vídeo', '🌱 Jugar'] }[l];
+    document.title = T[0]; document.getElementById('titre').textContent = T[0];
+    var j = document.getElementById('jouer'); j.textContent = T[1]; j.href = '/?lang=' + l;
+    document.querySelectorAll('.langs a').forEach(function (a) { a.classList.toggle('actif', a.dataset.l === l); });
+    var v = document.getElementById('v'); v.src = '/video/potager-' + l + '.mp4';
+    // le suivi ne compte que pendant la lecture
+    window.JDP_SUIVI_ACTIF = function () { return !v.paused && !v.ended; };
+    ['play', 'pause', 'ended'].forEach(function (e) { v.addEventListener(e, function () { if (window.JDP_SUIVI_MAJ) window.JDP_SUIVI_MAJ(); }); });
+  })();
+</script>
+<script src="/suivi-page.js"></script>
+</body>
+</html>

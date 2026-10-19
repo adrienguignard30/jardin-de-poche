@@ -9,15 +9,15 @@ export type Lang = typeof LANGUES[number]['id'];
 const GUIDE_ACCUEIL = {
   fr: {
     titre: 'Bienvenue ! Voici ton menu ⚙', passer: 'Passer', fin: "C'est parti", revoir: 'Revoir le guide',
-    lignes: ['La vidéo de présentation du jeu.', 'Comment j’ai créé ce jeu, étape par étape.', 'Les règles en 1 minute : semer, arroser, récolter, cuisiner, offrir.', 'Les meilleurs jardiniers. Crée un compte pour y figurer.', 'Léa, Marcel et Jimy en réalité augmentée, dans ta pièce, avec ton appareil photo.', 'Connecte-toi ou crée un compte : tu entres dans le classement et tu retrouves ton balcon sur tous tes appareils.', 'Pour voir tes plantes pousser en accéléré : Normal, ×50 ou ×90.'],
+    lignes: ['La vidéo de présentation du jeu.', 'Comment j’ai créé ce jeu, étape par étape.', 'Ma carte : qui je suis, et où me suivre.', 'Les règles en 1 minute : semer, arroser, récolter, cuisiner, offrir.', 'Les meilleurs jardiniers. Crée un compte pour y figurer.', 'Léa, Marcel et Jimy en réalité augmentée, dans ta pièce, avec ton appareil photo.', 'Connecte-toi ou crée un compte : tu entres dans le classement et tu retrouves ton balcon sur tous tes appareils.', 'Pour voir tes plantes pousser en accéléré : Normal, ×50 ou ×90.'],
   },
   en: {
     titre: 'Welcome! Here is your menu ⚙', passer: 'Skip', fin: "Let's go", revoir: 'Show the guide again',
-    lignes: ['The game’s presentation video.', 'How I made this game, step by step.', 'The rules in 1 minute: sow, water, harvest, cook, give.', 'The best gardeners. Create an account to join the leaderboard.', 'Léa, Marcel and Jimy in augmented reality, in your room, using your camera.', 'Sign in or create an account: join the leaderboard and access your balcony on all your devices.', 'Watch your plants grow faster: Normal, ×50 or ×90.'],
+    lignes: ['The game’s presentation video.', 'How I made this game, step by step.', 'My card: who I am, and where to follow me.', 'The rules in 1 minute: sow, water, harvest, cook, give.', 'The best gardeners. Create an account to join the leaderboard.', 'Léa, Marcel and Jimy in augmented reality, in your room, using your camera.', 'Sign in or create an account: join the leaderboard and access your balcony on all your devices.', 'Watch your plants grow faster: Normal, ×50 or ×90.'],
   },
   es: {
     titre: '¡Bienvenido! Este es tu menú ⚙', passer: 'Omitir', fin: '¡Vamos!', revoir: 'Volver a ver la guía',
-    lignes: ['El vídeo de presentación del juego.', 'Cómo hice este juego, paso a paso.', 'Las reglas en 1 minuto: sembrar, regar, cosechar, cocinar, regalar.', 'Los mejores jardineros. Crea una cuenta para aparecer en la clasificación.', 'Léa, Marcel y Jimy en realidad aumentada, en tu habitación, con tu cámara.', 'Inicia sesión o crea una cuenta: entra en la clasificación y accede a tu balcón desde todos tus dispositivos.', 'Para ver tus plantas crecer más rápido: Normal, ×50 o ×90.'],
+    lignes: ['El vídeo de presentación del juego.', 'Cómo hice este juego, paso a paso.', 'Mi tarjeta: quién soy y dónde seguirme.', 'Las reglas en 1 minuto: sembrar, regar, cosechar, cocinar, regalar.', 'Los mejores jardineros. Crea una cuenta para aparecer en la clasificación.', 'Léa, Marcel y Jimy en realidad aumentada, en tu habitación, con tu cámara.', 'Inicia sesión o crea una cuenta: entra en la clasificación y accede a tu balcón desde todos tus dispositivos.', 'Para ver tus plantas crecer más rápido: Normal, ×50 o ×90.'],
   },
 };
 export function guideAccueil() { return GUIDE_ACCUEIL[lang()]; }

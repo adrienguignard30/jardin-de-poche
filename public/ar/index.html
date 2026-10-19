@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-suivi="/ar/">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -189,5 +189,6 @@ const detecterLangue = () => {
   // sans caméra AR (ordinateur), le bouton explique quoi faire
   document.querySelectorAll('model-viewer').forEach(mv => mv.addEventListener('load', () => { if (!mv.canActivateAR) mv.closest('.carte').querySelector('.bouton').style.display = 'none'; }));   // pas de bouton sur ordinateur
 </script>
+<script src="/suivi-page.js"></script>
 </body>
 </html>
